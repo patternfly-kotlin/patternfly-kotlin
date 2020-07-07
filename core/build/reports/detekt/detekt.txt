@@ -1,0 +1,21 @@
+LongParameterList - 6/6 - [pfButton] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Button.kt:10:26 - Signature=Button.kt$( style: Style, text: String? = null, iconClass: String? = null, iconRight: Boolean = false, blockLevel: Boolean = false, content: Button.() -> Unit = {} )
+EnumNaming - [_4xl] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:55:5 - Signature=Types.kt$Size._4xl$_4xl
+EnumNaming - [_3xl] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:56:5 - Signature=Types.kt$Size._3xl$_3xl
+EnumNaming - [_2xl] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:57:5 - Signature=Types.kt$Size._2xl$_2xl
+EnumNaming - [xl] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:58:5 - Signature=Types.kt$Size.xl$xl
+EnumNaming - [lg] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:59:5 - Signature=Types.kt$Size.lg$lg
+EnumNaming - [md] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:60:5 - Signature=Types.kt$Size.md$md
+EnumNaming - [primary] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:64:5 - Signature=Types.kt$Style.primary$primary
+EnumNaming - [secondary] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:65:5 - Signature=Types.kt$Style.secondary$secondary
+EnumNaming - [tertiary] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:66:5 - Signature=Types.kt$Style.tertiary$tertiary
+EnumNaming - [danger] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:67:5 - Signature=Types.kt$Style.danger$danger
+SpreadOperator - [unique] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:25:76 - Signature=Id.kt$Id$(id, *additionalIds)
+SpreadOperator - [segments] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:28:30 - Signature=Id.kt$Id$(id, *additionalIds)
+SpreadOperator - [component] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/CSS.kt:3:64 - Signature=CSS.kt$("pf-c", this, *elements)
+SpreadOperator - [layout] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/CSS.kt:5:61 - Signature=CSS.kt$("pf-l", this, *elements)
+SpreadOperator - [Button] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Button.kt:60:34 - Signature=Button.kt$Button$(*modifier.toTypedArray())
+SpreadOperator - [pfSection] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt:9:21 - Signature=Section.kt$(*classes)
+SpreadOperator - [Section] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt:17:48 - Signature=Section.kt$Section$(*classes)
+MaxLineLength - [ByAttribute] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/By.kt:122:1 - Signature=By.kt$ByAttribute$private open
+MagicNumber - [notificationTimeout] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Settings.kt:5:36 - Signature=Settings.kt$Settings$8000
+MagicNumber - [<anonymous>] at /Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Navigation.kt:112:23 - Signature=Navigation.kt$NavigationExpandableGroup$333

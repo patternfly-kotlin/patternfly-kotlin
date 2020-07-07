@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>detekt report</title>
+    <style>
+h2 {
+  background-color: #666666;
+  padding: 0.2em;
+  color: #ffffff;
+}
+h3 {
+  background-color:#f8dfdf;
+  padding:0.5em;
+}
+.rule {
+  background-color: #dddddd;
+  padding: 0.3em;
+  font-weight: bold;
+}
+.description {
+  color:#000000;
+  padding:0.3em;
+}
+.location {
+  color: #690505;
+  font-family: monospace;
+  display: block;
+}
+.message {
+  font-size: 0.8em;
+  color: #444444;
+  display: block;
+  margin-top: 1pt;
+}
+.rule-container {
+  border: 0.1em dashed #dddddd;
+  padding: 0.1em;
+  line-height: 1.5em;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+pre {
+  border: 1px solid #e0e0e0;
+  overflow: scroll;
+}
+.lineno {
+  color: #999999;
+  background-color: #f0f0f0;
+}
+.error {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AwCFR4T/3uLMgAAADxJREFUCNdNyLERQEAABMCjL4lQwIzcjErpguAL+C9AvgKJDbeD/PRpLdm35Hm+MU+cB+tCKaJW4L4YBy+CAiLJrFs9mgAAAABJRU5ErkJggg==) bottom repeat-x;
+}
+.exception {
+  color: #b60808;
+  display: inline-block;
+  background-color: #ecdada;
+  border-color: #b60808;
+  border-radius: 10px;
+  border: solid 2px;
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-bottom: 16px;
+}
+</style>
+</head>
+<body>
+
+<h1>detekt report</h1>
+
+<h2>Metrics</h2>
+
+<div>
+  <ul>
+    <li>58 number of properties</li>
+    <li>109 number of functions</li>
+    <li>119 number of classes</li>
+    <li>2 number of packages</li>
+    <li>28 number of kt files</li>
+  </ul>
+</div>
+
+
+<h2>Complexity Report</h2>
+
+<div>
+  <ul>
+    <li>1,542 lines of code (loc)</li>
+    <li>1,089 source lines of code (sloc)</li>
+    <li>777 logical lines of code (lloc)</li>
+    <li>152 comment lines of code (cloc)</li>
+    <li>161 cyclomatic complexity (mcc)</li>
+    <li>30 cognitive complexity</li>
+    <li>21 number of total code smells</li>
+    <li>13% comment source ratio</li>
+    <li>207 mcc per 1,000 lloc</li>
+    <li>27 code smells per 1,000 lloc</li>
+  </ul>
+</div>
+
+
+<h2>Findings</h2>
+<div>Total: 21
+  <h3>complexity: 1</h3>
+  <details id="LongParameterList" open="open">
+    <summary class="rule-container"><span class="rule">LongParameterList: 1 </span><span class="description">The more parameters a function has the more complex it is. Long parameter lists are often used to control complex algorithms and violate the Single Responsibility Principle. Prefer functions with short parameter lists.</span></summary>
+    <ul>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Button.kt:10:26</span><span class="message">The function pfButton(style: Style, text: String?, iconClass: String?, iconRight: Boolean, blockLevel: Boolean, content: Button.() -&gt; Unit) has too many parameters. The current threshold is set to 6.</span>
+        <pre><code><span class="lineno">   7 </span>// ------------------------------------------------------ dsl
+<span class="lineno">   8 </span>
+<span class="lineno">   9 </span>@OptIn(ExperimentalStdlibApi::class)
+<span class="lineno">  10 </span>fun HtmlElements.pfButton<span class="error">(</span>
+<span class="lineno">  11 </span><span class="error">    style: Style,</span>
+<span class="lineno">  12 </span><span class="error">    text: String? = null,</span>
+<span class="lineno">  13 </span><span class="error">    iconClass: String? = null,</span>
+</code></pre>
+      </li>
+    </ul>
+  </details>
+  <h3>naming: 10</h3>
+  <details id="EnumNaming" open="open">
+    <summary class="rule-container"><span class="rule">EnumNaming: 10 </span><span class="description">Enum names should follow the naming convention set in the projects configuration.</span></summary>
+    <ul>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:55:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  52 </span>}
+<span class="lineno">  53 </span>
+<span class="lineno">  54 </span>enum class Size(val modifier: String) {
+<span class="lineno">  55 </span>    <span class="error">_4xl</span>(&quot;4xl&quot;.modifier()),
+<span class="lineno">  56 </span>    _3xl(&quot;3xl&quot;.modifier()),
+<span class="lineno">  57 </span>    _2xl(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    xl(&quot;xl&quot;.modifier()),
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:56:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  53 </span>
+<span class="lineno">  54 </span>enum class Size(val modifier: String) {
+<span class="lineno">  55 </span>    _4xl(&quot;4xl&quot;.modifier()),
+<span class="lineno">  56 </span>    <span class="error">_3xl</span>(&quot;3xl&quot;.modifier()),
+<span class="lineno">  57 </span>    _2xl(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    xl(&quot;xl&quot;.modifier()),
+<span class="lineno">  59 </span>    lg(&quot;lg&quot;.modifier()),
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:57:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  54 </span>enum class Size(val modifier: String) {
+<span class="lineno">  55 </span>    _4xl(&quot;4xl&quot;.modifier()),
+<span class="lineno">  56 </span>    _3xl(&quot;3xl&quot;.modifier()),
+<span class="lineno">  57 </span>    <span class="error">_2xl</span>(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    xl(&quot;xl&quot;.modifier()),
+<span class="lineno">  59 </span>    lg(&quot;lg&quot;.modifier()),
+<span class="lineno">  60 </span>    md(&quot;md&quot;.modifier())
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:58:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  55 </span>    _4xl(&quot;4xl&quot;.modifier()),
+<span class="lineno">  56 </span>    _3xl(&quot;3xl&quot;.modifier()),
+<span class="lineno">  57 </span>    _2xl(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    <span class="error">xl</span>(&quot;xl&quot;.modifier()),
+<span class="lineno">  59 </span>    lg(&quot;lg&quot;.modifier()),
+<span class="lineno">  60 </span>    md(&quot;md&quot;.modifier())
+<span class="lineno">  61 </span>}
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:59:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  56 </span>    _3xl(&quot;3xl&quot;.modifier()),
+<span class="lineno">  57 </span>    _2xl(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    xl(&quot;xl&quot;.modifier()),
+<span class="lineno">  59 </span>    <span class="error">lg</span>(&quot;lg&quot;.modifier()),
+<span class="lineno">  60 </span>    md(&quot;md&quot;.modifier())
+<span class="lineno">  61 </span>}
+<span class="lineno">  62 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:60:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  57 </span>    _2xl(&quot;2xl&quot;.modifier()),
+<span class="lineno">  58 </span>    xl(&quot;xl&quot;.modifier()),
+<span class="lineno">  59 </span>    lg(&quot;lg&quot;.modifier()),
+<span class="lineno">  60 </span>    <span class="error">md</span>(&quot;md&quot;.modifier())
+<span class="lineno">  61 </span>}
+<span class="lineno">  62 </span>
+<span class="lineno">  63 </span>enum class Style(val modifier: String) {
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:64:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  61 </span>}
+<span class="lineno">  62 </span>
+<span class="lineno">  63 </span>enum class Style(val modifier: String) {
+<span class="lineno">  64 </span>    <span class="error">primary</span>(&quot;primary&quot;.modifier()),
+<span class="lineno">  65 </span>    secondary(&quot;secondary&quot;.modifier()),
+<span class="lineno">  66 </span>    tertiary(&quot;tertiary&quot;.modifier()),
+<span class="lineno">  67 </span>    danger(&quot;danger&quot;.modifier()),
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:65:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  62 </span>
+<span class="lineno">  63 </span>enum class Style(val modifier: String) {
+<span class="lineno">  64 </span>    primary(&quot;primary&quot;.modifier()),
+<span class="lineno">  65 </span>    <span class="error">secondary</span>(&quot;secondary&quot;.modifier()),
+<span class="lineno">  66 </span>    tertiary(&quot;tertiary&quot;.modifier()),
+<span class="lineno">  67 </span>    danger(&quot;danger&quot;.modifier()),
+<span class="lineno">  68 </span>}
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:66:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  63 </span>enum class Style(val modifier: String) {
+<span class="lineno">  64 </span>    primary(&quot;primary&quot;.modifier()),
+<span class="lineno">  65 </span>    secondary(&quot;secondary&quot;.modifier()),
+<span class="lineno">  66 </span>    <span class="error">tertiary</span>(&quot;tertiary&quot;.modifier()),
+<span class="lineno">  67 </span>    danger(&quot;danger&quot;.modifier()),
+<span class="lineno">  68 </span>}
+<span class="lineno">  69 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Types.kt:67:5</span><span class="message">Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*</span>
+        <pre><code><span class="lineno">  64 </span>    primary(&quot;primary&quot;.modifier()),
+<span class="lineno">  65 </span>    secondary(&quot;secondary&quot;.modifier()),
+<span class="lineno">  66 </span>    tertiary(&quot;tertiary&quot;.modifier()),
+<span class="lineno">  67 </span>    <span class="error">danger</span>(&quot;danger&quot;.modifier()),
+<span class="lineno">  68 </span>}
+<span class="lineno">  69 </span>
+</code></pre>
+      </li>
+    </ul>
+  </details>
+  <h3>performance: 7</h3>
+  <details id="SpreadOperator" open="open">
+    <summary class="rule-container"><span class="rule">SpreadOperator: 7 </span><span class="description">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span></summary>
+    <ul>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:25:76</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  22 </span>    }
+<span class="lineno">  23 </span>
+<span class="lineno">  24 </span>    /** Creates an identifier guaranteed to be unique within this document. The unique part comes last. */
+<span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build<span class="error">(id, *additionalIds)</span>}-${unique()}&quot;
+<span class="lineno">  26 </span>
+<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
+<span class="lineno">  28 </span>        val segments = listOf(id, *additionalIds)
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:28:30</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build(id, *additionalIds)}-${unique()}&quot;
+<span class="lineno">  26 </span>
+<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
+<span class="lineno">  28 </span>        val segments = listOf<span class="error">(id, *additionalIds)</span>
+<span class="lineno">  29 </span>        return segments.joinToString(&quot;-&quot;) { asId(it) }
+<span class="lineno">  30 </span>    }
+<span class="lineno">  31 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Button.kt:60:34</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  57 </span>
+<span class="lineno">  58 </span>    init {
+<span class="lineno">  59 </span>        if (modifier.isNotEmpty()) {
+<span class="lineno">  60 </span>            domNode.classList.add<span class="error">(*modifier.toTypedArray())</span>
+<span class="lineno">  61 </span>        }
+<span class="lineno">  62 </span>        when {
+<span class="lineno">  63 </span>            text != null &amp;&amp; iconClass != null -&gt; if (iconRight) {
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/CSS.kt:3:64</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">   1 </span>package org.patternfly
+<span class="lineno">   2 </span>
+<span class="lineno">   3 </span>fun String.component(vararg elements: String): String = combine<span class="error">(&quot;pf-c&quot;, this, *elements)</span>
+<span class="lineno">   4 </span>
+<span class="lineno">   5 </span>fun String.layout(vararg elements: String): String = combine(&quot;pf-l&quot;, this, *elements)
+<span class="lineno">   6 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/CSS.kt:5:61</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">   2 </span>
+<span class="lineno">   3 </span>fun String.component(vararg elements: String): String = combine(&quot;pf-c&quot;, this, *elements)
+<span class="lineno">   4 </span>
+<span class="lineno">   5 </span>fun String.layout(vararg elements: String): String = combine<span class="error">(&quot;pf-l&quot;, this, *elements)</span>
+<span class="lineno">   6 </span>
+<span class="lineno">   7 </span>fun String.modifier(): String = &quot;pf-m-$this&quot;
+<span class="lineno">   8 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt:9:21</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">   6 </span>// ------------------------------------------------------ dsl
+<span class="lineno">   7 </span>
+<span class="lineno">   8 </span>fun HtmlElements.pfSection(vararg classes: String, content: Section.() -&gt; Unit = {}): Section =
+<span class="lineno">   9 </span>    register(Section<span class="error">(*classes)</span>, content)
+<span class="lineno">  10 </span>
+<span class="lineno">  11 </span>// ------------------------------------------------------ tag
+<span class="lineno">  12 </span>
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt:17:48</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  14 </span>    PatternFlyTag&lt;HTMLElement&gt;(
+<span class="lineno">  15 </span>        ComponentType.Section,
+<span class="lineno">  16 </span>        &quot;section&quot;,
+<span class="lineno">  17 </span>        &quot;page&quot;.component(&quot;main-section&quot;).append<span class="error">(*classes)</span>
+<span class="lineno">  18 </span>    ), Ouia
+<span class="lineno">  19 </span>
+</code></pre>
+      </li>
+    </ul>
+  </details>
+  <h3>style: 3</h3>
+  <details id="MagicNumber" open="open">
+    <summary class="rule-container"><span class="rule">MagicNumber: 2 </span><span class="description">Report magic numbers. Magic number is a numeric literal that is not defined as a constant and hence it's unclear what the purpose of this number is. It's better to declare such numbers as constants and give them a proper name. By default, -1, 0, 1, and 2 are not considered to be magic numbers.</span></summary>
+    <ul>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Navigation.kt:112:23</span><span class="message">This expression contains a magic number. Consider defining it to a well named constant.</span>
+        <pre><code><span class="lineno"> 109 </span>        // it might interfere with router flow, which also modified the class list
+<span class="lineno"> 110 </span>        MainScope().launch {
+<span class="lineno"> 111 </span>            this@NavigationExpandableGroup.navigation.router.routes.collect {
+<span class="lineno"> 112 </span>                delay(<span class="error">333</span>) // wait a little bit before testing for the current modifier
+<span class="lineno"> 113 </span>                val selector = By.classname(&quot;nav&quot;.component(&quot;link&quot;), &quot;current&quot;.modifier())
+<span class="lineno"> 114 </span>                val containsCurrent = domNode.querySelector(selector) != null
+<span class="lineno"> 115 </span>                domNode.classList.toggle(&quot;current&quot;.modifier(), containsCurrent)
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Settings.kt:5:36</span><span class="message">This expression contains a magic number. Consider defining it to a well named constant.</span>
+        <pre><code><span class="lineno">   2 </span>
+<span class="lineno">   3 </span>object Settings {
+<span class="lineno">   4 </span>
+<span class="lineno">   5 </span>    var notificationTimeout: Int = <span class="error">8000</span> // ms
+<span class="lineno">   6 </span>}
+<span class="lineno">   7 </span>
+</code></pre>
+      </li>
+    </ul>
+  </details>
+  <details id="MaxLineLength" open="open">
+    <summary class="rule-container"><span class="rule">MaxLineLength: 1 </span><span class="description">Line detected that is longer than the defined maximum line length in the code style.</span></summary>
+    <ul>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/By.kt:122:1</span><span class="message">Line detected that is longer than the defined maximum line length in the code style.</span>
+        <pre><code><span class="lineno"> 119 </span>
+<span class="lineno"> 120 </span>// ------------------------------------------------------ by implementations (a-z)
+<span class="lineno"> 121 </span>
+<span class="lineno"> 122 </span><span class="error">private open</span> class ByAttribute(private val name: String, private val operator: AttributeOperator?, private val value: String?) :
+<span class="lineno"> 123 </span>    By {
+<span class="lineno"> 124 </span>
+<span class="lineno"> 125 </span>    override val selector: String
+</code></pre>
+      </li>
+    </ul>
+  </details>
+</div>
+
+
+generated with <a href="https://arturbosch.github.io/detekt">detekt version 1.10.0</a> on 2020-07-07 08:39:52 UTC.
+
+</body>
+</html>
