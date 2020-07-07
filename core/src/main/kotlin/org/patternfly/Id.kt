@@ -1,4 +1,4 @@
-package org.jboss.elemento
+package org.patternfly
 
 import kotlin.browser.document
 

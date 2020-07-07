@@ -16,25 +16,25 @@
 	<error line="66" column="5" severity="warning" message="Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*" source="detekt.EnumNaming" />
 	<error line="67" column="5" severity="warning" message="Enum entry names should match the pattern: [A-Z][_a-zA-Z0-9]*" source="detekt.EnumNaming" />
 </file>
-<file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt">
-	<error line="25" column="76" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
-	<error line="28" column="30" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
-</file>
 <file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/CSS.kt">
 	<error line="3" column="64" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
 	<error line="5" column="61" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
+</file>
+<file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Id.kt">
+	<error line="25" column="76" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
+	<error line="28" column="30" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
 </file>
 <file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt">
 	<error line="9" column="21" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
 	<error line="17" column="48" severity="warning" message="In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty." source="detekt.SpreadOperator" />
 </file>
-<file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/By.kt">
-	<error line="122" column="1" severity="warning" message="Line detected that is longer than the defined maximum line length in the code style." source="detekt.MaxLineLength" />
-</file>
 <file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Settings.kt">
 	<error line="5" column="36" severity="warning" message="This expression contains a magic number. Consider defining it to a well named constant." source="detekt.MagicNumber" />
 </file>
 <file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Navigation.kt">
-	<error line="112" column="23" severity="warning" message="This expression contains a magic number. Consider defining it to a well named constant." source="detekt.MagicNumber" />
+	<error line="109" column="23" severity="warning" message="This expression contains a magic number. Consider defining it to a well named constant." source="detekt.MagicNumber" />
+</file>
+<file name="/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/By.kt">
+	<error line="122" column="1" severity="warning" message="Line detected that is longer than the defined maximum line length in the code style." source="detekt.MaxLineLength" />
 </file>
 </checkstyle>

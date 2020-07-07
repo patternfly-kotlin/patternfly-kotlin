@@ -75,7 +75,7 @@ pre {
     <li>58 number of properties</li>
     <li>109 number of functions</li>
     <li>119 number of classes</li>
-    <li>2 number of packages</li>
+    <li>1 number of packages</li>
     <li>28 number of kt files</li>
   </ul>
 </div>
@@ -85,14 +85,14 @@ pre {
 
 <div>
   <ul>
-    <li>1,542 lines of code (loc)</li>
-    <li>1,089 source lines of code (sloc)</li>
+    <li>1,536 lines of code (loc)</li>
+    <li>1,083 source lines of code (sloc)</li>
     <li>777 logical lines of code (lloc)</li>
     <li>152 comment lines of code (cloc)</li>
     <li>161 cyclomatic complexity (mcc)</li>
     <li>30 cognitive complexity</li>
     <li>21 number of total code smells</li>
-    <li>13% comment source ratio</li>
+    <li>14% comment source ratio</li>
     <li>207 mcc per 1,000 lloc</li>
     <li>27 code smells per 1,000 lloc</li>
   </ul>
@@ -226,26 +226,6 @@ pre {
   <details id="SpreadOperator" open="open">
     <summary class="rule-container"><span class="rule">SpreadOperator: 7 </span><span class="description">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span></summary>
     <ul>
-      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:25:76</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
-        <pre><code><span class="lineno">  22 </span>    }
-<span class="lineno">  23 </span>
-<span class="lineno">  24 </span>    /** Creates an identifier guaranteed to be unique within this document. The unique part comes last. */
-<span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build<span class="error">(id, *additionalIds)</span>}-${unique()}&quot;
-<span class="lineno">  26 </span>
-<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
-<span class="lineno">  28 </span>        val segments = listOf(id, *additionalIds)
-</code></pre>
-      </li>
-      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/Id.kt:28:30</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
-        <pre><code><span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build(id, *additionalIds)}-${unique()}&quot;
-<span class="lineno">  26 </span>
-<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
-<span class="lineno">  28 </span>        val segments = listOf<span class="error">(id, *additionalIds)</span>
-<span class="lineno">  29 </span>        return segments.joinToString(&quot;-&quot;) { asId(it) }
-<span class="lineno">  30 </span>    }
-<span class="lineno">  31 </span>
-</code></pre>
-      </li>
       <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Button.kt:60:34</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
         <pre><code><span class="lineno">  57 </span>
 <span class="lineno">  58 </span>    init {
@@ -275,6 +255,26 @@ pre {
 <span class="lineno">   8 </span>
 </code></pre>
       </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Id.kt:25:76</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  22 </span>    }
+<span class="lineno">  23 </span>
+<span class="lineno">  24 </span>    /** Creates an identifier guaranteed to be unique within this document. The unique part comes last. */
+<span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build<span class="error">(id, *additionalIds)</span>}-${unique()}&quot;
+<span class="lineno">  26 </span>
+<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
+<span class="lineno">  28 </span>        val segments = listOf(id, *additionalIds)
+</code></pre>
+      </li>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Id.kt:28:30</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
+        <pre><code><span class="lineno">  25 </span>    fun unique(id: String, vararg additionalIds: String): String = &quot;${build(id, *additionalIds)}-${unique()}&quot;
+<span class="lineno">  26 </span>
+<span class="lineno">  27 </span>    fun build(id: String, vararg additionalIds: String): String {
+<span class="lineno">  28 </span>        val segments = listOf<span class="error">(id, *additionalIds)</span>
+<span class="lineno">  29 </span>        return segments.joinToString(&quot;-&quot;) { asId(it) }
+<span class="lineno">  30 </span>    }
+<span class="lineno">  31 </span>
+</code></pre>
+      </li>
       <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Section.kt:9:21</span><span class="message">In most cases using a spread operator causes a full copy of the array to be created before calling a method which has a very high performance penalty.</span>
         <pre><code><span class="lineno">   6 </span>// ------------------------------------------------------ dsl
 <span class="lineno">   7 </span>
@@ -300,14 +300,14 @@ pre {
   <details id="MagicNumber" open="open">
     <summary class="rule-container"><span class="rule">MagicNumber: 2 </span><span class="description">Report magic numbers. Magic number is a numeric literal that is not defined as a constant and hence it's unclear what the purpose of this number is. It's better to declare such numbers as constants and give them a proper name. By default, -1, 0, 1, and 2 are not considered to be magic numbers.</span></summary>
     <ul>
-      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Navigation.kt:112:23</span><span class="message">This expression contains a magic number. Consider defining it to a well named constant.</span>
-        <pre><code><span class="lineno"> 109 </span>        // it might interfere with router flow, which also modified the class list
-<span class="lineno"> 110 </span>        MainScope().launch {
-<span class="lineno"> 111 </span>            this@NavigationExpandableGroup.navigation.router.routes.collect {
-<span class="lineno"> 112 </span>                delay(<span class="error">333</span>) // wait a little bit before testing for the current modifier
-<span class="lineno"> 113 </span>                val selector = By.classname(&quot;nav&quot;.component(&quot;link&quot;), &quot;current&quot;.modifier())
-<span class="lineno"> 114 </span>                val containsCurrent = domNode.querySelector(selector) != null
-<span class="lineno"> 115 </span>                domNode.classList.toggle(&quot;current&quot;.modifier(), containsCurrent)
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Navigation.kt:109:23</span><span class="message">This expression contains a magic number. Consider defining it to a well named constant.</span>
+        <pre><code><span class="lineno"> 106 </span>        // it might interfere with router flow, which also modified the class list
+<span class="lineno"> 107 </span>        MainScope().launch {
+<span class="lineno"> 108 </span>            this@NavigationExpandableGroup.navigation.router.routes.collect {
+<span class="lineno"> 109 </span>                delay(<span class="error">333</span>) // wait a little bit before testing for the current modifier
+<span class="lineno"> 110 </span>                val selector = By.classname(&quot;nav&quot;.component(&quot;link&quot;), &quot;current&quot;.modifier())
+<span class="lineno"> 111 </span>                val containsCurrent = domNode.querySelector(selector) != null
+<span class="lineno"> 112 </span>                domNode.classList.toggle(&quot;current&quot;.modifier(), containsCurrent)
 </code></pre>
       </li>
       <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/Settings.kt:5:36</span><span class="message">This expression contains a magic number. Consider defining it to a well named constant.</span>
@@ -324,7 +324,7 @@ pre {
   <details id="MaxLineLength" open="open">
     <summary class="rule-container"><span class="rule">MaxLineLength: 1 </span><span class="description">Line detected that is longer than the defined maximum line length in the code style.</span></summary>
     <ul>
-      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/jboss/elemento/By.kt:122:1</span><span class="message">Line detected that is longer than the defined maximum line length in the code style.</span>
+      <li><span class="location">/Users/hpehl/dev/patternfly/kotlin/patternfly-fritz2/core/src/main/kotlin/org/patternfly/By.kt:122:1</span><span class="message">Line detected that is longer than the defined maximum line length in the code style.</span>
         <pre><code><span class="lineno"> 119 </span>
 <span class="lineno"> 120 </span>// ------------------------------------------------------ by implementations (a-z)
 <span class="lineno"> 121 </span>
@@ -339,7 +339,7 @@ pre {
 </div>
 
 
-generated with <a href="https://arturbosch.github.io/detekt">detekt version 1.10.0</a> on 2020-07-07 08:39:52 UTC.
+generated with <a href="https://arturbosch.github.io/detekt">detekt version 1.10.0</a> on 2020-07-07 12:01:15 UTC.
 
 </body>
 </html>

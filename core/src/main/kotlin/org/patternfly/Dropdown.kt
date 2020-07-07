@@ -11,7 +11,6 @@ import dev.fritz2.identification.uniqueId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
-import org.jboss.elemento.Id
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl

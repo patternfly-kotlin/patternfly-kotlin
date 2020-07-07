@@ -1,4 +1,4 @@
-package org.jboss.elemento
+package org.patternfly
 
 import org.w3c.dom.Element
 

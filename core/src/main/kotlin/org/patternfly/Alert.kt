@@ -6,8 +6,6 @@ import dev.fritz2.dom.html.Li
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.jboss.elemento.Id
-import org.jboss.elemento.removeFromParent
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLUListElement

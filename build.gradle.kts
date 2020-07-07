@@ -23,14 +23,3 @@ subprojects {
         "implementation"("dev.fritz2:core:0.6")
     }
 }
-
-project(":core") {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    apply(plugin = "io.gitlab.arturbosch.detekt")
-}
-
-project(":showcase") {
-    dependencies {
-        "implementation"(project(":core"))
-    }
-}
