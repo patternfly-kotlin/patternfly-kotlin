@@ -1,5 +1,6 @@
 package org.patternfly.showcase.component
 
+import dev.fritz2.binding.const
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.render
 import org.patternfly.Severity
@@ -11,7 +12,16 @@ object AlertComponent : Iterable<Tag<HTMLElement>> {
     override fun iterator(): Iterator<Tag<HTMLElement>> = iterator {
         yield(render {
             component("Alert") {
-                p { +"Lorem ipsum, ..." }
+                p {
+                    strong { +"Alerts" }
+                    +" are used to notify the user about a change in status or other event. Related design guidelines: "
+                    a {
+                        href =
+                            const("https://www.patternfly.org/v4/design-guidelines/usage-and-behavior/alerts-and-notifications")
+                        target = const("pf4")
+                        +"Alerts and notifications"
+                    }
+                }
             }
         })
         yield(render {
