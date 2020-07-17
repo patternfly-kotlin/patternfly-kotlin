@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    id("org.jetbrains.kotlin.js") version "1.4-M2" apply false
+    id("org.jetbrains.kotlin.js") version "1.4-M3" apply false
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1" apply false
     id("io.gitlab.arturbosch.detekt") version "1.10.0" apply false
 }
+
+val fritz2Version = "0.7"
 
 allprojects {
     group = "org.patternfly"
@@ -14,12 +18,18 @@ allprojects {
         mavenLocal()
         mavenCentral()
     }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
+    }
 }
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.js")
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-js")
-        "implementation"("dev.fritz2:core:0.6")
+        "implementation"("dev.fritz2:core:$fritz2Version")
     }
 }

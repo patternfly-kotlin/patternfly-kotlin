@@ -6,6 +6,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "patternfly-fritz2"
-include("core")
+rootProject.name = "patternfly-fritz2-parent"
+include("impl")
 include("showcase")
+project(":impl").name = "patternfly-fritz2"
