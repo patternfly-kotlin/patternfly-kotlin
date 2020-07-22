@@ -3,7 +3,7 @@ package org.patternfly.showcase
 import dev.fritz2.binding.const
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.render
-import org.patternfly.modifier
+import org.patternfly.Modifier.light
 import org.patternfly.pfContent
 import org.patternfly.pfSection
 import org.patternfly.pfTitle
@@ -12,7 +12,7 @@ import org.w3c.dom.HTMLElement
 object HomePage : Iterable<Tag<HTMLElement>> {
     override fun iterator(): Iterator<Tag<HTMLElement>> = iterator {
         yield(render {
-            pfSection("light".modifier()) {
+            pfSection(light) {
                 pfContent {
                     pfTitle("PatternFly Fritz2")
                     p {

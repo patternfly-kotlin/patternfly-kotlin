@@ -5,14 +5,14 @@ import dev.fritz2.binding.const
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.A
+import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.render
 import dev.fritz2.identification.uniqueId
-import dev.fritz2.lenses.idProvider
+import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
-import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
@@ -28,10 +28,10 @@ fun <T> HtmlElements.pfDropdown(
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class Dropdown<T> internal constructor(private val text: String, private val store: DropdownStore<T>) :
-    PatternFlyTag<HTMLDivElement>(ComponentType.Dropdown, "div", "dropdown".component()), Ouia {
+    Div(baseClass = "dropdown".component()) {
 
     private val ces = CollapseExpandStore(domNode)
-    var identifier: idProvider<T> = { Id.asId(it.toString()) }
+    var identifier: IdProvider<T, String> = { Id.asId(it.toString()) }
     var asText: AsText<T> = { it.toString() }
     var display: DropdownDisplay<T> = {
         {
@@ -40,7 +40,8 @@ class Dropdown<T> internal constructor(private val text: String, private val sto
     }
 
     init {
-        classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
+        domNode.componentType(ComponentType.Dropdown)
+        classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
         val buttonId = uniqueId()
         button("dropdown".component("toggle"), buttonId) {
             attr("aria-haspopup", true.toString())

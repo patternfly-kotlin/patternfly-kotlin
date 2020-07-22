@@ -6,7 +6,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.10.0" apply false
 }
 
-val fritz2Version = "0.7"
+val fritz2Version = "0.7-SNAPSHOT"
 
 allprojects {
     group = "org.patternfly"
@@ -14,6 +14,7 @@ allprojects {
 
     repositories {
         jcenter()
+        maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
         mavenLocal()
         mavenCentral()

@@ -1,7 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.dom.Tag
-import org.w3c.dom.HTMLDivElement
+import dev.fritz2.dom.html.Div
 
 // ------------------------------------------------------ dsl
 
@@ -11,7 +10,10 @@ fun Sidebar.pfSidebarBody(content: SidebarBody.() -> Unit = {}) = register(Sideb
 
 // ------------------------------------------------------ tag
 
-class Sidebar :
-    PatternFlyTag<HTMLDivElement>(ComponentType.Sidebar, "div", "page".component("sidebar")), Ouia
+class Sidebar : Div(baseClass = "page".component("sidebar")) {
+    init {
+        domNode.componentType(ComponentType.Sidebar)
+    }
+}
 
-class SidebarBody : Tag<HTMLDivElement>("div", baseClass = "page".component("sidebar", "body"))
+class SidebarBody : Div(baseClass = "page".component("sidebar", "body"))

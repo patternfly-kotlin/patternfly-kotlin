@@ -1,7 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.HtmlElements
-import org.w3c.dom.HTMLElement
+import dev.fritz2.dom.html.TextElement
 
 // ------------------------------------------------------ dsl
 
@@ -10,9 +10,9 @@ fun HtmlElements.pfIcon(iconClass: String, content: Icon.() -> Unit = {}): Icon 
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String) :
-    PatternFlyTag<HTMLElement>(ComponentType.Icon, "i", iconClass), Ouia {
+class Icon internal constructor(iconClass: String) : TextElement("i", baseClass = iconClass) {
     init {
+        domNode.componentType(ComponentType.Icon)
         attr("aria-hidden", "true")
     }
 }

@@ -1,82 +1,49 @@
 package org.patternfly
 
-import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.HtmlElements
-import org.w3c.dom.HTMLButtonElement
+import dev.fritz2.dom.html.Span
 
 // ------------------------------------------------------ dsl
 
-@OptIn(ExperimentalStdlibApi::class)
-fun HtmlElements.pfButton(
-    style: Style,
-    text: String? = null,
-    iconClass: String? = null,
-    iconRight: Boolean = false,
-    blockLevel: Boolean = false,
-    content: Button.() -> Unit = {}
-): Button = register(Button(buildSet {
-    add(style.modifier)
-    if (blockLevel) add("block".modifier())
-}, text, iconClass, iconRight), content)
+fun HtmlElements.pfButton(vararg modifiers: String, content: Button.() -> Unit = {}): Button =
+    register(Button(modifiers.toList()), content)
 
-fun HtmlElements.pfControlButton(
-    text: String? = null,
-    iconClass: String? = null,
-    iconRight: Boolean = false,
-    content: Button.() -> Unit = {}
-): Button = register(Button(setOf("control".modifier()), text, iconClass, iconRight), content)
+fun HtmlElements.pfButton(vararg modifiers: Modifier, content: Button.() -> Unit = {}): Button =
+    register(Button(modifiers.map { it.value }), content)
 
-@OptIn(ExperimentalStdlibApi::class)
-fun HtmlElements.pfLinkButton(
-    text: String? = null,
-    iconClass: String? = null,
-    iconRight: Boolean = false,
-    inline: Boolean = false,
-    content: Button.() -> Unit = {}
-): Button = register(Button(buildSet {
-    add("link".modifier())
-    if (inline) add("inline".modifier())
-}, text, iconClass, iconRight), content)
+fun HtmlElements.pfLinkButton(vararg modifiers: String, content: LinkButton.() -> Unit = {}): LinkButton =
+    register(LinkButton(modifiers.toList()), content)
 
-fun HtmlElements.pfPlainButton(
-    text: String? = null,
-    iconClass: String? = null,
-    iconRight: Boolean = false,
-    content: Button.() -> Unit = {}
-): Button = register(Button(setOf("plain".modifier()), text, iconClass, iconRight), content)
+fun HtmlElements.pfLinkButton(vararg modifiers: Modifier, content: LinkButton.() -> Unit = {}): LinkButton =
+    register(LinkButton(modifiers.map { it.value }), content)
+
+fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Unit = {}): Span =
+    span(buildString { append("button".component("icon")).append(" ").append(position.modifier.value) }) {
+        pfIcon(iconClass, content)
+    }
 
 // ------------------------------------------------------ tag
 
-class Button(
-    modifier: Set<String>,
-    private val text: String? = null,
-    private val iconClass: String? = null,
-    iconRight: Boolean = false
-) : PatternFlyTag<HTMLButtonElement>(ComponentType.Button, "button", "button".component()),
-    WithText<HTMLButtonElement> {
-
+class Button internal constructor(modifiers: List<String>) :
+    dev.fritz2.dom.html.Button(baseClass = buildString {
+        append("button".component())
+        if (modifiers.isNotEmpty()) {
+            modifiers.joinTo(this, " ", " ")
+        }
+    }) {
     init {
-        if (modifier.isNotEmpty()) {
-            domNode.classList.add(*modifier.toTypedArray())
+        domNode.componentType(ComponentType.Button)
+    }
+}
+
+class LinkButton internal constructor(modifiers: List<String>) :
+    dev.fritz2.dom.html.A(baseClass = buildString {
+        append("button".component())
+        if (modifiers.isNotEmpty()) {
+            modifiers.joinTo(this, " ", " ")
         }
-        when {
-            text != null && iconClass != null -> if (iconRight) {
-                span("button".component("text")) {
-                    +this@Button.text
-                }
-                span("button".component("icon")) {
-                    pfIcon(this@Button.iconClass)
-                }
-            } else {
-                span("button".component("icon")) {
-                    pfIcon(this@Button.iconClass)
-                }
-                span("button".component("text")) {
-                    +this@Button.text
-                }
-            }
-            text != null -> +text
-            iconClass != null -> pfIcon(iconClass)
-        }
+    }) {
+    init {
+        domNode.componentType(ComponentType.Button)
     }
 }

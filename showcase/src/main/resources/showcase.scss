@@ -1,19 +1,14 @@
-.sc-component__buttons .pf-c-button {
-    margin-bottom: 6px;
-    margin-right: 6px;
-}
-
 .sc-snippet {
     background-color: var(--pf-global--BackgroundColor--light-100);
     margin-top: var(--pf-global--spacer--lg);
-}
 
-.sc-snippet .pf-c-content {
-    font-size: var(--pf-global--FontSize--md);
-}
+    .pf-c-content {
+        font-size: var(--pf-global--FontSize--md);
+    }
 
-.sc-snippet h3 {
-    margin-bottom: 0;
+    h3 {
+        margin-bottom: 0;
+    }
 }
 
 .sc-snippet__heading {
@@ -27,20 +22,14 @@
     padding: 1rem;
 }
 
-.sc-snippet__copied {
-    padding: 10px;
-    font-weight: 400
-}
-
 .sc-snippet__code {
     background-color: var(--pf-global--BackgroundColor--100);
     font-size: var(--pf-global--FontSize--sm);
     max-height: 37.5rem;
     overflow: auto !important;
     padding: 10px;
-}
 
-.sc-snippet__code code {
-    background-color: white;
-    font-size: 11pt;
+    .prettyprint {
+        border: none;
+    }
 }

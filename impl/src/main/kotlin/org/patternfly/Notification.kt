@@ -3,12 +3,12 @@ package org.patternfly
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.handledBy
+import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.HtmlElements
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
 
 // ------------------------------------------------------ dsl
@@ -17,18 +17,15 @@ fun HtmlElements.pfNotificationBadge() = register(NotificationBadge(), {})
 
 // ------------------------------------------------------ tag
 
-class NotificationBadge : PatternFlyTag<HTMLButtonElement>(
-    ComponentType.NotificationBadge,
-    "button",
-    "${"button".component()} ${"plain".modifier()}"
-) {
+class NotificationBadge : Button(baseClass = "${"button".component()} ${Modifier.plain.value}") {
     init {
+        domNode.componentType(ComponentType.NotificationBadge)
         Notification.store.unread.map { unread ->
             if (unread) "Unread notifications" else "Notifications"
         }.bindAttr("aria-label")
         span(baseClass = "notification-badge".component()) {
             classMap = Notification.store.unread.map { unread ->
-                mapOf("read".modifier() to !unread, "unread".modifier() to unread)
+                mapOf(Modifier.read.value to !unread, Modifier.unread.value to unread)
             }
             pfIcon("bell".fas())
         }

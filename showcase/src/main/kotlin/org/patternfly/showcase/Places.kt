@@ -2,11 +2,12 @@ package org.patternfly.showcase
 
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.render
-import org.patternfly.modifier
+import org.patternfly.Modifier.light
 import org.patternfly.pfContent
 import org.patternfly.pfSection
 import org.patternfly.pfTitle
 import org.patternfly.showcase.component.AlertComponent
+import org.patternfly.showcase.component.ButtonComponent
 import org.w3c.dom.HTMLElement
 
 @OptIn(ExperimentalStdlibApi::class)
@@ -21,7 +22,10 @@ object Places {
     private val tags: Map<String, Iterable<Tag<HTMLElement>>> = buildMap {
         put("home", HomePage)
         put(component("alert"), AlertComponent)
+        put(component("button"), ButtonComponent)
     }
+
+    fun behaviour(name: String) = "https://www.patternfly.org/v4/design-guidelines/usage-and-behavior/$name"
 
     fun component(id: String): String = "$DOCUMENTATION:component=$id"
 
@@ -31,7 +35,7 @@ object Places {
 
     private fun notFound(place: String) = listOf(
         render {
-            pfSection("light".modifier()) {
+            pfSection(light) {
                 pfContent {
                     pfTitle("Not Found")
                     p {

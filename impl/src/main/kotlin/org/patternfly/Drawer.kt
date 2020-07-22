@@ -2,10 +2,10 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.handledBy
-import dev.fritz2.dom.Tag
+import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import kotlinx.coroutines.flow.map
-import org.w3c.dom.HTMLDivElement
+import org.patternfly.Modifier.plain
 
 // ------------------------------------------------------ dsl
 
@@ -41,24 +41,23 @@ fun DrawerActions.pfDrawerClose(): DrawerClose =
 
 // ------------------------------------------------------ tag
 
-class Drawer : PatternFlyTag<HTMLDivElement>(ComponentType.Drawer, "div", "drawer".component()) {
+class Drawer : Div(baseClass = "drawer".component()) {
     val expanded = ExpandedStore()
 
     init {
-        classMap = expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
+        domNode.componentType(ComponentType.Drawer)
+        classMap = expanded.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
     }
 }
 
-class DrawerActions(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("actions"))
+class DrawerActions(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("actions"))
 
-class DrawerBody(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("body"))
+class DrawerBody(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("body"))
 
-class DrawerClose(private val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("close")) {
+class DrawerClose(private val store: ExpandedStore) : Div(baseClass = "drawer".component("close")) {
     init {
-        pfPlainButton(iconClass = "times".fas()) {
+        pfButton(plain) {
+            pfIcon("times".fas())
             attr("tabIndex", "-1")
             attr("aria-label", "Close drawer panel")
             clicks.map { false } handledBy this@DrawerClose.store.update
@@ -66,24 +65,19 @@ class DrawerClose(private val store: ExpandedStore) :
     }
 }
 
-class DrawerContent(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("content"))
+class DrawerContent(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("content"))
 
-class DrawerHead(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("head"))
+class DrawerHead(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("head"))
 
-class DrawerMain(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("main"))
+class DrawerMain(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("main"))
 
-class DrawerPanel(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("panel")) {
+class DrawerPanel(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("panel")) {
     init {
         store.data.bindAttr("hidden")
     }
 }
 
-class DrawerSection(internal val store: ExpandedStore) :
-    Tag<HTMLDivElement>("div", baseClass = "drawer".component("section"))
+class DrawerSection(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("section"))
 
 // ------------------------------------------------------ store
 

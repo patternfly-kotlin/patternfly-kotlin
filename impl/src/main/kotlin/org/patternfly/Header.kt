@@ -4,7 +4,7 @@ import dev.fritz2.binding.const
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
-import org.w3c.dom.HTMLElement
+import dev.fritz2.dom.html.TextElement
 
 // ------------------------------------------------------ dsl
 
@@ -16,8 +16,7 @@ fun HtmlElements.pfBrandLink(homeLink: String, content: A.() -> Unit = {}): A =
         href = const(homeLink)
     }, content)
 
-fun Page.pfHeader(content: Header.() -> Unit = {}): Header =
-    register(Header(), content)
+fun Page.pfHeader(content: Header.() -> Unit = {}): Header = register(Header(), content)
 
 fun Header.pfHeaderTools(content: Div.() -> Unit = {}): Div =
     register(Div(baseClass = "page".component("header", "tools")), content)
@@ -25,8 +24,9 @@ fun Header.pfHeaderTools(content: Div.() -> Unit = {}): Div =
 // ------------------------------------------------------ tag
 
 class Header internal constructor() :
-    PatternFlyTag<HTMLElement>(ComponentType.Header, "header", "page".component("header")), Ouia {
+    TextElement("header", baseClass = "page".component("header")) {
     init {
+        domNode.componentType(ComponentType.Header)
         attr("role", "banner")
     }
 }

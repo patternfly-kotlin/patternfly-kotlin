@@ -1,5 +1,14 @@
 package org.patternfly
 
+import org.patternfly.Modifier._2xl
+import org.patternfly.Modifier._3xl
+import org.patternfly.Modifier._4xl
+import org.patternfly.Modifier.end
+import org.patternfly.Modifier.lg
+import org.patternfly.Modifier.md
+import org.patternfly.Modifier.start
+import org.patternfly.Modifier.xl
+
 typealias AsText<T> = (T) -> String
 
 enum class ComponentType(val id: String) {
@@ -34,34 +43,31 @@ enum class Orientation {
     HORIZONTAL, VERTICAL
 }
 
+enum class Position(val modifier: Modifier) {
+    START(start), END(end)
+}
+
 enum class SelectionMode {
     NONE, SINGLE, MULTIPLE
 }
 
 enum class Severity(
-    val modifier: String,
+    val modifier: Modifier?,
     val iconClass: String,
     val aria: String
 ) {
-    DEFAULT("", "bell".fas(), "Default alert"),
-    INFO("info".modifier(), "info-circle".fas(), "Info alert"),
-    SUCCESS("success".modifier(), "check-circle".fas(), "Success alert"),
-    WARNING("warning".modifier(), "exclamation-triangle".fas(), "Warning alert"),
-    DANGER("danger".modifier(), "exclamation-circle".fas(), "Danger alert");
+    DEFAULT(null, "bell".fas(), "Default alert"),
+    INFO(Modifier.info, "info-circle".fas(), "Info alert"),
+    SUCCESS(Modifier.success, "check-circle".fas(), "Success alert"),
+    WARNING(Modifier.warning, "exclamation-triangle".fas(), "Warning alert"),
+    DANGER(Modifier.danger, "exclamation-circle".fas(), "Danger alert");
 }
 
-enum class Size(val modifier: String) {
-    _4xl("4xl".modifier()),
-    _3xl("3xl".modifier()),
-    _2xl("2xl".modifier()),
-    xl("xl".modifier()),
-    lg("lg".modifier()),
-    md("md".modifier())
-}
-
-enum class Style(val modifier: String) {
-    primary("primary".modifier()),
-    secondary("secondary".modifier()),
-    tertiary("tertiary".modifier()),
-    danger("danger".modifier()),
+enum class Size(val modifier: Modifier) {
+    XL_4(_4xl),
+    XL_3(_3xl),
+    XL_2(_2xl),
+    XL(xl),
+    LG(lg),
+    MD(md)
 }

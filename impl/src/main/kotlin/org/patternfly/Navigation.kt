@@ -13,6 +13,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.patternfly.Modifier.current
+import org.patternfly.Modifier.expandable
+import org.patternfly.Modifier.horizontal
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
@@ -58,7 +61,7 @@ internal fun <T> TextElement.pfNavigationItems(
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     text: String,
-    selected: ((route: T) -> Boolean)? = null,
+    selected: ((route: T) -> Boolean)? = null
 ): NavigationItem<T> = pfNavigationItem(item, selected) { +text }
 
 fun <T> NavigationItems<T>.pfNavigationItem(
@@ -76,13 +79,14 @@ class Navigation<T>(
     orientation: Orientation,
     tertiary: Boolean,
     content: Navigation<T>.() -> Unit
-) : PatternFlyTag<HTMLElement>(ComponentType.Navigation, "nav", "nav".component()), Ouia {
+) : TextElement("nav", baseClass = "nav".component()) {
     init {
+        domNode.componentType(ComponentType.Navigation)
         if (!tertiary) {
             attr("aria-label", "Global")
         }
         if (orientation == Orientation.HORIZONTAL) {
-            domNode.classList += "horizontal".modifier()
+            domNode.classList += horizontal
             // domNode.classList += "scrollable".modifier() // TODO Implement scrolling
             button("nav".component("scroll", "button")) {
                 attr("aria-label", "Scroll left")
@@ -121,7 +125,7 @@ class NavigationExpandableGroup<T>(
     text: String,
     content: NavigationItems<T>.() -> Unit
 ) :
-    Tag<HTMLLIElement>("li", baseClass = "${"nav".component("item")} ${"expandable".modifier()}") {
+    Tag<HTMLLIElement>("li", baseClass = "${"nav".component("item")} ${expandable.value}") {
 
     private val expanded = ExpandableGroupStore()
 
@@ -129,15 +133,15 @@ class NavigationExpandableGroup<T>(
         // don't use classMap for expanded flow
         // classMap = expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
         MainScope().launch {
-            expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
+            expanded.data.collect { domNode.classList.toggle(Modifier.expanded.value, it) }
         }
         // it might interfere with router flow, which also modified the class list
         MainScope().launch {
             this@NavigationExpandableGroup.navigation.router.routes.collect {
                 delay(333) // wait a little bit before testing for the current modifier
-                val selector = By.classname("nav".component("link"), "current".modifier())
+                val selector = By.classname("nav".component("link"), current.value)
                 val containsCurrent = domNode.querySelector(selector) != null
-                domNode.classList.toggle("current".modifier(), containsCurrent)
+                domNode.classList.toggle(current.value, containsCurrent)
             }
         }
         val id = Id.unique("neg")
@@ -175,7 +179,7 @@ class NavigationItem<T>(
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo
             classMap = this@NavigationItem.navigation.router.routes.map { route ->
-                mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
+                mapOf(current.value to (this@NavigationItem.calculateSelection(route)))
             }
             this@NavigationItem.navigation.router.routes
                 .map { route -> this@NavigationItem.calculateSelection(route) }

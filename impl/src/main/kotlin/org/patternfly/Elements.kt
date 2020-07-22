@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.dom.WithDomNode
 import org.w3c.dom.DOMTokenList
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
@@ -7,6 +8,14 @@ import org.w3c.dom.Node
 import org.w3c.dom.ParentNode
 
 // ------------------------------------------------------ token list
+
+operator fun DOMTokenList.plusAssign(modifier: Modifier) {
+    this.add(modifier.value)
+}
+
+operator fun DOMTokenList.minusAssign(modifier: Modifier) {
+    this.remove(modifier.value)
+}
 
 operator fun DOMTokenList.plusAssign(value: String) {
     this.add(value)
@@ -25,6 +34,9 @@ fun Node?.removeFromParent() {
 }
 
 // ------------------------------------------------------ element et al
+
+val WithDomNode<Element>.aria: Aria
+    get() = Aria(this.domNode)
 
 val Element.aria: Aria
     get() = Aria(this)

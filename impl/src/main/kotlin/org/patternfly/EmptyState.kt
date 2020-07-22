@@ -1,10 +1,7 @@
 package org.patternfly
 
-import dev.fritz2.dom.Tag
-import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
-import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
@@ -27,21 +24,22 @@ fun EmptyStateContent.pfEmptyStateSecondary(content: Div.() -> Unit = {}): Div =
 // ------------------------------------------------------ tag
 
 class EmptyState(iconClass: String, title: String, size: Size?, content: EmptyStateContent.() -> Unit) :
-    PatternFlyTag<HTMLDivElement>(ComponentType.EmptyState, "div", "empty-state".component()) {
+    Div(baseClass = "empty-state".component()) {
     init {
+        domNode.componentType(ComponentType.EmptyState)
         size?.let {
-            domNode.classList.add(it.modifier)
+            domNode.classList += it.modifier
         }
         pfEmptyStateContent {
             pfIcon(iconClass).apply {
                 domNode.classList.add("empty-state".component("icon"))
             }
-            pfTitle(title, size = Size.lg)
+            pfTitle(title, size = Size.LG)
             content(this)
         }
     }
 }
 
-class EmptyStateBody : Tag<HTMLDivElement>("div", baseClass = "empty-state".component("body")), WithText<HTMLDivElement>
+class EmptyStateBody : Div(baseClass = "empty-state".component("body"))
 
-class EmptyStateContent : Tag<HTMLDivElement>("div", baseClass = "empty-state".component("content"))
+class EmptyStateContent : Div(baseClass = "empty-state".component("content"))
