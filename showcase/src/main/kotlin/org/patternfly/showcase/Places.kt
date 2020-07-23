@@ -7,6 +7,7 @@ import org.patternfly.pfContent
 import org.patternfly.pfSection
 import org.patternfly.pfTitle
 import org.patternfly.showcase.component.AlertComponent
+import org.patternfly.showcase.component.AlertGroupComponent
 import org.patternfly.showcase.component.ButtonComponent
 import org.w3c.dom.HTMLElement
 
@@ -22,6 +23,7 @@ object Places {
     private val tags: Map<String, Iterable<Tag<HTMLElement>>> = buildMap {
         put("home", HomePage)
         put(component("alert"), AlertComponent)
+        put(component("alert-group"), AlertGroupComponent)
         put(component("button"), ButtonComponent)
     }
 

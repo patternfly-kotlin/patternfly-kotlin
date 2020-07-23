@@ -66,6 +66,7 @@ class Skeleton(private val router: Router<String>) : Iterable<Tag<HTMLElement>> 
                             pfNavigationItems {
                                 pfNavigationExpandableGroup("Components") {
                                     pfNavigationItem(Places.component("alert"), "Alert")
+                                    pfNavigationItem(Places.component("alert-group"), "Alert group")
                                     pfNavigationItem(Places.component("avatar"), "Avatar")
                                     pfNavigationItem(Places.component("badge"), "Badge")
                                     pfNavigationItem(Places.component("brand"), "Brand")
