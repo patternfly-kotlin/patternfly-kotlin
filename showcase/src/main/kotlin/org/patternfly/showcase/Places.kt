@@ -9,6 +9,9 @@ import org.patternfly.pfTitle
 import org.patternfly.showcase.component.AlertComponent
 import org.patternfly.showcase.component.AlertGroupComponent
 import org.patternfly.showcase.component.ButtonComponent
+import org.patternfly.showcase.component.ContentComponent
+import org.patternfly.showcase.component.DataListComponent
+import org.patternfly.showcase.component.DropdownComponent
 import org.w3c.dom.HTMLElement
 
 @OptIn(ExperimentalStdlibApi::class)
@@ -25,6 +28,9 @@ object Places {
         put(component("alert"), AlertComponent)
         put(component("alert-group"), AlertGroupComponent)
         put(component("button"), ButtonComponent)
+        put(component("content"), ContentComponent)
+        put(component("data-list"), DataListComponent)
+        put(component("dropdown"), DropdownComponent)
     }
 
     fun behaviour(name: String) = "https://www.patternfly.org/v4/design-guidelines/usage-and-behavior/$name"

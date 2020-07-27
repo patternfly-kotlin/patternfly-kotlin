@@ -17,7 +17,6 @@
 }
 
 .sc-snippet__heading {
-    border-bottom: var(--pf-global--BorderWidth--sm) solid #f8f8f8;
     font-size: var(--pf-global--FontSize--xl);
     margin-top: var(--pf-global--spacer--lg);
     padding: var(--pf-global--spacer--md);

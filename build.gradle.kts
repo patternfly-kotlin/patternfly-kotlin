@@ -14,9 +14,9 @@ allprojects {
 
     repositories {
         jcenter()
+        mavenLocal()
         maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
-        mavenLocal()
         mavenCentral()
     }
 
@@ -31,6 +31,8 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.js")
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-js")
-        "implementation"("dev.fritz2:core:$fritz2Version")
+        "implementation"("dev.fritz2:core:$fritz2Version") {
+            isChanging = true
+        }
     }
 }

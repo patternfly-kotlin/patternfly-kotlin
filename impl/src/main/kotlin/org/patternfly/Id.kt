@@ -22,7 +22,7 @@ object Id {
     }
 
     /** Creates an identifier guaranteed to be unique within this document. The unique part comes last. */
-    fun unique(id: String, vararg additionalIds: String): String = "${build(id, *additionalIds)}-${unique()}"
+    fun unique(prefix: String, vararg additionalIds: String): String = "${build(prefix, *additionalIds)}-${unique()}"
 
     fun build(id: String, vararg additionalIds: String): String {
         val segments = listOf(id, *additionalIds)

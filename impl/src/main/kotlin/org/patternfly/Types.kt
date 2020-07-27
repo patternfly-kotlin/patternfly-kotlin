@@ -4,8 +4,10 @@ import org.patternfly.Modifier._2xl
 import org.patternfly.Modifier._3xl
 import org.patternfly.Modifier._4xl
 import org.patternfly.Modifier.end
+import org.patternfly.Modifier.left
 import org.patternfly.Modifier.lg
 import org.patternfly.Modifier.md
+import org.patternfly.Modifier.right
 import org.patternfly.Modifier.start
 import org.patternfly.Modifier.xl
 
@@ -29,6 +31,10 @@ enum class ComponentType(val id: String) {
     Page("pg"),
     Section("se"),
     Sidebar("sb");
+}
+
+enum class Align(val modifier: Modifier) {
+    LEFT(left), RIGHT(right)
 }
 
 enum class Direction {

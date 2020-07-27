@@ -2,19 +2,15 @@
 
 package org.patternfly.showcase.component
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.const
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.render
-import kotlinx.browser.window
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.patternfly.Modifier.secondary
-import org.patternfly.Modifier.tertiary
 import org.patternfly.Notification
 import org.patternfly.Severity.DANGER
 import org.patternfly.Severity.INFO
@@ -93,19 +89,21 @@ object AlertGroupComponent : Iterable<Tag<HTMLElement>> {
                     }
                 }
                 snippet("Async alert group", AlertGroupCode.ASYNC_ALERT_GROUP) {
-                    var handle = -1
                     var counter = 1
+                    var job: Job? = null
 
                     fun startSending() {
-                        handle = window.setInterval({
-                            Notification.info("Async notification $counter was added to the queue.")
-                            counter++
-                        }, 750)
+                        job = MainScope().launch {
+                            while (true) {
+                                Notification.info("Async notification $counter was added to the queue.")
+                                counter++
+                                delay(750)
+                            }
+                        }
                     }
 
                     fun stopSending() {
-                        window.clearInterval(handle)
-                        counter = 1
+                        job?.cancel()
                     }
 
                     pfButton(secondary) {
@@ -174,19 +172,21 @@ internal object AlertGroupCode {
     //language=kotlin
     const val ASYNC_ALERT_GROUP: String = """fun main() {
     render {
-        var handle = -1
         var counter = 1
+        var job: Job? = null
 
         fun startSending() {
-            handle = window.setInterval({
-                Notification.info("Async notification $counter was added to the queue.")
-                counter++
-            }, 750)
+            job = MainScope().launch {
+                while (true) {
+                    Notification.info("Async notification ${'$'}counter was added to the queue.")
+                    counter++
+                    delay(750)
+                }
+            }
         }
 
         fun stopSending() {
-            window.clearInterval(handle)
-            counter = 1
+            job?.cancel()
         }
 
         pfButton(secondary) {
