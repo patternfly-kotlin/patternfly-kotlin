@@ -137,7 +137,7 @@ class NavigationExpandableGroup<T>(
         }
         // it might interfere with router flow, which also modified the class list
         MainScope().launch {
-            this@NavigationExpandableGroup.navigation.router.routes.collect {
+            this@NavigationExpandableGroup.navigation.router.collect {
                 delay(333) // wait a little bit before testing for the current modifier
                 val selector = By.classname("nav".component("link"), current.value)
                 val containsCurrent = domNode.querySelector(selector) != null
@@ -178,10 +178,10 @@ class NavigationItem<T>(
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo
-            classMap = this@NavigationItem.navigation.router.routes.map { route ->
+            classMap = this@NavigationItem.navigation.router.map { route ->
                 mapOf(current.value to (this@NavigationItem.calculateSelection(route)))
             }
-            this@NavigationItem.navigation.router.routes
+            this@NavigationItem.navigation.router
                 .map { route -> this@NavigationItem.calculateSelection(route) }
                 .bindAttr("aria-current", "page")
             content(this)

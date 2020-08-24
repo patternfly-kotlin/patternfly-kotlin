@@ -1,6 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
+import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
@@ -71,7 +71,7 @@ fun <T> DropdownGroupBuilder<T>.pfDropdownSeparator() {
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class Dropdown<T> internal constructor(
-    internal val store: DropdownStore<T>,
+    val store: DropdownStore<T>,
     private val textOrIcon: Either<String, Icon>,
     align: Align?
 ) : Div(baseClass = "dropdown".component()) {
@@ -186,7 +186,7 @@ class DropdownItemBuilder<T>(private val item: T) {
 }
 
 class DropdownStore<T> : RootStore<List<DropdownEntry<T>>>(listOf()) {
-    internal val offerItem: EmittingHandler<T, T> = handleAndOffer { items, item ->
+    internal val offerItem: OfferingHandler<T, T> = handleAndOffer { items, item ->
         offer(item)
         items
     }

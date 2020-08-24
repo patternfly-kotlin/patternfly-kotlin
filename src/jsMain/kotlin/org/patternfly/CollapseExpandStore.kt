@@ -1,11 +1,11 @@
 package org.patternfly
 
+import dev.fritz2.binding.QueuedUpdate
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.dom.html.Events
 import kotlinx.browser.document
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ class CollapseExpandStore<T>(private val root: HTMLElement) : RootStore<Boolean>
         if (!clickInside) {
             removeCloseHandler()
             launch {
-                enqueue { false }
+                enqueue(QueuedUpdate({ false }, ::errorHandler))
             }
         }
     }
