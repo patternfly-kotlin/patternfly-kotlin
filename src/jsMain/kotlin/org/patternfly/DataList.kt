@@ -181,7 +181,7 @@ class DataListRow<T> internal constructor(
 
 // ------------------------------------------------------ store
 
-class DataListStore<T>(private val identifier: IdProvider<T, String>) : RootStore<List<T>>(listOf()) {
+open class DataListStore<T>(private val identifier: IdProvider<T, String>) : RootStore<List<T>>(listOf()) {
     val selection = handleAndOffer<T, T> { items, item ->
         offer(item)
         items
