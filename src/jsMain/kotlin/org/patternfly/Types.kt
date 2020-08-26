@@ -32,7 +32,8 @@ enum class ComponentType(val id: String) {
     NotificationDrawer("nd"),
     Page("pg"),
     Section("se"),
-    Sidebar("sb");
+    Sidebar("sb"),
+    Switch("sw");
 }
 
 enum class Align(val modifier: Modifier) {
