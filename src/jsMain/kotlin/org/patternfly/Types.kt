@@ -14,8 +14,10 @@ import org.patternfly.Modifier.xl
 typealias AsText<T> = (T) -> String
 
 enum class ComponentType(val id: String) {
+    Accordion("acc"),
     Alert("at"),
     AlertGroup("ag"),
+    Badge("bdg"),
     Button("btn"),
     Content("cnt"),
     DataList("dl"),
@@ -43,6 +45,10 @@ enum class Direction {
 
 enum class DividerVariant {
     HR, DIV, LI
+}
+
+enum class ExpansionMode {
+    SINGLE, MULTI
 }
 
 enum class Orientation {

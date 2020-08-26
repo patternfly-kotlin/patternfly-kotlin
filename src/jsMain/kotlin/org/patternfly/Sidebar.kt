@@ -4,9 +4,9 @@ import dev.fritz2.dom.html.Div
 
 // ------------------------------------------------------ dsl
 
-fun Page.pfSidebar(content: Sidebar.() -> Unit = {}) = register(Sidebar(), content)
+fun Page.pfSidebar(content: Sidebar.() -> Unit = {}): Sidebar = register(Sidebar(), content)
 
-fun Sidebar.pfSidebarBody(content: SidebarBody.() -> Unit = {}) = register(SidebarBody(), content)
+fun Sidebar.pfSidebarBody(content: SidebarBody.() -> Unit = {}): SidebarBody = register(SidebarBody(), content)
 
 // ------------------------------------------------------ tag
 
