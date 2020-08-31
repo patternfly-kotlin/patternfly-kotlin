@@ -26,50 +26,116 @@ fun <T> HtmlElements.pfHorizontalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
     tertiary: Boolean = false,
+    classes: String? = null,
     content: Navigation<T>.() -> Unit = {}
-): Navigation<T> = register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, content), {})
+): Navigation<T> =
+    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, classes, content), {})
+
+fun <T> HtmlElements.pfHorizontalNavigation(
+    router: Router<T>,
+    selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
+    tertiary: Boolean = false,
+    modifier: Modifier,
+    content: Navigation<T>.() -> Unit = {}
+): Navigation<T> =
+    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, modifier.value, content), {})
 
 fun <T> HtmlElements.pfVerticalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
+    classes: String? = null,
     content: Navigation<T>.() -> Unit = {}
-): Navigation<T> = register(Navigation(router, selected, Orientation.VERTICAL, false, content), {})
+): Navigation<T> =
+    register(Navigation(router, selected, Orientation.VERTICAL, false, classes, content), {})
+
+fun <T> HtmlElements.pfVerticalNavigation(
+    router: Router<T>,
+    selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
+    modifier: Modifier,
+    content: Navigation<T>.() -> Unit = {}
+): Navigation<T> =
+    register(Navigation(router, selected, Orientation.VERTICAL, false, modifier.value, content), {})
 
 fun <T> Navigation<T>.pfNavigationGroup(
     text: String,
+    classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationGroup<T> = register(NavigationGroup(this, text, content), {})
+): NavigationGroup<T> = register(NavigationGroup(this, text, classes, content), {})
+
+fun <T> Navigation<T>.pfNavigationGroup(
+    text: String,
+    modifier: Modifier,
+    content: NavigationItems<T>.() -> Unit = {}
+): NavigationGroup<T> = register(NavigationGroup(this, text, modifier.value, content), {})
 
 fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
     text: String,
+    classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationExpandableGroup<T> = register(NavigationExpandableGroup(this.navigation, text, content), {})
+): NavigationExpandableGroup<T> = register(NavigationExpandableGroup(this.navigation, text, classes, content), {})
+
+fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
+    text: String,
+    modifier: Modifier,
+    content: NavigationItems<T>.() -> Unit = {}
+): NavigationExpandableGroup<T> =
+    register(NavigationExpandableGroup(this.navigation, text, modifier.value, content), {})
 
 fun <T> Navigation<T>.pfNavigationItems(
+    classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this), content)
+): NavigationItems<T> = register(NavigationItems(this, classes), content)
+
+fun <T> Navigation<T>.pfNavigationItems(
+    modifier: Modifier,
+    content: NavigationItems<T>.() -> Unit = {}
+): NavigationItems<T> = register(NavigationItems(this, modifier.value), content)
 
 fun <T> NavigationGroup<T>.pfNavigationItems(
+    classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this.navigation), content)
+): NavigationItems<T> = register(NavigationItems(this.navigation, classes), content)
+
+fun <T> NavigationGroup<T>.pfNavigationItems(
+    modifier: Modifier,
+    content: NavigationItems<T>.() -> Unit = {}
+): NavigationItems<T> = register(NavigationItems(this.navigation, modifier.value), content)
 
 internal fun <T> TextElement.pfNavigationItems(
     navigation: Navigation<T>,
+    classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(navigation), content)
+): NavigationItems<T> = register(NavigationItems(navigation, classes), content)
 
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     text: String,
+    classes: String? = null,
     selected: ((route: T) -> Boolean)? = null
-): NavigationItem<T> = pfNavigationItem(item, selected) { +text }
+): NavigationItem<T> = pfNavigationItem(item, classes, selected) { +text }
 
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
+    text: String,
+    modifier: Modifier,
+    selected: ((route: T) -> Boolean)? = null
+): NavigationItem<T> = pfNavigationItem(item, modifier, selected) { +text }
+
+fun <T> NavigationItems<T>.pfNavigationItem(
+    item: T,
+    classes: String? = null,
     selected: ((route: T) -> Boolean)? = null,
     content: A.() -> Unit = {}
 ): NavigationItem<T> =
-    register(NavigationItem(this.navigation, item, selected, content), {})
+    register(NavigationItem(this.navigation, item, selected, classes, content), {})
+
+fun <T> NavigationItems<T>.pfNavigationItem(
+    item: T,
+    modifier: Modifier,
+    selected: ((route: T) -> Boolean)? = null,
+    content: A.() -> Unit = {}
+): NavigationItem<T> =
+    register(NavigationItem(this.navigation, item, selected, modifier.value, content), {})
 
 // ------------------------------------------------------ tag
 
@@ -78,15 +144,21 @@ class Navigation<T>(
     internal val selected: (route: T, item: T) -> Boolean,
     orientation: Orientation,
     tertiary: Boolean,
+    classes: String?,
     content: Navigation<T>.() -> Unit
-) : TextElement("nav", baseClass = "nav".component()) {
+) : PatternFlyComponent<HTMLElement>,
+    TextElement("nav", baseClass = classes {
+        +ComponentType.Navigation
+        +(if (orientation == Orientation.HORIZONTAL) horizontal else null)
+        +classes
+    }) {
+
     init {
-        domNode.componentType(ComponentType.Navigation)
+        markAs(ComponentType.Navigation)
         if (!tertiary) {
             attr("aria-label", "Global")
         }
         if (orientation == Orientation.HORIZONTAL) {
-            domNode.classList += horizontal
             // domNode.classList += "scrollable".modifier() // TODO Implement scrolling
             button("nav".component("scroll", "button")) {
                 attr("aria-label", "Scroll left")
@@ -108,8 +180,9 @@ class Navigation<T>(
 class NavigationGroup<T>(
     internal val navigation: Navigation<T>,
     text: String,
+    classes: String?,
     content: NavigationItems<T>.() -> Unit
-) : Tag<HTMLElement>("section", baseClass = "nav".component("section")) {
+) : Tag<HTMLElement>("section", baseClass = classes("nav".component("section"), classes)) {
     init {
         val id = Id.unique("ng")
         attr("aria-label", id)
@@ -123,9 +196,13 @@ class NavigationGroup<T>(
 class NavigationExpandableGroup<T>(
     private val navigation: Navigation<T>,
     text: String,
+    classes: String?,
     content: NavigationItems<T>.() -> Unit
-) :
-    Tag<HTMLLIElement>("li", baseClass = "${"nav".component("item")} ${expandable.value}") {
+) : Tag<HTMLLIElement>("li", baseClass = classes {
+    +"nav".component("item")
+    +expandable
+    +classes
+}) {
 
     private val expanded = ExpandableGroupStore()
 
@@ -166,15 +243,16 @@ class NavigationExpandableGroup<T>(
     }
 }
 
-class NavigationItems<T>(internal val navigation: Navigation<T>) :
-    Tag<HTMLUListElement>("ul", baseClass = "nav".component("list"))
+class NavigationItems<T>(internal val navigation: Navigation<T>, classes: String?) :
+    Tag<HTMLUListElement>("ul", baseClass = classes("nav".component("list"), classes))
 
 class NavigationItem<T>(
     private val navigation: Navigation<T>,
     private val item: T,
     private val selected: ((route: T) -> Boolean)?,
+    classes: String?,
     content: A.() -> Unit
-) : Tag<HTMLLIElement>("li", baseClass = "nav".component("item")) {
+) : Tag<HTMLLIElement>("li", baseClass = classes("nav".component("item"), classes)) {
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo

@@ -1,43 +1,65 @@
 package org.patternfly
 
+import dev.fritz2.dom.WithDomNode
+import kotlinx.browser.window
 import org.patternfly.Modifier._2xl
 import org.patternfly.Modifier._3xl
 import org.patternfly.Modifier._4xl
+import org.patternfly.Modifier.alignLeft
+import org.patternfly.Modifier.alignRight
 import org.patternfly.Modifier.end
-import org.patternfly.Modifier.left
 import org.patternfly.Modifier.lg
 import org.patternfly.Modifier.md
-import org.patternfly.Modifier.right
 import org.patternfly.Modifier.start
 import org.patternfly.Modifier.xl
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.get
+import org.w3c.dom.set
+
+// ------------------------------------------------------ types
 
 typealias AsText<T> = (T) -> String
 
-enum class ComponentType(val id: String) {
-    Accordion("acc"),
-    Alert("at"),
-    AlertGroup("ag"),
-    Badge("bdg"),
-    Button("btn"),
-    Content("cnt"),
-    DataList("dl"),
-    Drawer("dw"),
-    Dropdown("dd"),
-    EmptyState("es"),
-    Header("hdr"),
+interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
+
+    fun markAs(componentType: ComponentType) {
+        domNode.dataset[Dataset.COMPONENT_TYPE.short] = componentType.id
+//        domNode.setAttribute(Dataset.COMPONENT_TYPE.long, componentType.id)
+        if (window.localStorage["ouia"].toString() == "true") {
+            domNode.dataset[Dataset.OUIA_COMPONENT_TYPE.short] = componentType.name
+//            domNode.setAttribute(Dataset.OUIA_COMPONENT_TYPE.long, componentType.name)
+        }
+    }
+}
+
+// ------------------------------------------------------ enums
+
+enum class ComponentType(val id: String, internal val baseClass: String? = null) {
+    Alert("at", "alert".component()),
+    AlertGroup("ag", "alert-group".component()),
+    Badge("bdg", "badge".component()),
+    Brand("brd", "brand".component()),
+    Button("btn", "button".component()),
+    Card("crd", "card".component()),
+    Content("cnt", "content".component()),
+    DataList("dl", "data-list".component()),
+    Drawer("dw", "drawer".component()),
+    Dropdown("dd", "dropdown".component()),
+    EmptyState("es", "empty-state".component()),
+    Header("hdr", "page".component("header")),
     Icon("icn"),
-    Main("mn"),
-    Navigation("nav"),
-    NotificationBadge("nb"),
-    NotificationDrawer("nd"),
-    Page("pg"),
-    Section("se"),
-    Sidebar("sb"),
-    Switch("sw");
+    Main("mn", "page".component("main")),
+    Navigation("nav", "nav".component()),
+    NotificationBadge("nb", "button".component()),
+    Page("pg", "page".component()),
+    Section("se", "page".component("main-section")),
+    Sidebar("sb", "page".component("sidebar")),
+    Switch("sw", "switch".component()),
+    Title("tlt", "title".component());
 }
 
 enum class Align(val modifier: Modifier) {
-    LEFT(left), RIGHT(right)
+    LEFT(alignLeft), RIGHT(alignRight)
 }
 
 enum class Direction {

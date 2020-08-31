@@ -6,55 +6,91 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier.plain
+import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfDrawer(content: Drawer.() -> Unit = {}): Drawer =
-    register(Drawer(), content)
+fun HtmlElements.pfDrawer(classes: String? = null, content: Drawer.() -> Unit = {}): Drawer =
+    register(Drawer(classes), content)
 
-fun Drawer.pfDrawerSection(content: DrawerSection.() -> Unit = {}): DrawerSection =
-    register(DrawerSection(this.expanded), content)
+fun HtmlElements.pfDrawer(modifier: Modifier, content: Drawer.() -> Unit = {}): Drawer =
+    register(Drawer(modifier.value), content)
 
-fun Drawer.pfDrawerMain(content: DrawerMain.() -> Unit = {}): DrawerMain =
-    register(DrawerMain(this.expanded), content)
+fun Drawer.pfDrawerSection(classes: String? = null, content: DrawerSection.() -> Unit = {}): DrawerSection =
+    register(DrawerSection(this.expanded, classes), content)
 
-fun DrawerMain.pfDrawerContent(content: DrawerContent.() -> Unit = {}): DrawerContent =
-    register(DrawerContent(this.store), content)
+fun Drawer.pfDrawerSection(modifier: Modifier, content: DrawerSection.() -> Unit = {}): DrawerSection =
+    register(DrawerSection(this.expanded, modifier.value), content)
 
-fun DrawerMain.pfDrawerPanel(content: DrawerPanel.() -> Unit = {}): DrawerPanel =
-    register(DrawerPanel(this.store), content)
+fun Drawer.pfDrawerMain(classes: String? = null, content: DrawerMain.() -> Unit = {}): DrawerMain =
+    register(DrawerMain(this.expanded, classes), content)
 
-fun DrawerContent.pfDrawerBody(content: DrawerBody.() -> Unit = {}): DrawerBody =
-    register(DrawerBody(this.store), content)
+fun Drawer.pfDrawerMain(modifier: Modifier, content: DrawerMain.() -> Unit = {}): DrawerMain =
+    register(DrawerMain(this.expanded, modifier.value), content)
 
-fun DrawerPanel.pfDrawerBody(content: DrawerBody.() -> Unit = {}): DrawerBody =
-    register(DrawerBody(this.store), content)
+fun DrawerMain.pfDrawerContent(classes: String? = null, content: DrawerContent.() -> Unit = {}): DrawerContent =
+    register(DrawerContent(this.store, classes), content)
 
-fun DrawerBody.pfDrawerHead(content: DrawerHead.() -> Unit = {}): DrawerHead =
-    register(DrawerHead(this.store), content)
+fun DrawerMain.pfDrawerContent(modifier: Modifier, content: DrawerContent.() -> Unit = {}): DrawerContent =
+    register(DrawerContent(this.store, modifier.value), content)
 
-fun DrawerHead.pfDrawerActions(content: DrawerActions.() -> Unit = {}): DrawerActions =
-    register(DrawerActions(this.store), content)
+fun DrawerMain.pfDrawerPanel(classes: String? = null, content: DrawerPanel.() -> Unit = {}): DrawerPanel =
+    register(DrawerPanel(this.store, classes), content)
 
-fun DrawerActions.pfDrawerClose(): DrawerClose =
-    register(DrawerClose(this.store), {})
+fun DrawerMain.pfDrawerPanel(modifier: Modifier, content: DrawerPanel.() -> Unit = {}): DrawerPanel =
+    register(DrawerPanel(this.store, modifier.value), content)
+
+fun DrawerContent.pfDrawerBody(classes: String? = null, content: DrawerBody.() -> Unit = {}): DrawerBody =
+    register(DrawerBody(this.store, classes), content)
+
+fun DrawerContent.pfDrawerBody(modifier: Modifier, content: DrawerBody.() -> Unit = {}): DrawerBody =
+    register(DrawerBody(this.store, modifier.value), content)
+
+fun DrawerPanel.pfDrawerBody(classes: String? = null, content: DrawerBody.() -> Unit = {}): DrawerBody =
+    register(DrawerBody(this.store, classes), content)
+
+fun DrawerPanel.pfDrawerBody(modifier: Modifier, content: DrawerBody.() -> Unit = {}): DrawerBody =
+    register(DrawerBody(this.store, modifier.value), content)
+
+fun DrawerBody.pfDrawerHead(classes: String? = null, content: DrawerHead.() -> Unit = {}): DrawerHead =
+    register(DrawerHead(this.store, classes), content)
+
+fun DrawerBody.pfDrawerHead(modifier: Modifier, content: DrawerHead.() -> Unit = {}): DrawerHead =
+    register(DrawerHead(this.store, modifier.value), content)
+
+fun DrawerHead.pfDrawerActions(classes: String? = null, content: DrawerActions.() -> Unit = {}): DrawerActions =
+    register(DrawerActions(this.store, classes), content)
+
+fun DrawerHead.pfDrawerActions(modifier: Modifier, content: DrawerActions.() -> Unit = {}): DrawerActions =
+    register(DrawerActions(this.store, modifier.value), content)
+
+fun DrawerActions.pfDrawerClose(classes: String? = null): DrawerClose =
+    register(DrawerClose(this.store, classes), {})
+
+fun DrawerActions.pfDrawerClose(modifier: Modifier): DrawerClose =
+    register(DrawerClose(this.store, modifier.value), {})
 
 // ------------------------------------------------------ tag
 
-class Drawer : Div(baseClass = "drawer".component()) {
+class Drawer internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Drawer, classes)) {
+
     val expanded = ExpandedStore()
 
     init {
-        domNode.componentType(ComponentType.Drawer)
+        markAs(ComponentType.Drawer)
         classMap = expanded.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
     }
 }
 
-class DrawerActions(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("actions"))
+class DrawerActions(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("actions"), classes))
 
-class DrawerBody(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("body"))
+class DrawerBody(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("body"), classes))
 
-class DrawerClose(private val store: ExpandedStore) : Div(baseClass = "drawer".component("close")) {
+class DrawerClose(private val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("close"), classes)) {
     init {
         pfButton(plain) {
             pfIcon("times".fas())
@@ -65,19 +101,24 @@ class DrawerClose(private val store: ExpandedStore) : Div(baseClass = "drawer".c
     }
 }
 
-class DrawerContent(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("content"))
+class DrawerContent(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("content"), classes))
 
-class DrawerHead(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("head"))
+class DrawerHead(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("head"), classes))
 
-class DrawerMain(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("main"))
+class DrawerMain(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("main"), classes))
 
-class DrawerPanel(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("panel")) {
+class DrawerPanel(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("panel"), classes)) {
     init {
         store.data.bindAttr("hidden")
     }
 }
 
-class DrawerSection(internal val store: ExpandedStore) : Div(baseClass = "drawer".component("section"))
+class DrawerSection(internal val store: ExpandedStore, classes: String?) :
+    Div(baseClass = classes("drawer".component("section"), classes))
 
 // ------------------------------------------------------ store
 

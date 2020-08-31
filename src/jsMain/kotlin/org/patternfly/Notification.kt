@@ -9,17 +9,25 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfNotificationBadge() = register(NotificationBadge(), {})
+fun HtmlElements.pfNotificationBadge(classes: String? = null): NotificationBadge =
+    register(NotificationBadge(classes), {})
+
+fun HtmlElements.pfNotificationBadge(modifier: Modifier): NotificationBadge =
+    register(NotificationBadge(modifier.value), {})
 
 // ------------------------------------------------------ tag
 
-class NotificationBadge : Button(baseClass = "${"button".component()} ${Modifier.plain.value}") {
+class NotificationBadge(classes: String?) :
+    PatternFlyComponent<HTMLButtonElement>,
+    Button(baseClass = classes(ComponentType.NotificationBadge, classes)) {
+
     init {
-        domNode.componentType(ComponentType.NotificationBadge)
+        markAs(ComponentType.NotificationBadge)
         Notification.store.unread.map { unread ->
             if (unread) "Unread notifications" else "Notifications"
         }.bindAttr("aria-label")

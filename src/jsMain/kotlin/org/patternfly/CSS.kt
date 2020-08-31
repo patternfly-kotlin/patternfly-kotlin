@@ -17,12 +17,53 @@ private fun combine(prefix: String, main: String, elements: Array<out String>): 
     if (elements.isNotEmpty()) elements.joinTo(this, "-", "__")
 }
 
+inline fun classes(builderAction: ClassBuilder.() -> Unit): String = ClassBuilder().apply { builderAction() }.build()
+
+fun classes(vararg classes: String): String = classes.joinToString(" ")
+
+fun classes(vararg modifiers: Modifier): String = modifiers.joinToString(" ") { it.value }
+
+internal fun classes(componentType: ComponentType, optionalClass: String? = null): String? =
+    classes(componentType.baseClass, optionalClass)
+
+internal fun classes(baseClass: String?, optionalClass: String? = null): String? = buildString {
+    baseClass?.let { append(it).append(" ") }
+    optionalClass?.let { append(it) }
+}.trim().ifEmpty { null }
+
+class ClassBuilder {
+
+    private val builder = StringBuilder()
+
+    operator fun String?.unaryPlus() {
+        this?.let {
+            builder.append(it).append(" ")
+        }
+    }
+
+    operator fun Modifier?.unaryPlus() {
+        this?.let {
+            builder.append(it).append(" ")
+        }
+    }
+
+    internal operator fun ComponentType.unaryPlus() {
+        this.baseClass?.let {
+            builder.append(it).append(" ")
+        }
+    }
+
+    fun build() = builder.toString().trim()
+}
+
 @Suppress("EnumEntryName")
 enum class Modifier(val value: String) {
 
     _4xl("4xl".modifier()),
     _3xl("3xl".modifier()),
     _2xl("2xl".modifier()),
+    alignLeft("align-left".modifier()),
+    alignRight("align-right".modifier()),
     ariaDisabled("aria-disabled".modifier()),
     block("block".modifier()),
     control("control".modifier()),
@@ -34,17 +75,17 @@ enum class Modifier(val value: String) {
     expanded("expanded".modifier()),
     expandable("expandable".modifier()),
     horizontal("horizontal".modifier()),
+    hoverable("hoverable".modifier()),
     info("info".modifier()),
     `inline`("inline".modifier()),
-    left("left".modifier()),
     lg("lg".modifier()),
     light("light".modifier()),
     link("link".modifier()),
     md("md".modifier()),
+    noFill("no-fill".modifier()),
     plain("plain".modifier()),
     primary("primary".modifier()),
     read("read".modifier()),
-    right("right".modifier()),
     secondary("secondary".modifier()),
     selectable("selectable".modifier()),
     small("small".modifier()),

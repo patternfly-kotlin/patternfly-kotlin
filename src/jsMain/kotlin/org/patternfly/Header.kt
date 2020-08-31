@@ -1,32 +1,31 @@
 package org.patternfly
 
-import dev.fritz2.binding.const
-import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun Header.pfBrand(content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = "page".component("header", "brand")), content)
+fun Page.pfHeader(classes: String? = null, content: Header.() -> Unit = {}): Header =
+    register(Header(classes), content)
 
-fun HtmlElements.pfBrandLink(homeLink: String, content: A.() -> Unit = {}): A =
-    register(A(baseClass = "page".component("header", "brand", "link")).apply {
-        href = const(homeLink)
-    }, content)
+fun Page.pfHeader(modifier: Modifier, content: Header.() -> Unit = {}): Header =
+    register(Header(modifier.value), content)
 
-fun Page.pfHeader(content: Header.() -> Unit = {}): Header = register(Header(), content)
+fun Header.pfHeaderTools(classes: String? = null, content: Div.() -> Unit = {}): Div =
+    register(Div(baseClass = classes("page".component("header", "tools"), classes)), content)
 
-fun Header.pfHeaderTools(content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = "page".component("header", "tools")), content)
+fun Header.pfHeaderTools(modifier: Modifier, content: Div.() -> Unit = {}): Div =
+    register(Div(baseClass = classes("page".component("header", "tools"), modifier.value)), content)
 
 // ------------------------------------------------------ tag
 
-class Header internal constructor() :
-    TextElement("header", baseClass = "page".component("header")) {
+class Header internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLElement>,
+    TextElement("header", baseClass = classes(ComponentType.Header, classes)) {
+
     init {
-        domNode.componentType(ComponentType.Header)
+        markAs(ComponentType.Header)
         attr("role", "banner")
     }
 }

@@ -2,17 +2,24 @@ package org.patternfly
 
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfMain(content: Main.() -> Unit = {}): Main = register(Main(), content)
+fun HtmlElements.pfMain(classes: String? = null, content: Main.() -> Unit = {}): Main =
+    register(Main(classes), content)
+
+fun HtmlElements.pfMain(modifier: Modifier, content: Main.() -> Unit = {}): Main =
+    register(Main(modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Main internal constructor() :
-    TextElement("main", baseClass = "page".component("main")) {
+class Main internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLElement>,
+    TextElement("main", baseClass = classes(ComponentType.Main, classes)) {
+
     init {
-        domNode.componentType(ComponentType.Main)
+        markAs(ComponentType.Main)
         attr("role", "main")
         attr("tabindex", "-1")
     }

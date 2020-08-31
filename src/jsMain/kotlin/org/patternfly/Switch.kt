@@ -13,15 +13,20 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
+import org.w3c.dom.HTMLLabelElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSwitch(content: Switch.() -> Unit = {}): Switch =
-    register(Switch(), content)
+fun HtmlElements.pfSwitch(classes: String? = null, content: Switch.() -> Unit = {}): Switch =
+    register(Switch(classes), content)
+
+fun HtmlElements.pfSwitch(modifier: Modifier, content: Switch.() -> Unit = {}): Switch =
+    register(Switch(modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Switch internal constructor() : Label(baseClass = "switch".component()) {
+class Switch internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLLabelElement>, Label(baseClass = classes(ComponentType.Switch, classes)) {
 
     var label: Flow<String>
         get() = with(labelTag.domNode.textContent) {
@@ -53,11 +58,11 @@ class Switch internal constructor() : Label(baseClass = "switch".component()) {
     private val labelOffTag: Span
 
     init {
+        markAs(ComponentType.Switch)
         val id = Id.unique("switch")
         val onId = Id.unique("switch-on")
         val offId = Id.unique("switch-off")
         domNode.htmlFor = id
-        domNode.componentType(ComponentType.Switch)
         input = input(id = id, baseClass = "switch".component("input")) {
             type = const("checkbox")
             aria["labelledby"] = onId

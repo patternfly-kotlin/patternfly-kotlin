@@ -2,28 +2,23 @@ package org.patternfly
 
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSection(content: Section.() -> Unit = {}): Section =
-    register(Section(emptyList()), content)
+fun HtmlElements.pfSection(classes: String? = null, content: Section.() -> Unit = {}): Section =
+    register(Section(classes), content)
 
-fun HtmlElements.pfSection(vararg classes: String, content: Section.() -> Unit = {}): Section =
-    register(Section(classes.toList()), content)
-
-fun HtmlElements.pfSection(vararg modifier: Modifier, content: Section.() -> Unit = {}): Section =
-    register(Section(modifier.map { it.value }), content)
+fun HtmlElements.pfSection(modifier: Modifier, content: Section.() -> Unit = {}): Section =
+    register(Section(modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Section internal constructor(classes: List<String>) :
-    TextElement("section", baseClass = buildString {
-        append("page".component("main-section"))
-        if (classes.isNotEmpty()) {
-            classes.joinTo(this, " ", " ")
-        }
-    }) {
+class Section internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLElement>,
+    TextElement("section", baseClass = classes(ComponentType.Section, classes)) {
+
     init {
-        domNode.componentType(ComponentType.Section)
+        markAs(ComponentType.Section)
     }
 }

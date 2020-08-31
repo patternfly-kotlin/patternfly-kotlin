@@ -10,18 +10,29 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.Text
 import kotlin.math.max
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfBadge(min: Int = 0, max: Int = 999, content: Badge.() -> Unit = {}): Badge =
-    register(Badge(min, max), content)
+fun HtmlElements.pfBadge(
+    min: Int = 0,
+    max: Int = 999,
+    classes: String? = null,
+    content: Badge.() -> Unit = {}
+): Badge = register(Badge(min, max, classes), content)
+
+fun HtmlElements.pfBadge(min: Int = 0, max: Int = 999, modifier: Modifier, content: Badge.() -> Unit = {}): Badge =
+    register(Badge(min, max, modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Badge internal constructor(private val min: Int, private val max: Int) :
-    Span(baseClass = "badge".component()) {
+class Badge internal constructor(
+    private val min: Int,
+    private val max: Int,
+    classes: String?
+) : PatternFlyComponent<HTMLSpanElement>, Span(baseClass = classes(ComponentType.Badge, classes)) {
 
     var read: Flow<Boolean>
         get() = flowOf(true)
@@ -30,7 +41,7 @@ class Badge internal constructor(private val min: Int, private val max: Int) :
         }
 
     init {
-        domNode.componentType(ComponentType.Badge)
+        markAs(ComponentType.Badge)
         classMap = read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) }
     }
 

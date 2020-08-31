@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.DividerVariant.DIV
+import org.w3c.dom.HTMLDivElement
 
 typealias DropdownDisplay<T> = (T) -> Button.() -> Unit
 
@@ -23,21 +24,49 @@ fun <T> HtmlElements.pfDropdown(
     store: DropdownStore<T>,
     text: String,
     align: Align? = null,
+    classes: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, Either.Left(text), align), content)
+): Dropdown<T> = register(Dropdown(store, Either.Left(text), align, classes), content)
+
+fun <T> HtmlElements.pfDropdown(
+    store: DropdownStore<T>,
+    text: String,
+    align: Align? = null,
+    modifier: Modifier,
+    content: Dropdown<T>.() -> Unit = {}
+): Dropdown<T> = register(Dropdown(store, Either.Left(text), align, modifier.value), content)
 
 fun <T> HtmlElements.pfDropdownIcon(
     store: DropdownStore<T>,
     icon: Icon,
     align: Align? = null,
+    classes: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align), content)
+): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align, classes), content)
+
+fun <T> HtmlElements.pfDropdownIcon(
+    store: DropdownStore<T>,
+    icon: Icon,
+    align: Align? = null,
+    modifier: Modifier,
+    content: Dropdown<T>.() -> Unit = {}
+): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align, modifier.value), content)
 
 fun <T> HtmlElements.pfDropdownKebab(
     store: DropdownStore<T>,
     align: Align? = null,
+    classes: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, Either.Right(pfIcon("ellipsis-v".fas())), align), content)
+): Dropdown<T> =
+    register(Dropdown(store, Either.Right(pfIcon("ellipsis-v".fas())), align, classes), content)
+
+fun <T> HtmlElements.pfDropdownKebab(
+    store: DropdownStore<T>,
+    align: Align? = null,
+    modifier: Modifier,
+    content: Dropdown<T>.() -> Unit = {}
+): Dropdown<T> =
+    register(Dropdown(store, Either.Right(pfIcon("ellipsis-v".fas())), align, modifier.value), content)
 
 fun <T> Dropdown<T>.pfDropdownItems(block: DropdownEntryBuilder<T>.() -> Unit) {
     val entries = DropdownEntryBuilder<T>().apply(block).build()
@@ -73,8 +102,13 @@ fun <T> DropdownGroupBuilder<T>.pfDropdownSeparator() {
 class Dropdown<T> internal constructor(
     val store: DropdownStore<T>,
     private val textOrIcon: Either<String, Icon>,
-    align: Align?
-) : Div(baseClass = "dropdown".component()) {
+    align: Align?,
+    classes: String?
+) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
+    +ComponentType.Dropdown
+    +align?.modifier
+    +classes
+}) {
 
     val ces = CollapseExpandStore<T>(domNode)
     var asText: AsText<T> = { it.toString() }
@@ -85,11 +119,8 @@ class Dropdown<T> internal constructor(
     }
 
     init {
-        domNode.componentType(ComponentType.Dropdown)
+        markAs(ComponentType.Dropdown)
         classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
-        align?.let {
-            domNode.classList += it.modifier
-        }
         val buttonId = Id.unique("dd-button")
         button("dropdown".component("toggle"), buttonId) {
             aria["haspopup"] = true
@@ -110,7 +141,12 @@ class Dropdown<T> internal constructor(
                 }
             }
         }
-        ul("dropdown".component("menu")) {
+        ul(baseClass = buildString {
+            append("dropdown".component("menu"))
+            align?.let {
+                append(" ").append(it.modifier)
+            }
+        }) {
             aria["labelledby"] = buttonId
             attr("role", "menu")
             this@Dropdown.ces.data.map { !it }.bindAttr("hidden")

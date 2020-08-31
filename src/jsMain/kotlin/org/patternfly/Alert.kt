@@ -10,51 +10,98 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.patternfly.Modifier.plain
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfAlertGroup(toast: Boolean = false, content: AlertGroup.() -> Unit = {}): AlertGroup =
-    register(AlertGroup(toast), content)
+fun HtmlElements.pfAlertGroup(
+    toast: Boolean = false,
+    classes: String? = null,
+    content: AlertGroup.() -> Unit = {}
+): AlertGroup = register(AlertGroup(toast, classes), content)
+
+fun HtmlElements.pfAlertGroup(
+    toast: Boolean = false,
+    modifier: Modifier,
+    content: AlertGroup.() -> Unit = {}
+): AlertGroup = register(AlertGroup(toast, modifier.value), content)
 
 fun HtmlElements.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
     inline: Boolean = false,
+    classes: String? = null,
     content: Alert.() -> Unit = {}
-): Alert = register(Alert(severity, text, closable, inline), content)
+): Alert = register(Alert(severity, text, closable, inline, classes), content)
+
+fun HtmlElements.pfAlert(
+    severity: Severity,
+    text: String,
+    closable: Boolean = false,
+    inline: Boolean = false,
+    modifier: Modifier,
+    content: Alert.() -> Unit = {}
+): Alert = register(Alert(severity, text, closable, inline, modifier.value), content)
 
 fun AlertGroup.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
     inline: Boolean = false,
+    classes: String? = null,
     content: Alert.() -> Unit = {}
 ): Li = register(li("alert-group".component("item")) {
-    pfAlert(severity, text, closable, inline) {
+    pfAlert(severity, text, closable, inline, classes) {
         content(this)
     }
 }, {})
 
-fun Alert.pfAlertDescription(content: Div.() -> Unit = {}): Div =
-    register(div("alert".component("description")) {
+fun AlertGroup.pfAlert(
+    severity: Severity,
+    text: String,
+    closable: Boolean = false,
+    inline: Boolean = false,
+    modifier: Modifier,
+    content: Alert.() -> Unit = {}
+): Li = register(li("alert-group".component("item")) {
+    pfAlert(severity, text, closable, inline, modifier) {
+        content(this)
+    }
+}, {})
+
+fun Alert.pfAlertDescription(classes: String? = null, content: Div.() -> Unit = {}): Div =
+    register(div(baseClass = classes("alert".component("description"), classes)) {
         content()
     }, {})
 
-fun Alert.pfAlertActionGroup(content: Div.() -> Unit = {}): Div =
-    register(div("alert".component("action-group")) {
+fun Alert.pfAlertDescription(modifier: Modifier, content: Div.() -> Unit = {}): Div =
+    register(div(baseClass = classes("alert".component("description"), modifier.value)) {
+        content()
+    }, {})
+
+fun Alert.pfAlertActionGroup(classes: String? = null, content: Div.() -> Unit = {}): Div =
+    register(div(baseClass = classes("alert".component("action-group"), classes)) {
+        content()
+    }, {})
+
+fun Alert.pfAlertActionGroup(modifier: Modifier, content: Div.() -> Unit = {}): Div =
+    register(div(baseClass = classes("alert".component("action-group"), modifier.value)) {
         content()
     }, {})
 
 // ------------------------------------------------------ tag
 
-class AlertGroup internal constructor(toast: Boolean) : Ul(baseClass = "alert-group".component()) {
+class AlertGroup internal constructor(toast: Boolean, classes: String?) :
+    PatternFlyComponent<HTMLUListElement>,
+    Ul(baseClass = classes(ComponentType.AlertGroup, classes)) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
 
     init {
-        domNode.componentType(ComponentType.AlertGroup)
+        markAs(ComponentType.AlertGroup)
         if (toast) {
             domNode.classList += Modifier.toast
             MainScope().launch {
@@ -85,11 +132,12 @@ class Alert internal constructor(
     private val severity: Severity,
     private val text: String,
     closable: Boolean = false,
-    inline: Boolean = false
-) : Div(baseClass = "alert".component()) {
+    inline: Boolean = false,
+    classes: String?
+) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Alert, classes)) {
 
     init {
-        domNode.componentType(ComponentType.Alert)
+        markAs(ComponentType.Alert)
         severity.modifier?.let {
             domNode.classList += it
         }

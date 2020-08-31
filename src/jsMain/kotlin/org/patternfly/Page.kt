@@ -2,15 +2,21 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
+import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ tag
 
-fun HtmlElements.pfPage(content: Page.() -> Unit = {}): Page = register(Page(), content)
+fun HtmlElements.pfPage(classes: String? = null, content: Page.() -> Unit = {}): Page =
+    register(Page(classes), content)
+
+fun HtmlElements.pfPage(modifier: Modifier, content: Page.() -> Unit = {}): Page =
+    register(Page(modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Page internal constructor() : Div(baseClass = "page".component()) {
+class Page internal constructor(classes: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Page, classes)) {
     init {
-        domNode.componentType(ComponentType.Page)
+        markAs(ComponentType.Page)
     }
 }

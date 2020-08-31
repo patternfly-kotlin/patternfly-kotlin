@@ -12,6 +12,7 @@ import dev.fritz2.dom.html.render
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier.selectable
+import org.w3c.dom.HTMLUListElement
 
 typealias DataListDisplay<T> = (T) -> DataListItem<T>.() -> Unit
 
@@ -21,46 +22,88 @@ fun <T> HtmlElements.pfDataList(
     identifier: IdProvider<T, String>,
     store: DataListStore<T>,
     selectionMode: SelectionMode = SelectionMode.NONE,
+    classes: String? = null,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(identifier, store, selectionMode), content)
+): DataList<T> = register(DataList(identifier, store, selectionMode, classes), content)
+
+fun <T> HtmlElements.pfDataList(
+    identifier: IdProvider<T, String>,
+    store: DataListStore<T>,
+    selectionMode: SelectionMode = SelectionMode.NONE,
+    modifier: Modifier,
+    content: DataList<T>.() -> Unit = {}
+): DataList<T> = register(DataList(identifier, store, selectionMode, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListAction(
-    vararg classes: String,
+    classes: String? = null,
     content: DataListAction<T>.() -> Unit = {}
-): DataListAction<T> = register(DataListAction(this.dataList, this.item, classes.toList()), content)
+): DataListAction<T> = register(DataListAction(this.dataList, this.item, classes), content)
+
+fun <T> DataListRow<T>.pfDataListAction(
+    modifier: Modifier,
+    content: DataListAction<T>.() -> Unit = {}
+): DataListAction<T> = register(DataListAction(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListContent<T>.pfDataListCell(
-    vararg classes: String,
+    classes: String? = null,
     content: DataListCell<T>.() -> Unit = {}
-): DataListCell<T> = register(DataListCell(this.dataList, this.item, classes.toList()), content)
+): DataListCell<T> = register(DataListCell(this.dataList, this.item, classes), content)
+
+fun <T> DataListContent<T>.pfDataListCell(
+    modifier: Modifier,
+    content: DataListCell<T>.() -> Unit = {}
+): DataListCell<T> = register(DataListCell(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListControl<T>.pfDataListCheck(
     checkBoxName: String = Id.unique("dl-checkbox"),
+    classes: String? = null,
     content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxName), content)
+): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxName, classes), content)
+
+fun <T> DataListControl<T>.pfDataListCheck(
+    checkBoxName: String = Id.unique("dl-checkbox"),
+    modifier: Modifier,
+    content: DataListCheck<T>.() -> Unit = {}
+): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxName, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListContent(
-    vararg classes: String,
+    classes: String? = null,
     content: DataListContent<T>.() -> Unit = {}
-): DataListContent<T> = register(DataListContent(this.dataList, this.item, classes.toList()), content)
+): DataListContent<T> = register(DataListContent(this.dataList, this.item, classes), content)
+
+fun <T> DataListRow<T>.pfDataListContent(
+    modifier: Modifier,
+    content: DataListContent<T>.() -> Unit = {}
+): DataListContent<T> = register(DataListContent(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListControl(
-    vararg classes: String,
+    classes: String? = null,
     content: DataListControl<T>.() -> Unit = {}
-): DataListControl<T> = register(DataListControl(this.dataList, this.item, classes.toList()), content)
+): DataListControl<T> = register(DataListControl(this.dataList, this.item, classes), content)
+
+fun <T> DataListRow<T>.pfDataListControl(
+    modifier: Modifier,
+    content: DataListControl<T>.() -> Unit = {}
+): DataListControl<T> = register(DataListControl(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListItem<T>.pfDataListRow(
-    vararg classes: String,
+    classes: String? = null,
     content: DataListRow<T>.() -> Unit = {}
-): DataListRow<T> = register(DataListRow(this.dataList, this.item, classes.toList()), content)
+): DataListRow<T> = register(DataListRow(this.dataList, this.item, classes), content)
+
+fun <T> DataListItem<T>.pfDataListRow(
+    modifier: Modifier,
+    content: DataListRow<T>.() -> Unit = {}
+): DataListRow<T> = register(DataListRow(this.dataList, this.item, modifier.value), content)
 
 // ------------------------------------------------------ tag
 
 class DataList<T> internal constructor(
     internal val identifier: IdProvider<T, String>,
     internal val store: DataListStore<T>,
-    internal val selectionMode: SelectionMode
-) : Ul(baseClass = "data-list".component()) {
+    internal val selectionMode: SelectionMode,
+    classes: String?
+) : PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
 
     var asText: AsText<T> = { it.toString() }
     var display: DataListDisplay<T> = {
@@ -70,7 +113,7 @@ class DataList<T> internal constructor(
     }
 
     init {
-        domNode.componentType(ComponentType.DataList)
+        markAs(ComponentType.DataList)
         attr("role", "list")
         store.data.each().map { item ->
             render {
@@ -83,34 +126,25 @@ class DataList<T> internal constructor(
 class DataListAction<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T,
-    classes: List<String>
-) : Div(baseClass = buildString {
-    append("data-list".component("item-action"))
-    if (classes.isNotEmpty()) {
-        classes.joinTo(this, " ", " ")
-    }
-})
+    classes: String?
+) : Div(baseClass = classes("data-list".component("item-action"), classes))
 
 class DataListCell<T> internal constructor(
-    internal val dataList: DataList<T>,
-    internal val item: T,
-    classes: List<String>
-) : Div(baseClass = buildString {
-    append("data-list".component("cell"))
-    if (classes.isNotEmpty()) {
-        classes.joinTo(this, " ", " ")
-    }
-}) {
+    dataList: DataList<T>,
+    item: T,
+    classes: String?
+) : Div(baseClass = classes("data-list".component("cell"), classes)) {
     init {
         attr("rowId", rowId(dataList.identifier, item))
     }
 }
 
 class DataListCheck<T> internal constructor(
-    internal val dataList: DataList<T>,
-    internal val item: T,
-    checkBoxName: String
-) : Div(baseClass = "data-list".component("check")) {
+    private val dataList: DataList<T>,
+    private val item: T,
+    checkBoxName: String,
+    classes: String?
+) : Div(baseClass = classes("data-list".component("check"), classes)) {
     init {
         input {
             name = const(checkBoxName)
@@ -125,13 +159,8 @@ class DataListCheck<T> internal constructor(
 class DataListContent<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T,
-    classes: List<String>
-) : Div(baseClass = buildString {
-    append("data-list".component("item-content"))
-    if (classes.isNotEmpty()) {
-        classes.joinTo(this, " ", " ")
-    }
-}) {
+    classes: String?
+) : Div(baseClass = classes("data-list".component("item-content"), classes)) {
     init {
         attr("rowId", rowId(dataList.identifier, item))
     }
@@ -140,13 +169,8 @@ class DataListContent<T> internal constructor(
 class DataListControl<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T,
-    classes: List<String>
-) : Div(baseClass = buildString {
-    append("data-list".component("item-control"))
-    if (classes.isNotEmpty()) {
-        classes.joinTo(this, " ", " ")
-    }
-})
+    classes: String?
+) : Div(baseClass = classes("data-list".component("item-control"), classes))
 
 class DataListItem<T> internal constructor(
     internal val dataList: DataList<T>,
@@ -167,13 +191,8 @@ class DataListItem<T> internal constructor(
 class DataListRow<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T,
-    classes: List<String>
-) : Div(baseClass = buildString {
-    append("data-list".component("item-row"))
-    if (classes.isNotEmpty()) {
-        classes.joinTo(this, " ", " ")
-    }
-}) {
+    classes: String?
+) : Div(baseClass = classes("data-list".component("item-row"), classes)) {
     init {
         attr("rowId", rowId(dataList.identifier, item))
     }
