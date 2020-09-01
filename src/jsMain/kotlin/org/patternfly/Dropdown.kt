@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.action
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Button
@@ -11,7 +12,6 @@ import dev.fritz2.dom.html.render
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.DividerVariant.DIV
 import org.w3c.dom.HTMLDivElement
@@ -70,7 +70,7 @@ fun <T> HtmlElements.pfDropdownKebab(
 
 fun <T> Dropdown<T>.pfDropdownItems(block: DropdownEntryBuilder<T>.() -> Unit) {
     val entries = DropdownEntryBuilder<T>().apply(block).build()
-    flowOf(entries) handledBy this.store.update
+    action(entries) handledBy this.store.update
 }
 
 fun <T> pfDropdownItems(block: DropdownEntryBuilder<T>.() -> Unit): List<DropdownEntry<T>> =
@@ -141,11 +141,9 @@ class Dropdown<T> internal constructor(
                 }
             }
         }
-        ul(baseClass = buildString {
-            append("dropdown".component("menu"))
-            align?.let {
-                append(" ").append(it.modifier)
-            }
+        ul(baseClass = classes {
+            +"dropdown".component("menu")
+            +align?.modifier
         }) {
             aria["labelledby"] = buttonId
             attr("role", "menu")
@@ -203,13 +201,13 @@ data class DropdownItem<T>(val item: T, val disabled: Boolean = false, val selec
 class DropdownSeparator<T> : DropdownEntry<T>()
 
 class DropdownEntryBuilder<T> {
-    val entries: MutableList<DropdownEntry<T>> = mutableListOf()
+    internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
 
     internal fun build(): List<DropdownEntry<T>> = entries
 }
 
 class DropdownGroupBuilder<T>(private val title: String) {
-    val entries: MutableList<DropdownEntry<T>> = mutableListOf()
+    internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
 
     internal fun build(): DropdownGroup<T> = DropdownGroup(title, entries)
 }

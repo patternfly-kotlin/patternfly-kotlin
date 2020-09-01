@@ -21,7 +21,10 @@ fun HtmlElements.pfLinkButton(modifier: Modifier, content: LinkButton.() -> Unit
     register(LinkButton(modifier.value), content)
 
 fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Unit = {}): Span =
-    span(buildString { append("button".component("icon")).append(" ").append(position.modifier.value) }) {
+    span(baseClass = classes {
+        +"button".component("icon")
+        +position.modifier
+    }) {
         pfIcon(iconClass, content)
     }
 

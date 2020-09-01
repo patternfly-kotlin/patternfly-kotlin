@@ -8,7 +8,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.dom.html.render
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier.selectable
@@ -115,10 +114,8 @@ class DataList<T> internal constructor(
     init {
         markAs(ComponentType.DataList)
         attr("role", "list")
-        store.data.each().map { item ->
-            render {
-                register(DataListItem(this@DataList, item)) {}
-            }
+        store.data.each().render { item ->
+            register(DataListItem(this@DataList, item)) {}
         }.bind()
     }
 }
