@@ -9,18 +9,18 @@ import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ dsl
 
-fun Header.pfBrandContainer(classes: String? = null, content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = classes("page".component("header", "brand"), classes)), content)
+fun Header.pfBrandContainer(classes: String? = null, content: BrandContainer.() -> Unit = {}): BrandContainer =
+    register(BrandContainer(classes("page".component("header", "brand"), classes)), content)
 
-fun Header.pfBrandContainer(modifier: Modifier, content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = classes("page".component("header", "brand"), modifier.value)), content)
+fun Header.pfBrandContainer(modifier: Modifier, content: BrandContainer.() -> Unit = {}): BrandContainer =
+    register(BrandContainer(classes("page".component("header", "brand"), modifier.value)), content)
 
-fun HtmlElements.pfBrandLink(homeLink: String, classes: String? = null, content: A.() -> Unit = {}): A =
+fun BrandContainer.pfBrandLink(homeLink: String, classes: String? = null, content: A.() -> Unit = {}): A =
     register(A(baseClass = classes("page".component("header", "brand", "link"), classes)).apply {
         href = const(homeLink)
     }, content)
 
-fun HtmlElements.pfBrandLink(homeLink: String, modifier: Modifier, content: A.() -> Unit = {}): A =
+fun BrandContainer.pfBrandLink(homeLink: String, modifier: Modifier, content: A.() -> Unit = {}): A =
     register(A(baseClass = classes("page".component("header", "brand", "link"), modifier.value)).apply {
         href = const(homeLink)
     }, content)
@@ -41,3 +41,5 @@ class Brand internal constructor(src: String, classes: String?) :
         this.src = const(src)
     }
 }
+
+class BrandContainer(classes: String?) : Div(baseClass = classes)

@@ -6,14 +6,21 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfIcon(iconClass: String, content: Icon.() -> Unit = {}): Icon =
-    register(Icon(iconClass), content)
+fun HtmlElements.pfIcon(iconClass: String, classes: String? = null, content: Icon.() -> Unit = {}): Icon =
+    register(Icon(iconClass, classes), content)
+
+fun HtmlElements.pfIcon(iconClass: String, modifier: Modifier, content: Icon.() -> Unit = {}): Icon =
+    register(Icon(iconClass, modifier.value), content)
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String) :
+class Icon internal constructor(iconClass: String, classes: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("i", baseClass = classes(ComponentType.Icon, iconClass)) {
+    TextElement("i", baseClass = classes {
+        +ComponentType.Icon
+        +iconClass
+        +classes
+    }) {
     init {
         markAs(ComponentType.Icon)
         attr("aria-hidden", "true")

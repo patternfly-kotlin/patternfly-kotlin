@@ -149,7 +149,7 @@ class Navigation<T>(
 ) : PatternFlyComponent<HTMLElement>,
     TextElement("nav", baseClass = classes {
         +ComponentType.Navigation
-        +(if (orientation == Orientation.HORIZONTAL) horizontal else null)
+        +(horizontal `when` (orientation == Orientation.HORIZONTAL))
         +classes
     }) {
 

@@ -8,7 +8,6 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
-import dev.fritz2.dom.html.render
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +20,7 @@ typealias DropdownDisplay<T> = (T) -> Button.() -> Unit
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfDropdown(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     text: String,
     align: Align? = null,
     classes: String? = null,
@@ -29,7 +28,7 @@ fun <T> HtmlElements.pfDropdown(
 ): Dropdown<T> = register(Dropdown(store, Either.Left(text), align, classes), content)
 
 fun <T> HtmlElements.pfDropdown(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     text: String,
     align: Align? = null,
     modifier: Modifier,
@@ -37,7 +36,7 @@ fun <T> HtmlElements.pfDropdown(
 ): Dropdown<T> = register(Dropdown(store, Either.Left(text), align, modifier.value), content)
 
 fun <T> HtmlElements.pfDropdownIcon(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     icon: Icon,
     align: Align? = null,
     classes: String? = null,
@@ -45,7 +44,7 @@ fun <T> HtmlElements.pfDropdownIcon(
 ): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align, classes), content)
 
 fun <T> HtmlElements.pfDropdownIcon(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     icon: Icon,
     align: Align? = null,
     modifier: Modifier,
@@ -53,7 +52,7 @@ fun <T> HtmlElements.pfDropdownIcon(
 ): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align, modifier.value), content)
 
 fun <T> HtmlElements.pfDropdownKebab(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     align: Align? = null,
     classes: String? = null,
     content: Dropdown<T>.() -> Unit = {}
@@ -61,7 +60,7 @@ fun <T> HtmlElements.pfDropdownKebab(
     register(Dropdown(store, Either.Right(pfIcon("ellipsis-v".fas())), align, classes), content)
 
 fun <T> HtmlElements.pfDropdownKebab(
-    store: DropdownStore<T>,
+    store: DropdownStore<T> = DropdownStore(),
     align: Align? = null,
     modifier: Modifier,
     content: Dropdown<T>.() -> Unit = {}
@@ -121,17 +120,17 @@ class Dropdown<T> internal constructor(
     init {
         markAs(ComponentType.Dropdown)
         classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
-        val buttonId = Id.unique("dd-button")
+        val buttonId = Id.unique(ComponentType.Dropdown.id, "btn")
         button("dropdown".component("toggle"), buttonId) {
             aria["haspopup"] = true
             this@Dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
             clicks handledBy this@Dropdown.ces.expand
             when (this@Dropdown.textOrIcon) {
                 is Either.Left -> {
-                    span("dropdown".component("toggle", "text")) {
+                    span(baseClass = "dropdown".component("toggle", "text")) {
                         +this@Dropdown.textOrIcon.value
                     }
-                    span("dropdown".component("toggle", "icon")) {
+                    span(baseClass = "dropdown".component("toggle", "icon")) {
                         pfIcon("caret-down".fas())
                     }
                 }
@@ -148,39 +147,37 @@ class Dropdown<T> internal constructor(
             aria["labelledby"] = buttonId
             attr("role", "menu")
             this@Dropdown.ces.data.map { !it }.bindAttr("hidden")
-            this@Dropdown.store.data.each().map { item ->
-                render {
-                    when (item) {
-                        is DropdownItem<T> -> {
-                            li {
-                                attr("role", "menuitem")
-                                button("dropdown".component("menu-item")) {
-                                    attr("tabindex", "-1")
-                                    if (item.disabled) {
-                                        attr("disabled", "true")
-                                        domNode.classList += Modifier.disabled
-                                    }
-                                    if (item.selected) {
-                                        domNode.autofocus = true
-                                    }
-                                    val content = this@Dropdown.display(item.item)
-                                    content.invoke(this)
-
-                                    this@Dropdown.store.offerItem handledBy this@Dropdown.ces.collapse
-                                    clicks.map { item.item } handledBy this@Dropdown.store.offerItem
+            this@Dropdown.store.data.each().render { item ->
+                when (item) {
+                    is DropdownItem<T> -> {
+                        li {
+                            attr("role", "menuitem")
+                            button(baseClass = "dropdown".component("menu-item")) {
+                                attr("tabindex", "-1")
+                                if (item.disabled) {
+                                    attr("disabled", "true")
+                                    domNode.classList += Modifier.disabled
                                 }
+                                if (item.selected) {
+                                    domNode.autofocus = true
+                                }
+                                val content = this@Dropdown.display(item.item)
+                                content.invoke(this)
+
+                                this@Dropdown.store.offerItem handledBy this@Dropdown.ces.collapse
+                                clicks.map { item.item } handledBy this@Dropdown.store.offerItem
                             }
                         }
-                        is DropdownGroup<T> -> {
-                            li(baseClass = "display-none".util()) {
-                                !"Dropdown groups not yet implemented"
-                            }
+                    }
+                    is DropdownGroup<T> -> {
+                        li(baseClass = "display-none".util()) {
+                            !"Dropdown groups not yet implemented"
                         }
-                        is DropdownSeparator<T> -> {
-                            li {
-                                attr("role", "separator")
-                                pfDivider(DIV)
-                            }
+                    }
+                    is DropdownSeparator<T> -> {
+                        li {
+                            attr("role", "separator")
+                            pfDivider(DIV)
                         }
                     }
                 }
@@ -202,20 +199,17 @@ class DropdownSeparator<T> : DropdownEntry<T>()
 
 class DropdownEntryBuilder<T> {
     internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
-
     internal fun build(): List<DropdownEntry<T>> = entries
 }
 
 class DropdownGroupBuilder<T>(private val title: String) {
     internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
-
     internal fun build(): DropdownGroup<T> = DropdownGroup(title, entries)
 }
 
 class DropdownItemBuilder<T>(private val item: T) {
     var disabled: Boolean = false
     var selected: Boolean = false
-
     internal fun build(): DropdownItem<T> = DropdownItem(item, disabled, selected)
 }
 

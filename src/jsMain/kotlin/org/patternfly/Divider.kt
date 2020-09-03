@@ -8,13 +8,13 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfDivider(variant: DividerVariant = DividerVariant.HR, baseClass: String? = null): Tag<HTMLElement> =
+fun HtmlElements.pfDivider(variant: DividerVariant = DividerVariant.HR, classes: String? = null): Tag<HTMLElement> =
     when (variant) {
-        DividerVariant.HR -> register(Hr(baseClass = classes("divider".component(), baseClass)), {})
-        DividerVariant.DIV -> register(Div(baseClass = classes("divider".component(), baseClass)).apply {
+        DividerVariant.HR -> register(Hr(baseClass = classes("divider".component(), classes)), {})
+        DividerVariant.DIV -> register(Div(baseClass = classes("divider".component(), classes)).apply {
             attr("role", "separator")
         }, {})
-        DividerVariant.LI -> register(Div(baseClass = classes("divider".component(), baseClass)).apply {
+        DividerVariant.LI -> register(Div(baseClass = classes("divider".component(), classes)).apply {
             attr("role", "separator")
         }, {})
     }

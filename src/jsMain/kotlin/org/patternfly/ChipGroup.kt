@@ -65,13 +65,12 @@ class ChipGroup<T> internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>,
     Div(baseClass = classes {
         +ComponentType.ChipGroup
-        +(if (text != null) "category".modifier() else null)
+        +("category".modifier() `when` (text != null))
         +classes
     }) {
 
     private var closeButton: Button? = null
     private val expanded = object : RootStore<Boolean>(false) {
-        val expand = handle { true }
         val collapse = handle { false }
         val flip = handle { !it }
     }
@@ -89,7 +88,11 @@ class ChipGroup<T> internal constructor(
         }
     }
     var asText: AsText<T> = { it.toString() }
-    var display: ChipGroupDisplay<T>? = null
+    var display: ChipGroupDisplay<T> = {
+        {
+            +this@ChipGroup.asText(it)
+        }
+    }
 
     init {
         markAs(ComponentType.ChipGroup)
@@ -110,15 +113,12 @@ class ChipGroup<T> internal constructor(
                 .combine(this@ChipGroup.expanded.data) { items, expanded -> Pair(items, expanded) }
                 .onEach { (items, expanded) ->
                     domNode.clear()
-                    console.log("expanded: $expanded")
                     val visibleItems = if (expanded) items else items.take(limit)
                     visibleItems.forEach { item ->
                         li(baseClass = "chip-group".component("list-item")) {
-                            pfChip(this@ChipGroup.asText(item)) {
-                                this@ChipGroup.display?.let { display ->
-                                    val content = display(item)
-                                    content.invoke(this)
-                                }
+                            pfChip {
+                                val content = this@ChipGroup.display(item)
+                                content.invoke(this)
                                 val id = this@ChipGroup.store.identifier(item)
                                 closes.map { id } handledBy this@ChipGroup.store.remove
                             }

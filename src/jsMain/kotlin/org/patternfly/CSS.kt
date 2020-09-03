@@ -47,6 +47,10 @@ class ClassBuilder {
         }
     }
 
+    infix fun String.`when`(condition: Boolean): String? = if (condition) this else null
+
+    infix fun Modifier.`when`(condition: Boolean): Modifier? = if (condition) this else null
+
     internal operator fun ComponentType.unaryPlus() {
         this.baseClass?.let {
             builder.append(it).append(" ")

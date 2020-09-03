@@ -25,7 +25,7 @@ fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Uni
         +"button".component("icon")
         +position.modifier
     }) {
-        pfIcon(iconClass, content)
+        pfIcon(iconClass, content = content)
     }
 
 // ------------------------------------------------------ tag

@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.const
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
@@ -8,6 +7,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Ul
+import dev.fritz2.dom.states
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier.selectable
@@ -19,7 +19,7 @@ typealias DataListDisplay<T> = (T) -> DataListItem<T>.() -> Unit
 
 fun <T> HtmlElements.pfDataList(
     identifier: IdProvider<T, String>,
-    store: DataListStore<T>,
+    store: ItemStore<T>,
     selectionMode: SelectionMode = SelectionMode.NONE,
     classes: String? = null,
     content: DataList<T>.() -> Unit = {}
@@ -27,7 +27,7 @@ fun <T> HtmlElements.pfDataList(
 
 fun <T> HtmlElements.pfDataList(
     identifier: IdProvider<T, String>,
-    store: DataListStore<T>,
+    store: ItemStore<T>,
     selectionMode: SelectionMode = SelectionMode.NONE,
     modifier: Modifier,
     content: DataList<T>.() -> Unit = {}
@@ -99,7 +99,7 @@ fun <T> DataListItem<T>.pfDataListRow(
 
 class DataList<T> internal constructor(
     internal val identifier: IdProvider<T, String>,
-    internal val store: DataListStore<T>,
+    internal val store: ItemStore<T>,
     internal val selectionMode: SelectionMode,
     classes: String?
 ) : PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
@@ -114,7 +114,7 @@ class DataList<T> internal constructor(
     init {
         markAs(ComponentType.DataList)
         attr("role", "list")
-        store.data.each().render { item ->
+        store.visibleItems.each().render { item ->
             register(DataListItem(this@DataList, item)) {}
         }.bind()
     }
@@ -148,7 +148,9 @@ class DataListCheck<T> internal constructor(
             type = const("checkbox")
             aria["invalid"] = false
             aria["labelledby"] = this@DataListCheck.dataList.identifier(this@DataListCheck.item)
-            selects.map { this@DataListCheck.item } handledBy this@DataListCheck.dataList.store.selection
+            changes.states()
+                .map { (this@DataListCheck.item to it) }
+                .handledBy(this@DataListCheck.dataList.store.select)
         }
     }
 }
@@ -178,7 +180,7 @@ class DataListItem<T> internal constructor(
         if (dataList.selectionMode != SelectionMode.NONE) {
             attr("tabindex", "0")
             domNode.classList += selectable
-            clicks.map { item } handledBy dataList.store.selection
+            clicks.map { item } handledBy dataList.store.toggleSelection
         }
         val content = dataList.display.invoke(item)
         content.invoke(this)
@@ -193,21 +195,6 @@ class DataListRow<T> internal constructor(
     init {
         attr("rowId", rowId(dataList.identifier, item))
     }
-}
-
-// ------------------------------------------------------ store
-
-open class DataListStore<T>(private val identifier: IdProvider<T, String>) : RootStore<List<T>>(listOf()) {
-    val selection = handleAndOffer<T, T> { items, item ->
-        offer(item)
-        items
-    }
-
-    val remove = handle<String> { items, id ->
-        items.filterNot { identifier(it) == id }
-    }
-
-    val empty = data.map { it.isEmpty() }
 }
 
 // ------------------------------------------------------ internals

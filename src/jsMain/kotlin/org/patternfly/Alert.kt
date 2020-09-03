@@ -96,14 +96,17 @@ fun Alert.pfAlertActionGroup(modifier: Modifier, content: Div.() -> Unit = {}): 
 
 class AlertGroup internal constructor(toast: Boolean, classes: String?) :
     PatternFlyComponent<HTMLUListElement>,
-    Ul(baseClass = classes(ComponentType.AlertGroup, classes)) {
+    Ul(baseClass = classes {
+        +ComponentType.AlertGroup
+        +(Modifier.toast `when` toast)
+        +classes
+    }) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
 
     init {
         markAs(ComponentType.AlertGroup)
         if (toast) {
-            domNode.classList += Modifier.toast
             MainScope().launch {
                 Notification.store.latest.collect {
                     val id = Id.unique("alert")
@@ -134,16 +137,15 @@ class Alert internal constructor(
     closable: Boolean = false,
     inline: Boolean = false,
     classes: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Alert, classes)) {
+) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
+    +ComponentType.Alert
+    +severity.modifier
+    +(Modifier.inline `when` inline)
+    +classes
+}) {
 
     init {
         markAs(ComponentType.Alert)
-        severity.modifier?.let {
-            domNode.classList += it
-        }
-        if (inline) {
-            domNode.classList += Modifier.inline
-        }
         attr("aria-label", severity.aria)
         div(baseClass = "alert".component("icon")) {
             pfIcon(this@Alert.severity.iconClass)
@@ -158,7 +160,7 @@ class Alert internal constructor(
             div(baseClass = "alert".component("action")) {
                 pfButton(plain) {
                     pfIcon("times".fas())
-                    attr("aria-label", "Close ${this@Alert.severity.aria.toLowerCase()}: ${this@Alert.text}")
+                    aria["label"] = "Close ${this@Alert.severity.aria.toLowerCase()}: ${this@Alert.text}"
                     domNode.addEventListener(Events.click.name, { this@Alert.close() })
                 }
             }

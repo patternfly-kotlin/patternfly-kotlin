@@ -73,18 +73,18 @@ class Card(internal val selectable: Boolean, classes: String?) :
     PatternFlyComponent<HTMLElement>,
     TextElement("article", baseClass = classes {
         +ComponentType.Card
-        +(if (selectable) Modifier.selectable else null)
+        +(Modifier.selectable `when` selectable)
         +classes
     }) {
 
-    val store: CardStore = CardStore()
+    val selected: SelectionStore = SelectionStore()
 
     init {
         markAs(ComponentType.Card)
         if (selectable) {
             domNode.tabIndex = 0
-            classMap = store.data.map { mapOf(Modifier.selected.value to it) }
-            clicks handledBy store.flip
+            classMap = selected.data.map { mapOf(Modifier.selected.value to it) }
+            clicks handledBy selected.flip
         }
     }
 }
@@ -109,8 +109,8 @@ class CardCheckbox(card: Card, classes: String?) :
     init {
         type = const("checkbox")
         if (card.selectable) {
-            checked = card.store.data
-            changes.states() handledBy card.store.update
+            checked = card.selected.data
+            changes.states() handledBy card.selected.update
         }
     }
 }
@@ -126,6 +126,6 @@ class CardFooter(classes: String?) :
 
 // ------------------------------------------------------ store
 
-class CardStore : RootStore<Boolean>(false) {
-    val flip = handle { !it }
+class SelectionStore : RootStore<Boolean>(false) {
+    internal val flip = handle { !it }
 }
