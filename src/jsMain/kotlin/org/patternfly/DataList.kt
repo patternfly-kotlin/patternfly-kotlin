@@ -10,6 +10,7 @@ import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
+import org.patternfly.Modifier.plain
 import org.patternfly.Modifier.selectable
 import org.w3c.dom.HTMLUListElement
 
@@ -18,20 +19,18 @@ typealias DataListDisplay<T> = (T) -> DataListItem<T>.() -> Unit
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfDataList(
-    identifier: IdProvider<T, String>,
     store: ItemStore<T>,
     selectionMode: SelectionMode = SelectionMode.NONE,
     classes: String? = null,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(identifier, store, selectionMode, classes), content)
+): DataList<T> = register(DataList(store, selectionMode, classes), content)
 
 fun <T> HtmlElements.pfDataList(
-    identifier: IdProvider<T, String>,
     store: ItemStore<T>,
     selectionMode: SelectionMode = SelectionMode.NONE,
     modifier: Modifier,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(identifier, store, selectionMode, modifier.value), content)
+): DataList<T> = register(DataList(store, selectionMode, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListAction(
     classes: String? = null,
@@ -54,16 +53,28 @@ fun <T> DataListContent<T>.pfDataListCell(
 ): DataListCell<T> = register(DataListCell(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListControl<T>.pfDataListCheck(
-    checkBoxName: String = Id.unique("dl-checkbox"),
+    checkBoxId: String = Id.unique(ComponentType.DataList.id, "chk"),
     classes: String? = null,
     content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxName, classes), content)
+): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxId, classes), content)
 
 fun <T> DataListControl<T>.pfDataListCheck(
-    checkBoxName: String = Id.unique("dl-checkbox"),
+    checkBoxId: String = Id.unique(ComponentType.DataList.id, "chk"),
     modifier: Modifier,
     content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxName, modifier.value), content)
+): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, checkBoxId, modifier.value), content)
+
+fun <T> DataListControl<T>.pfDataListToggle(
+    toggleId: String = Id.unique(ComponentType.DataList.id, "tgl"),
+    classes: String?,
+    content: DataListToggle<T>.() -> Unit = {}
+): DataListToggle<T> = register(DataListToggle(this.dataList, this.item, toggleId, classes), content)
+
+fun <T> DataListControl<T>.pfDataListToggle(
+    toggleId: String = Id.unique(ComponentType.DataList.id, "tgl"),
+    modifier: Modifier,
+    content: DataListToggle<T>.() -> Unit = {}
+): DataListToggle<T> = register(DataListToggle(this.dataList, this.item, toggleId, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListContent(
     classes: String? = null,
@@ -98,8 +109,7 @@ fun <T> DataListItem<T>.pfDataListRow(
 // ------------------------------------------------------ tag
 
 class DataList<T> internal constructor(
-    internal val identifier: IdProvider<T, String>,
-    internal val store: ItemStore<T>,
+    val store: ItemStore<T>,
     internal val selectionMode: SelectionMode,
     classes: String?
 ) : PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
@@ -132,25 +142,43 @@ class DataListCell<T> internal constructor(
     classes: String?
 ) : Div(baseClass = classes("data-list".component("cell"), classes)) {
     init {
-        attr("rowId", rowId(dataList.identifier, item))
+        attr("rowId", rowId(dataList.store.identifier, item))
     }
 }
 
 class DataListCheck<T> internal constructor(
     private val dataList: DataList<T>,
     private val item: T,
-    checkBoxName: String,
+    checkBoxId: String,
     classes: String?
 ) : Div(baseClass = classes("data-list".component("check"), classes)) {
     init {
         input {
-            name = const(checkBoxName)
+            name = const(checkBoxId)
             type = const("checkbox")
             aria["invalid"] = false
-            aria["labelledby"] = this@DataListCheck.dataList.identifier(this@DataListCheck.item)
+            aria["labelledby"] = this@DataListCheck.dataList.store.identifier(this@DataListCheck.item)
             changes.states()
                 .map { (this@DataListCheck.item to it) }
                 .handledBy(this@DataListCheck.dataList.store.select)
+        }
+    }
+}
+
+class DataListToggle<T> internal constructor(
+    private val dataList: DataList<T>,
+    private val item: T,
+    toggleId: String,
+    classes: String?
+) : Div(baseClass = classes("data-list".component("toggle"), classes)) {
+    init {
+        pfButton(plain) {
+            aria["labelledby"] = "$toggleId ${this@DataListToggle.dataList.store.identifier(this@DataListToggle.item)}"
+            aria["label"] = "Details"
+            aria["expanded"] = false
+            div(baseClass = "data-list".component("toggle", "icon")) {
+                pfIcon("angle-right".fas())
+            }
         }
     }
 }
@@ -161,7 +189,7 @@ class DataListContent<T> internal constructor(
     classes: String?
 ) : Div(baseClass = classes("data-list".component("item-content"), classes)) {
     init {
-        attr("rowId", rowId(dataList.identifier, item))
+        attr("rowId", rowId(dataList.store.identifier, item))
     }
 }
 
@@ -174,9 +202,9 @@ class DataListControl<T> internal constructor(
 class DataListItem<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T
-) : Li(id = rowId<T>(dataList.identifier, item), baseClass = "data-list".component("item")) {
+) : Li(id = rowId<T>(dataList.store.identifier, item), baseClass = "data-list".component("item")) {
     init {
-        aria["labelledby"] = dataList.identifier(item)
+        aria["labelledby"] = dataList.store.identifier(item)
         if (dataList.selectionMode != SelectionMode.NONE) {
             attr("tabindex", "0")
             domNode.classList += selectable
@@ -193,7 +221,7 @@ class DataListRow<T> internal constructor(
     classes: String?
 ) : Div(baseClass = classes("data-list".component("item-row"), classes)) {
     init {
-        attr("rowId", rowId(dataList.identifier, item))
+        attr("rowId", rowId(dataList.store.identifier, item))
     }
 }
 

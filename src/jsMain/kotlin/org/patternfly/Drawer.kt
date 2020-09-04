@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
@@ -75,7 +74,7 @@ fun DrawerActions.pfDrawerClose(modifier: Modifier): DrawerClose =
 class Drawer internal constructor(classes: String?) :
     PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Drawer, classes)) {
 
-    val expanded = ExpandedStore()
+    val expanded = CollapseExpandStore()
 
     init {
         markAs(ComponentType.Drawer)
@@ -120,9 +119,3 @@ class DrawerPanel(internal val drawer: Drawer, classes: String?) :
 
 class DrawerSection(internal val drawer: Drawer, classes: String?) :
     Div(baseClass = classes("drawer".component("section"), classes))
-
-// ------------------------------------------------------ store
-
-class ExpandedStore : RootStore<Boolean>(false) {
-    val toggle = handle { !it }
-}

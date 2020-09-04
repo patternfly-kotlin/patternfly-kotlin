@@ -70,10 +70,7 @@ class ChipGroup<T> internal constructor(
     }) {
 
     private var closeButton: Button? = null
-    private val expanded = object : RootStore<Boolean>(false) {
-        val collapse = handle { false }
-        val flip = handle { !it }
-    }
+    private val expanded = CollapseExpandStore()
     val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {
@@ -130,7 +127,7 @@ class ChipGroup<T> internal constructor(
                                 span(baseClass = "chip".component("text")) {
                                     +(if (expanded) "Shoe less" else "${items.size - limit} more")
                                 }
-                                clicks handledBy this@ChipGroup.expanded.flip
+                                clicks handledBy this@ChipGroup.expanded.toggle
                             }
                         }
                     } else {

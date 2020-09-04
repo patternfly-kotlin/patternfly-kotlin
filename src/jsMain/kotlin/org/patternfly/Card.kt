@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.const
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
@@ -123,9 +122,3 @@ class CardBody(classes: String?) :
 
 class CardFooter(classes: String?) :
     Div(baseClass = classes("card".component("footer"), classes))
-
-// ------------------------------------------------------ store
-
-class SelectionStore : RootStore<Boolean>(false) {
-    internal val flip = handle { !it }
-}

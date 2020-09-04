@@ -109,7 +109,7 @@ class Dropdown<T> internal constructor(
     +classes
 }) {
 
-    val ces = CollapseExpandStore<T>(domNode)
+    val ces = CollapseExpandStore(domNode)
     var asText: AsText<T> = { it.toString() }
     var display: DropdownDisplay<T> = {
         {
@@ -147,25 +147,25 @@ class Dropdown<T> internal constructor(
             aria["labelledby"] = buttonId
             attr("role", "menu")
             this@Dropdown.ces.data.map { !it }.bindAttr("hidden")
-            this@Dropdown.store.data.each().render { item ->
-                when (item) {
+            this@Dropdown.store.data.each().render { entry ->
+                when (entry) {
                     is DropdownItem<T> -> {
                         li {
                             attr("role", "menuitem")
                             button(baseClass = "dropdown".component("menu-item")) {
                                 attr("tabindex", "-1")
-                                if (item.disabled) {
+                                if (entry.disabled) {
                                     attr("disabled", "true")
                                     domNode.classList += Modifier.disabled
                                 }
-                                if (item.selected) {
+                                if (entry.selected) {
                                     domNode.autofocus = true
                                 }
-                                val content = this@Dropdown.display(item.item)
+                                val content = this@Dropdown.display(entry.item)
                                 content.invoke(this)
 
-                                this@Dropdown.store.offerItem handledBy this@Dropdown.ces.collapse
-                                clicks.map { item.item } handledBy this@Dropdown.store.offerItem
+                                clicks.map { entry.item } handledBy this@Dropdown.store.offerItem
+                                clicks handledBy this@Dropdown.ces.collapse
                             }
                         }
                     }

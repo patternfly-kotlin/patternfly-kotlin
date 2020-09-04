@@ -1,16 +1,10 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
-import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlin.math.max
 import kotlin.math.min
 
 const val DEFAULT_PAGE_SIZE = 50
-
-// ------------------------------------------------------ items
 
 data class Items<T>(
     private val identifier: IdProvider<T, String>,
@@ -153,31 +147,4 @@ data class SelectionInfo<T>(internal val identifier: IdProvider<T, String>, priv
             selectionMap + (identifier(item) to item)
         }
     )
-}
-
-// ------------------------------------------------------ store
-
-class ItemStore<T>(identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)) {
-
-    val empty: Flow<Boolean> = data.map { it.visibleItems.isEmpty() }
-    val allItems: Flow<List<T>> = data.map { it.allItems }
-    val visibleItems: Flow<List<T>> = data.map { it.visibleItems }
-
-    val clear: Handler<Unit> = handle { it.clear() }
-    val addAll: Handler<List<T>> = handle { items, list -> items.addAll(list) }
-
-    val gotoPage: Handler<Int> = handle { items, page -> items.gotoPage(page) }
-    val pageSize: Handler<Int> = handle { items, page -> items.pageSize(page) }
-
-    val selectNone: Handler<Unit> = handle { it.selectNone() }
-    val selectVisible: Handler<Unit> = handle { it.selectVisible() }
-    val selectAll: Handler<Unit> = handle { it.selectAll() }
-    val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
-        items.select(item, select)
-    }
-    val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
-
-    val sortBy: Handler<Pair<String, Comparator<T>>> = handle { items, (name, comparator) ->
-        items.sortBy(name, comparator)
-    }
 }

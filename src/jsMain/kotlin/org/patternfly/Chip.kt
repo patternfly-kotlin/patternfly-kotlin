@@ -118,4 +118,3 @@ class Chip internal constructor(readOnly: Boolean, classes: String?) :
         return textElement.domNode
     }
 }
-
