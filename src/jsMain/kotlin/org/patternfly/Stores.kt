@@ -69,7 +69,7 @@ class CollapseExpandStore(private val root: HTMLElement? = null) : RootStore<Boo
     }
 }
 
-class ItemStore<T>(internal val identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)) {
+class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)) {
 
     val empty: Flow<Boolean> = data.map { it.visibleItems.isEmpty() }
     val allItems: Flow<List<T>> = data.map { it.allItems }

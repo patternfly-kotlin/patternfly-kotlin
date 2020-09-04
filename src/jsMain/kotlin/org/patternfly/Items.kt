@@ -6,6 +6,7 @@ import kotlin.math.min
 
 const val DEFAULT_PAGE_SIZE = 50
 
+/** Immutable holder for items used in [ItemStore]. */
 data class Items<T>(
     private val identifier: IdProvider<T, String>,
     val allItems: List<T> = listOf(),
@@ -129,7 +130,7 @@ data class PageInfo(val pageSize: Int, val page: Int, val total: Int) {
 data class SortInfo<T>(val name: String, val comparator: Comparator<T>)
 
 // contains only selected items
-data class SelectionInfo<T>(internal val identifier: IdProvider<T, String>, private val selectionMap: Map<String, T>) {
+data class SelectionInfo<T>(private val identifier: IdProvider<T, String>, private val selectionMap: Map<String, T>) {
 
     val items: List<T>
         get() = selectionMap.values.toList()
