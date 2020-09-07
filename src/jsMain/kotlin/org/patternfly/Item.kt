@@ -6,7 +6,7 @@ import kotlin.math.min
 
 const val DEFAULT_PAGE_SIZE = 50
 
-/** Immutable holder for items used in [ItemStore]. */
+/** Immutable holder for items used in components like [DataList]. */
 data class Items<T>(
     private val identifier: IdProvider<T, String>,
     val allItems: List<T> = listOf(),

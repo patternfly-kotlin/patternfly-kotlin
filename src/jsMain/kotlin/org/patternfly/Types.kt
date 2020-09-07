@@ -20,14 +20,14 @@ import org.w3c.dom.set
 
 typealias AsText<T> = (T) -> String
 
-interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
+typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
+
+internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
 
     fun markAs(componentType: ComponentType) {
-        domNode.dataset[Dataset.COMPONENT_TYPE.short] = componentType.id
-//        domNode.setAttribute(Dataset.COMPONENT_TYPE.long, componentType.id)
+        domNode.dataset["pfct"] = componentType.id
         if (window.localStorage["ouia"].toString() == "true") {
-            domNode.dataset[Dataset.OUIA_COMPONENT_TYPE.short] = componentType.name
-//            domNode.setAttribute(Dataset.OUIA_COMPONENT_TYPE.long, componentType.name)
+            domNode.dataset["ouiaComponentType"] = componentType.name
         }
     }
 }
@@ -53,7 +53,9 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Main("mn", "page".component("main")),
     Navigation("nav", "nav".component()),
     NotificationBadge("nb", "button".component()),
+    OptionsMenu("opt", "options-menu".component()),
     Page("pg", "page".component()),
+    Pagination("pgn", "pagination".component()),
     Section("se", "page".component("main-section")),
     Sidebar("sb", "page".component("sidebar")),
     Switch("sw", "switch".component()),

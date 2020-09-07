@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import org.patternfly.DividerVariant.DIV
 import org.w3c.dom.HTMLDivElement
 
-typealias DropdownDisplay<T> = (T) -> Button.() -> Unit
+typealias DropdownItemDisplay<T> = (T) -> Button.() -> Unit
 
 // ------------------------------------------------------ dsl
 
@@ -67,32 +67,9 @@ fun <T> HtmlElements.pfDropdownKebab(
 ): Dropdown<T> =
     register(Dropdown(store, Either.Right(pfIcon("ellipsis-v".fas())), align, modifier.value), content)
 
-fun <T> Dropdown<T>.pfDropdownItems(block: DropdownEntryBuilder<T>.() -> Unit) {
-    val entries = DropdownEntryBuilder<T>().apply(block).build()
+fun <T> Dropdown<T>.pfEntries(block: EntryBuilder<T>.() -> Unit) {
+    val entries = EntryBuilder<T>().apply(block).build()
     action(entries) handledBy this.store.update
-}
-
-fun <T> pfDropdownItems(block: DropdownEntryBuilder<T>.() -> Unit): List<DropdownEntry<T>> =
-    DropdownEntryBuilder<T>().apply(block).build()
-
-fun <T> DropdownEntryBuilder<T>.pfDropdownItem(item: T, block: DropdownItemBuilder<T>.() -> Unit = {}) {
-    entries.add(DropdownItemBuilder(item).apply(block).build())
-}
-
-fun <T> DropdownEntryBuilder<T>.pfDropdownSeparator() {
-    entries.add(DropdownSeparator())
-}
-
-fun <T> DropdownEntryBuilder<T>.pfDropdownGroup(title: String, block: DropdownGroupBuilder<T>.() -> Unit) {
-    entries.add(DropdownGroupBuilder<T>(title).apply(block).build())
-}
-
-fun <T> DropdownGroupBuilder<T>.pfDropdownItem(item: T, block: DropdownItemBuilder<T>.() -> Unit = {}) {
-    entries.add(DropdownItemBuilder(item).apply(block).build())
-}
-
-fun <T> DropdownGroupBuilder<T>.pfDropdownSeparator() {
-    entries.add(DropdownSeparator())
 }
 
 // ------------------------------------------------------ tag
@@ -111,7 +88,7 @@ class Dropdown<T> internal constructor(
 
     val ces = CollapseExpandStore(domNode)
     var asText: AsText<T> = { it.toString() }
-    var display: DropdownDisplay<T> = {
+    var display: DropdownItemDisplay<T> = {
         {
             +this@Dropdown.asText.invoke(it)
         }
@@ -121,10 +98,10 @@ class Dropdown<T> internal constructor(
         markAs(ComponentType.Dropdown)
         classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
         val buttonId = Id.unique(ComponentType.Dropdown.id, "btn")
-        button("dropdown".component("toggle"), buttonId) {
+        button(id = buttonId, baseClass = "dropdown".component("toggle")) {
             aria["haspopup"] = true
-            this@Dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
             clicks handledBy this@Dropdown.ces.expand
+            this@Dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
             when (this@Dropdown.textOrIcon) {
                 is Either.Left -> {
                     span(baseClass = "dropdown".component("toggle", "text")) {
@@ -149,7 +126,7 @@ class Dropdown<T> internal constructor(
             this@Dropdown.ces.data.map { !it }.bindAttr("hidden")
             this@Dropdown.store.data.each().render { entry ->
                 when (entry) {
-                    is DropdownItem<T> -> {
+                    is Item<T> -> {
                         li {
                             attr("role", "menuitem")
                             button(baseClass = "dropdown".component("menu-item")) {
@@ -169,12 +146,12 @@ class Dropdown<T> internal constructor(
                             }
                         }
                     }
-                    is DropdownGroup<T> -> {
+                    is Group<T> -> {
                         li(baseClass = "display-none".util()) {
                             !"Dropdown groups not yet implemented"
                         }
                     }
-                    is DropdownSeparator<T> -> {
+                    is Separator<T> -> {
                         li {
                             attr("role", "separator")
                             pfDivider(DIV)
@@ -188,32 +165,7 @@ class Dropdown<T> internal constructor(
 
 // ------------------------------------------------------ store
 
-sealed class DropdownEntry<T>
-
-data class DropdownGroup<T>(val title: String, val items: List<DropdownEntry<T>>) : DropdownEntry<T>()
-
-data class DropdownItem<T>(val item: T, val disabled: Boolean = false, val selected: Boolean = false) :
-    DropdownEntry<T>()
-
-class DropdownSeparator<T> : DropdownEntry<T>()
-
-class DropdownEntryBuilder<T> {
-    internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
-    internal fun build(): List<DropdownEntry<T>> = entries
-}
-
-class DropdownGroupBuilder<T>(private val title: String) {
-    internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
-    internal fun build(): DropdownGroup<T> = DropdownGroup(title, entries)
-}
-
-class DropdownItemBuilder<T>(private val item: T) {
-    var disabled: Boolean = false
-    var selected: Boolean = false
-    internal fun build(): DropdownItem<T> = DropdownItem(item, disabled, selected)
-}
-
-class DropdownStore<T> : RootStore<List<DropdownEntry<T>>>(listOf()) {
+class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
     internal val offerItem: OfferingHandler<T, T> = handleAndOffer { items, item ->
         offer(item)
         items

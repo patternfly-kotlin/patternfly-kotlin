@@ -165,7 +165,7 @@ private class ByCombination(private val left: By, private val combinator: Combin
         get() = left.selector + combinator.operator + right.selector
 }
 
-private class ByData(private val name: String, private val operator: AttributeOperator?, private val value: String?) :
+private class ByData(name: String, operator: AttributeOperator?, value: String?) :
     ByAttribute("data-" + if (name.contains("-")) name else camelToKebabCase(name), operator, value) {
 
     companion object {
@@ -176,7 +176,7 @@ private class ByData(private val name: String, private val operator: AttributeOp
     }
 }
 
-private class ByElement(private val element: String) : By {
+private class ByElement(element: String) : By {
     override val selector: String = element
 }
 

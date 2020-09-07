@@ -16,8 +16,6 @@ import org.patternfly.Modifier.selectable
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
-typealias DataListDisplay<T> = (T) -> DataListItem<T>.() -> Unit
-
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfDataList(
@@ -137,7 +135,7 @@ class DataList<T> internal constructor(
 ) : PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
 
     var asText: AsText<T> = { it.toString() }
-    var display: DataListDisplay<T> = {
+    var display: ComponentDisplay<DataListItem<T>, T> = {
         {
             +this@DataList.asText.invoke(it)
         }

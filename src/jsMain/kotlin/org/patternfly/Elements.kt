@@ -77,16 +77,12 @@ class Aria(private val element: Element) {
 
     operator fun contains(name: String): Boolean = element.hasAttribute(name)
 
-    operator fun get(name: String): String = element.getAttribute(failSafeKey(name)) ?: ""
+    operator fun get(name: String): String = element.getAttribute(attributeSafeKey(name)) ?: ""
 
     operator fun set(name: String, value: Any) {
-        element.setAttribute(failSafeKey(name), value.toString())
+        element.setAttribute(attributeSafeKey(name), value.toString())
     }
 
-    fun remove(name: String) {
-        element.removeAttribute(failSafeKey(name))
-    }
-
-    private fun failSafeKey(name: String) =
+    private fun attributeSafeKey(name: String) =
         if (name.startsWith("aria-")) name else "aria-$name"
 }

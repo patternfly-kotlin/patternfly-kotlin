@@ -26,8 +26,6 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 
-typealias ChipGroupDisplay<T> = (T) -> Chip.() -> Unit
-
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfChipGroup(
@@ -85,7 +83,7 @@ class ChipGroup<T> internal constructor(
         }
     }
     var asText: AsText<T> = { it.toString() }
-    var display: ChipGroupDisplay<T> = {
+    var display: ComponentDisplay<Chip, T> = {
         {
             +this@ChipGroup.asText(it)
         }

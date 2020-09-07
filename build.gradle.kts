@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.4.0"
-    id("org.jetbrains.dokka") version "1.4.0-rc"
+    id("org.jetbrains.dokka") version "1.4.0"
     `maven-publish`
 }
 
@@ -35,17 +35,6 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
-            }
-        }
-    }
-}
-
-tasks {
-    dokkaHtml {
-        dokkaSourceSets {
-            register("jsMain") {
-                displayName = "JS"
-                platform = "js"
             }
         }
     }
