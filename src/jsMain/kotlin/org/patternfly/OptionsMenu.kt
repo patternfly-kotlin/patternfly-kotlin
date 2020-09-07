@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
 
-typealias OptionDisplay<T> = (T) -> Button.() -> Unit
-
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfOptionsMenu(
@@ -50,19 +48,25 @@ class OptionsMenu<T> internal constructor(
     +classes
 }) {
 
+    private val button: Button
     val ces = CollapseExpandStore(domNode)
     var asText: AsText<T> = { it.toString() }
-    var display: OptionDisplay<T> = {
+    var display: ComponentDisplay<Button, T> = {
         {
             +this@OptionsMenu.asText.invoke(it)
         }
     }
+    var disabled: Flow<Boolean>
+        get() = button.disabled
+        set(value) {
+            button.disabled = value
+        }
 
     init {
         markAs(ComponentType.OptionsMenu)
         classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
         val buttonId = Id.unique(ComponentType.Dropdown.id, "btn")
-        button(id = id, baseClass = "options-menu".component("toggle")) {
+        button = button(id = id, baseClass = "options-menu".component("toggle")) {
             aria["label"] = "Options menu"
             aria["haspopup"] = "listbox"
             clicks handledBy this@OptionsMenu.ces.expand

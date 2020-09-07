@@ -23,7 +23,7 @@ fun <T> GroupBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
-/** Entry used in components like [Dropdown] or [OptionsMenu]. */
+/** Entry used in simple components like [Dropdown], [OptionsMenu] or [Select]. */
 sealed class Entry<T>
 
 data class Group<T>(val title: String, val items: List<Entry<T>>) : Entry<T>()

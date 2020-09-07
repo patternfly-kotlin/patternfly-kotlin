@@ -93,3 +93,7 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(
         items.sortBy(name, comparator)
     }
 }
+
+class SelectionStore : RootStore<Boolean>(false) {
+    val toggle = handle { !it }
+}

@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.const
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Tag
@@ -204,7 +203,7 @@ class NavigationExpandableGroup<T>(
     +classes
 }) {
 
-    private val expanded = ExpandableGroupStore()
+    private val expanded = CollapseExpandStore()
 
     init {
         // don't use classMap for expanded flow
@@ -212,7 +211,7 @@ class NavigationExpandableGroup<T>(
         MainScope().launch {
             expanded.data.collect { domNode.classList.toggle(Modifier.expanded.value, it) }
         }
-        // it might interfere with router flow, which also modified the class list
+        // it might interfere with router flow, which also modifies the class list
         MainScope().launch {
             this@NavigationExpandableGroup.navigation.router.collect {
                 delay(333) // wait a little bit before testing for the current modifier
@@ -268,14 +267,5 @@ class NavigationItem<T>(
 
     private fun calculateSelection(route: T): Boolean {
         return selected?.invoke(route) ?: navigation.selected.invoke(route, item)
-    }
-}
-
-// ------------------------------------------------------ store
-
-internal class ExpandableGroupStore : RootStore<Boolean>(false) {
-
-    val toggle = handle { expanded ->
-        !expanded
     }
 }

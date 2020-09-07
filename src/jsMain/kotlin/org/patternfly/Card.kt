@@ -77,14 +77,14 @@ class Card(internal val selectable: Boolean, classes: String?) :
         +classes
     }) {
 
-    val selected: CardStore=  CardStore()
+    val selected = SelectionStore()
 
     init {
         markAs(ComponentType.Card)
         if (selectable) {
             domNode.tabIndex = 0
             classMap = selected.data.map { mapOf(Modifier.selected.value to it) }
-            clicks handledBy selected.flip
+            clicks handledBy selected.toggle
         }
     }
 }

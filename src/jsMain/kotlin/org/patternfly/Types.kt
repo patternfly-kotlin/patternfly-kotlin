@@ -57,6 +57,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Page("pg", "page".component()),
     Pagination("pgn", "pagination".component()),
     Section("se", "page".component("main-section")),
+    Select("sel", "select".component()),
     Sidebar("sb", "page".component("sidebar")),
     Switch("sw", "switch".component()),
     Title("tlt", "title".component());

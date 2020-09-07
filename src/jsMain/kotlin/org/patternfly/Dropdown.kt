@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.map
 import org.patternfly.DividerVariant.DIV
 import org.w3c.dom.HTMLDivElement
 
-typealias DropdownItemDisplay<T> = (T) -> Button.() -> Unit
-
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfDropdown(
@@ -86,19 +84,25 @@ class Dropdown<T> internal constructor(
     +classes
 }) {
 
+    private val button: Button
     val ces = CollapseExpandStore(domNode)
     var asText: AsText<T> = { it.toString() }
-    var display: DropdownItemDisplay<T> = {
+    var display: ComponentDisplay<Button, T> = {
         {
             +this@Dropdown.asText.invoke(it)
         }
     }
+    var disabled: Flow<Boolean>
+        get() = button.disabled
+        set(value) {
+            button.disabled = value
+        }
 
     init {
         markAs(ComponentType.Dropdown)
         classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
         val buttonId = Id.unique(ComponentType.Dropdown.id, "btn")
-        button(id = buttonId, baseClass = "dropdown".component("toggle")) {
+        button = button(id = buttonId, baseClass = "dropdown".component("toggle")) {
             aria["haspopup"] = true
             clicks handledBy this@Dropdown.ces.expand
             this@Dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
