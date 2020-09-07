@@ -12,60 +12,57 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.Node
+import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 
-// initial data: expanded = false, automatically collapses when clicked outside root element
-class CollapseExpandStore(private val root: HTMLElement? = null) : RootStore<Boolean>(false) {
+typealias AutoCollapse = (Element) -> Boolean
 
-    private var closeHandler: ((Event) -> Unit)? = if (root != null) {
-        {
-            val clickInside = root.contains(it.target as Node)
-            if (!clickInside) {
-                removeCloseHandler()
-                launch {
-                    enqueue(QueuedUpdate({ false }, ::errorHandler))
-                }
-            }
-        }
-    } else null
+// initial data: expanded = false
+class CollapseExpandStore(private val autoCollapse: AutoCollapse? = null) : RootStore<Boolean>(false) {
+
+    private var closeHandler: ((Event) -> Unit)? = null
 
     val collapsed: Flow<Boolean> = data.drop(1).filter { !it } // drop initial state
     val expanded: Flow<Boolean> = data.drop(1).filter { it } // drop initial state
 
-    val expand: SimpleHandler<Unit> = handle { expanded ->
-        if (closeHandler != null) {
-            if (!expanded) {
-                document.addEventListener(Events.click.name, closeHandler)
-            }
-        }
+    val expand: SimpleHandler<Unit> = handle {
+        addCloseHandler()
         true
     }
 
     val collapse: SimpleHandler<Unit> = handle {
-        if (closeHandler != null) {
-            removeCloseHandler()
-        }
+        removeCloseHandler()
         false
     }
 
     val toggle = handle { expanded ->
-        if (closeHandler != null) {
-            if (expanded) {
-                removeCloseHandler()
-                false
-            } else {
-                document.addEventListener(Events.click.name, closeHandler)
-                true
-            }
+        if (expanded) {
+            removeCloseHandler()
+            false
         } else {
-            !expanded
+            addCloseHandler()
+            true
+        }
+    }
+
+    private fun addCloseHandler() {
+        if (autoCollapse != null) {
+            closeHandler = {
+                if (autoCollapse.invoke((it.target as Element))) {
+                    removeCloseHandler()
+                    launch {
+                        enqueue(QueuedUpdate({ false }, ::errorHandler))
+                    }
+                }
+            }
+            document.addEventListener(Events.click.name, closeHandler)
         }
     }
 
     private fun removeCloseHandler() {
-        document.removeEventListener(Events.click.name, closeHandler)
+        closeHandler?.let {
+            document.removeEventListener(Events.click.name, it)
+        }
     }
 }
 
@@ -92,8 +89,4 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(
     val sortBy: Handler<Pair<String, Comparator<T>>> = handle { items, (name, comparator) ->
         items.sortBy(name, comparator)
     }
-}
-
-class SelectionStore : RootStore<Boolean>(false) {
-    val toggle = handle { !it }
 }

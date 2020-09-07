@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLDivElement
 fun HtmlElements.pfSelect(classes: String? = null, content: Select.() -> Unit = {}): Select =
     register(Select(classes), content)
 
-fun HtmlElements.pfSelect(iconClass: String, modifier: Modifier, content: Select.() -> Unit = {}): Select =
+fun HtmlElements.pfSelect(modifier: Modifier, content: Select.() -> Unit = {}): Select =
     register(Select(modifier.value), content)
 
 // ------------------------------------------------------ tag

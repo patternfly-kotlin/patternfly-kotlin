@@ -28,7 +28,7 @@ sealed class Entry<T>
 
 data class Group<T>(val title: String, val items: List<Entry<T>>) : Entry<T>()
 
-data class Item<T>(val item: T, val disabled: Boolean = false, val selected: Boolean = false) :
+data class Item<T>(val item: T, val disabled: Boolean = false, var selected: Boolean = false) :
     Entry<T>()
 
 class Separator<T> : Entry<T>()

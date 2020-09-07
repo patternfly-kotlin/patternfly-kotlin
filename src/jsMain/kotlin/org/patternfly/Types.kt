@@ -18,6 +18,8 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ types
 
+const val COMPONENT_TYPE = "pfct"
+
 typealias AsText<T> = (T) -> String
 
 typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
@@ -25,7 +27,7 @@ typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
 internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
 
     fun markAs(componentType: ComponentType) {
-        domNode.dataset["pfct"] = componentType.id
+        domNode.dataset[COMPONENT_TYPE] = componentType.id
         if (window.localStorage["ouia"].toString() == "true") {
             domNode.dataset["ouiaComponentType"] = componentType.name
         }
@@ -65,10 +67,6 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
 
 enum class Align(val modifier: Modifier) {
     LEFT(alignLeft), RIGHT(alignRight)
-}
-
-enum class Direction {
-    RIGHT, UP
 }
 
 enum class DividerVariant {

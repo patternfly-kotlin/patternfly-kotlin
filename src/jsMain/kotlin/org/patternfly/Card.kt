@@ -77,7 +77,7 @@ class Card(internal val selectable: Boolean, classes: String?) :
         +classes
     }) {
 
-    val selected = SelectionStore()
+    val selected = CardStore()
 
     init {
         markAs(ComponentType.Card)
@@ -127,5 +127,5 @@ class CardFooter(classes: String?) :
 // ------------------------------------------------------ store
 
 class CardStore : RootStore<Boolean>(false) {
-    internal val flip = handle { !it }
+    internal val toggle = handle { !it }
 }

@@ -69,6 +69,19 @@ fun Element.closest(selector: By): Element? = this.closest(selector.selector)
 
 fun Element.matches(selector: By): Boolean = this.matches(selector.selector)
 
+fun Element.debug(): String = buildString {
+    append("<${tagName.toLowerCase()}")
+    getAttributeNames().joinTo(this, " ", " ") { name ->
+        buildString {
+            append(name)
+            getAttribute(name)?.let { value ->
+                append("=\"$value\"")
+            }
+        }
+    }
+    append("/>")
+}
+
 fun ParentNode.querySelector(selector: By) = this.querySelector(selector.selector)
 
 fun ParentNode.querySelectorAll(selector: By) = this.querySelectorAll(selector.selector)
