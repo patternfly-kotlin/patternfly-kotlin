@@ -7,6 +7,8 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.Li
+import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
@@ -16,20 +18,42 @@ import org.w3c.dom.HTMLDivElement
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
     text: String,
+    grouped: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), align, up, classes), content)
+): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), grouped, align, up, classes), content)
 
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
     text: String,
+    grouped: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     modifier: Modifier,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), align, up, modifier.value), content)
+): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), grouped, align, up, modifier.value), content)
+
+fun <T> HtmlElements.pfOptionsMenu(
+    store: OptionStore<T> = OptionStore(),
+    icon: Icon,
+    grouped: Boolean = false,
+    align: Align? = null,
+    up: Boolean = false,
+    classes: String? = null,
+    content: OptionsMenu<T>.() -> Unit = {}
+): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, classes), content)
+
+fun <T> HtmlElements.pfOptionsMenu(
+    store: OptionStore<T> = OptionStore(),
+    icon: Icon,
+    grouped: Boolean = false,
+    align: Align? = null,
+    up: Boolean = false,
+    modifier: Modifier,
+    content: OptionsMenu<T>.() -> Unit = {}
+): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, modifier.value), content)
 
 fun <T> OptionsMenu<T>.pfEntries(block: EntryBuilder<T>.() -> Unit) {
     val entries = EntryBuilder<T>().apply(block).build()
@@ -41,6 +65,7 @@ fun <T> OptionsMenu<T>.pfEntries(block: EntryBuilder<T>.() -> Unit) {
 class OptionsMenu<T> internal constructor(
     val store: OptionStore<T>,
     private val textOrIcon: Either<String, Icon>,
+    grouped: Boolean,
     align: Align?,
     up: Boolean,
     classes: String?
@@ -92,49 +117,75 @@ class OptionsMenu<T> internal constructor(
                 }
             }
         }
-        ul(baseClass = classes {
+
+        val baseClass = classes {
             +"options-menu".component("menu")
             +align?.modifier
-        }) {
+        }
+        val menuContent: TextElement.() -> Unit = {
             aria["labelledby"] = buttonId
             attr("role", "menu")
             this@OptionsMenu.ces.data.map { !it }.bindAttr("hidden")
             this@OptionsMenu.store.data.each().render { entry ->
                 when (entry) {
                     is Item<T> -> {
-                        li {
-                            attr("role", "menuitem")
-                            button(baseClass = "options-menu".component("menu-item")) {
-                                attr("tabindex", "-1")
-                                if (entry.disabled) {
-                                    attr("disabled", "true")
-                                    domNode.classList += Modifier.disabled
-                                }
-                                val content = this@OptionsMenu.display(entry.item)
-                                content.invoke(this)
-
-                                clicks.map { entry.item } handledBy this@OptionsMenu.store.toggle
-                                if (entry.selected) {
-                                    span(baseClass = "options-menu".component("menu-item", "icon")) {
-                                        pfIcon("check".fas())
+                        li(content = this@OptionsMenu.itemContent(entry))
+                    }
+                    is Group<T> -> {
+                        section(baseClass = "options-menu".component("group")) {
+                            entry.title?.let {
+                                h1(baseClass = "options-menu".component("group", "title")) { +it }
+                            }
+                            ul {
+                                entry.items.forEach { groupEntry ->
+                                    when (groupEntry) {
+                                        is Item<T> -> {
+                                            li(content = this@OptionsMenu.itemContent(groupEntry))
+                                        }
+                                        is Separator<T> -> {
+                                            pfDivider(DividerVariant.LI)
+                                        }
+                                        else -> {
+                                            console.warn("Nested groups are not supported for ${this@OptionsMenu.domNode.debug()}")
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    is Group<T> -> {
-                        li(baseClass = "display-none".util()) {
-                            !"OptionsMenu groups not yet implemented"
-                        }
-                    }
                     is Separator<T> -> {
-                        li {
-                            attr("role", "separator")
+                        if (grouped) {
                             pfDivider(DividerVariant.DIV)
+                        } else {
+                            pfDivider(DividerVariant.LI)
                         }
                     }
                 }
             }.bind()
+        }
+        if (grouped) {
+            register(TextElement("div", baseClass = baseClass), menuContent)
+        } else {
+            register(TextElement("ul", baseClass = baseClass), menuContent)
+        }
+    }
+
+    private fun itemContent(entry: Item<T>): Li.() -> Unit = {
+        attr("role", "menuitem")
+        button(baseClass = "options-menu".component("menu-item")) {
+            attr("tabindex", "-1")
+            if (entry.disabled) {
+                attr("disabled", "true")
+                domNode.classList += Modifier.disabled
+            }
+            this@OptionsMenu.display(entry.item).invoke(this)
+
+            clicks.map { entry } handledBy this@OptionsMenu.store.toggle
+            if (entry.selected) {
+                span(baseClass = "options-menu".component("menu-item", "icon")) {
+                    pfIcon("check".fas())
+                }
+            }
         }
     }
 }
@@ -143,23 +194,47 @@ class OptionsMenu<T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val toggle = handle<T> { items, item ->
-        items.map {
-            when (it) {
+    internal val toggle = handle<Item<T>> { items, item ->
+        items.map { entry ->
+            when (entry) {
                 is Item<T> -> {
-                    if (it.item == item) {
-                        if (it.selected) {
-                            it
+                    if (entry.item == item.item) {
+                        if (entry.selected) {
+                            entry
                         } else {
-                            it.copy(selected = true)
+                            entry.copy(selected = true)
                         }
                     } else {
-                        it.copy(selected = false)
+                        entry.copy(selected = false)
                     }
-//                    it.copy(selected = identifier(it.item) == identifier(item))
+                }
+                is Group<T> -> {
+                    if (entry.id == item.group?.id) {
+                        val groupItems = entry.items.map { groupEntry ->
+                            when (groupEntry) {
+                                is Item<T> -> {
+                                    if (groupEntry.item == item.item) {
+                                        if (groupEntry.selected) {
+                                            groupEntry
+                                        } else {
+                                            groupEntry.copy(selected = true)
+                                        }
+                                    } else {
+                                        groupEntry.copy(selected = false)
+                                    }
+                                }
+                                else -> {
+                                    groupEntry
+                                }
+                            }
+                        }
+                        entry.copy(items = groupItems)
+                    } else {
+                        entry
+                    }
                 }
                 else -> {
-                    it
+                    entry
                 }
             }
         }

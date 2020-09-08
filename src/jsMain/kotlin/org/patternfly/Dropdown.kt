@@ -35,7 +35,7 @@ fun <T> HtmlElements.pfDropdown(
     content: Dropdown<T>.() -> Unit = {}
 ): Dropdown<T> = register(Dropdown(store, Either.Left(text), align, up, modifier.value), content)
 
-fun <T> HtmlElements.pfDropdownIcon(
+fun <T> HtmlElements.pfDropdown(
     store: DropdownStore<T> = DropdownStore(),
     icon: Icon,
     align: Align? = null,
@@ -44,7 +44,7 @@ fun <T> HtmlElements.pfDropdownIcon(
     content: Dropdown<T>.() -> Unit = {}
 ): Dropdown<T> = register(Dropdown(store, Either.Right(icon), align, up, classes), content)
 
-fun <T> HtmlElements.pfDropdownIcon(
+fun <T> HtmlElements.pfDropdown(
     store: DropdownStore<T> = DropdownStore(),
     icon: Icon,
     align: Align? = null,
