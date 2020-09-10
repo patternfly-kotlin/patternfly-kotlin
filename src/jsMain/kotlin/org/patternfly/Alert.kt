@@ -1,18 +1,26 @@
 package org.patternfly
 
+import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Ul
 import kotlinx.browser.window
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.patternfly.Modifier.plain
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
@@ -131,6 +139,7 @@ class AlertGroup internal constructor(toast: Boolean, classes: String?) :
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class Alert internal constructor(
     private val severity: Severity,
     private val text: String,
@@ -143,6 +152,21 @@ class Alert internal constructor(
     +(Modifier.inline `when` inline)
     +classes
 }) {
+
+    private var closeButton: Button? = null
+    val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
+        if (closeButton != null) {
+            Listener(callbackFlow {
+                val listener: (Event) -> Unit = {
+                    offer(it.unsafeCast<MouseEvent>())
+                }
+                this@Alert.closeButton?.domNode?.addEventListener(Events.click.name, listener)
+                awaitClose { this@Alert.closeButton?.domNode?.removeEventListener(Events.click.name, listener) }
+            })
+        } else {
+            Listener(emptyFlow())
+        }
+    }
 
     init {
         markAs(ComponentType.Alert)
@@ -158,7 +182,7 @@ class Alert internal constructor(
         }
         if (closable) {
             div(baseClass = "alert".component("action")) {
-                pfButton(plain) {
+                this@Alert.closeButton = pfButton(plain) {
                     pfIcon("times".fas())
                     aria["label"] = "Close ${this@Alert.severity.aria.toLowerCase()}: ${this@Alert.text}"
                     domNode.addEventListener(Events.click.name, { this@Alert.close() })

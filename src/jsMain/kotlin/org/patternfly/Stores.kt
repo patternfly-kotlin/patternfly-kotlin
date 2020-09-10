@@ -48,7 +48,7 @@ class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = nu
     private fun addCloseHandler() {
         if (collapsePredicate != null) {
             closeHandler = {
-                if (collapsePredicate.invoke((it.target as Element))) {
+                if (collapsePredicate.invoke((it.target.unsafeCast<Element>()))) {
                     removeCloseHandler()
                     launch {
                         enqueue(QueuedUpdate({ false }, ::errorHandler))

@@ -1,7 +1,15 @@
 package org.patternfly
 
+import dev.fritz2.binding.SingleMountPoint
+import dev.fritz2.dom.DomMountPoint
+import dev.fritz2.dom.DomMountPointPreserveOrder
+import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.WithDomNode
+import dev.fritz2.dom.WithText
 import kotlinx.browser.window
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier._2xl
 import org.patternfly.Modifier._3xl
 import org.patternfly.Modifier._4xl
@@ -13,6 +21,8 @@ import org.patternfly.Modifier.md
 import org.patternfly.Modifier.start
 import org.patternfly.Modifier.xl
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.Node
+import org.w3c.dom.Text
 import org.w3c.dom.get
 import org.w3c.dom.set
 
@@ -32,6 +42,27 @@ internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
             domNode.dataset["ouiaComponentType"] = componentType.name
         }
     }
+}
+
+// Delegates the text related methods to another element
+internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
+
+    override fun text(value: String): Node = appendText(value)
+
+    override operator fun String.unaryPlus(): Node = appendText(this)
+
+    override fun Flow<String>.bind(preserveOrder: Boolean): SingleMountPoint<WithDomNode<Text>> {
+        val upstream = this.map {
+            TextNode(it)
+        }.distinctUntilChanged()
+
+        return if (preserveOrder) DomMountPointPreserveOrder(upstream, delegate())
+        else DomMountPoint(upstream, delegate())
+    }
+
+    fun delegate(): D
+
+    fun appendText(text: String): Node = delegate().appendChild(TextNode(text).domNode)
 }
 
 // ------------------------------------------------------ enums

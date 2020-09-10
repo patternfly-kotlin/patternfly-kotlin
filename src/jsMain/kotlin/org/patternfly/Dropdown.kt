@@ -10,13 +10,15 @@ import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
-import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.dom.clear
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
@@ -39,39 +41,13 @@ fun <T> HtmlElements.pfDropdown(
 
 fun <T> Dropdown<T>.pfDropdownToggle(
     classes: String? = null,
-    content: Span.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, classes, textContent = content), {})
+    content: DropdownToggle<T>.() -> Unit = {}
+): DropdownToggle<T> = register(DropdownToggle(this, classes), content)
 
 fun <T> Dropdown<T>.pfDropdownToggle(
     modifier: Modifier,
-    content: Span.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, modifier.value, textContent = content), {})
-
-fun <T> Dropdown<T>.pfDropdownIcon(
-    iconClass: String,
-    classes: String? = null,
-    content: Icon.() -> Unit = {}
-): DropdownToggle<T> =
-    register(DropdownToggle(this, classes, iconClass = iconClass, iconContent = content), {})
-
-fun <T> Dropdown<T>.pfDropdownIcon(
-    iconClass: String,
-    modifier: Modifier,
-    content: Icon.() -> Unit = {}
-): DropdownToggle<T> =
-    register(DropdownToggle(this, modifier.value, iconClass = iconClass, iconContent = content), {})
-
-fun <T> Dropdown<T>.pfDropdownKebab(
-    classes: String? = null,
-    content: Icon.() -> Unit = {}
-): DropdownToggle<T> =
-    register(DropdownToggle(this, classes, iconClass = "ellipsis-v".fas(), iconContent = content), {})
-
-fun <T> Dropdown<T>.pfDropdownKebab(
-    modifier: Modifier,
-    content: Icon.() -> Unit = {}
-): DropdownToggle<T> =
-    register(DropdownToggle(this, modifier.value, iconClass = "ellipsis-v".fas(), iconContent = content), {})
+    content: DropdownToggle<T>.() -> Unit = {}
+): DropdownToggle<T> = register(DropdownToggle(this, modifier.value), content)
 
 fun <T> Dropdown<T>.pfDropdownItems(
     classes: String? = null,
@@ -151,31 +127,33 @@ class Dropdown<T> internal constructor(
 
 class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
-    classes: String?,
-    textContent: (Span.() -> Unit)? = null,
-    iconClass: String = "",
-    iconContent: (Icon.() -> Unit)? = null
-) : Button(id = Id.unique(ComponentType.Dropdown.id, "btn"), baseClass = classes {
-    +"dropdown".component("toggle")
-    +(Modifier.plain `when` (iconContent != null))
-    +classes
-}) {
+    classes: String?
+) : WithTextDelegate<HTMLButtonElement, HTMLSpanElement>,
+    Button(id = Id.unique(ComponentType.Dropdown.id, "btn"), baseClass = classes {
+        +"dropdown".component("toggle")
+        +Modifier.plain
+        +classes
+    }) {
+
+    private var textElement: HTMLSpanElement? = null
+
     init {
         dropdown.toggleId = id
         aria["haspopup"] = true
         clicks handledBy dropdown.ces.toggle
         dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
-        textContent?.let {
-            span(baseClass = "dropdown".component("toggle", "text"), content = it)
-            span(baseClass = "dropdown".component("toggle", "icon")) {
+    }
+
+    override fun delegate(): HTMLSpanElement {
+        if (textElement == null) {
+            domNode.clear()
+            domNode.classList -= Modifier.plain.value
+            textElement = register(span(baseClass = "dropdown".component("toggle", "text")) {}, {}).domNode
+            register(span(baseClass = "dropdown".component("toggle", "icon")) {
                 pfIcon("caret-down".fas())
-            }
+            }, {})
         }
-        iconContent?.let {
-            pfIcon(iconClass) {
-                it(this)
-            }
-        }
+        return textElement!!
     }
 }
 

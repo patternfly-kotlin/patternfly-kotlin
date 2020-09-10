@@ -1,26 +1,18 @@
 package org.patternfly
 
-import dev.fritz2.binding.SingleMountPoint
-import dev.fritz2.dom.DomMountPoint
 import dev.fritz2.dom.Listener
-import dev.fritz2.dom.TextNode
-import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 import org.patternfly.Modifier.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.Node
-import org.w3c.dom.Text
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 
@@ -67,6 +59,7 @@ private fun insertBadge(chip: Chip, badge: Badge) {
 @OptIn(ExperimentalCoroutinesApi::class)
 class Chip internal constructor(readOnly: Boolean, classes: String?) :
     PatternFlyComponent<HTMLDivElement>,
+    WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(baseClass = classes {
         +ComponentType.Chip
         +("read-only".modifier() `when` readOnly)
@@ -103,18 +96,10 @@ class Chip internal constructor(readOnly: Boolean, classes: String?) :
         }
     }
 
-    override fun text(value: String): Node = setText(value)
+    override fun delegate(): HTMLSpanElement = textElement.domNode
 
-    override operator fun String.unaryPlus(): Node = setText(this)
-
-    override fun Flow<String>.bind(preserveOrder: Boolean): SingleMountPoint<WithDomNode<Text>> {
-        val upstream = this.map { TextNode(it) }.distinctUntilChanged()
-        return DomMountPoint(upstream, textElement.domNode)
-    }
-
-    private fun setText(value: String): HTMLSpanElement {
-        textElement.domNode.textContent = value
-        textElement.domNode.title = value
-        return textElement.domNode
+    override fun appendText(text: String): Node {
+        textElement.domNode.title = text
+        return super.appendText(text)
     }
 }
