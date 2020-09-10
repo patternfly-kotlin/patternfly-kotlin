@@ -1,17 +1,31 @@
 package org.patternfly
 
-fun <T> pfEntries(block: EntryBuilder<T>.() -> Unit): List<Entry<T>> =
-    EntryBuilder<T>().apply(block).build()
 
-fun <T> EntryBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-fun <T> EntryBuilder<T>.pfSeparator() {
+fun <T> ItemsBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
-fun <T> EntryBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+fun <T> GroupsBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+    entries.add(GroupBuilder<T>(title).apply(block).build())
+}
+
+fun <T> GroupsBuilder<T>.pfSeparator() {
+    entries.add(Separator())
+}
+
+fun <T> EntriesBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+    entries.add(ItemBuilder(item).apply(block).build())
+}
+
+fun <T> EntriesBuilder<T>.pfSeparator() {
+    entries.add(Separator())
+}
+
+fun <T> EntriesBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
@@ -58,7 +72,17 @@ data class Item<T> internal constructor(
 
 class Separator<T> : Entry<T>()
 
-class EntryBuilder<T> {
+class ItemsBuilder<T> {
+    internal val entries: MutableList<Entry<T>> = mutableListOf()
+    internal fun build(): List<Entry<T>> = entries
+}
+
+class EntriesBuilder<T> {
+    internal val entries: MutableList<Entry<T>> = mutableListOf()
+    internal fun build(): List<Entry<T>> = entries
+}
+
+class GroupsBuilder<T> {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }

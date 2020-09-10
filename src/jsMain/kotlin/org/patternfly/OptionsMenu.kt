@@ -55,8 +55,8 @@ fun <T> HtmlElements.pfOptionsMenu(
     content: OptionsMenu<T>.() -> Unit = {}
 ): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, modifier.value), content)
 
-fun <T> OptionsMenu<T>.pfEntries(block: EntryBuilder<T>.() -> Unit) {
-    val entries = EntryBuilder<T>().apply(block).build()
+fun <T> OptionsMenu<T>.pfEntries(block: EntriesBuilder<T>.() -> Unit) {
+    val entries = EntriesBuilder<T>().apply(block).build()
     action(entries) handledBy this.store.update
 }
 
@@ -78,8 +78,7 @@ class OptionsMenu<T> internal constructor(
 
     private val button: Button
     val ces = CollapseExpandStore { target ->
-        !domNode.contains(target) &&
-                !target.matches(By.classname("options-menu".component("menu-item")))
+        !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
     var asText: AsText<T> = { it.toString() }
     var display: ComponentDisplay<Button, T> = {
@@ -175,12 +174,14 @@ class OptionsMenu<T> internal constructor(
         button(baseClass = "options-menu".component("menu-item")) {
             attr("tabindex", "-1")
             if (entry.disabled) {
+                aria["disabled"] = true
                 attr("disabled", "true")
                 domNode.classList += Modifier.disabled
             }
-            this@OptionsMenu.display(entry.item).invoke(this)
 
+            this@OptionsMenu.display(entry.item).invoke(this)
             clicks.map { entry } handledBy this@OptionsMenu.store.toggle
+
             if (entry.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
                     pfIcon("check".fas())

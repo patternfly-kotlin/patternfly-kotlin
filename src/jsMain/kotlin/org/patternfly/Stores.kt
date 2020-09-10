@@ -15,10 +15,10 @@ import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 
-typealias AutoCollapse = (Element) -> Boolean
+typealias CollapsePredicate = (Element) -> Boolean
 
 // initial data: expanded = false
-class CollapseExpandStore(private val autoCollapse: AutoCollapse? = null) : RootStore<Boolean>(false) {
+class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = null) : RootStore<Boolean>(false) {
 
     private var closeHandler: ((Event) -> Unit)? = null
 
@@ -46,9 +46,9 @@ class CollapseExpandStore(private val autoCollapse: AutoCollapse? = null) : Root
     }
 
     private fun addCloseHandler() {
-        if (autoCollapse != null) {
+        if (collapsePredicate != null) {
             closeHandler = {
-                if (autoCollapse.invoke((it.target as Element))) {
+                if (collapsePredicate.invoke((it.target as Element))) {
                     removeCloseHandler()
                     launch {
                         enqueue(QueuedUpdate({ false }, ::errorHandler))
