@@ -1,5 +1,7 @@
 package org.patternfly
 
+import dev.fritz2.dom.html.Span
+
 
 fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
@@ -55,14 +57,22 @@ data class Group<T> internal constructor(
 
 data class Item<T> internal constructor(
     val item: T,
-    val disabled: Boolean = false,
-    var selected: Boolean = false,
-    internal var group: Group<T>? = null
+    val disabled: Boolean,
+    val selected: Boolean,
+    val description: String,
+    val icon: (Span.() -> Unit)?,
+    internal var group: Group<T>?
 ) : Entry<T>() {
     override fun toString(): String = buildString {
         append("Item(item=").append(item)
         append(", disabled=").append(disabled)
         append(", selected=").append(selected)
+        if (description.isNotEmpty()) {
+            append(", description=").append(description)
+        }
+        if (icon != null) {
+            append(", with icon")
+        }
         group?.let {
             append(", group=").append(it.id)
         }
@@ -97,5 +107,8 @@ class GroupBuilder<T>(private val title: String?) {
 class ItemBuilder<T>(private val item: T) {
     var disabled: Boolean = false
     var selected: Boolean = false
-    internal fun build(): Item<T> = Item(item, disabled, selected)
+    var description: String = ""
+    var icon: (Span.() -> Unit)? = null
+
+    internal fun build(): Item<T> = Item(item, disabled, selected, description, icon, null)
 }

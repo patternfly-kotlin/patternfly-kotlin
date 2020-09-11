@@ -2,13 +2,17 @@ package org.patternfly
 
 import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SingleMountPoint
 import dev.fritz2.binding.action
+import dev.fritz2.binding.const
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.Input
+import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -48,6 +52,26 @@ fun <T> Dropdown<T>.pfDropdownToggle(
     modifier: Modifier,
     content: DropdownToggle<T>.() -> Unit = {}
 ): DropdownToggle<T> = register(DropdownToggle(this, modifier.value), content)
+
+fun <T> Dropdown<T>.pfDropdownCheckboxToggle(
+    classes: String? = null,
+    content: DropdownCheckboxToggle<T>.() -> Unit = {}
+): DropdownCheckboxToggle<T> = register(DropdownCheckboxToggle(this, classes), content)
+
+fun <T> Dropdown<T>.pfDropdownCheckboxToggle(
+    modifier: Modifier,
+    content: DropdownCheckboxToggle<T>.() -> Unit = {}
+): DropdownCheckboxToggle<T> = register(DropdownCheckboxToggle(this, modifier.value), content)
+
+fun <T> Dropdown<T>.pfDropdownActionToggle(
+    classes: String? = null,
+    content: Button.() -> Unit = {}
+): DropdownActionToggle<T> = register(DropdownActionToggle(this, classes, content), {})
+
+fun <T> Dropdown<T>.pfDropdownActionToggle(
+    modifier: Modifier,
+    content: Button.() -> Unit = {}
+): DropdownActionToggle<T> = register(DropdownActionToggle(this, modifier.value, content), {})
 
 fun <T> Dropdown<T>.pfDropdownItems(
     classes: String? = null,
@@ -112,10 +136,28 @@ class Dropdown<T> internal constructor(
     val ces = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
     }
-    var asText: AsText<T> = { it.toString() }
-    var display: ComponentDisplay<Button, T> = {
+    var display: ComponentDisplay<Button, Item<T>> = { item ->
         {
-            +this@Dropdown.asText(it)
+            if (item.description.isNotEmpty()) {
+                div(baseClass = "dropdown".component("menu-item", "main")) {
+                    item.icon?.let { iconDisplay ->
+                        span(baseClass = "dropdown".component("menu-item", "icon")) {
+                            iconDisplay(this)
+                        }
+                    }
+                    +item.item.toString()
+                }
+                div(baseClass = "dropdown".component("menu-item", "description")) {
+                    +item.description
+                }
+            } else {
+                item.icon?.let { iconDisplay ->
+                    span(baseClass = "dropdown".component("menu-item", "icon")) {
+                        iconDisplay(this)
+                    }
+                }
+                +item.item.toString()
+            }
         }
     }
 
@@ -129,7 +171,7 @@ class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
     classes: String?
 ) : WithTextDelegate<HTMLButtonElement, HTMLSpanElement>,
-    Button(id = Id.unique(ComponentType.Dropdown.id, "btn"), baseClass = classes {
+    Button(id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"), baseClass = classes {
         +"dropdown".component("toggle")
         +Modifier.plain
         +classes
@@ -148,12 +190,111 @@ class DropdownToggle<T> internal constructor(
         if (textElement == null) {
             domNode.clear()
             domNode.classList -= Modifier.plain.value
-            textElement = register(span(baseClass = "dropdown".component("toggle", "text")) {}, {}).domNode
-            register(span(baseClass = "dropdown".component("toggle", "icon")) {
+            textElement = span(baseClass = "dropdown".component("toggle", "text"), content = {}).domNode
+            span(baseClass = "dropdown".component("toggle", "icon")) {
                 pfIcon("caret-down".fas())
-            }, {})
+            }
         }
         return textElement!!
+    }
+}
+
+class DropdownCheckboxToggle<T> internal constructor(
+    dropdown: Dropdown<T>,
+    classes: String?
+) : WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
+    Div(baseClass = classes {
+        +"dropdown".component("toggle")
+        +"split-button".modifier()
+        +classes
+    }) {
+
+    private val labelTag: Label
+    private lateinit var inputTag: Input
+    private val toggleTag: Button
+    private var textElement: HTMLSpanElement? = null
+
+    var disabled: Flow<Boolean>
+        get() {
+            throw NotImplementedError()
+        }
+        set(value) {
+            object : SingleMountPoint<Boolean>(value) {
+                override fun set(value: Boolean, last: Boolean?) {
+                    if (value) {
+                        domNode.classList += "disabled".modifier()
+                        inputTag.domNode.setAttribute("disabled", "")
+                        toggleTag.domNode.setAttribute("disabled", "")
+                    } else {
+                        domNode.classList -= "disabled".modifier()
+                        inputTag.domNode.removeAttribute("disabled")
+                        toggleTag.domNode.removeAttribute("disabled")
+                    }
+                }
+            }
+        }
+
+    init {
+        val checkId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
+        labelTag = label(baseClass = "dropdown".component("toggle", "check")) {
+            `for` = const(checkId)
+            this@DropdownCheckboxToggle.inputTag = input(id = checkId) {
+                type = const("checkbox")
+            }
+        }
+        toggleTag = button(
+            id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
+            baseClass = "dropdown".component("toggle", "button")
+        ) {
+            dropdown.toggleId = id
+            aria["haspopup"] = true
+            clicks handledBy dropdown.ces.toggle
+            dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
+            pfIcon("caret-down".fas())
+        }
+    }
+
+    override fun delegate(): HTMLSpanElement {
+        if (textElement == null) {
+            val textId = Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
+            textElement = labelTag.register(
+                span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
+                    aria["hidden"] = true
+                }, {}).domNode
+            inputTag.aria["labelledby"] = textId
+        }
+        return textElement!!
+    }
+}
+
+// TODO Implement disable!
+@Suppress("JoinDeclarationAndAssignment")
+class DropdownActionToggle<T> internal constructor(
+    dropdown: Dropdown<T>,
+    classes: String?,
+    content: Button.() -> Unit
+) : Div(baseClass = classes {
+    +"dropdown".component("toggle")
+    +"split-button".modifier()
+    +"action".modifier()
+    +classes
+}) {
+
+    private val actionTag: Button
+    private val toggleTag: Button
+
+    init {
+        actionTag = button(baseClass = "dropdown".component("toggle", "button"), content = content)
+        toggleTag = button(
+            id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
+            baseClass = "dropdown".component("toggle", "button")
+        ) {
+            dropdown.toggleId = id
+            aria["haspopup"] = true
+            clicks handledBy dropdown.ces.toggle
+            dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
+            pfIcon("caret-down".fas())
+        }
     }
 }
 
@@ -211,23 +352,25 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
         }.bind()
     }
 
-    private fun itemContent(entry: Item<T>): Li.() -> Unit = {
+    private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
-        button(baseClass = "dropdown".component("menu-item")) {
+        button(baseClass = classes {
+            +"dropdown".component("menu-item")
+            +("icon".modifier() `when` (item.icon != null))
+            +("description".modifier() `when` item.description.isNotEmpty())
+        }) {
             attr("tabindex", "-1")
-            if (entry.disabled) {
+            if (item.disabled) {
                 aria["disabled"] = true
                 attr("disabled", "true")
                 domNode.classList += Modifier.disabled
             }
-
-            this@DropdownEntries.dropdown.display(entry.item).invoke(this)
-            clicks.map { entry.item } handledBy this@DropdownEntries.dropdown.store.clicked
+            clicks.map { item.item } handledBy this@DropdownEntries.dropdown.store.clicked
             clicks handledBy this@DropdownEntries.dropdown.ces.collapse
-
-            if (entry.selected) {
+            if (item.selected) {
                 domNode.autofocus = true
             }
+            this@DropdownEntries.dropdown.display(item).invoke(this)
         }
     }
 }
