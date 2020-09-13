@@ -9,9 +9,6 @@ import org.w3c.dom.HTMLElement
 fun HtmlElements.pfSection(classes: String? = null, content: Section.() -> Unit = {}): Section =
     register(Section(classes), content)
 
-fun HtmlElements.pfSection(modifier: Modifier, content: Section.() -> Unit = {}): Section =
-    register(Section(modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Section internal constructor(classes: String?) :

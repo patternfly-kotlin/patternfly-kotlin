@@ -20,9 +20,6 @@ import org.w3c.dom.HTMLLabelElement
 fun HtmlElements.pfSwitch(classes: String? = null, content: Switch.() -> Unit = {}): Switch =
     register(Switch(classes), content)
 
-fun HtmlElements.pfSwitch(modifier: Modifier, content: Switch.() -> Unit = {}): Switch =
-    register(Switch(modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Switch internal constructor(classes: String?) :

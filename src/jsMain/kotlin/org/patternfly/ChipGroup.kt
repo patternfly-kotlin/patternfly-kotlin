@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.dom.clear
-import org.patternfly.Modifier.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
@@ -36,15 +35,6 @@ fun <T> HtmlElements.pfChipGroup(
     classes: String? = null,
     content: ChipGroup<T>.() -> Unit = {}
 ): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, classes), content)
-
-fun <T> HtmlElements.pfChipGroup(
-    store: ChipGroupStore<T> = ChipGroupStore(),
-    text: String? = null,
-    limit: Int = 3,
-    closable: Boolean = false,
-    modifier: Modifier,
-    content: ChipGroup<T>.() -> Unit = {}
-): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, modifier.value), content)
 
 fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
     val entries = ChipBuilder<T>().apply(block).build()
@@ -136,7 +126,7 @@ class ChipGroup<T> internal constructor(
         }
         if (closable) {
             div(baseClass = "chip-group".component("close")) {
-                this@ChipGroup.closeButton = pfButton(plain) {
+                this@ChipGroup.closeButton = pfButton("plain".modifier()) {
                     pfIcon("times-circle".fas())
                     aria["label"] = "Close chip group"
                     if (labelId != null) {

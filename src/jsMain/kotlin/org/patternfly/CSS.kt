@@ -21,8 +21,6 @@ inline fun classes(builderAction: ClassBuilder.() -> Unit): String = ClassBuilde
 
 fun classes(vararg classes: String): String = classes.joinToString(" ")
 
-fun classes(vararg modifiers: Modifier): String = modifiers.joinToString(" ") { it.value }
-
 internal fun classes(componentType: ComponentType, optionalClass: String? = null): String? =
     classes(componentType.baseClass, optionalClass)
 
@@ -41,15 +39,7 @@ class ClassBuilder {
         }
     }
 
-    operator fun Modifier?.unaryPlus() {
-        this?.let {
-            builder.append(it).append(" ")
-        }
-    }
-
     infix fun String.`when`(condition: Boolean): String? = if (condition) this else null
-
-    infix fun Modifier.`when`(condition: Boolean): Modifier? = if (condition) this else null
 
     internal operator fun ComponentType.unaryPlus() {
         this.baseClass?.let {
@@ -58,51 +48,4 @@ class ClassBuilder {
     }
 
     fun build() = builder.toString().trim()
-}
-
-@Suppress("EnumEntryName")
-enum class Modifier(val value: String) {
-
-    _4xl("4xl".modifier()),
-    _3xl("3xl".modifier()),
-    _2xl("2xl".modifier()),
-    alignLeft("align-left".modifier()),
-    alignRight("align-right".modifier()),
-    ariaDisabled("aria-disabled".modifier()),
-    block("block".modifier()),
-    compact("compact".modifier()),
-    control("control".modifier()),
-    current("current".modifier()),
-    danger("danger".modifier()),
-    disabled("disabled".modifier()),
-    displayLg("display-lg".modifier()),
-    end("end".modifier()),
-    expanded("expanded".modifier()),
-    expandable("expandable".modifier()),
-    flat("flat".modifier()),
-    horizontal("horizontal".modifier()),
-    hoverable("hoverable".modifier()),
-    info("info".modifier()),
-    `inline`("inline".modifier()),
-    lg("lg".modifier()),
-    light("light".modifier()),
-    link("link".modifier()),
-    md("md".modifier()),
-    noFill("no-fill".modifier()),
-    plain("plain".modifier()),
-    primary("primary".modifier()),
-    read("read".modifier()),
-    secondary("secondary".modifier()),
-    selectable("selectable".modifier()),
-    selected("selected".modifier()),
-    small("small".modifier()),
-    start("start".modifier()),
-    success("success".modifier()),
-    tertiary("tertiary".modifier()),
-    toast("toast".modifier()),
-    unread("unread".modifier()),
-    warning("warning".modifier()),
-    xl("xl".modifier());
-
-    override fun toString(): String = value
 }

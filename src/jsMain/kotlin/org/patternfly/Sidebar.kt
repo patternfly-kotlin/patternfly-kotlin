@@ -8,14 +8,8 @@ import org.w3c.dom.HTMLDivElement
 fun Page.pfSidebar(classes: String? = null, content: Sidebar.() -> Unit = {}): Sidebar =
     register(Sidebar(classes), content)
 
-fun Page.pfSidebar(modifier: Modifier, content: Sidebar.() -> Unit = {}): Sidebar =
-    register(Sidebar(modifier.value), content)
-
 fun Sidebar.pfSidebarBody(classes: String? = null, content: SidebarBody.() -> Unit = {}): SidebarBody =
     register(SidebarBody(classes), content)
-
-fun Sidebar.pfSidebarBody(modifier: Modifier, content: SidebarBody.() -> Unit = {}): SidebarBody =
-    register(SidebarBody(modifier.value), content)
 
 // ------------------------------------------------------ tag
 

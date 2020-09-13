@@ -10,9 +10,6 @@ import org.w3c.dom.HTMLDivElement
 fun HtmlElements.pfPagination(classes: String? = null, content: Pagination.() -> Unit = {}): Pagination =
     register(Pagination(classes), content)
 
-fun HtmlElements.pfPagination(modifier: Modifier, content: Pagination.() -> Unit = {}): Pagination =
-    register(Pagination(modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Pagination internal constructor(classes: String?) :

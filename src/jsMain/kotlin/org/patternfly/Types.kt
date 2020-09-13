@@ -10,16 +10,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import org.patternfly.Modifier._2xl
-import org.patternfly.Modifier._3xl
-import org.patternfly.Modifier._4xl
-import org.patternfly.Modifier.alignLeft
-import org.patternfly.Modifier.alignRight
-import org.patternfly.Modifier.end
-import org.patternfly.Modifier.lg
-import org.patternfly.Modifier.md
-import org.patternfly.Modifier.start
-import org.patternfly.Modifier.xl
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.Text
@@ -96,8 +86,8 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Title("tlt", "title".component());
 }
 
-enum class Align(val modifier: Modifier) {
-    LEFT(alignLeft), RIGHT(alignRight)
+enum class Align(val modifier: String) {
+    LEFT("align-left".modifier()), RIGHT("align-right".modifier())
 }
 
 enum class DividerVariant {
@@ -112,8 +102,8 @@ enum class Orientation {
     HORIZONTAL, VERTICAL
 }
 
-enum class Position(val modifier: Modifier) {
-    START(start), END(end)
+enum class Position(val modifier: String) {
+    START("start".modifier()), END("end".modifier())
 }
 
 enum class SelectionMode {
@@ -121,22 +111,22 @@ enum class SelectionMode {
 }
 
 enum class Severity(
-    val modifier: Modifier?,
+    val modifier: String?,
     val iconClass: String,
     val aria: String
 ) {
     DEFAULT(null, "bell".fas(), "Default alert"),
-    INFO(Modifier.info, "info-circle".fas(), "Info alert"),
-    SUCCESS(Modifier.success, "check-circle".fas(), "Success alert"),
-    WARNING(Modifier.warning, "exclamation-triangle".fas(), "Warning alert"),
-    DANGER(Modifier.danger, "exclamation-circle".fas(), "Danger alert");
+    INFO("info".modifier(), "info-circle".fas(), "Info alert"),
+    SUCCESS("success".modifier(), "check-circle".fas(), "Success alert"),
+    WARNING("warning".modifier(), "exclamation-triangle".fas(), "Warning alert"),
+    DANGER("danger".modifier(), "exclamation-circle".fas(), "Danger alert");
 }
 
-enum class Size(val modifier: Modifier) {
-    XL_4(_4xl),
-    XL_3(_3xl),
-    XL_2(_2xl),
-    XL(xl),
-    LG(lg),
-    MD(md)
+enum class Size(val modifier: String) {
+    XL_4("4xl".modifier()),
+    XL_3("3xl".modifier()),
+    XL_2("2xl".modifier()),
+    XL("xl".modifier()),
+    LG("lg".modifier()),
+    MD("md".modifier())
 }

@@ -17,9 +17,6 @@ import kotlin.js.Date
 fun HtmlElements.pfNotificationBadge(classes: String? = null): NotificationBadge =
     register(NotificationBadge(classes), {})
 
-fun HtmlElements.pfNotificationBadge(modifier: Modifier): NotificationBadge =
-    register(NotificationBadge(modifier.value), {})
-
 // ------------------------------------------------------ tag
 
 class NotificationBadge(classes: String?) :
@@ -33,7 +30,7 @@ class NotificationBadge(classes: String?) :
         }.bindAttr("aria-label")
         span(baseClass = "notification-badge".component()) {
             classMap = Notification.store.unread.map { unread ->
-                mapOf(Modifier.read.value to !unread, Modifier.unread.value to unread)
+                mapOf("read".modifier() to !unread, "unread".modifier() to unread)
             }
             pfIcon("bell".fas())
         }

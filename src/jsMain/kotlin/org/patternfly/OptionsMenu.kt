@@ -27,16 +27,6 @@ fun <T> HtmlElements.pfOptionsMenu(
 
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
-    text: String,
-    grouped: Boolean = false,
-    align: Align? = null,
-    up: Boolean = false,
-    modifier: Modifier,
-    content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), grouped, align, up, modifier.value), content)
-
-fun <T> HtmlElements.pfOptionsMenu(
-    store: OptionStore<T> = OptionStore(),
     icon: Icon,
     grouped: Boolean = false,
     align: Align? = null,
@@ -44,16 +34,6 @@ fun <T> HtmlElements.pfOptionsMenu(
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
 ): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, classes), content)
-
-fun <T> HtmlElements.pfOptionsMenu(
-    store: OptionStore<T> = OptionStore(),
-    icon: Icon,
-    grouped: Boolean = false,
-    align: Align? = null,
-    up: Boolean = false,
-    modifier: Modifier,
-    content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, modifier.value), content)
 
 fun <T> OptionsMenu<T>.pfEntries(block: EntriesBuilder<T>.() -> Unit) {
     val entries = EntriesBuilder<T>().apply(block).build()
@@ -94,7 +74,7 @@ class OptionsMenu<T> internal constructor(
 
     init {
         markAs(ComponentType.OptionsMenu)
-        classMap = ces.data.map { expanded -> mapOf(Modifier.expanded.value to expanded) }
+        classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
         val buttonId = Id.unique(ComponentType.OptionsMenu.id, "btn")
         button = button(id = id, baseClass = "options-menu".component("toggle")) {
             aria["label"] = "Options menu"
@@ -111,7 +91,7 @@ class OptionsMenu<T> internal constructor(
                     }
                 }
                 is Either.Right -> {
-                    domNode.classList += Modifier.plain
+                    domNode.classList += "plain".modifier()
                     register(this@OptionsMenu.textOrIcon.value) {}
                 }
             }
@@ -176,7 +156,7 @@ class OptionsMenu<T> internal constructor(
             if (entry.disabled) {
                 aria["disabled"] = true
                 attr("disabled", "true")
-                domNode.classList += Modifier.disabled
+                domNode.classList += "disabled".modifier()
             }
 
             this@OptionsMenu.display(entry.item).invoke(this)

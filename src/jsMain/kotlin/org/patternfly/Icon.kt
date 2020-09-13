@@ -9,9 +9,6 @@ import org.w3c.dom.HTMLElement
 fun HtmlElements.pfIcon(iconClass: String, classes: String? = null, content: Icon.() -> Unit = {}): Icon =
     register(Icon(iconClass, classes), content)
 
-fun HtmlElements.pfIcon(iconClass: String, modifier: Modifier, content: Icon.() -> Unit = {}): Icon =
-    register(Icon(iconClass, modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Icon internal constructor(iconClass: String, classes: String?) :

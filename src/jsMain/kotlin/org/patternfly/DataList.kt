@@ -11,8 +11,6 @@ import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
-import org.patternfly.Modifier.plain
-import org.patternfly.Modifier.selectable
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
@@ -25,62 +23,30 @@ fun <T> HtmlElements.pfDataList(
     content: DataList<T>.() -> Unit = {}
 ): DataList<T> = register(DataList(store, selectionMode, classes), content)
 
-fun <T> HtmlElements.pfDataList(
-    store: ItemStore<T>,
-    selectionMode: SelectionMode = SelectionMode.NONE,
-    modifier: Modifier,
-    content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(store, selectionMode, modifier.value), content)
-
 fun <T> DataListRow<T>.pfDataListAction(
     classes: String? = null,
     content: DataListAction<T>.() -> Unit = {}
 ): DataListAction<T> = register(DataListAction(this.dataList, this.item, classes), content)
-
-fun <T> DataListRow<T>.pfDataListAction(
-    modifier: Modifier,
-    content: DataListAction<T>.() -> Unit = {}
-): DataListAction<T> = register(DataListAction(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListContent<T>.pfDataListCell(
     classes: String? = null,
     content: DataListCell<T>.() -> Unit = {}
 ): DataListCell<T> = register(DataListCell(this.dataList, this.item, classes), content)
 
-fun <T> DataListContent<T>.pfDataListCell(
-    modifier: Modifier,
-    content: DataListCell<T>.() -> Unit = {}
-): DataListCell<T> = register(DataListCell(this.dataList, this.item, modifier.value), content)
-
 fun <T> DataListControl<T>.pfDataListCheck(
     classes: String? = null,
     content: DataListCheck<T>.() -> Unit = {}
 ): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, classes), content)
-
-fun <T> DataListControl<T>.pfDataListCheck(
-    modifier: Modifier,
-    content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.dataList, this.item, modifier.value), content)
 
 fun <T> DataListRow<T>.pfDataListContent(
     classes: String? = null,
     content: DataListContent<T>.() -> Unit = {}
 ): DataListContent<T> = register(DataListContent(this.dataList, this.item, classes), content)
 
-fun <T> DataListRow<T>.pfDataListContent(
-    modifier: Modifier,
-    content: DataListContent<T>.() -> Unit = {}
-): DataListContent<T> = register(DataListContent(this.dataList, this.item, modifier.value), content)
-
 fun <T> DataListRow<T>.pfDataListControl(
     classes: String? = null,
     content: DataListControl<T>.() -> Unit = {}
 ): DataListControl<T> = register(DataListControl(this.dataList, this.dataListItem, this.item, classes), content)
-
-fun <T> DataListRow<T>.pfDataListControl(
-    modifier: Modifier,
-    content: DataListControl<T>.() -> Unit = {}
-): DataListControl<T> = register(DataListControl(this.dataList, this.dataListItem, this.item, modifier.value), content)
 
 fun <T> DataListItem<T>.pfDataListExpandableContent(
     classes: String? = null,
@@ -88,43 +54,21 @@ fun <T> DataListItem<T>.pfDataListExpandableContent(
 ): DataListExpandableContent<T> =
     register(DataListExpandableContent(this.dataList, this, this.item, classes), content)
 
-fun <T> DataListItem<T>.pfDataListExpandableContent(
-    modifier: Modifier,
-    content: DataListExpandableContent<T>.() -> Unit = {}
-): DataListExpandableContent<T> =
-    register(DataListExpandableContent(this.dataList, this, this.item, modifier.value), content)
-
 fun <T> DataListExpandableContent<T>.pfDataListExpandableContentBody(
     classes: String? = null,
     content: DataListExpandableContentBody<T>.() -> Unit = {}
 ): DataListExpandableContentBody<T> =
     register(DataListExpandableContentBody(this.dataList, this.item, classes), content)
 
-fun <T> DataListExpandableContent<T>.pfDataListExpandableContentBody(
-    modifier: Modifier,
-    content: DataListExpandableContentBody<T>.() -> Unit = {}
-): DataListExpandableContentBody<T> =
-    register(DataListExpandableContentBody(this.dataList, this.item, modifier.value), content)
-
 fun <T> DataListItem<T>.pfDataListRow(
     classes: String? = null,
     content: DataListRow<T>.() -> Unit = {}
 ): DataListRow<T> = register(DataListRow(this.dataList, this, this.item, classes), content)
 
-fun <T> DataListItem<T>.pfDataListRow(
-    modifier: Modifier,
-    content: DataListRow<T>.() -> Unit = {}
-): DataListRow<T> = register(DataListRow(this.dataList, this, this.item, modifier.value), content)
-
 fun <T> DataListControl<T>.pfDataListToggle(
     classes: String? = null,
     content: DataListToggle<T>.() -> Unit = {}
 ): DataListToggle<T> = register(DataListToggle(this.dataList, this.dataListItem, this.item, classes), content)
-
-fun <T> DataListControl<T>.pfDataListToggle(
-    modifier: Modifier,
-    content: DataListToggle<T>.() -> Unit = {}
-): DataListToggle<T> = register(DataListToggle(this.dataList, this.dataListItem, this.item, modifier.value), content)
 
 // ------------------------------------------------------ tag
 
@@ -236,7 +180,7 @@ class DataListItem<T> internal constructor(
         aria["labelledby"] = dataList.store.identifier(item)
         if (dataList.selectionMode != SelectionMode.NONE) {
             attr("tabindex", "0")
-            domNode.classList += selectable
+            domNode.classList += "selectable".modifier()
             clicks.map { item } handledBy dataList.store.toggleSelection
         }
         val content = dataList.display.invoke(item)
@@ -263,7 +207,7 @@ class DataListToggle<T> internal constructor(
 ) : Div(baseClass = classes("data-list".component("toggle"), classes)) {
     init {
         val id = Id.unique(ComponentType.DataList.id, "tgl")
-        pfButton(plain) {
+        pfButton("plain".modifier()) {
             domNode.id = id
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["labelledby"] = "$id ${this@DataListToggle.dataList.store.identifier(this@DataListToggle.item)}"

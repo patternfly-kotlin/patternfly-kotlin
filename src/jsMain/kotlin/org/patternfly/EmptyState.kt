@@ -14,39 +14,18 @@ fun HtmlElements.pfEmptyState(
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyState = register(EmptyState(iconClass, title, size, classes, content), {})
 
-fun HtmlElements.pfEmptyState(
-    iconClass: String,
-    title: String,
-    size: Size? = null,
-    modifier: Modifier,
-    content: EmptyStateContent.() -> Unit = {}
-): EmptyState = register(EmptyState(iconClass, title, size, modifier.value, content), {})
-
 fun EmptyState.pfEmptyStateContent(
     classes: String? = null,
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyStateContent = register(EmptyStateContent(classes), content)
-
-fun EmptyState.pfEmptyStateContent(
-    modifier: Modifier,
-    content: EmptyStateContent.() -> Unit = {}
-): EmptyStateContent = register(EmptyStateContent(modifier.value), content)
 
 fun EmptyStateContent.pfEmptyStateBody(
     classes: String? = null,
     content: EmptyStateBody.() -> Unit = {}
 ): EmptyStateBody = register(EmptyStateBody(classes), content)
 
-fun EmptyStateContent.pfEmptyStateBody(
-    modifier: Modifier,
-    content: EmptyStateBody.() -> Unit = {}
-): EmptyStateBody = register(EmptyStateBody(modifier.value), content)
-
 fun EmptyStateContent.pfEmptyStateSecondary(classes: String? = null, content: Div.() -> Unit = {}): Div =
     register(Div(baseClass = classes("empty-state".component("secondary"), classes)), content)
-
-fun EmptyStateContent.pfEmptyStateSecondary(modifier: Modifier, content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = classes("empty-state".component("secondary"), modifier.value)), content)
 
 // ------------------------------------------------------ tag
 

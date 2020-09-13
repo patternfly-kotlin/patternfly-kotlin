@@ -12,9 +12,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.patternfly.Modifier.current
-import org.patternfly.Modifier.expandable
-import org.patternfly.Modifier.horizontal
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
@@ -30,15 +27,6 @@ fun <T> HtmlElements.pfHorizontalNavigation(
 ): Navigation<T> =
     register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, classes, content), {})
 
-fun <T> HtmlElements.pfHorizontalNavigation(
-    router: Router<T>,
-    selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
-    tertiary: Boolean = false,
-    modifier: Modifier,
-    content: Navigation<T>.() -> Unit = {}
-): Navigation<T> =
-    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, modifier.value, content), {})
-
 fun <T> HtmlElements.pfVerticalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
@@ -47,25 +35,11 @@ fun <T> HtmlElements.pfVerticalNavigation(
 ): Navigation<T> =
     register(Navigation(router, selected, Orientation.VERTICAL, false, classes, content), {})
 
-fun <T> HtmlElements.pfVerticalNavigation(
-    router: Router<T>,
-    selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
-    modifier: Modifier,
-    content: Navigation<T>.() -> Unit = {}
-): Navigation<T> =
-    register(Navigation(router, selected, Orientation.VERTICAL, false, modifier.value, content), {})
-
 fun <T> Navigation<T>.pfNavigationGroup(
     text: String,
     classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationGroup<T> = register(NavigationGroup(this, text, classes, content), {})
-
-fun <T> Navigation<T>.pfNavigationGroup(
-    text: String,
-    modifier: Modifier,
-    content: NavigationItems<T>.() -> Unit = {}
-): NavigationGroup<T> = register(NavigationGroup(this, text, modifier.value, content), {})
 
 fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
     text: String,
@@ -73,32 +47,15 @@ fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationExpandableGroup<T> = register(NavigationExpandableGroup(this.navigation, text, classes, content), {})
 
-fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
-    text: String,
-    modifier: Modifier,
-    content: NavigationItems<T>.() -> Unit = {}
-): NavigationExpandableGroup<T> =
-    register(NavigationExpandableGroup(this.navigation, text, modifier.value, content), {})
-
 fun <T> Navigation<T>.pfNavigationItems(
     classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(this, classes), content)
 
-fun <T> Navigation<T>.pfNavigationItems(
-    modifier: Modifier,
-    content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this, modifier.value), content)
-
 fun <T> NavigationGroup<T>.pfNavigationItems(
     classes: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(this.navigation, classes), content)
-
-fun <T> NavigationGroup<T>.pfNavigationItems(
-    modifier: Modifier,
-    content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this.navigation, modifier.value), content)
 
 internal fun <T> TextElement.pfNavigationItems(
     navigation: Navigation<T>,
@@ -115,26 +72,11 @@ fun <T> NavigationItems<T>.pfNavigationItem(
 
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
-    text: String,
-    modifier: Modifier,
-    selected: ((route: T) -> Boolean)? = null
-): NavigationItem<T> = pfNavigationItem(item, modifier, selected) { +text }
-
-fun <T> NavigationItems<T>.pfNavigationItem(
-    item: T,
     classes: String? = null,
     selected: ((route: T) -> Boolean)? = null,
     content: A.() -> Unit = {}
 ): NavigationItem<T> =
     register(NavigationItem(this.navigation, item, selected, classes, content), {})
-
-fun <T> NavigationItems<T>.pfNavigationItem(
-    item: T,
-    modifier: Modifier,
-    selected: ((route: T) -> Boolean)? = null,
-    content: A.() -> Unit = {}
-): NavigationItem<T> =
-    register(NavigationItem(this.navigation, item, selected, modifier.value, content), {})
 
 // ------------------------------------------------------ tag
 
@@ -148,7 +90,7 @@ class Navigation<T>(
 ) : PatternFlyComponent<HTMLElement>,
     TextElement("nav", baseClass = classes {
         +ComponentType.Navigation
-        +(horizontal `when` (orientation == Orientation.HORIZONTAL))
+        +("horizontal".modifier() `when` (orientation == Orientation.HORIZONTAL))
         +classes
     }) {
 
@@ -199,7 +141,7 @@ class NavigationExpandableGroup<T>(
     content: NavigationItems<T>.() -> Unit
 ) : Tag<HTMLLIElement>("li", baseClass = classes {
     +"nav".component("item")
-    +expandable
+    +"expandable".modifier()
     +classes
 }) {
 
@@ -209,15 +151,15 @@ class NavigationExpandableGroup<T>(
         // don't use classMap for expanded flow
         // classMap = expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
         MainScope().launch {
-            expanded.data.collect { domNode.classList.toggle(Modifier.expanded.value, it) }
+            expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
         }
         // it might interfere with router flow, which also modifies the class list
         MainScope().launch {
             this@NavigationExpandableGroup.navigation.router.collect {
                 delay(333) // wait a little bit before testing for the current modifier
-                val selector = By.classname("nav".component("link"), current.value)
+                val selector = By.classname("nav".component("link"), "current".modifier())
                 val containsCurrent = domNode.querySelector(selector) != null
-                domNode.classList.toggle(current.value, containsCurrent)
+                domNode.classList.toggle("current".modifier(), containsCurrent)
             }
         }
         val id = Id.unique("neg")
@@ -256,7 +198,7 @@ class NavigationItem<T>(
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo
             classMap = this@NavigationItem.navigation.router.map { route ->
-                mapOf(current.value to (this@NavigationItem.calculateSelection(route)))
+                mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
             }
             this@NavigationItem.navigation.router
                 .map { route -> this@NavigationItem.calculateSelection(route) }

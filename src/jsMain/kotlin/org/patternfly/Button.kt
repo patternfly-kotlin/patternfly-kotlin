@@ -11,14 +11,8 @@ import org.w3c.dom.HTMLButtonElement
 fun HtmlElements.pfButton(classes: String? = null, content: Button.() -> Unit = {}): Button =
     register(Button(classes), content)
 
-fun HtmlElements.pfButton(modifier: Modifier, content: Button.() -> Unit = {}): Button =
-    register(Button(modifier.value), content)
-
 fun HtmlElements.pfLinkButton(classes: String? = null, content: LinkButton.() -> Unit = {}): LinkButton =
     register(LinkButton(classes), content)
-
-fun HtmlElements.pfLinkButton(modifier: Modifier, content: LinkButton.() -> Unit = {}): LinkButton =
-    register(LinkButton(modifier.value), content)
 
 fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Unit = {}): Span =
     span(baseClass = classes {

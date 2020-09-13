@@ -23,13 +23,6 @@ fun HtmlElements.pfBadge(
     content: Badge.() -> Unit = {}
 ): Badge = register(Badge(min, max, classes), content)
 
-fun HtmlElements.pfBadge(
-    min: Int = 0,
-    max: Int = 999,
-    modifier: Modifier,
-    content: Badge.() -> Unit = {}
-): Badge = register(Badge(min, max, modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Badge internal constructor(

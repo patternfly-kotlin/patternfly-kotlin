@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
-import org.patternfly.Modifier.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -30,12 +29,6 @@ fun HtmlElements.pfAlertGroup(
     content: AlertGroup.() -> Unit = {}
 ): AlertGroup = register(AlertGroup(toast, classes), content)
 
-fun HtmlElements.pfAlertGroup(
-    toast: Boolean = false,
-    modifier: Modifier,
-    content: AlertGroup.() -> Unit = {}
-): AlertGroup = register(AlertGroup(toast, modifier.value), content)
-
 fun HtmlElements.pfAlert(
     severity: Severity,
     text: String,
@@ -44,15 +37,6 @@ fun HtmlElements.pfAlert(
     classes: String? = null,
     content: Alert.() -> Unit = {}
 ): Alert = register(Alert(severity, text, closable, inline, classes), content)
-
-fun HtmlElements.pfAlert(
-    severity: Severity,
-    text: String,
-    closable: Boolean = false,
-    inline: Boolean = false,
-    modifier: Modifier,
-    content: Alert.() -> Unit = {}
-): Alert = register(Alert(severity, text, closable, inline, modifier.value), content)
 
 fun AlertGroup.pfAlert(
     severity: Severity,
@@ -67,36 +51,13 @@ fun AlertGroup.pfAlert(
     }
 }, {})
 
-fun AlertGroup.pfAlert(
-    severity: Severity,
-    text: String,
-    closable: Boolean = false,
-    inline: Boolean = false,
-    modifier: Modifier,
-    content: Alert.() -> Unit = {}
-): Li = register(li("alert-group".component("item")) {
-    pfAlert(severity, text, closable, inline, modifier) {
-        content(this)
-    }
-}, {})
-
 fun Alert.pfAlertDescription(classes: String? = null, content: Div.() -> Unit = {}): Div =
     register(div(baseClass = classes("alert".component("description"), classes)) {
         content()
     }, {})
 
-fun Alert.pfAlertDescription(modifier: Modifier, content: Div.() -> Unit = {}): Div =
-    register(div(baseClass = classes("alert".component("description"), modifier.value)) {
-        content()
-    }, {})
-
 fun Alert.pfAlertActionGroup(classes: String? = null, content: Div.() -> Unit = {}): Div =
     register(div(baseClass = classes("alert".component("action-group"), classes)) {
-        content()
-    }, {})
-
-fun Alert.pfAlertActionGroup(modifier: Modifier, content: Div.() -> Unit = {}): Div =
-    register(div(baseClass = classes("alert".component("action-group"), modifier.value)) {
         content()
     }, {})
 
@@ -106,7 +67,7 @@ class AlertGroup internal constructor(toast: Boolean, classes: String?) :
     PatternFlyComponent<HTMLUListElement>,
     Ul(baseClass = classes {
         +ComponentType.AlertGroup
-        +(Modifier.toast `when` toast)
+        +("toast".modifier() `when` toast)
         +classes
     }) {
 
@@ -149,7 +110,7 @@ class Alert internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
     +ComponentType.Alert
     +severity.modifier
-    +(Modifier.inline `when` inline)
+    +("inline".modifier() `when` inline)
     +classes
 }) {
 
@@ -182,7 +143,7 @@ class Alert internal constructor(
         }
         if (closable) {
             div(baseClass = "alert".component("action")) {
-                this@Alert.closeButton = pfButton(plain) {
+                this@Alert.closeButton = pfButton("plain".modifier()) {
                     pfIcon("times".fas())
                     aria["label"] = "Close ${this@Alert.severity.aria.toLowerCase()}: ${this@Alert.text}"
                     domNode.addEventListener(Events.click.name, { this@Alert.close() })

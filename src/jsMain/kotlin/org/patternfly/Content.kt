@@ -9,9 +9,6 @@ import org.w3c.dom.HTMLDivElement
 fun HtmlElements.pfContent(classes: String? = null, content: Content.() -> Unit = {}): Content =
     register(Content(classes), content)
 
-fun HtmlElements.pfContent(modifier: Modifier, content: Content.() -> Unit = {}): Content =
-    register(Content(modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Content internal constructor(classes: String?) :

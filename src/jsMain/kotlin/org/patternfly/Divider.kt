@@ -19,14 +19,3 @@ fun HtmlElements.pfDivider(variant: DividerVariant = DividerVariant.HR, classes:
             attr("role", "separator")
         }, {})
     }
-
-fun HtmlElements.pfDivider(variant: DividerVariant = DividerVariant.HR, modifier: Modifier): Tag<HTMLElement> =
-    when (variant) {
-        DividerVariant.HR -> register(Hr(baseClass = classes("divider".component(), modifier.value)), {})
-        DividerVariant.DIV -> register(Div(baseClass = classes("divider".component(), modifier.value)).apply {
-            attr("role", "separator")
-        }, {})
-        DividerVariant.LI -> register(Li(baseClass = classes("divider".component(), modifier.value)).apply {
-            attr("role", "separator")
-        }, {})
-    }

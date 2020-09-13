@@ -13,13 +13,6 @@ fun HtmlElements.pfTitle(
     content: Title.() -> Unit = {}
 ): Title = register(Title(level, size, classes), content)
 
-fun HtmlElements.pfTitle(
-    level: Int = 1,
-    size: Size = Size.XL_2,
-    modifier: Modifier,
-    content: Title.() -> Unit = {}
-): Title = register(Title(level, size, modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Title internal constructor(level: Int = 1, size: Size = Size.XL_2, classes: String?) :

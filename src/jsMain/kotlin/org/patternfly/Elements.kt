@@ -9,14 +9,6 @@ import org.w3c.dom.ParentNode
 
 // ------------------------------------------------------ token list
 
-operator fun DOMTokenList.plusAssign(modifier: Modifier) {
-    this.add(modifier.value)
-}
-
-operator fun DOMTokenList.minusAssign(modifier: Modifier) {
-    this.remove(modifier.value)
-}
-
 operator fun DOMTokenList.plusAssign(value: String) {
     this.add(value)
 }

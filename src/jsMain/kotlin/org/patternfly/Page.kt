@@ -9,9 +9,6 @@ import org.w3c.dom.HTMLDivElement
 fun HtmlElements.pfPage(classes: String? = null, content: Page.() -> Unit = {}): Page =
     register(Page(classes), content)
 
-fun HtmlElements.pfPage(modifier: Modifier, content: Page.() -> Unit = {}): Page =
-    register(Page(modifier.value), content)
-
 // ------------------------------------------------------ tag
 
 class Page internal constructor(classes: String?) :

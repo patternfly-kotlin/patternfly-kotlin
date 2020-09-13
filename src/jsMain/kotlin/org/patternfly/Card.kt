@@ -16,56 +16,29 @@ import org.w3c.dom.HTMLElement
 fun HtmlElements.pfCard(selectable: Boolean = false, classes: String? = null, content: Card.() -> Unit = {}): Card =
     register(Card(selectable, classes), content)
 
-fun HtmlElements.pfCard(selectable: Boolean = false, modifier: Modifier, content: Card.() -> Unit = {}): Card =
-    register(Card(selectable, modifier.value), content)
-
 fun Card.pfCardHeader(classes: String? = null, content: CardHeader.() -> Unit = {}): CardHeader =
     register(CardHeader(this, classes), content)
-
-fun Card.pfCardHeader(modifier: Modifier, content: CardHeader.() -> Unit = {}): CardHeader =
-    register(CardHeader(this, modifier.value), content)
 
 fun CardHeader.pfCardHeaderMain(classes: String? = null, content: CardHeaderMain.() -> Unit = {}): CardHeaderMain =
     register(CardHeaderMain(classes), content)
 
-fun CardHeader.pfCardHeaderMain(modifier: Modifier, content: CardHeaderMain.() -> Unit = {}): CardHeaderMain =
-    register(CardHeaderMain(modifier.value), content)
-
 fun CardHeader.pfCardActions(classes: String? = null, content: CardActions.() -> Unit = {}): CardActions =
     register(CardActions(this.card, classes), content)
-
-fun CardHeader.pfCardActions(modifier: Modifier, content: CardActions.() -> Unit = {}): CardActions =
-    register(CardActions(this.card, modifier.value), content)
 
 fun CardHeader.pfCardTitle(classes: String? = null, content: CardTitle.() -> Unit = {}): CardTitle =
     register(CardTitle(classes), content)
 
-fun CardHeader.pfCardTitle(modifier: Modifier, content: CardTitle.() -> Unit = {}): CardTitle =
-    register(CardTitle(modifier.value), content)
-
 fun CardActions.pfCardCheckbox(classes: String? = null, content: CardCheckbox.() -> Unit = {}): CardCheckbox =
     register(CardCheckbox(this.card, classes), content)
-
-fun CardActions.pfCardCheckbox(modifier: Modifier, content: CardCheckbox.() -> Unit = {}): CardCheckbox =
-    register(CardCheckbox(this.card, modifier.value), content)
 
 fun Card.pfCardTitle(classes: String? = null, content: CardTitle.() -> Unit = {}): CardTitle =
     register(CardTitle(classes), content)
 
-fun Card.pfCardTitle(modifier: Modifier, content: CardTitle.() -> Unit = {}): CardTitle =
-    register(CardTitle(modifier.value), content)
-
 fun Card.pfCardBody(classes: String? = null, content: CardBody.() -> Unit = {}): CardBody =
     register(CardBody(classes), content)
 
-fun Card.pfCardBody(modifier: Modifier, content: CardBody.() -> Unit = {}): CardBody =
-    register(CardBody(modifier.value), content)
-
 fun Card.pfCardFooter(classes: String? = null, content: CardFooter.() -> Unit = {}): CardFooter =
     register(CardFooter(classes), content)
-
-fun Card.pfCardFooter(modifier: Modifier, content: CardFooter.() -> Unit = {}): CardFooter =
-    register(CardFooter(modifier.value), content)
 
 // ------------------------------------------------------ tag
 
@@ -73,7 +46,7 @@ class Card(internal val selectable: Boolean, classes: String?) :
     PatternFlyComponent<HTMLElement>,
     TextElement("article", baseClass = classes {
         +ComponentType.Card
-        +(Modifier.selectable `when` selectable)
+        +("selectable".modifier() `when` selectable)
         +classes
     }) {
 
@@ -83,7 +56,7 @@ class Card(internal val selectable: Boolean, classes: String?) :
         markAs(ComponentType.Card)
         if (selectable) {
             domNode.tabIndex = 0
-            classMap = selected.data.map { mapOf(Modifier.selected.value to it) }
+            classMap = selected.data.map { mapOf("selected".modifier() to it) }
             clicks handledBy selected.toggle
         }
     }

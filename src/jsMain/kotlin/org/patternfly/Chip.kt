@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emptyFlow
-import org.patternfly.Modifier.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
@@ -24,12 +23,6 @@ fun HtmlElements.pfChip(
     content: Chip.() -> Unit = {}
 ): Chip = register(Chip(readOnly, classes), content)
 
-fun HtmlElements.pfChip(
-    readOnly: Boolean = false,
-    modifier: Modifier,
-    content: Chip.() -> Unit = {}
-): Chip = register(Chip(readOnly, modifier.value), content)
-
 fun Chip.pfBadge(
     min: Int = 0,
     max: Int = 999,
@@ -37,15 +30,6 @@ fun Chip.pfBadge(
     content: Badge.() -> Unit = {}
 ) {
     insertBadge(this, register(Badge(min, max, classes), content))
-}
-
-fun Chip.pfBadge(
-    min: Int = 0,
-    max: Int = 999,
-    modifier: Modifier,
-    content: Badge.() -> Unit = {}
-) {
-    insertBadge(this, register(Badge(min, max, modifier.value), content))
 }
 
 private fun insertBadge(chip: Chip, badge: Badge) {
@@ -87,7 +71,7 @@ class Chip internal constructor(readOnly: Boolean, classes: String?) :
         markAs(ComponentType.Chip)
         register(textElement, {})
         if (!readOnly) {
-            closeButton = pfButton(plain) {
+            closeButton = pfButton("plain".modifier()) {
                 pfIcon("times".fas())
                 aria["label"] = "Remove"
                 aria["labelledby"] = this@Chip.textId
