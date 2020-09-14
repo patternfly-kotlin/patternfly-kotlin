@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Span
 
+fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
 
 fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())

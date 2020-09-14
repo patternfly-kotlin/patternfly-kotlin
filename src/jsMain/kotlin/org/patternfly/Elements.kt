@@ -39,7 +39,7 @@ var Element.hidden
         setAttribute("hidden", value.toString())
     }
 
-var HTMLElement.visible: Boolean
+var HTMLElement.styleHidden: Boolean
     get() = this.style.display != "none"
     set(value) {
         if (value) {
