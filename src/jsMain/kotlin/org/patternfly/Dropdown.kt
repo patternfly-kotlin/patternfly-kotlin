@@ -52,6 +52,14 @@ fun <T> Dropdown<T>.pfDropdownToggleIcon(
     content: DropdownToggleIcon<T>.() -> Unit = {}
 ): DropdownToggleIcon<T> = register(DropdownToggleIcon(this, classes), content)
 
+fun <T> Dropdown<T>.pfDropdownToggleKebab(
+    classes: String? = null,
+    content: DropdownToggleIcon<T>.() -> Unit = {}
+): DropdownToggleIcon<T> = register(DropdownToggleIcon(this, classes), content = {
+    it.register(pfIcon("ellipsis-v".fas()), {})
+    content(it)
+})
+
 fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
     classes: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
@@ -315,8 +323,9 @@ class DropdownToggleCheckbox<T> internal constructor(
     }
 
     override fun appendText(text: String): Node {
+        val node = super.appendText(text)
         textElement?.styleHidden = text.isNotEmpty()
-        return super.appendText(text)
+        return node
     }
 
     override fun delegate(): HTMLSpanElement {
