@@ -24,6 +24,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -42,39 +43,27 @@ fun <T> HtmlElements.pfDropdown(
     content: Dropdown<T>.() -> Unit = {}
 ): Dropdown<T> = register(Dropdown(store, align, up, classes), content)
 
-fun <T> Dropdown<T>.pfDropdownToggleText(
+fun <T> Dropdown<T>.pfDropdownToggle(
     classes: String? = null,
-    content: DropdownToggleText<T>.() -> Unit = {}
-): DropdownToggleText<T> = register(DropdownToggleText(this, classes), content)
-
-fun <T> Dropdown<T>.pfDropdownToggleIcon(
-    classes: String? = null,
-    content: DropdownToggleIcon<T>.() -> Unit = {}
-): DropdownToggleIcon<T> = register(DropdownToggleIcon(this, classes), content)
+    content: DropdownToggle<T>.() -> Unit = {}
+): DropdownToggle<T> = register(DropdownToggle(this, classes), content)
 
 fun <T> Dropdown<T>.pfDropdownToggleKebab(
     classes: String? = null,
-    content: DropdownToggleIcon<T>.() -> Unit = {}
-): DropdownToggleIcon<T> = register(DropdownToggleIcon(this, classes), content = {
-    it.register(pfIcon("ellipsis-v".fas()), {})
-    content(it)
-})
+    content: DropdownToggle<T>.() -> Unit = {}
+): DropdownToggle<T> = register(DropdownToggle(this, classes).apply {
+    icon = pfIcon("ellipsis-v".fas())
+}, content)
 
 fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
     classes: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
 ): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, classes), content)
 
-fun <T> Dropdown<T>.pfDropdownToggleActionText(
+fun <T> Dropdown<T>.pfDropdownToggleAction(
     classes: String? = null,
     content: DropdownToggleAction<T>.() -> Unit = {}
-): DropdownToggleAction<T> = register(DropdownToggleAction(this, null, classes), content)
-
-fun <T> Dropdown<T>.pfDropdownToggleActionIcon(
-    icon: Icon,
-    classes: String? = null,
-    content: DropdownToggleAction<T>.() -> Unit = {}
-): DropdownToggleAction<T> = register(DropdownToggleAction(this, icon, classes), content)
+): DropdownToggleAction<T> = register(DropdownToggleAction(this, classes), content)
 
 fun <T> Dropdown<T>.pfDropdownItems(
     classes: String? = null,
@@ -113,7 +102,7 @@ class Dropdown<T> internal constructor(
     +classes
 }) {
 
-    internal var toggle: DropdownToggle<out HTMLElement, T>? = null
+    internal var toggle: DropdownToggleBase<out HTMLElement, T>? = null
 
     val ces = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
@@ -150,7 +139,7 @@ class Dropdown<T> internal constructor(
     }
 }
 
-sealed class DropdownToggle<E : HTMLElement, T>(
+sealed class DropdownToggleBase<E : HTMLElement, T>(
     private val dropdown: Dropdown<T>,
     tagName: String,
     id: String? = null,
@@ -163,36 +152,41 @@ sealed class DropdownToggle<E : HTMLElement, T>(
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
             aria["haspopup"] = true
-            clicks handledBy this@DropdownToggle.dropdown.ces.toggle
-            this@DropdownToggle.toggleId = id
-            this@DropdownToggle.dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
+            clicks handledBy this@DropdownToggleBase.dropdown.ces.toggle
+            this@DropdownToggleBase.toggleId = id
+            this@DropdownToggleBase.dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
         }
         dropdown.toggle = this
     }
 }
 
-class DropdownToggleText<T> internal constructor(
+class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
     classes: String?,
-) : DropdownToggle<HTMLButtonElement, T>(
+) : DropdownToggleBase<HTMLButtonElement, T>(
     dropdown = dropdown,
     tagName = "button",
     id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass = classes {
         +"dropdown".component("toggle")
+        +"plain".modifier()
         +classes
     }),
     WithTextDelegate<HTMLButtonElement, HTMLSpanElement> {
 
-    private var textElement: HTMLSpanElement
+    private var textElement: HTMLSpanElement? = null
 
     init {
         initToggle(this)
-        textElement = span(baseClass = "dropdown".component("toggle", "text")) {}.domNode
-        span(baseClass = "dropdown".component("toggle", "icon")) {
-            pfIcon("caret-down".fas())
-        }
     }
+
+    var icon: Icon? = null
+        set(value) {
+            field = value
+            value?.let {
+                register(it, {})
+            }
+        }
 
     override var disabled: Flow<Boolean>
         get() {
@@ -206,37 +200,17 @@ class DropdownToggleText<T> internal constructor(
             }
         }
 
-    override fun delegate(): HTMLSpanElement = textElement
-}
-
-class DropdownToggleIcon<T> internal constructor(
-    dropdown: Dropdown<T>,
-    classes: String?
-) : DropdownToggle<HTMLButtonElement, T>(
-    dropdown = dropdown,
-    tagName = "button",
-    id = Id.unique(ComponentType.Dropdown.id, "tgl", "icn"),
-    baseClass = classes {
-        +"dropdown".component("toggle")
-        +"plain".modifier()
-        +classes
-    }) {
-
-    init {
-        initToggle(this)
+    override fun delegate(): HTMLSpanElement {
+        if (textElement == null) {
+            domNode.clear()
+            domNode.classList -= "plain".modifier()
+            textElement = register(span(baseClass = "dropdown".component("toggle", "text")) {}, {}).domNode
+            register(span(baseClass = "dropdown".component("toggle", "icon")) {
+                pfIcon("caret-down".fas())
+            }, {})
+        }
+        return textElement!!
     }
-
-    override var disabled: Flow<Boolean>
-        get() {
-            throw NotImplementedError()
-        }
-        set(flow) {
-            object : SingleMountPoint<Boolean>(flow) {
-                override fun set(value: Boolean, last: Boolean?) {
-                    domNode.disabled = value
-                }
-            }
-        }
 }
 
 enum class TriState { OFF, INDETERMINATE, ON }
@@ -244,7 +218,7 @@ enum class TriState { OFF, INDETERMINATE, ON }
 class DropdownToggleCheckbox<T> internal constructor(
     dropdown: Dropdown<T>,
     classes: String?,
-) : DropdownToggle<HTMLDivElement, T>(
+) : DropdownToggleBase<HTMLDivElement, T>(
     dropdown = dropdown,
     tagName = "div",
     id = null,
@@ -278,7 +252,7 @@ class DropdownToggleCheckbox<T> internal constructor(
     }
 
     override var disabled: Flow<Boolean>
-        get() = TODO("Not yet implemented")
+        get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<Boolean>(flow) {
                 override fun set(value: Boolean, last: Boolean?) {
@@ -290,7 +264,7 @@ class DropdownToggleCheckbox<T> internal constructor(
         }
 
     var triState: Flow<TriState>
-        get() = TODO("Not yet implemented")
+        get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<TriState>(flow) {
                 override fun set(value: TriState, last: TriState?) {
@@ -344,10 +318,9 @@ class DropdownToggleCheckbox<T> internal constructor(
 
 class DropdownToggleAction<T> internal constructor(
     dropdown: Dropdown<T>,
-    icon: Icon?,
     classes: String?
 ) : WithTextDelegate<HTMLDivElement, HTMLButtonElement>,
-    DropdownToggle<HTMLDivElement, T>(
+    DropdownToggleBase<HTMLDivElement, T>(
         dropdown = dropdown,
         tagName = "div",
         id = null,
@@ -358,11 +331,7 @@ class DropdownToggleAction<T> internal constructor(
             +classes
         }) {
 
-    val action = button(baseClass = "dropdown".component("toggle", "button")) {
-        icon?.let {
-            register(it, {})
-        }
-    }
+    val action = button(baseClass = "dropdown".component("toggle", "button")) {}
     private val toggleTag = button(
         id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
         baseClass = "dropdown".component("toggle", "button")
@@ -371,8 +340,17 @@ class DropdownToggleAction<T> internal constructor(
         pfIcon("caret-down".fas())
     }
 
+    var icon: Icon? = null
+        set(value) {
+            field = value
+            value?.let {
+                action.domNode.clear()
+                action.register(it, {})
+            }
+        }
+
     override var disabled: Flow<Boolean>
-        get() = TODO("Not yet implemented")
+        get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<Boolean>(flow) {
                 override fun set(value: Boolean, last: Boolean?) {
