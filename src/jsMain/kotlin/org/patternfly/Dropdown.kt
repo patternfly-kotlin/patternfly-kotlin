@@ -52,7 +52,7 @@ fun <T> Dropdown<T>.pfDropdownToggleKebab(
     classes: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
 ): DropdownToggle<T> = register(DropdownToggle(this, classes).apply {
-    icon = pfIcon("ellipsis-v".fas())
+    icon = { pfIcon("ellipsis-v".fas()) }
 }, content)
 
 fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
@@ -180,12 +180,14 @@ class DropdownToggle<T> internal constructor(
         initToggle(this)
     }
 
-    var icon: Icon? = null
+    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
         set(value) {
             field = value
-            value?.let {
-                register(it, {})
+            if (textElement != null) {
+                textElement.removeFromParent()
+                textElement = null
             }
+            value?.invoke(this)
         }
 
     override var disabled: Flow<Boolean>
@@ -340,13 +342,11 @@ class DropdownToggleAction<T> internal constructor(
         pfIcon("caret-down".fas())
     }
 
-    var icon: Icon? = null
+    var icon: (Button.() -> Unit)? = null
         set(value) {
             field = value
-            value?.let {
-                action.domNode.clear()
-                action.register(it, {})
-            }
+            action.domNode.clear()
+            value?.invoke(action)
         }
 
     override var disabled: Flow<Boolean>
