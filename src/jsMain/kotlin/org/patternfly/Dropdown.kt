@@ -431,7 +431,7 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
                 attr("disabled", "true")
                 domNode.classList += "disabled".modifier()
             }
-            clicks.map { item.item } handledBy this@DropdownEntries.dropdown.store.clicked
+            clicks.map { item } handledBy this@DropdownEntries.dropdown.store.clicked
             clicks handledBy this@DropdownEntries.dropdown.ces.collapse
             if (item.selected) {
                 domNode.autofocus = true
@@ -445,11 +445,11 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
 
 class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    val clicked: OfferingHandler<T, T> = handleAndOffer { items, item ->
+    val clicked: OfferingHandler<Item<T>, Item<T>> = handleAndOffer { items, item ->
         offer(item)
         items
     }
 
-    val items: Flow<List<T>> = data.map { it.filterIsInstance<Item<T>>() }.map { it.map { item -> item.item } }
-    val groups: Flow<List<Group<T>>> = data.map { it.filterIsInstance<Group<T>>() }
+    val items: Flow<List<Item<T>>> = data.flatItems()
+    val groups: Flow<List<Group<T>>> = data.groups()
 }

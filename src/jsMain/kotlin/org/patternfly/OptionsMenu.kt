@@ -344,23 +344,10 @@ class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
             }
         }
 
-    private val wrappedItems = data.map {
-        it.flatMap { entry ->
-            when (entry) {
-                is Item<T> -> listOf(entry)
-                is Group<T> -> entry.items
-                is Separator<T> -> emptyList()
-            }
-        }.filterIsInstance<Item<T>>()
+    val items: Flow<List<Item<T>>> = data.flatItems()
+    val groups: Flow<List<Group<T>>> = data.groups()
+    val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
+        items.filter { it.selected }
     }
-
-    val items: Flow<List<T>> = wrappedItems.map { items -> items.map { it.item } }
-
-    val groups: Flow<List<Group<T>>> = data.map { it.filterIsInstance<Group<T>>() }
-
-    val selection: Flow<List<T>> = wrappedItems.drop(1).map { items ->
-        items.filter { it.selected }.map { it.item }
-    }
-
-    val singleSelection: Flow<T?> = selection.map { it.firstOrNull() }
+    val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
 }

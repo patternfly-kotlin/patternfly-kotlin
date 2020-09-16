@@ -1,6 +1,10 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Span
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+// ------------------------------------------------------ dsl
 
 fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
 
@@ -39,6 +43,28 @@ fun <T> GroupBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
 fun <T> GroupBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
+
+// ------------------------------------------------------ flow extensions
+
+fun <T> Flow<List<Entry<T>>>.groups() = this.map { it.filterIsInstance<Group<T>>() }
+
+fun <T> Flow<List<Entry<T>>>.flatItems() = this.map {
+    it.flatMap { entry ->
+        when (entry) {
+            is Item<T> -> listOf(entry)
+            is Group<T> -> entry.items
+            is Separator<T> -> emptyList()
+        }
+    }.filterIsInstance<Item<T>>()
+}
+
+fun <T> Flow<List<Item<T>>>.unwrap(): Flow<List<T>> = this.map { items -> items.map { it.item } }
+
+fun <T> Flow<Item<T>>.unwrap(): Flow<T> = this.map { it.item }
+
+fun <T> Flow<Item<T>?>.unwrapOrNull(): Flow<T?> = this.map { it?.item }
+
+// ------------------------------------------------------ data classes
 
 /** Entry used in simple components like [Dropdown], [OptionsMenu] or [Select]. */
 sealed class Entry<T>
