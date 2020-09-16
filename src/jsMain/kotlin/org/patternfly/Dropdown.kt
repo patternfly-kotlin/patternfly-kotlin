@@ -445,12 +445,11 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
 
 class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val clicked: OfferingHandler<T, T> = handleAndOffer { items, item ->
+    val clicked: OfferingHandler<T, T> = handleAndOffer { items, item ->
         offer(item)
         items
     }
 
-    val clicks: Flow<T> = clicked.map { it }
     val items: Flow<List<T>> = data.map { it.filterIsInstance<Item<T>>() }.map { it.map { item -> item.item } }
     val groups: Flow<List<Group<T>>> = data.map { it.filterIsInstance<Group<T>>() }
 }

@@ -1,6 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SingleMountPoint
 import dev.fritz2.binding.action
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
@@ -11,20 +12,36 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import kotlinx.dom.clear
+import org.patternfly.SelectionMode.SINGLE
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
+    selectionMode: SelectionMode = SINGLE,
     align: Align? = null,
     up: Boolean = false,
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, align, up, classes), content)
+): OptionsMenu<T> = register(OptionsMenu(store, selectionMode, align, up, classes), content)
+
+fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
+    classes: String? = null,
+    content: OptionsMenuToggle<T>.() -> Unit = {}
+): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, classes), content)
+
+fun <T> OptionsMenu<T>.pfOptionsMenuTogglePlain(
+    classes: String? = null,
+    content: OptionsMenuTogglePlain<T>.() -> Unit = {}
+): OptionsMenuTogglePlain<T> = register(OptionsMenuTogglePlain(this, classes), content)
 
 fun <T> OptionsMenu<T>.pfOptionsMenuItems(
     classes: String? = null,
@@ -52,6 +69,7 @@ fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
 
 class OptionsMenu<T> internal constructor(
     val store: OptionStore<T>,
+    selectionMode: SelectionMode,
     internal val optionsMenuAlign: Align?,
     up: Boolean,
     classes: String?
@@ -75,6 +93,7 @@ class OptionsMenu<T> internal constructor(
     }
 
     init {
+        store.selectionMode = selectionMode
         markAs(ComponentType.OptionsMenu)
         classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
     }
@@ -101,12 +120,112 @@ sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
     }
 }
 
+class OptionsMenuToggle<T> internal constructor(
+    optionsMenu: OptionsMenu<T>,
+    classes: String?,
+) : OptionsMenuToggleBase<HTMLButtonElement, T>(
+    optionsMenu = optionsMenu,
+    tagName = "button",
+    id = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
+    baseClass = classes {
+        +"options-menu".component("toggle")
+        +"plain".modifier()
+        +classes
+    }),
+    WithTextDelegate<HTMLButtonElement, HTMLSpanElement> {
+
+    private var textElement: HTMLSpanElement? = null
+
+    init {
+        initToggle(this)
+    }
+
+    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
+        set(value) {
+            field = value
+            if (textElement != null) {
+                textElement.removeFromParent()
+                textElement = null
+            }
+            value?.invoke(this)
+        }
+
+    override var disabled: Flow<Boolean>
+        get() {
+            throw NotImplementedError()
+        }
+        set(flow) {
+            object : SingleMountPoint<Boolean>(flow) {
+                override fun set(value: Boolean, last: Boolean?) {
+                    domNode.disabled = value
+                }
+            }
+        }
+
+    override fun delegate(): HTMLSpanElement {
+        if (textElement == null) {
+            domNode.clear()
+            domNode.classList -= "plain".modifier()
+            textElement = register(span(baseClass = "options-menu".component("toggle", "text")) {}, {}).domNode
+            register(span(baseClass = "options-menu".component("toggle", "icon")) {
+                pfIcon("caret-down".fas())
+            }, {})
+        }
+        return textElement!!
+    }
+}
+
+class OptionsMenuTogglePlain<T> internal constructor(
+    optionsMenu: OptionsMenu<T>,
+    classes: String?,
+) : OptionsMenuToggleBase<HTMLDivElement, T>(
+    optionsMenu = optionsMenu,
+    tagName = "div",
+    id = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
+    baseClass = classes {
+        +"options-menu".component("toggle")
+        +"plain".modifier()
+        +"text".modifier()
+        +classes
+    }),
+    WithTextDelegate<HTMLDivElement, HTMLSpanElement> {
+
+    private var textElement: HTMLSpanElement =
+        span(baseClass = "options-menu".component("toggle-text")) { }.domNode
+    private var toggleTag: Button
+
+    init {
+        toggleTag = button(
+            id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
+            baseClass = "options-menu".component("toggle", "button")
+        ) {
+            this@OptionsMenuTogglePlain.initToggle(this)
+            span(baseClass = "options-menu".component("toggle", "button", "icon")) {
+                pfIcon("caret-down".fas())
+            }
+        }
+    }
+
+    override var disabled: Flow<Boolean>
+        get() = throw NotImplementedError()
+        set(flow) {
+            object : SingleMountPoint<Boolean>(flow) {
+                override fun set(value: Boolean, last: Boolean?) {
+                    domNode.classList.toggle("disabled".modifier(), value)
+                    toggleTag.domNode.disabled = value
+                }
+            }
+        }
+
+    override fun delegate(): HTMLSpanElement = textElement
+}
+
 class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
     private val optionsMenu: OptionsMenu<T>,
     tagName: String,
     classes: String?
 ) : Tag<E>(tagName = tagName, baseClass = classes {
-    +"dropdown".component("menu")
+    +"options-menu".component("menu")
     +optionsMenu.optionsMenuAlign?.modifier
     +classes
 }) {
@@ -122,9 +241,9 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                     li(content = itemContent(entry))
                 }
                 is Group<T> -> {
-                    section(baseClass = "dropdown".component("group")) {
+                    section(baseClass = "options-menu".component("group")) {
                         entry.title?.let {
-                            h1(baseClass = "dropdown".component("group", "title")) { +it }
+                            h1(baseClass = "options-menu".component("group", "title")) { +it }
                         }
                         ul {
                             entry.items.forEach { groupEntry ->
@@ -178,38 +297,26 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val toggle = handle<Item<T>> { items, item ->
-        items.map { entry ->
+    internal var selectionMode: SelectionMode = SINGLE
+        set(value) {
+            field = if (value == SelectionMode.NONE) {
+                console.warn("Selection mode $value is not supported for options menu")
+                SINGLE
+            } else {
+                value
+            }
+        }
+
+    internal val toggle = handle<Item<T>> { entries, item ->
+        entries.map { entry ->
             when (entry) {
-                is Item<T> -> {
-                    if (entry.item == item.item) {
-                        if (entry.selected) {
-                            entry
-                        } else {
-                            entry.copy(selected = true)
-                        }
-                    } else {
-                        entry.copy(selected = false)
-                    }
-                }
+                is Item<T> -> handleSelection(entry, item)
                 is Group<T> -> {
                     if (entry.id == item.group?.id) {
                         val groupItems = entry.items.map { groupEntry ->
                             when (groupEntry) {
-                                is Item<T> -> {
-                                    if (groupEntry.item == item.item) {
-                                        if (groupEntry.selected) {
-                                            groupEntry
-                                        } else {
-                                            groupEntry.copy(selected = true)
-                                        }
-                                    } else {
-                                        groupEntry.copy(selected = false)
-                                    }
-                                }
-                                else -> {
-                                    groupEntry
-                                }
+                                is Item<T> -> handleSelection(groupEntry, item)
+                                else -> groupEntry
                             }
                         }
                         entry.copy(items = groupItems)
@@ -217,15 +324,43 @@ class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
                         entry
                     }
                 }
-                else -> {
-                    entry
-                }
+                else -> entry
             }
         }
     }
 
-    val items: Flow<List<T>> = data.map {
-        it.filterIsInstance<Item<T>>()
-    }.map { it.map { item -> item.item } }
+    private fun handleSelection(entry: Item<T>, current: Item<T>): Entry<T> =
+        if (entry.item == current.item) {
+            if (entry.selected) {
+                entry
+            } else {
+                entry.copy(selected = true)
+            }
+        } else {
+            if (selectionMode == SINGLE) {
+                entry.copy(selected = false)
+            } else {
+                entry
+            }
+        }
+
+    private val wrappedItems = data.map {
+        it.flatMap { entry ->
+            when (entry) {
+                is Item<T> -> listOf(entry)
+                is Group<T> -> entry.items
+                is Separator<T> -> emptyList()
+            }
+        }.filterIsInstance<Item<T>>()
+    }
+
+    val items: Flow<List<T>> = wrappedItems.map { items -> items.map { it.item } }
+
     val groups: Flow<List<Group<T>>> = data.map { it.filterIsInstance<Group<T>>() }
+
+    val selection: Flow<List<T>> = wrappedItems.drop(1).map { items ->
+        items.filter { it.selected }.map { it.item }
+    }
+
+    val singleSelection: Flow<T?> = selection.map { it.firstOrNull() }
 }
