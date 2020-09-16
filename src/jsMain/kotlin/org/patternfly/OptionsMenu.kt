@@ -4,165 +4,168 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.action
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
+import dev.fritz2.dom.Tag
+import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
-import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
-    text: String,
-    grouped: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Left(text), grouped, align, up, classes), content)
+): OptionsMenu<T> = register(OptionsMenu(store, align, up, classes), content)
 
-fun <T> HtmlElements.pfOptionsMenu(
-    store: OptionStore<T> = OptionStore(),
-    icon: Icon,
-    grouped: Boolean = false,
-    align: Align? = null,
-    up: Boolean = false,
+fun <T> OptionsMenu<T>.pfOptionsMenuItems(
     classes: String? = null,
-    content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, Either.Right(icon), grouped, align, up, classes), content)
+    block: ItemsBuilder<T>.() -> Unit = {}
+): OptionsMenuEntries<HTMLUListElement, T> {
+    val element = this.register(
+        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", classes), {})
+    val items = ItemsBuilder<T>().apply(block).build()
+    action(items) handledBy this.store.update
+    return element
+}
 
-fun <T> OptionsMenu<T>.pfEntries(block: EntriesBuilder<T>.() -> Unit) {
-    val entries = EntriesBuilder<T>().apply(block).build()
-    action(entries) handledBy this.store.update
+fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
+    classes: String? = null,
+    block: GroupsBuilder<T>.() -> Unit = {}
+): OptionsMenuEntries<HTMLDivElement, T> {
+    val element = this.register(
+        OptionsMenuEntries<HTMLDivElement, T>(this, "div", classes), {})
+    val groups = GroupsBuilder<T>().apply(block).build()
+    action(groups) handledBy this.store.update
+    return element
 }
 
 // ------------------------------------------------------ tag
 
 class OptionsMenu<T> internal constructor(
     val store: OptionStore<T>,
-    private val textOrIcon: Either<String, Icon>,
-    grouped: Boolean,
-    align: Align?,
+    internal val optionsMenuAlign: Align?,
     up: Boolean,
     classes: String?
 ) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
     +ComponentType.OptionsMenu
-    +align?.modifier
+    +optionsMenuAlign?.modifier
     +("top".modifier() `when` up)
     +classes
 }) {
 
-    private val button: Button
+    internal var toggle: OptionsMenuToggleBase<out HTMLElement, T>? = null
+
     val ces = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
-    var asText: AsText<T> = { it.toString() }
-    var display: ComponentDisplay<Button, T> = {
+
+    var display: ComponentDisplay<Button, Item<T>> = {
         {
-            +this@OptionsMenu.asText(it)
+            +it.item.toString()
         }
     }
-    var disabled: Flow<Boolean>
-        get() = button.disabled
-        set(value) {
-            button.disabled = value
-        }
 
     init {
         markAs(ComponentType.OptionsMenu)
         classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
-        val buttonId = Id.unique(ComponentType.OptionsMenu.id, "btn")
-        button = button(id = id, baseClass = "options-menu".component("toggle")) {
-            aria["label"] = "Options menu"
-            aria["haspopup"] = "listbox"
-            clicks handledBy this@OptionsMenu.ces.toggle
-            this@OptionsMenu.ces.data.map { it.toString() }.bindAttr("aria-expanded")
-            when (this@OptionsMenu.textOrIcon) {
-                is Either.Left -> {
-                    span(baseClass = "options-menu".component("toggle", "text")) {
-                        +this@OptionsMenu.textOrIcon.value
-                    }
-                    span(baseClass = "options-menu".component("toggle", "icon")) {
-                        pfIcon("caret-down".fas())
-                    }
-                }
-                is Either.Right -> {
-                    domNode.classList += "plain".modifier()
-                    register(this@OptionsMenu.textOrIcon.value) {}
-                }
-            }
-        }
+    }
+}
 
-        val baseClass = classes {
-            +"options-menu".component("menu")
-            +align?.modifier
+sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
+    private val optionsMenu: OptionsMenu<T>,
+    tagName: String,
+    id: String? = null,
+    baseClass: String? = null,
+) : Tag<E>(tagName, id, baseClass), WithText<E> {
+
+    internal var toggleId: String? = null
+    abstract var disabled: Flow<Boolean>
+
+    internal fun initToggle(toggleTag: Tag<HTMLElement>) {
+        with(toggleTag) {
+            aria["haspopup"] = "listbox"
+            clicks handledBy this@OptionsMenuToggleBase.optionsMenu.ces.toggle
+            this@OptionsMenuToggleBase.toggleId = id
+            this@OptionsMenuToggleBase.optionsMenu.ces.data.map { it.toString() }.bindAttr("aria-expanded")
         }
-        val menuContent: TextElement.() -> Unit = {
-            aria["labelledby"] = buttonId
-            attr("role", "menu")
-            this@OptionsMenu.ces.data.map { !it }.bindAttr("hidden")
-            this@OptionsMenu.store.data.each().render { entry ->
-                when (entry) {
-                    is Item<T> -> {
-                        li(content = this@OptionsMenu.itemContent(entry))
-                    }
-                    is Group<T> -> {
-                        section(baseClass = "options-menu".component("group")) {
-                            entry.title?.let {
-                                h1(baseClass = "options-menu".component("group", "title")) { +it }
-                            }
-                            ul {
-                                entry.items.forEach { groupEntry ->
-                                    when (groupEntry) {
-                                        is Item<T> -> {
-                                            li(content = this@OptionsMenu.itemContent(groupEntry))
-                                        }
-                                        is Separator<T> -> {
-                                            pfDivider(DividerVariant.LI)
-                                        }
-                                        else -> {
-                                            console.warn("Nested groups are not supported for ${this@OptionsMenu.domNode.debug()}")
-                                        }
+        optionsMenu.toggle = this
+    }
+}
+
+class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
+    private val optionsMenu: OptionsMenu<T>,
+    tagName: String,
+    classes: String?
+) : Tag<E>(tagName = tagName, baseClass = classes {
+    +"dropdown".component("menu")
+    +optionsMenu.optionsMenuAlign?.modifier
+    +classes
+}) {
+    init {
+        attr("role", "menu")
+        optionsMenu.toggle?.toggleId?.let {
+            aria["labelledby"] = it
+        }
+        optionsMenu.ces.data.map { !it }.bindAttr("hidden")
+        optionsMenu.store.data.each().render { entry ->
+            when (entry) {
+                is Item<T> -> {
+                    li(content = itemContent(entry))
+                }
+                is Group<T> -> {
+                    section(baseClass = "dropdown".component("group")) {
+                        entry.title?.let {
+                            h1(baseClass = "dropdown".component("group", "title")) { +it }
+                        }
+                        ul {
+                            entry.items.forEach { groupEntry ->
+                                when (groupEntry) {
+                                    is Item<T> -> {
+                                        li(content = this@OptionsMenuEntries.itemContent(groupEntry))
+                                    }
+                                    is Separator<T> -> {
+                                        pfDivider(DividerVariant.LI)
+                                    }
+                                    else -> {
+                                        console.warn("Nested groups are not supported for ${this@OptionsMenuEntries.optionsMenu.domNode.debug()}")
                                     }
                                 }
                             }
                         }
                     }
-                    is Separator<T> -> {
-                        if (grouped) {
-                            pfDivider(DividerVariant.DIV)
-                        } else {
-                            pfDivider(DividerVariant.LI)
-                        }
+                }
+                is Separator<T> -> {
+                    if (domNode.tagName.toLowerCase() == "ul") {
+                        pfDivider(DividerVariant.LI)
+                    } else {
+                        pfDivider(DividerVariant.DIV)
                     }
                 }
-            }.bind()
-        }
-        if (grouped) {
-            register(TextElement("div", baseClass = baseClass), menuContent)
-        } else {
-            register(TextElement("ul", baseClass = baseClass), menuContent)
-        }
+            }
+        }.bind()
     }
 
-    private fun itemContent(entry: Item<T>): Li.() -> Unit = {
+    private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
         button(baseClass = "options-menu".component("menu-item")) {
             attr("tabindex", "-1")
-            if (entry.disabled) {
+            if (item.disabled) {
                 aria["disabled"] = true
                 attr("disabled", "true")
                 domNode.classList += "disabled".modifier()
             }
-
-            this@OptionsMenu.display(entry.item).invoke(this)
-            clicks.map { entry } handledBy this@OptionsMenu.store.toggle
-
-            if (entry.selected) {
+            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.toggle
+            this@OptionsMenuEntries.optionsMenu.display(item).invoke(this)
+            if (item.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
                     pfIcon("check".fas())
                 }
@@ -224,6 +227,5 @@ class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
     val items: Flow<List<T>> = data.map {
         it.filterIsInstance<Item<T>>()
     }.map { it.map { item -> item.item } }
-
     val groups: Flow<List<Group<T>>> = data.map { it.filterIsInstance<Group<T>>() }
 }

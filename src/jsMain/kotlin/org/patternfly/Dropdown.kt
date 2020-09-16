@@ -374,10 +374,10 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
     +classes
 }) {
     init {
+        attr("role", "menu")
         dropdown.toggle?.toggleId?.let {
             aria["labelledby"] = it
         }
-        attr("role", "menu")
         dropdown.ces.data.map { !it }.bindAttr("hidden")
 
         dropdown.store.data.each().render { entry ->

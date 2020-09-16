@@ -1,6 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.4.0"
-    id("org.jetbrains.dokka") version "1.4.0"
+    kotlin("multiplatform") version "1.4.10"
     `maven-publish`
 }
 
@@ -11,6 +10,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     jcenter()
 }
 
@@ -27,6 +27,17 @@ kotlin {
     }
 
     sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("dev.fritz2:core:0.8-SNAPSHOT")
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
         val jsMain by getting {
             dependencies {
                 implementation("dev.fritz2:core:0.8-SNAPSHOT")
