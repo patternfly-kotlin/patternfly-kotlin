@@ -4,13 +4,11 @@ import dev.fritz2.lenses.IdProvider
 import kotlin.math.max
 import kotlin.math.min
 
-const val DEFAULT_PAGE_SIZE = 50
-
 /** Immutable holder for items used in data components like [DataList]. */
 data class Items<T>(
     private val identifier: IdProvider<T, String>,
     val allItems: List<T> = listOf(),
-    val pageInfo: PageInfo = PageInfo(DEFAULT_PAGE_SIZE, 0, allItems.size),
+    val pageInfo: PageInfo = PageInfo(total = allItems.size),
     val selection: SelectionInfo<T> = SelectionInfo(identifier, mapOf()),
     val sortInfo: SortInfo<T>? = null
 ) {
@@ -22,80 +20,27 @@ data class Items<T>(
             } else {
                 allItems
             }
-            val paged = sorted.subList(max(0, pageInfo.from - 1), pageInfo.to)
-            return paged
+            return sorted.subList(max(0, pageInfo.range.first - 1), pageInfo.range.last)
         }
 
     internal fun clear(): Items<T> = Items(identifier, emptyList())
 
     internal fun addAll(list: List<T>): Items<T> = Items(identifier, list)
 
-    internal fun gotoPage(page: Int): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo.gotoPage(page),
-        selection,
-        sortInfo
-    )
+    internal fun gotoPage(page: Int): Items<T> = copy(pageInfo = pageInfo.gotoPage(page))
+    internal fun pageSize(pageSize: Int): Items<T> = copy(pageInfo = pageInfo.pageSize(pageSize))
 
-    internal fun pageSize(pageSize: Int): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo.pageSize(pageSize),
-        selection,
-        sortInfo
-    )
+    internal fun selectNone(): Items<T> = copy(selection = SelectionInfo(identifier, mapOf()))
+    internal fun select(item: T, select: Boolean): Items<T> = copy(selection = selection.select(item, select))
+    internal fun toggleSelection(item: T): Items<T> = copy(selection = selection.toggle(item))
+    internal fun selectAll(): Items<T> = copy(selection = SelectionInfo(identifier, allItems.associateBy(identifier)))
+    internal fun selectVisible(): Items<T> =
+        copy(selection = SelectionInfo(identifier, visibleItems.associateBy(identifier)))
 
-    internal fun selectNone(): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        SelectionInfo(identifier, mapOf()),
-        sortInfo
-    )
-
-    internal fun select(item: T, select: Boolean): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        selection.select(item, select),
-        sortInfo
-    )
-
-    internal fun toggleSelection(item: T): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        selection.toggle(item),
-        sortInfo
-    )
-
-    internal fun selectVisible(): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        SelectionInfo(identifier, visibleItems.associateBy(identifier)),
-        sortInfo
-    )
-
-    internal fun selectAll(): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        SelectionInfo(identifier, allItems.associateBy(identifier)),
-        sortInfo
-    )
-
-    internal fun sortBy(name: String, comparator: Comparator<T>): Items<T> = Items(
-        identifier,
-        allItems,
-        pageInfo,
-        selection,
-        SortInfo(name, comparator)
-    )
+    internal fun sortBy(name: String, comparator: Comparator<T>): Items<T> = copy(sortInfo = SortInfo(name, comparator))
 
     override fun toString(): String = buildString {
-        append("Items [${pageInfo.from}, ${pageInfo.to}) of ${pageInfo.total} items, page ${pageInfo.page} of ${pageInfo.pages} with size ${pageInfo.page}")
+        append("Items [${pageInfo.range.first}, ${pageInfo.range.last}) of ${pageInfo.total} items, page ${pageInfo.page} of ${pageInfo.pages} with size ${pageInfo.page}")
         sortInfo?.let {
             append(", sorted by ${it.name}")
         }
@@ -103,28 +48,62 @@ data class Items<T>(
     }
 }
 
-data class PageInfo(val pageSize: Int, val page: Int, val total: Int) {
-
-    val from: Int
-        get() = if (total == 0) 0 else page * pageSize + 1
-
-    val to: Int
+data class PageInfo(
+    val pageSize: Int = DEFAULT_PAGE_SIZE,
+    val page: Int = 0,
+    val total: Int = 0,
+    private val refreshCounter: Int = 0
+) {
+    val range: IntRange
         get() {
-            return min(total, from + pageSize - 1)
+            val from = if (total == 0) 1 else page * pageSize + 1
+            val to = min(total, from + pageSize - 1)
+            return from..to
         }
 
-    val pages: Int
-        get() {
-            var pages = total / pageSize
-            if (total % pageSize != 0) {
-                pages++
-            }
-            return max(1, pages)
+    val pages: Int = safePages(pageSize, total)
+
+    val firstPage: Boolean = page == 0
+
+    val lastPagePage: Boolean = page == pages - 1
+
+    internal fun gotoFirstPage(): PageInfo = copy(page = 0)
+    internal fun gotoPreviousPage(): PageInfo = copy(page = safeBounds(page - 1, 0, pages - 1))
+    internal fun gotoNextPage(): PageInfo = copy(page = safeBounds(page + 1, 0, pages - 1))
+    internal fun gotoLastPage(): PageInfo = copy(page = pages - 1)
+    internal fun gotoPage(page: Int): PageInfo = copy(page = safeBounds(page, 0, pages - 1))
+
+    internal fun pageSize(pageSize: Int): PageInfo {
+        val pages = safePages(pageSize, total)
+        val page = safeBounds(page, 0, pages - 1)
+        return copy(pageSize = pageSize, page = page)
+    }
+
+    internal fun total(total: Int): PageInfo {
+        val pages = safePages(pageSize, total)
+        val page = safeBounds(page, 0, pages - 1)
+        return copy(page = page, total = total)
+    }
+
+    internal fun refresh(): PageInfo =
+        copy(refreshCounter = if (refreshCounter == Int.MAX_VALUE) 0 else refreshCounter + 1)
+
+    override fun toString(): String = "PageInfo(range=$range,page=($page/$pages),pageSize=$pageSize,total=$total)"
+
+    private fun safePages(pageSize: Int, total: Int): Int {
+        var pages = total / pageSize
+        if (total % pageSize != 0) {
+            pages++
         }
+        return max(1, pages)
+    }
 
-    internal fun gotoPage(page: Int): PageInfo = PageInfo(pageSize, page, total)
+    private fun safeBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
 
-    internal fun pageSize(pageSize: Int): PageInfo = PageInfo(pageSize, page, total)
+    companion object {
+        const val DEFAULT_PAGE_SIZE = 50
+        val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
+    }
 }
 
 data class SortInfo<T>(val name: String, val comparator: Comparator<T>)
@@ -135,14 +114,12 @@ data class SelectionInfo<T>(private val identifier: IdProvider<T, String>, priva
     val items: List<T>
         get() = selectionMap.values.toList()
 
-    internal fun select(item: T, select: Boolean): SelectionInfo<T> = SelectionInfo(
-        identifier,
-        if (select) selectionMap + (identifier(item) to item) else selectionMap - identifier(item)
+    internal fun select(item: T, select: Boolean): SelectionInfo<T> = copy(
+        selectionMap = if (select) selectionMap + (identifier(item) to item) else selectionMap - identifier(item)
     )
 
-    internal fun toggle(item: T): SelectionInfo<T> = SelectionInfo(
-        identifier,
-        if (selectionMap.containsKey(identifier(item))) {
+    internal fun toggle(item: T): SelectionInfo<T> = copy(
+        selectionMap = if (selectionMap.containsKey(identifier(item))) {
             selectionMap - identifier(item)
         } else {
             selectionMap + (identifier(item) to item)

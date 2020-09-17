@@ -11,6 +11,7 @@ import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
+import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -19,7 +20,6 @@ import org.patternfly.SelectionMode.SINGLE
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
@@ -80,7 +80,7 @@ class OptionsMenu<T> internal constructor(
     +classes
 }) {
 
-    internal var toggle: OptionsMenuToggleBase<out HTMLElement, T>? = null
+    lateinit var toggle: OptionsMenuToggleBase<out HTMLElement, T>
 
     val ces = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
@@ -104,16 +104,16 @@ sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
     tagName: String,
     id: String? = null,
     baseClass: String? = null,
-) : Tag<E>(tagName, id, baseClass), WithText<E> {
+) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
 
-    internal var toggleId: String? = null
+    internal lateinit var toggleId: String
     abstract var disabled: Flow<Boolean>
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
             aria["haspopup"] = "listbox"
             clicks handledBy this@OptionsMenuToggleBase.optionsMenu.ces.toggle
-            this@OptionsMenuToggleBase.toggleId = id
+            this@OptionsMenuToggleBase.toggleId = id ?: Id.unique()
             this@OptionsMenuToggleBase.optionsMenu.ces.data.map { it.toString() }.bindAttr("aria-expanded")
         }
         optionsMenu.toggle = this
@@ -129,25 +129,24 @@ class OptionsMenuToggle<T> internal constructor(
     id = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
     baseClass = classes {
         +"options-menu".component("toggle")
-        +"plain".modifier()
         +classes
-    }),
-    WithTextDelegate<HTMLButtonElement, HTMLSpanElement> {
-
-    private var textElement: HTMLSpanElement? = null
+    }) {
 
     init {
         initToggle(this)
     }
 
-    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
+    var content: (Span.() -> Unit)? = null
         set(value) {
+            domNode.clear()
+            domNode.classList -= "plain".modifier()
+            register(span(baseClass = "options-menu".component("toggle", "text")) {
+                value?.invoke(this)
+            }, {})
+            register(span(baseClass = "options-menu".component("toggle", "icon")) {
+                pfIcon("caret-down".fas())
+            }, {})
             field = value
-            if (textElement != null) {
-                textElement.removeFromParent()
-                textElement = null
-            }
-            value?.invoke(this)
         }
 
     override var disabled: Flow<Boolean>
@@ -162,17 +161,13 @@ class OptionsMenuToggle<T> internal constructor(
             }
         }
 
-    override fun delegate(): HTMLSpanElement {
-        if (textElement == null) {
+    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
+        set(value) {
             domNode.clear()
-            domNode.classList -= "plain".modifier()
-            textElement = register(span(baseClass = "options-menu".component("toggle", "text")) {}, {}).domNode
-            register(span(baseClass = "options-menu".component("toggle", "icon")) {
-                pfIcon("caret-down".fas())
-            }, {})
+            domNode.classList += "plain".modifier()
+            value?.invoke(this)
+            field = value
         }
-        return textElement!!
-    }
 }
 
 class OptionsMenuTogglePlain<T> internal constructor(
@@ -187,15 +182,12 @@ class OptionsMenuTogglePlain<T> internal constructor(
         +"plain".modifier()
         +"text".modifier()
         +classes
-    }),
-    WithTextDelegate<HTMLDivElement, HTMLSpanElement> {
+    }) {
 
-    private var textElement: HTMLSpanElement =
-        span(baseClass = "options-menu".component("toggle-text")) { }.domNode
-    private var toggleTag: Button
+    private var toggleButton: Button
 
     init {
-        toggleTag = button(
+        toggleButton = button(
             id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
             baseClass = "options-menu".component("toggle", "button")
         ) {
@@ -206,18 +198,25 @@ class OptionsMenuTogglePlain<T> internal constructor(
         }
     }
 
+    var content: (Span.() -> Unit)? = null
+        set(value) {
+            val span = Span(baseClass = "options-menu".component("toggle-text")).apply {
+                value?.invoke(this)
+            }
+            domNode.prepend(span.domNode)
+            field = value
+        }
+
     override var disabled: Flow<Boolean>
         get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<Boolean>(flow) {
                 override fun set(value: Boolean, last: Boolean?) {
                     domNode.classList.toggle("disabled".modifier(), value)
-                    toggleTag.domNode.disabled = value
+                    toggleButton.domNode.disabled = value
                 }
             }
         }
-
-    override fun delegate(): HTMLSpanElement = textElement
 }
 
 class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
@@ -231,9 +230,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 }) {
     init {
         attr("role", "menu")
-        optionsMenu.toggle?.toggleId?.let {
-            aria["labelledby"] = it
-        }
+        aria["labelledby"] = optionsMenu.toggle.toggleId
         optionsMenu.ces.data.map { !it }.bindAttr("hidden")
         optionsMenu.store.data.each().render { entry ->
             when (entry) {

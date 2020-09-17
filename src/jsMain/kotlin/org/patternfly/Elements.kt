@@ -43,9 +43,9 @@ var HTMLElement.styleHidden: Boolean
     get() = this.style.display != "none"
     set(value) {
         if (value) {
-            show()
-        } else {
             hide()
+        } else {
+            show()
         }
     }
 

@@ -7,11 +7,7 @@ import dev.fritz2.binding.action
 import dev.fritz2.binding.const
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
-import dev.fritz2.dom.DomMountPoint
-import dev.fritz2.dom.DomMountPointPreserveOrder
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.TextNode
-import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
@@ -19,19 +15,16 @@ import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
+import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLUListElement
-import org.w3c.dom.Node
-import org.w3c.dom.Text
 
 // ------------------------------------------------------ dsl
 
@@ -102,7 +95,7 @@ class Dropdown<T> internal constructor(
     +classes
 }) {
 
-    internal var toggle: DropdownToggleBase<out HTMLElement, T>? = null
+    lateinit var toggle: DropdownToggleBase<out HTMLElement, T>
 
     val ces = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
@@ -144,16 +137,16 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
     tagName: String,
     id: String? = null,
     baseClass: String? = null,
-) : Tag<E>(tagName, id, baseClass), WithText<E> {
+) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
 
-    internal var toggleId: String? = null
+    internal lateinit var toggleId: String
     abstract var disabled: Flow<Boolean>
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
             aria["haspopup"] = true
             clicks handledBy this@DropdownToggleBase.dropdown.ces.toggle
-            this@DropdownToggleBase.toggleId = id
+            this@DropdownToggleBase.toggleId = id ?: Id.unique()
             this@DropdownToggleBase.dropdown.ces.data.map { it.toString() }.bindAttr("aria-expanded")
         }
         dropdown.toggle = this
@@ -169,25 +162,32 @@ class DropdownToggle<T> internal constructor(
     id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass = classes {
         +"dropdown".component("toggle")
-        +"plain".modifier()
         +classes
-    }),
-    WithTextDelegate<HTMLButtonElement, HTMLSpanElement> {
-
-    private var textElement: HTMLSpanElement? = null
+    }) {
 
     init {
         initToggle(this)
     }
 
+    var content: (Span.() -> Unit)? = null
+        set(value) {
+            domNode.clear()
+            domNode.classList -= "plain".modifier()
+            register(span(baseClass = "dropdown".component("toggle", "text")) {
+                value?.invoke(this)
+            }, {})
+            register(span(baseClass = "dropdown".component("toggle", "icon")) {
+                pfIcon("caret-down".fas())
+            }, {})
+            field = value
+        }
+
     var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
         set(value) {
-            field = value
-            if (textElement != null) {
-                textElement.removeFromParent()
-                textElement = null
-            }
+            domNode.clear()
+            domNode.classList += "plain".modifier()
             value?.invoke(this)
+            field = value
         }
 
     override var disabled: Flow<Boolean>
@@ -201,18 +201,6 @@ class DropdownToggle<T> internal constructor(
                 }
             }
         }
-
-    override fun delegate(): HTMLSpanElement {
-        if (textElement == null) {
-            domNode.clear()
-            domNode.classList -= "plain".modifier()
-            textElement = register(span(baseClass = "dropdown".component("toggle", "text")) {}, {}).domNode
-            register(span(baseClass = "dropdown".component("toggle", "icon")) {
-                pfIcon("caret-down".fas())
-            }, {})
-        }
-        return textElement!!
-    }
 }
 
 enum class TriState { OFF, INDETERMINATE, ON }
@@ -228,13 +216,13 @@ class DropdownToggleCheckbox<T> internal constructor(
         +"dropdown".component("toggle")
         +"split-button".modifier()
         +classes
-    }),
-    WithTextDelegate<HTMLDivElement, HTMLSpanElement> {
+    }) {
 
     private val labelTag: Label
-    private val toggleTag: Button
-    private var textElement: HTMLSpanElement? = null
+    private val toggleButton: Button
     private val checkId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
+    private val textId = Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
+
     val input: Input = Input(checkId)
 
     init {
@@ -244,7 +232,7 @@ class DropdownToggleCheckbox<T> internal constructor(
                 it.type = const("checkbox")
             }
         }
-        toggleTag = button(
+        toggleButton = button(
             id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
             baseClass = "dropdown".component("toggle", "button")
         ) {
@@ -253,6 +241,16 @@ class DropdownToggleCheckbox<T> internal constructor(
         }
     }
 
+    var content: (Span.() -> Unit)? = null
+        set(value) {
+            labelTag.register(
+                span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
+                    aria["hidden"] = true
+                    value?.invoke(this)
+                }, {})
+            field = value
+        }
+
     override var disabled: Flow<Boolean>
         get() = throw NotImplementedError()
         set(flow) {
@@ -260,7 +258,7 @@ class DropdownToggleCheckbox<T> internal constructor(
                 override fun set(value: Boolean, last: Boolean?) {
                     domNode.classList.toggle("disabled".modifier(), value)
                     input.domNode.disabled = value
-                    toggleTag.domNode.disabled = value
+                    toggleButton.domNode.disabled = value
                 }
             }
         }
@@ -287,54 +285,24 @@ class DropdownToggleCheckbox<T> internal constructor(
                 }
             }
         }
-
-    override fun Flow<String>.bind(preserveOrder: Boolean): SingleMountPoint<WithDomNode<Text>> {
-        val upstream = this.map {
-            textElement?.styleHidden = it.isNotEmpty()
-            TextNode(it)
-        }.distinctUntilChanged()
-
-        return if (preserveOrder) DomMountPointPreserveOrder(upstream, delegate())
-        else DomMountPoint(upstream, delegate())
-    }
-
-    override fun appendText(text: String): Node {
-        val node = super.appendText(text)
-        textElement?.styleHidden = text.isNotEmpty()
-        return node
-    }
-
-    override fun delegate(): HTMLSpanElement {
-        if (textElement == null) {
-            val textId = Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
-            textElement = labelTag.register(
-                span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
-                    aria["hidden"] = true
-                    domNode.style.display = "none"
-                }, {}).domNode
-            input.aria["labelledby"] = textId
-        }
-        return textElement!!
-    }
 }
 
 class DropdownToggleAction<T> internal constructor(
     dropdown: Dropdown<T>,
     classes: String?
-) : WithTextDelegate<HTMLDivElement, HTMLButtonElement>,
-    DropdownToggleBase<HTMLDivElement, T>(
-        dropdown = dropdown,
-        tagName = "div",
-        id = null,
-        baseClass = classes {
-            +"dropdown".component("toggle")
-            +"split-button".modifier()
-            +"action".modifier()
-            +classes
-        }) {
+) : DropdownToggleBase<HTMLDivElement, T>(
+    dropdown = dropdown,
+    tagName = "div",
+    id = null,
+    baseClass = classes {
+        +"dropdown".component("toggle")
+        +"split-button".modifier()
+        +"action".modifier()
+        +classes
+    }) {
 
-    val action = button(baseClass = "dropdown".component("toggle", "button")) {}
-    private val toggleTag = button(
+    private var actionButton: Button? = null
+    private val toggleButton = button(
         id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
         baseClass = "dropdown".component("toggle", "button")
     ) {
@@ -342,11 +310,13 @@ class DropdownToggleAction<T> internal constructor(
         pfIcon("caret-down".fas())
     }
 
-    var icon: (Button.() -> Unit)? = null
+    var action: (Button.() -> Unit)? = null
         set(value) {
+            actionButton = Button(baseClass = "dropdown".component("toggle", "button")).apply {
+                value?.invoke(this)
+            }
+            domNode.prepend(actionButton?.domNode)
             field = value
-            action.domNode.clear()
-            value?.invoke(action)
         }
 
     override var disabled: Flow<Boolean>
@@ -355,13 +325,11 @@ class DropdownToggleAction<T> internal constructor(
             object : SingleMountPoint<Boolean>(flow) {
                 override fun set(value: Boolean, last: Boolean?) {
                     domNode.classList.toggle("disabled".modifier(), value)
-                    action.domNode.disabled = value
-                    toggleTag.domNode.disabled = value
+                    actionButton?.domNode?.disabled = value
+                    toggleButton.domNode.disabled = value
                 }
             }
         }
-
-    override fun delegate(): HTMLButtonElement = action.domNode
 }
 
 class DropdownEntries<E : HTMLElement, T> internal constructor(
@@ -375,9 +343,7 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
 }) {
     init {
         attr("role", "menu")
-        dropdown.toggle?.toggleId?.let {
-            aria["labelledby"] = it
-        }
+        aria["labelledby"] = dropdown.toggle.toggleId
         dropdown.ces.data.map { !it }.bindAttr("hidden")
 
         dropdown.store.data.each().render { entry ->
