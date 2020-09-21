@@ -155,6 +155,7 @@ class DataListExpandableContent<T> internal constructor(
     init {
         val id = Id.unique(ComponentType.DataList.id, "ec")
         domNode.id = id
+        domNode.hidden = true // tp prevent flickering during updates
         dataListItem.toggleButton?.let {
             it.aria["controls"] = id
         }
@@ -172,6 +173,7 @@ class DataListItem<T> internal constructor(
     internal val dataList: DataList<T>,
     internal val item: T
 ) : Li(id = rowId<T>(dataList.store.identifier, item), baseClass = "data-list".component("item")) {
+
     val expanded: CollapseExpandStore = CollapseExpandStore()
     internal var toggleButton: HTMLButtonElement? = null
 

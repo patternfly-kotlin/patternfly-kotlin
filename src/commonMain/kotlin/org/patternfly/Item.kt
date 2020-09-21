@@ -24,27 +24,14 @@ data class Items<T>(
         }
 
     internal fun clear(): Items<T> = Items(identifier, emptyList())
-
     internal fun addAll(list: List<T>): Items<T> = Items(identifier, list)
 
-    internal fun gotoPage(page: Int): Items<T> = copy(pageInfo = pageInfo.gotoPage(page))
-    internal fun pageSize(pageSize: Int): Items<T> = copy(pageInfo = pageInfo.pageSize(pageSize))
-
-    internal fun selectNone(): Items<T> = copy(selection = SelectionInfo(identifier, mapOf()))
-    internal fun select(item: T, select: Boolean): Items<T> = copy(selection = selection.select(item, select))
-    internal fun toggleSelection(item: T): Items<T> = copy(selection = selection.toggle(item))
-    internal fun selectAll(): Items<T> = copy(selection = SelectionInfo(identifier, allItems.associateBy(identifier)))
-    internal fun selectVisible(): Items<T> =
-        copy(selection = SelectionInfo(identifier, visibleItems.associateBy(identifier)))
-
-    internal fun sortBy(name: String, comparator: Comparator<T>): Items<T> = copy(sortInfo = SortInfo(name, comparator))
-
     override fun toString(): String = buildString {
-        append("Items [${pageInfo.range.first}, ${pageInfo.range.last}) of ${pageInfo.total} items, page ${pageInfo.page} of ${pageInfo.pages} with size ${pageInfo.page}")
+        append("Items(pageInfo=$pageInfo")
         sortInfo?.let {
-            append(", sorted by ${it.name}")
+            append(",sortedBy=${it.name}")
         }
-        append(", ${selection.items.size} item(s) selected")
+        append(",selected=${selection.items.size})")
     }
 }
 
@@ -101,7 +88,7 @@ data class PageInfo(
     private fun safeBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
 
     companion object {
-        const val DEFAULT_PAGE_SIZE = 50
+        const val DEFAULT_PAGE_SIZE = 10
         val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
     }
 }

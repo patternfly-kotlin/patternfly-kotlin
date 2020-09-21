@@ -1,7 +1,7 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.SingleMountPoint
 import dev.fritz2.binding.action
 import dev.fritz2.binding.const
@@ -20,17 +20,31 @@ import org.w3c.dom.HTMLInputElement
 
 // ------------------------------------------------------ dsl
 
+fun <T> HtmlElements.pfPagination(
+    itemStore: ItemStore<T>,
+    pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
+    compact: Boolean = false,
+    classes: String? = null,
+    content: Pagination.() -> Unit = {}
+): Pagination =
+    register(Pagination(itemStore, itemStore.data.map { it.pageInfo }, pageSizes, compact, classes), content)
+
 fun HtmlElements.pfPagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
-    classes: String? = null, content: Pagination.() -> Unit = {}
-): Pagination = register(Pagination(pageInfo, pageSizes, compact, classes), content)
+    classes: String? = null,
+    content: Pagination.() -> Unit = {}
+): Pagination {
+    val pageInfoStore = PageInfoStore(pageInfo)
+    return register(Pagination(pageInfoStore, pageInfoStore.data, pageSizes, compact, classes), content)
+}
 
 // ------------------------------------------------------ tag
 
 class Pagination internal constructor(
-    pageInfo: PageInfo,
+    val pageInfoHandler: PageInfoHandler,
+    val pageInfoFlow: Flow<PageInfo>,
     pageSizes: Array<Int>,
     compact: Boolean,
     classes: String?
@@ -44,19 +58,18 @@ class Pagination internal constructor(
     private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()
     private var inputElement: HTMLInputElement? = null
     private val optionsMenu: OptionsMenu<Int>
-    val store: PageInfoStore = PageInfoStore(pageInfo)
 
     init {
         markAs(ComponentType.Pagination)
         div(baseClass = "pagination".component("total-items")) {
-            this@Pagination.store.showRange().invoke(this)
+            this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
         optionsMenu = pfOptionsMenu {
             display = {
                 { +"${it.item} per page" }
             }
             pfOptionsMenuTogglePlain {
-                content = { this@Pagination.store.showRange().invoke(this) }
+                content = { this@Pagination.pageInfoFlow.showRange().invoke(this) }
             }
             pfOptionsMenuItems {
                 pageSizes.forEachIndexed { index, pageSize ->
@@ -66,15 +79,15 @@ class Pagination internal constructor(
                 }
             }
             store.selection.map { Unit } handledBy ces.collapse
-            store.selection.unwrap().map { it.first() } handledBy this@Pagination.store.pageSize
+            store.selection.unwrap().map { it.first() } handledBy this@Pagination.pageInfoHandler.pageSize
         }
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
                     this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                         aria["label"] = "Go to first page"
-                        disabled = this@Pagination.store.data.map { it.firstPage }
-                        clicks handledBy this@Pagination.store.gotoFirstPage
+                        disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
+                        clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
                         pfIcon("angle-double-left".fas())
                     }.domNode)
                 }
@@ -82,8 +95,8 @@ class Pagination internal constructor(
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
                 this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                     aria["label"] = "Go to previous page"
-                    disabled = this@Pagination.store.data.map { it.firstPage }
-                    clicks handledBy this@Pagination.store.gotoPreviousPage
+                    disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
+                    clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
                     pfIcon("angle-left".fas())
                 }.domNode)
             }
@@ -93,15 +106,16 @@ class Pagination internal constructor(
                         aria["label"] = "Current page"
                         type = const("number")
                         min = const("1")
-                        max = this@Pagination.store.data.map { it.pages.toString() }
-                        disabled = this@Pagination.store.data.map { it.pages < 2 }
-                        value = this@Pagination.store.data.map { (if (it.total == 0) 0 else it.page + 1).toString() }
-                        changes.valuesAsNumber().map { it.toInt() - 1 } handledBy this@Pagination.store.gotoPage
+                        max = this@Pagination.pageInfoFlow.map { it.pages.toString() }
+                        disabled = this@Pagination.pageInfoFlow.map { it.pages < 2 }
+                        value = this@Pagination.pageInfoFlow.map { (if (it.total == 0) 0 else it.page + 1).toString() }
+                        changes.valuesAsNumber()
+                            .map { it.toInt() - 1 } handledBy this@Pagination.pageInfoHandler.gotoPage
                     }.domNode
                     span {
                         aria["hidden"] = true
                         +"of "
-                        this@Pagination.store.data.map {
+                        this@Pagination.pageInfoFlow.map {
                             if (it.total == 0) "0" else it.pages.toString()
                         }.bind(true)
                     }
@@ -110,8 +124,8 @@ class Pagination internal constructor(
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
                 this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                     aria["label"] = "Go to next page"
-                    disabled = this@Pagination.store.data.map { it.lastPagePage }
-                    clicks handledBy this@Pagination.store.gotoNextPage
+                    disabled = this@Pagination.pageInfoFlow.map { it.lastPagePage }
+                    clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
                     pfIcon("angle-right".fas())
                 }.domNode)
             }
@@ -119,8 +133,8 @@ class Pagination internal constructor(
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
                     this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                         aria["label"] = "Go to last page"
-                        disabled = this@Pagination.store.data.map { it.lastPagePage }
-                        clicks handledBy this@Pagination.store.gotoLastPage
+                        disabled = this@Pagination.pageInfoFlow.map { it.lastPagePage }
+                        clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
                         pfIcon("angle-double-right".fas())
                     }.domNode)
                 }
@@ -138,7 +152,7 @@ class Pagination internal constructor(
                         controlElements.forEach { it.disabled = true }
                         inputElement?.let { it.disabled = true }
                     } else {
-                        action() handledBy store.refresh
+                        action() handledBy pageInfoHandler.refresh
                     }
                 }
             }
@@ -147,16 +161,40 @@ class Pagination internal constructor(
 
 // ------------------------------------------------------ store
 
-class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo) {
+fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
+    b {
+        this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.bind(true)
+        +" - "
+        this@showRange.map { it.range.last.toString() }.bind(true)
+    }
+    domNode.appendChild(TextNode(" of ").domNode)
+    b {
+        this@showRange.map { it.total.toString() }.bind()
+    }
+}
 
-    val gotoFirstPage: SimpleHandler<Unit> = handle { pageInfo -> pageInfo.gotoFirstPage() }
-    val gotoPreviousPage: SimpleHandler<Unit> = handle { pageInfo -> pageInfo.gotoPreviousPage() }
-    val gotoNextPage: SimpleHandler<Unit> = handle { pageInfo -> pageInfo.gotoNextPage() }
-    val gotoLastPage: SimpleHandler<Unit> = handle { pageInfo -> pageInfo.gotoLastPage() }
-    val gotoPage: SimpleHandler<Int> = handle { pageInfo, page -> pageInfo.gotoPage(page) }
-    val pageSize: SimpleHandler<Int> = handle { pageInfo, pageSize -> pageInfo.pageSize(pageSize) }
-    val total: SimpleHandler<Int> = handle { pageInfo, total -> pageInfo.total(total) }
-    val refresh: SimpleHandler<Unit> = handle { pageInfo-> pageInfo.refresh() }
+interface PageInfoHandler {
+
+    val gotoFirstPage: Handler<Unit>
+    val gotoPreviousPage: Handler<Unit>
+    val gotoNextPage: Handler<Unit>
+    val gotoLastPage: Handler<Unit>
+    val gotoPage: Handler<Int>
+    val pageSize: Handler<Int>
+    val total: Handler<Int>
+    val refresh: Handler<Unit>
+}
+
+class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInfoHandler {
+
+    override val gotoFirstPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoFirstPage() }
+    override val gotoPreviousPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoPreviousPage() }
+    override val gotoNextPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoNextPage() }
+    override val gotoLastPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoLastPage() }
+    override val gotoPage: Handler<Int> = handle { pageInfo, page -> pageInfo.gotoPage(page) }
+    override val pageSize: Handler<Int> = handle { pageInfo, pageSize -> pageInfo.pageSize(pageSize) }
+    override val total: Handler<Int> = handle { pageInfo, total -> pageInfo.total(total) }
+    override val refresh: Handler<Unit> = handle { pageInfo -> pageInfo.refresh() }
 
     internal fun showRange(): Tag<HTMLElement>.() -> Unit = {
         b {

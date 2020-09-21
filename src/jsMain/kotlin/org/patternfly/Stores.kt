@@ -66,7 +66,7 @@ class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = nu
     }
 }
 
-class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)) {
+class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)), PageInfoHandler {
 
     val empty: Flow<Boolean> = data.map { it.visibleItems.isEmpty() }
     val allItems: Flow<List<T>> = data.map { it.allItems }
@@ -75,18 +75,54 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(
     val clear: Handler<Unit> = handle { it.clear() }
     val addAll: Handler<List<T>> = handle { items, list -> items.addAll(list) }
 
-    val gotoPage: Handler<Int> = handle { items, page -> items.gotoPage(page) }
-    val pageSize: Handler<Int> = handle { items, page -> items.pageSize(page) }
-
-    val selectNone: Handler<Unit> = handle { it.selectNone() }
-    val selectVisible: Handler<Unit> = handle { it.selectVisible() }
-    val selectAll: Handler<Unit> = handle { it.selectAll() }
-    val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
-        items.select(item, select)
+    override val gotoFirstPage: Handler<Unit> = handle { items ->
+        items.copy(pageInfo = items.pageInfo.gotoFirstPage())
     }
-    val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
+    override val gotoPreviousPage: Handler<Unit> = handle { items ->
+        items.copy(pageInfo = items.pageInfo.gotoPreviousPage())
+    }
+    override val gotoNextPage: Handler<Unit> = handle { items ->
+        items.copy(pageInfo = items.pageInfo.gotoNextPage())
+    }
+    override val gotoLastPage: Handler<Unit> = handle { items ->
+        items.copy(pageInfo = items.pageInfo.gotoLastPage())
+    }
+    override val gotoPage: Handler<Int> = handle { items, page ->
+        items.copy(pageInfo = items.pageInfo.gotoPage(page))
+    }
+    override val pageSize: Handler<Int> = handle { items, page ->
+        items.copy(pageInfo = items.pageInfo.pageSize(page))
+    }
+    override val total: Handler<Int> = handle { items, total ->
+        items.copy(pageInfo = items.pageInfo.total(total))
+    }
+    override val refresh: Handler<Unit> = handle { items ->
+        items.copy(pageInfo = items.pageInfo.refresh())
+    }
+
+    val selectNone: Handler<Unit> = handle { items ->
+        items.copy(selection = SelectionInfo(identifier, mapOf()))
+    }
+    val selectVisible: Handler<Unit> = handle { items ->
+        items.copy(
+            selection = SelectionInfo(
+                identifier, items.visibleItems.associateBy(
+                    identifier
+                )
+            )
+        )
+    }
+    val selectAll: Handler<Unit> = handle { items ->
+        items.copy(selection = SelectionInfo(identifier, items.allItems.associateBy(identifier)))
+    }
+    val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
+        items.copy(selection = items.selection.select(item, select))
+    }
+    val toggleSelection: Handler<T> = handle { items, item ->
+        items.copy(selection = items.selection.toggle(item))
+    }
 
     val sortBy: Handler<Pair<String, Comparator<T>>> = handle { items, (name, comparator) ->
-        items.sortBy(name, comparator)
+        items.copy(sortInfo = SortInfo(name, comparator))
     }
 }
