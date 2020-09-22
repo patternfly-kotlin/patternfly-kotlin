@@ -66,63 +66,75 @@ class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = nu
     }
 }
 
-class ItemStore<T>(val identifier: IdProvider<T, String>) : RootStore<Items<T>>(Items(identifier)), PageInfoHandler {
+class ItemStore<T>(val identifier: IdProvider<T, String>) :
+    RootStore<Items<T>>(Items(identifier)), PageInfoHandler {
 
-    val empty: Flow<Boolean> = data.map { it.visibleItems.isEmpty() }
-    val allItems: Flow<List<T>> = data.map { it.allItems }
-    val visibleItems: Flow<List<T>> = data.map { it.visibleItems }
+    private var filters: Map<String, ItemFilter<T>> = mapOf()
+    private var sortInfo: SortInfo<T>? = null
 
-    val clear: Handler<Unit> = handle { it.clear() }
-    val addAll: Handler<List<T>> = handle { items, list -> items.addAll(list) }
+    val visible: Flow<List<T>> = data.map { it.page }
+    val selected: Flow<Int> = data.map { it.selected.size }
 
-    override val gotoFirstPage: Handler<Unit> = handle { items ->
-        items.copy(pageInfo = items.pageInfo.gotoFirstPage())
+    val addAll: Handler<List<T>> = handle { items, newItems ->
+        val copy = items.copy(
+            allItems = newItems,
+            items = newItems,
+            selected = emptySet(),
+            pageInfo = items.pageInfo.total(newItems.size)
+        )
+        console.log("addAll: $copy")
+        copy
     }
-    override val gotoPreviousPage: Handler<Unit> = handle { items ->
-        items.copy(pageInfo = items.pageInfo.gotoPreviousPage())
+
+    val addFilter: Handler<Pair<String, ItemFilter<T>>> = handle { items, (id, filter) ->
+        filters += (id to filter)
+        val filtered = filter(items.allItems)
+        val pageInfo = items.pageInfo.total(filtered.size)
+        items.copy(items = filtered, pageInfo = pageInfo)
     }
-    override val gotoNextPage: Handler<Unit> = handle { items ->
-        items.copy(pageInfo = items.pageInfo.gotoNextPage())
+    val removeFilter: Handler<String> = handle { items, id ->
+        filters -= id
+        val filtered = filter(items.allItems)
+        val pageInfo = items.pageInfo.total(filtered.size)
+        items.copy(items = filtered, pageInfo = pageInfo)
     }
-    override val gotoLastPage: Handler<Unit> = handle { items ->
-        items.copy(pageInfo = items.pageInfo.gotoLastPage())
-    }
+
+    override val gotoFirstPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoFirstPage()) }
+    override val gotoPreviousPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoPreviousPage()) }
+    override val gotoNextPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoNextPage()) }
+    override val gotoLastPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoLastPage()) }
     override val gotoPage: Handler<Int> = handle { items, page ->
         items.copy(pageInfo = items.pageInfo.gotoPage(page))
     }
-    override val pageSize: Handler<Int> = handle { items, page ->
-        items.copy(pageInfo = items.pageInfo.pageSize(page))
+    override val pageSize: Handler<Int> = handle { items, pageSize ->
+        items.copy(pageInfo = items.pageInfo.pageSize(pageSize))
     }
-    override val total: Handler<Int> = handle { items, total ->
-        items.copy(pageInfo = items.pageInfo.total(total))
-    }
-    override val refresh: Handler<Unit> = handle { items ->
-        items.copy(pageInfo = items.pageInfo.refresh())
-    }
+    override val total: Handler<Int> = handle { items, _ -> items } // not implemented!
+    override val refresh: Handler<Unit> = handle { it } // not implemented!
 
-    val selectNone: Handler<Unit> = handle { items ->
-        items.copy(selection = SelectionInfo(identifier, mapOf()))
+    val selectNone: Handler<Unit> = handle { it.copy(selected = emptySet()) }
+    val selectVisible: Handler<Unit> = handle {
+        it.copy(selected = it.page.map { item -> identifier(item) }.toSet())
     }
-    val selectVisible: Handler<Unit> = handle { items ->
-        items.copy(
-            selection = SelectionInfo(
-                identifier, items.visibleItems.associateBy(
-                    identifier
-                )
-            )
-        )
-    }
-    val selectAll: Handler<Unit> = handle { items ->
-        items.copy(selection = SelectionInfo(identifier, items.allItems.associateBy(identifier)))
+    val selectAll: Handler<Unit> = handle {
+        it.copy(selected = it.items.map { item -> identifier(item) }.toSet())
     }
     val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
-        items.copy(selection = items.selection.select(item, select))
+        val id = identifier(item)
+        val newSelection = if (select) items.selected + id else items.selected - id
+        items.copy(selected = newSelection)
     }
     val toggleSelection: Handler<T> = handle { items, item ->
-        items.copy(selection = items.selection.toggle(item))
+        val id = identifier(item)
+        val newSelection = if (id in items.selected) items.selected + id else items.selected - id
+        items.copy(selected = newSelection)
     }
 
-    val sortBy: Handler<Pair<String, Comparator<T>>> = handle { items, (name, comparator) ->
-        items.copy(sortInfo = SortInfo(name, comparator))
+    private fun filter(items: List<T>): List<T> = if (filters.isEmpty()) {
+        items
+    } else {
+        var sequence = items.asSequence()
+        filters.values.forEach { sequence = sequence.filter(it) }
+        sequence.toList()
     }
 }

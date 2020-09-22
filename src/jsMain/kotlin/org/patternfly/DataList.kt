@@ -88,7 +88,7 @@ class DataList<T> internal constructor(
     init {
         markAs(ComponentType.DataList)
         attr("role", "list")
-        store.visibleItems.each().render { item ->
+        store.visible.each { store.identifier(it) }.render { item ->
             register(DataListItem(this@DataList, item)) {}
         }.bind()
     }
@@ -125,6 +125,7 @@ class DataListCheck<T> internal constructor(
             changes.states()
                 .map { (this@DataListCheck.item to it) }
                 .handledBy(this@DataListCheck.dataList.store.select)
+            checked = this@DataListCheck.dataList.store.data.map { it.isSelected(this@DataListCheck.item) }
         }
     }
 }

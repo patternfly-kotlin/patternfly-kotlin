@@ -83,7 +83,7 @@ fun <T> Dropdown<T>.pfDropdownGroups(
 // ------------------------------------------------------ tag
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class Dropdown<T> internal constructor(
+open class Dropdown<T> internal constructor(
     val store: DropdownStore<T>,
     internal val dropdownAlign: Align?,
     up: Boolean,

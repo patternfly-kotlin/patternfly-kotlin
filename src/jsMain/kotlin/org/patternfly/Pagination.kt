@@ -21,13 +21,13 @@ import org.w3c.dom.HTMLInputElement
 // ------------------------------------------------------ dsl
 
 fun <T> HtmlElements.pfPagination(
-    itemStore: ItemStore<T>,
+    store: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     classes: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination =
-    register(Pagination(itemStore, itemStore.data.map { it.pageInfo }, pageSizes, compact, classes), content)
+    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, classes), content)
 
 fun HtmlElements.pfPagination(
     pageInfo: PageInfo = PageInfo(),
@@ -36,8 +36,8 @@ fun HtmlElements.pfPagination(
     classes: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination {
-    val pageInfoStore = PageInfoStore(pageInfo)
-    return register(Pagination(pageInfoStore, pageInfoStore.data, pageSizes, compact, classes), content)
+    val store = PageInfoStore(pageInfo)
+    return register(Pagination(store, store.data, pageSizes, compact, classes), content)
 }
 
 // ------------------------------------------------------ tag
@@ -195,16 +195,4 @@ class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInf
     override val pageSize: Handler<Int> = handle { pageInfo, pageSize -> pageInfo.pageSize(pageSize) }
     override val total: Handler<Int> = handle { pageInfo, total -> pageInfo.total(total) }
     override val refresh: Handler<Unit> = handle { pageInfo -> pageInfo.refresh() }
-
-    internal fun showRange(): Tag<HTMLElement>.() -> Unit = {
-        b {
-            data.map { if (it.total == 0) "0" else it.range.first.toString() }.bind(true)
-            +" - "
-            data.map { it.range.last.toString() }.bind(true)
-        }
-        domNode.appendChild(TextNode(" of ").domNode)
-        b {
-            data.map { it.total.toString() }.bind()
-        }
-    }
 }

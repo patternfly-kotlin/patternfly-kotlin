@@ -4,35 +4,26 @@ import dev.fritz2.lenses.IdProvider
 import kotlin.math.max
 import kotlin.math.min
 
-/** Immutable holder for items used in data components like [DataList]. */
+typealias ItemFilter<T> = (T) -> Boolean
+
 data class Items<T>(
-    private val identifier: IdProvider<T, String>,
-    val allItems: List<T> = listOf(),
-    val pageInfo: PageInfo = PageInfo(total = allItems.size),
-    val selection: SelectionInfo<T> = SelectionInfo(identifier, mapOf()),
-    val sortInfo: SortInfo<T>? = null
+    val identifier: IdProvider<T, String>,
+    val allItems: List<T> = emptyList(),
+    val items: List<T> = emptyList(),
+    val selected: Set<String> = emptySet(),
+    val pageInfo: PageInfo = PageInfo()
 ) {
-
-    val visibleItems: List<T>
-        get() {
-            val sorted = if (sortInfo != null) {
-                allItems.sortedWith(sortInfo.comparator)
-            } else {
-                allItems
-            }
-            return sorted.subList(max(0, pageInfo.range.first - 1), pageInfo.range.last)
+    val page: List<T>
+        get() = if (items.isEmpty()) listOf() else {
+            val from = safeBounds(pageInfo.range.first - 1, 0, items.size - 1)
+            val to = safeBounds(pageInfo.range.last, 1, items.size)
+            items.subList(from, to)
         }
 
-    internal fun clear(): Items<T> = Items(identifier, emptyList())
-    internal fun addAll(list: List<T>): Items<T> = Items(identifier, list)
+    fun isSelected(item: T): Boolean = identifier(item) in selected
 
-    override fun toString(): String = buildString {
-        append("Items(pageInfo=$pageInfo")
-        sortInfo?.let {
-            append(",sortedBy=${it.name}")
-        }
-        append(",selected=${selection.items.size})")
-    }
+    override fun toString(): String =
+        "Items(allItems=${allItems.size},items=${items.size},selected=${selected.size},pageInfo=$pageInfo)"
 }
 
 data class PageInfo(
@@ -85,8 +76,6 @@ data class PageInfo(
         return max(1, pages)
     }
 
-    private fun safeBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
-
     companion object {
         const val DEFAULT_PAGE_SIZE = 10
         val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
@@ -95,21 +84,4 @@ data class PageInfo(
 
 data class SortInfo<T>(val name: String, val comparator: Comparator<T>)
 
-// contains only selected items
-data class SelectionInfo<T>(private val identifier: IdProvider<T, String>, private val selectionMap: Map<String, T>) {
-
-    val items: List<T>
-        get() = selectionMap.values.toList()
-
-    internal fun select(item: T, select: Boolean): SelectionInfo<T> = copy(
-        selectionMap = if (select) selectionMap + (identifier(item) to item) else selectionMap - identifier(item)
-    )
-
-    internal fun toggle(item: T): SelectionInfo<T> = copy(
-        selectionMap = if (selectionMap.containsKey(identifier(item))) {
-            selectionMap - identifier(item)
-        } else {
-            selectionMap + (identifier(item) to item)
-        }
-    )
-}
+private fun safeBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
