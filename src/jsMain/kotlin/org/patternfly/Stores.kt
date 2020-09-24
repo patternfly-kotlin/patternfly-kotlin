@@ -99,4 +99,8 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) :
         items.select(item, select)
     }
     val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
+
+    val sortWith: Handler<Comparator<T>> = handle { items, comparator ->
+        items.sortWith(comparator)
+    }
 }

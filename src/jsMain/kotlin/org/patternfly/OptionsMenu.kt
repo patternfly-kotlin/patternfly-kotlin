@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
-import org.patternfly.SelectionMode.SINGLE
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -26,12 +25,11 @@ import org.w3c.dom.HTMLUListElement
 
 fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
-    selectionMode: SelectionMode = SINGLE,
     align: Align? = null,
     up: Boolean = false,
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, selectionMode, align, up, classes), content)
+): OptionsMenu<T> = register(OptionsMenu(store, align, up, classes), content)
 
 fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
     classes: String? = null,
@@ -67,9 +65,8 @@ fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
 
 // ------------------------------------------------------ tag
 
-class OptionsMenu<T> internal constructor(
+open class OptionsMenu<T> internal constructor(
     val store: OptionStore<T>,
-    selectionMode: SelectionMode,
     internal val optionsMenuAlign: Align?,
     up: Boolean,
     classes: String?
@@ -93,7 +90,6 @@ class OptionsMenu<T> internal constructor(
     }
 
     init {
-        store.selectionMode = selectionMode
         markAs(ComponentType.OptionsMenu)
         classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
     }
@@ -294,16 +290,6 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal var selectionMode: SelectionMode = SINGLE
-        set(value) {
-            field = if (value == SelectionMode.NONE) {
-                console.warn("Selection mode $value is not supported for options menu")
-                SINGLE
-            } else {
-                value
-            }
-        }
-
     internal val toggle = handle<Item<T>> { entries, item ->
         entries.map { entry ->
             when (entry) {
@@ -334,11 +320,7 @@ class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
                 entry.copy(selected = true)
             }
         } else {
-            if (selectionMode == SINGLE) {
-                entry.copy(selected = false)
-            } else {
-                entry
-            }
+            entry.copy(selected = false)
         }
 
     val items: Flow<List<Item<T>>> = data.flatItems()

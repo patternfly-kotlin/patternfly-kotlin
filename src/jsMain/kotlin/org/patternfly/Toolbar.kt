@@ -6,6 +6,7 @@ import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
 
@@ -51,6 +52,15 @@ fun <T> ToolbarItem.pfBulkSelect(
     return register(BulkSelect(itemStore, classes), content)
 }
 
+fun <T> ToolbarItem.pfSortOptions(
+    itemStore: ItemStore<T>,
+    options: Map<String, Comparator<T>>,
+    classes: String? = null,
+    content: SortOptions<T>.() -> Unit = {}
+): SortOptions<T> {
+    return register(SortOptions(itemStore, options, classes), content)
+}
+
 fun <T> ToolbarItem.pfPagination(
     itemStore: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
@@ -92,7 +102,7 @@ enum class PreSelection(val text: String) {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BulkSelect<T>(itemStore: ItemStore<T>, classes: String?) :
-    Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, classes = null) {
+    Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, classes = classes) {
 
     init {
         pfDropdownToggleCheckbox {
@@ -121,5 +131,38 @@ class BulkSelect<T>(itemStore: ItemStore<T>, classes: String?) :
         pfDropdownItems {
             PreSelection.values().map { pfItem(it) }
         }
+    }
+}
+
+sealed class SortOption(val text: String)
+class SortProperty<T>(text: String, val comparator: Comparator<T>) : SortOption(text)
+class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending")
+
+class SortOptions<T>(itemStore: ItemStore<T>, options: Map<String, Comparator<*>>, classes: String?) :
+    OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, classes = classes) {
+
+    init {
+        display = {
+            { +it.item.text }
+        }
+        pfOptionsMenuToggle { icon = { pfIcon("sort-amount-down".fas()) } }
+        pfOptionsMenuGroups {
+            pfGroup {
+                options.map { (name, comparator) ->
+                    pfItem(SortProperty(name, comparator))
+                }
+            }
+            pfSeparator()
+            pfGroup {
+                pfItem(SortOrder(true)) { selected = true }
+                pfItem(SortOrder(false))
+            }
+        }
+        store.selection.unwrap()
+            .map { items ->
+                val property = items.filterIsInstance<SortProperty<T>>().firstOrNull()
+                val order = items.filterIsInstance<SortOrder>().first()
+                if (order.ascending) property?.comparator else property?.comparator?.reversed()
+            }.filterNotNull() handledBy itemStore.sortWith
     }
 }
