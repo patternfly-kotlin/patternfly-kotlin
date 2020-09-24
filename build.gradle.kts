@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform") version "1.4.10"
     `maven-publish`
@@ -17,6 +15,11 @@ repositories {
 }
 
 kotlin {
+    jvm {
+        tasks.withType<Test> {
+            useJUnitPlatform()
+        }
+    }
     js {
         browser {
             testTask {
@@ -36,8 +39,10 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation("io.kotest:kotest-framework-api:4.2.5")
+                implementation("io.kotest:kotest-framework-engine:4.2.5")
+                implementation("io.kotest:kotest-assertions-core:4.2.5")
+                implementation("io.kotest:kotest-property:4.2.5")
             }
         }
         val jsMain by getting {
@@ -45,9 +50,11 @@ kotlin {
                 implementation("dev.fritz2:core:0.8-SNAPSHOT")
             }
         }
-        val jsTest by getting {
+        val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation("io.kotest:kotest-runner-junit5:4.2.5")
+                implementation("io.kotest:kotest-assertions-core:4.2.5")
+                implementation("io.kotest:kotest-property:4.2.5")
             }
         }
     }

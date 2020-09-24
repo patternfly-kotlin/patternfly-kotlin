@@ -124,7 +124,7 @@ class Pagination internal constructor(
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
                 this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                     aria["label"] = "Go to next page"
-                    disabled = this@Pagination.pageInfoFlow.map { it.lastPagePage }
+                    disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                     clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
                     pfIcon("angle-right".fas())
                 }.domNode)
@@ -133,7 +133,7 @@ class Pagination internal constructor(
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
                     this@Pagination.controlElements.add(pfButton("plain".modifier()) {
                         aria["label"] = "Go to last page"
-                        disabled = this@Pagination.pageInfoFlow.map { it.lastPagePage }
+                        disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                         clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
                         pfIcon("angle-double-right".fas())
                     }.domNode)

@@ -10,20 +10,86 @@ data class Items<T>(
     val identifier: IdProvider<T, String>,
     val allItems: List<T> = emptyList(),
     val items: List<T> = emptyList(),
-    val selected: Set<String> = emptySet(),
-    val pageInfo: PageInfo = PageInfo()
+    val pageInfo: PageInfo = PageInfo(),
+    val filters: Map<String, ItemFilter<T>> = emptyMap(),
+    val selected: Set<String> = emptySet(), // selected identifiers
+    val comparator: Comparator<T>? = null
 ) {
+
     val page: List<T>
         get() = if (items.isEmpty()) listOf() else {
-            val from = safeBounds(pageInfo.range.first - 1, 0, items.size - 1)
-            val to = safeBounds(pageInfo.range.last, 1, items.size)
+            val from = inBounds(pageInfo.range.first - 1, 0, items.size - 1)
+            val to = inBounds(pageInfo.range.last, 1, items.size)
             items.subList(from, to)
         }
 
+    fun addAll(newItems: List<T>): Items<T> =
+        copy(allItems = newItems, items = newItems, pageInfo = pageInfo.total(newItems.size))
+
+    fun addFilter(name: String, itemFilter: ItemFilter<T>): Items<T> {
+        val newFilters = filters + (name to itemFilter)
+        val newItems = filterAndSort(allItems, newFilters, comparator)
+        val newPageInfo = pageInfo.total(newItems.size)
+        return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
+    }
+
+    fun removeFilter(name: String): Items<T> {
+        val newFilters = filters - name
+        val newItems = filterAndSort(allItems, newFilters, comparator)
+        val newPageInfo = pageInfo.total(newItems.size)
+        return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
+    }
+
+    fun sortWith(comparator: Comparator<T>): Items<T> {
+        val newItems = filterAndSort(allItems, filters, comparator)
+        return copy(items = newItems, comparator = comparator)
+    }
+
+    fun selectNone(): Items<T> = copy(selected = emptySet())
+
+    fun selectPage(): Items<T> = copy(selected = page.map { identifier(it) }.toSet())
+
+    fun selectAll(): Items<T> = copy(selected = items.map { identifier(it) }.toSet())
+
+    fun select(item: T, select: Boolean): Items<T> {
+        val id = identifier(item)
+        val newSelection = if (select) selected + id else selected - id
+        return copy(selected = newSelection)
+    }
+
+    fun toggleSelection(item: T): Items<T> {
+        val id = identifier(item)
+        val newSelection = if (id in selected) selected - id else selected + id
+        return copy(selected = newSelection)
+    }
+
     fun isSelected(item: T): Boolean = identifier(item) in selected
 
-    override fun toString(): String =
-        "Items(allItems=${allItems.size},items=${items.size},selected=${selected.size},pageInfo=$pageInfo)"
+    override fun toString(): String = buildString {
+        append("Items(allItems(").append(allItems.size).append(")")
+        append(",items(").append(items.size).append(")")
+        append(",pageInfo=").append(pageInfo)
+        if (filters.isNotEmpty()) {
+            append(",filters=").append(filters.keys)
+        }
+        append(",selected(").append(selected.size).append(")")
+        append(")")
+    }
+
+    private fun filterAndSort(
+        items: List<T>,
+        filters: Map<String, ItemFilter<T>>,
+        comparator: Comparator<T>?
+    ): List<T> = if (filters.isEmpty()) {
+        if (comparator != null) allItems.sortedWith(comparator) else allItems
+    } else {
+        var sequence = items.asSequence()
+        filters.values.forEach { sequence = sequence.filter(it) }
+        comparator?.let {
+            sequence = sequence.sortedWith(it)
+        }
+        sequence.toList()
+    }
 }
 
 data class PageInfo(
@@ -43,23 +109,23 @@ data class PageInfo(
 
     val firstPage: Boolean = page == 0
 
-    val lastPagePage: Boolean = page == pages - 1
+    val lastPage: Boolean = page == pages - 1
 
-    internal fun gotoFirstPage(): PageInfo = copy(page = 0)
-    internal fun gotoPreviousPage(): PageInfo = copy(page = safeBounds(page - 1, 0, pages - 1))
-    internal fun gotoNextPage(): PageInfo = copy(page = safeBounds(page + 1, 0, pages - 1))
-    internal fun gotoLastPage(): PageInfo = copy(page = pages - 1)
-    internal fun gotoPage(page: Int): PageInfo = copy(page = safeBounds(page, 0, pages - 1))
+    fun gotoFirstPage(): PageInfo = copy(page = 0)
+    fun gotoPreviousPage(): PageInfo = copy(page = inBounds(page - 1, 0, pages - 1))
+    fun gotoNextPage(): PageInfo = copy(page = inBounds(page + 1, 0, pages - 1))
+    fun gotoLastPage(): PageInfo = copy(page = pages - 1)
+    fun gotoPage(page: Int): PageInfo = copy(page = inBounds(page, 0, pages - 1))
 
-    internal fun pageSize(pageSize: Int): PageInfo {
+    fun pageSize(pageSize: Int): PageInfo {
         val pages = safePages(pageSize, total)
-        val page = safeBounds(page, 0, pages - 1)
+        val page = inBounds(page, 0, pages - 1)
         return copy(pageSize = pageSize, page = page)
     }
 
-    internal fun total(total: Int): PageInfo {
+    fun total(total: Int): PageInfo {
         val pages = safePages(pageSize, total)
-        val page = safeBounds(page, 0, pages - 1)
+        val page = inBounds(page, 0, pages - 1)
         return copy(page = page, total = total)
     }
 
@@ -82,6 +148,4 @@ data class PageInfo(
     }
 }
 
-data class SortInfo<T>(val name: String, val comparator: Comparator<T>)
-
-private fun safeBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
+private fun inBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
