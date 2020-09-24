@@ -37,7 +37,8 @@ open class PageInfoTests : FunSpec({
 
     test("Goto first page") {
         checkAll(Arb.positiveInts(), Arb.positiveInts()) { pageSize, total ->
-            with(PageInfo(pageSize = pageSize, total = total).gotoFirstPage()) {
+            val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoFirstPage()
+            with(pageInfo) {
                 range.first shouldBe 1
                 range.last shouldBe min(total, pageSize)
                 page shouldBe 0
@@ -49,7 +50,8 @@ open class PageInfoTests : FunSpec({
 
     test("Goto last page") {
         checkAll(Arb.positiveInts(), Arb.positiveInts()) { pageSize, total ->
-            with(PageInfo(pageSize = pageSize, total = total).gotoLastPage()) {
+            val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoLastPage()
+            with(pageInfo) {
                 range.first shouldBe (page * pageSize) + 1
                 range.last shouldBe min(total, range.first + pageSize - 1)
                 page shouldBe pages - 1
@@ -61,7 +63,8 @@ open class PageInfoTests : FunSpec({
 
     test("Goto page") {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.int()) { pageSize, total, pg ->
-            with(PageInfo(pageSize = pageSize, total = total).gotoPage(pg)) {
+            val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoPage(pg)
+            with(pageInfo) {
                 range.first shouldBeGreaterThanOrEqual 1
                 range.last shouldBeLessThanOrEqual total
                 page shouldBeInRange (0 until pages)
@@ -73,7 +76,8 @@ open class PageInfoTests : FunSpec({
 
     test("Change page size") {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.positiveInts()) { pageSize, total, ps ->
-            with(PageInfo(pageSize = pageSize, total = total).pageSize(ps)) {
+            val pageInfo = PageInfo(pageSize = pageSize, total = total).pageSize(ps)
+            with(pageInfo) {
                 range.first shouldBeGreaterThanOrEqual 1
                 range.last shouldBeLessThanOrEqual total
                 page shouldBeInRange (0 until pages)
@@ -85,7 +89,8 @@ open class PageInfoTests : FunSpec({
 
     test("Change total") {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.positiveInts()) { pageSize, total, tt ->
-            with(PageInfo(pageSize = pageSize, total = total).total(tt)) {
+            val pageInfo = PageInfo(pageSize = pageSize, total = total).total(tt)
+            with(pageInfo) {
                 range.first shouldBeGreaterThanOrEqual 1
                 range.last shouldBeLessThanOrEqual tt
                 page shouldBeInRange (0 until pages)
