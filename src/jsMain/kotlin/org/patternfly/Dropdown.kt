@@ -16,8 +16,6 @@ import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Span
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
@@ -82,7 +80,6 @@ fun <T> Dropdown<T>.pfDropdownGroups(
 
 // ------------------------------------------------------ tag
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 open class Dropdown<T> internal constructor(
     val store: DropdownStore<T>,
     internal val dropdownAlign: Align?,

@@ -4,7 +4,6 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -100,7 +99,6 @@ enum class PreSelection(val text: String) {
     NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class BulkSelect<T>(itemStore: ItemStore<T>, classes: String?) :
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, classes = classes) {
 

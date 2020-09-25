@@ -8,7 +8,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -43,7 +42,6 @@ fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
 
 // ------------------------------------------------------ tag
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ChipGroup<T> internal constructor(
     val store: ChipGroupStore<T>,
     text: String?,
@@ -162,7 +160,6 @@ class ChipBuilder<T> {
     internal fun build() = entries.toList()
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
     RootStore<List<T>>(listOf()) {
 

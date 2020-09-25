@@ -18,7 +18,7 @@ open class ItemTests : FunSpec({
 
     test("New Items") {
         with(Items<Int>({ it.toString() })) {
-            allItems.shouldBeEmpty()
+            all.shouldBeEmpty()
             items.shouldBeEmpty()
             filters.shouldBeEmpty()
             selected.shouldBeEmpty()
@@ -30,7 +30,7 @@ open class ItemTests : FunSpec({
         checkAll(Arb.positiveInts(100)) { size ->
             val numbers = (0 until size).toList()
             with(Items<Int>({ it.toString() }).addAll(numbers)) {
-                allItems shouldContainInOrder numbers
+                all shouldContainInOrder numbers
                 items shouldContainInOrder numbers
                 filters.shouldBeEmpty()
                 selected.shouldBeEmpty()
@@ -45,35 +45,35 @@ open class ItemTests : FunSpec({
 
         numberItems = numberItems.addFilter("even") { it % 2 == 0 }
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(2, 4, 6, 8, 10)
             filters shouldContainKey "even"
         }
 
         numberItems = numberItems.addFilter("three") { it % 3 == 0 }
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(6)
             filters.shouldContainKeys("even", "three")
         }
 
         numberItems = numberItems.removeFilter("even")
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(3, 6, 9)
             filters shouldContainKey "three"
         }
 
         numberItems = numberItems.removeFilter("foo")
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(3, 6, 9)
             filters shouldContainKey "three"
         }
 
         numberItems = numberItems.removeFilter("three")
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder numbers
             filters.shouldBeEmpty()
         }
@@ -85,14 +85,14 @@ open class ItemTests : FunSpec({
 
         numberItems = numberItems.sortWith(naturalOrder())
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(2, 7, 33, 38, 65, 75, 89, 123)
             comparator shouldNotBe null
         }
 
         numberItems = numberItems.sortWith(naturalOrder<Int>().reversed())
         with(numberItems) {
-            allItems shouldContainInOrder numbers
+            all shouldContainInOrder numbers
             items shouldContainInOrder listOf(123, 89, 75, 65, 38, 33, 7, 2)
             comparator shouldNotBe null
         }

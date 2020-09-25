@@ -1,5 +1,6 @@
 package org.patternfly
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.ints.shouldBeInRange
@@ -7,6 +8,7 @@ import io.kotest.matchers.ints.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.negativeInts
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
 import kotlin.math.min
@@ -20,6 +22,30 @@ open class PageInfoTests : FunSpec({
             pages shouldBe 1
             firstPage shouldBe true
             lastPage shouldBe true
+        }
+    }
+
+    test("Illegal page size") {
+        checkAll(Arb.int(Int.MIN_VALUE..0)) { pageSize ->
+            shouldThrow<IllegalArgumentException> {
+                PageInfo(pageSize = pageSize)
+            }
+        }
+    }
+
+    test("Illegal page") {
+        checkAll(Arb.negativeInts()) { page ->
+            shouldThrow<IllegalArgumentException> {
+                PageInfo(page = page)
+            }
+        }
+    }
+
+    test("Illegal total") {
+        checkAll(Arb.negativeInts()) { total ->
+            shouldThrow<IllegalArgumentException> {
+                PageInfo(total = total)
+            }
         }
     }
 

@@ -8,14 +8,13 @@ typealias ItemFilter<T> = (T) -> Boolean
 
 data class Items<T>(
     val identifier: IdProvider<T, String>,
-    val allItems: List<T> = emptyList(),
+    val all: List<T> = emptyList(),
     val items: List<T> = emptyList(),
     val pageInfo: PageInfo = PageInfo(),
     val filters: Map<String, ItemFilter<T>> = emptyMap(),
     val selected: Set<String> = emptySet(), // selected identifiers
     val comparator: Comparator<T>? = null
 ) {
-
     val page: List<T>
         get() = if (items.isEmpty()) listOf() else {
             val from = inBounds(pageInfo.range.first - 1, 0, items.size - 1)
@@ -23,25 +22,25 @@ data class Items<T>(
             items.subList(from, to)
         }
 
-    fun addAll(newItems: List<T>): Items<T> =
-        copy(allItems = newItems, items = newItems, pageInfo = pageInfo.total(newItems.size))
+    fun addAll(items: List<T>): Items<T> =
+        copy(all = items, items = items, pageInfo = pageInfo.total(items.size))
 
-    fun addFilter(name: String, itemFilter: ItemFilter<T>): Items<T> {
-        val newFilters = filters + (name to itemFilter)
-        val newItems = filterAndSort(allItems, newFilters, comparator)
+    fun addFilter(name: String, filter: ItemFilter<T>): Items<T> {
+        val newFilters = filters + (name to filter)
+        val newItems = items(newFilters, comparator)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
     fun removeFilter(name: String): Items<T> {
         val newFilters = filters - name
-        val newItems = filterAndSort(allItems, newFilters, comparator)
+        val newItems = items(newFilters, comparator)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
     fun sortWith(comparator: Comparator<T>): Items<T> {
-        val newItems = filterAndSort(allItems, filters, comparator)
+        val newItems = items(filters, comparator)
         return copy(items = newItems, comparator = comparator)
     }
 
@@ -66,7 +65,7 @@ data class Items<T>(
     fun isSelected(item: T): Boolean = identifier(item) in selected
 
     override fun toString(): String = buildString {
-        append("Items(allItems(").append(allItems.size).append(")")
+        append("Items(all(").append(all.size).append(")")
         append(",items(").append(items.size).append(")")
         append(",pageInfo=").append(pageInfo)
         if (filters.isNotEmpty()) {
@@ -76,20 +75,17 @@ data class Items<T>(
         append(")")
     }
 
-    private fun filterAndSort(
-        items: List<T>,
-        filters: Map<String, ItemFilter<T>>,
-        comparator: Comparator<T>?
-    ): List<T> = if (filters.isEmpty()) {
-        if (comparator != null) allItems.sortedWith(comparator) else allItems
-    } else {
-        var sequence = items.asSequence()
-        filters.values.forEach { sequence = sequence.filter(it) }
-        comparator?.let {
-            sequence = sequence.sortedWith(it)
+    private fun items(filters: Map<String, ItemFilter<T>>, comparator: Comparator<T>?): List<T> =
+        if (filters.isEmpty()) {
+            if (comparator != null) all.sortedWith(comparator) else all
+        } else {
+            var sequence = all.asSequence()
+            filters.values.forEach { sequence = sequence.filter(it) }
+            comparator?.let {
+                sequence = sequence.sortedWith(it)
+            }
+            sequence.toList()
         }
-        sequence.toList()
-    }
 }
 
 data class PageInfo(
@@ -98,6 +94,12 @@ data class PageInfo(
     val total: Int = 0,
     private val refreshCounter: Int = 0
 ) {
+    init {
+        require(pageSize > 0) { "Page size must be greater than 0" }
+        require(page >= 0) { "Page must be greater than or equal 0" }
+        require(total >= 0) { "Total must be greater than or equal 0" }
+    }
+
     val range: IntRange
         get() {
             val from = if (total == 0) 1 else page * pageSize + 1
