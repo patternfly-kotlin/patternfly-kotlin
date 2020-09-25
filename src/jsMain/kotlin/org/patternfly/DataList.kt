@@ -18,10 +18,9 @@ import org.w3c.dom.HTMLUListElement
 
 fun <T> HtmlElements.pfDataList(
     store: ItemStore<T>,
-    selectionMode: SelectionMode = SelectionMode.NONE,
     classes: String? = null,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(store, selectionMode, classes), content)
+): DataList<T> = register(DataList(store, classes), content)
 
 fun <T> DataListRow<T>.pfDataListAction(
     classes: String? = null,
@@ -74,7 +73,6 @@ fun <T> DataListControl<T>.pfDataListToggle(
 
 class DataList<T> internal constructor(
     val store: ItemStore<T>,
-    internal val selectionMode: SelectionMode,
     classes: String?
 ) : PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
 
@@ -181,11 +179,6 @@ class DataListItem<T> internal constructor(
     init {
         classMap = expanded.data.map { mapOf("expanded".modifier() to it) }
         aria["labelledby"] = dataList.store.identifier(item)
-        if (dataList.selectionMode != SelectionMode.NONE) {
-            attr("tabindex", "0")
-            domNode.classList += "selectable".modifier()
-            clicks.map { item } handledBy dataList.store.toggleSelection
-        }
         val content = dataList.display.invoke(item)
         content.invoke(this)
     }
