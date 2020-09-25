@@ -73,6 +73,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     EmptyState("es", "empty-state".component()),
     Header("hdr", "page".component("header")),
     Icon("icn"),
+    InputGroup("ig", "input-group".component()),
     Main("mn", "page".component("main")),
     Navigation("nav", "nav".component()),
     NotificationBadge("nb", "button".component()),
