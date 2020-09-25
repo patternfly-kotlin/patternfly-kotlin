@@ -64,6 +64,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Brand("brd", "brand".component()),
     Button("btn", "button".component()),
     Card("crd", "card".component()),
+    CardView("cv"),
     Chip("chp", "chip".component()),
     ChipGroup("cpg", "chip-group".component()),
     Content("cnt", "content".component()),
