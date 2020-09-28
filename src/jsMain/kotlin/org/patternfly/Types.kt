@@ -69,6 +69,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     ChipGroup("cpg", "chip-group".component()),
     Content("cnt", "content".component()),
     DataList("dl", "data-list".component()),
+    DataTable("dt", "data-table".component()),
     Drawer("dw", "drawer".component()),
     Dropdown("dd", "dropdown".component()),
     EmptyState("es", "empty-state".component()),

@@ -39,8 +39,7 @@ fun ToolbarContent.pfToolbarExpandableContent(
 fun ToolbarExpandableContent.pfToolbarGroup(
     classes: String? = null,
     content: ToolbarGroup.() -> Unit = {}
-): ToolbarGroup =
-    register(ToolbarGroup(classes), content)
+): ToolbarGroup = register(ToolbarGroup(classes), content)
 
 fun <T> ToolbarItem.pfBulkSelect(
     itemStore: ItemStore<T>,
@@ -56,9 +55,7 @@ fun <T> ToolbarItem.pfSortOptions(
     options: Map<String, Comparator<T>>,
     classes: String? = null,
     content: SortOptions<T>.() -> Unit = {}
-): SortOptions<T> {
-    return register(SortOptions(itemStore, options, classes), content)
-}
+): SortOptions<T> = register(SortOptions(itemStore, options, classes), content)
 
 fun <T> ToolbarItem.pfPagination(
     itemStore: ItemStore<T>,

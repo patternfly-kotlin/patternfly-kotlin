@@ -39,8 +39,8 @@ var Element.hidden
         setAttribute("hidden", value.toString())
     }
 
-var HTMLElement.styleHidden: Boolean
-    get() = this.style.display != "none"
+var Element.styleHidden: Boolean
+    get() = this.unsafeCast<HTMLElement>().style.display != "none"
     set(value) {
         if (value) {
             hide()
@@ -49,12 +49,12 @@ var HTMLElement.styleHidden: Boolean
         }
     }
 
-fun HTMLElement.hide() {
-    this.style.display = "none"
+fun Element.hide() {
+    this.unsafeCast<HTMLElement>().style.display = "none"
 }
 
-fun HTMLElement.show() {
-    this.style.display = "unset"
+fun Element.show() {
+    this.unsafeCast<HTMLElement>().style.display = "unset"
 }
 
 fun Element.closest(selector: By): Element? = this.closest(selector.selector)
