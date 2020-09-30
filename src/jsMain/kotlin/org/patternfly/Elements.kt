@@ -22,6 +22,10 @@ operator fun DOMTokenList.minusAssign(value: String) {
 
 // ------------------------------------------------------ parent / child
 
+fun Element.appendAll(elements: Elements) {
+    elements.forEach { this.appendChild(it) }
+}
+
 fun Node?.removeFromParent() {
     if (this != null && this.parentNode != null) {
         this.parentNode!!.removeChild(this)
@@ -30,14 +34,9 @@ fun Node?.removeFromParent() {
 
 fun elements(content: HtmlElements.() -> Unit): List<Element> = render {
     div { content(this) }
-}.domNode.children.asList()
+}.domNode.childNodes.asList().map { it.unsafeCast<Element>() }
 
-
-fun Element.addAll(elements: Elements) {
-    elements.forEach { this.append(it) }
-}
-
-interface Elements: Iterable<Element> {
+interface Elements : Iterable<Element> {
     val elements: List<Element>
     override fun iterator(): Iterator<Element> = elements.iterator()
 }

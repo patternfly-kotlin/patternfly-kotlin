@@ -19,17 +19,19 @@ import kotlin.math.max
 fun HtmlElements.pfBadge(
     min: Int = 0,
     max: Int = 999,
+    id: String? = null,
     classes: String? = null,
     content: Badge.() -> Unit = {}
-): Badge = register(Badge(min, max, classes), content)
+): Badge = register(Badge(min, max, id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
 class Badge internal constructor(
     private val min: Int,
     private val max: Int,
+    id: String? = null,
     classes: String?
-) : PatternFlyComponent<HTMLSpanElement>, Span(baseClass = classes(ComponentType.Badge, classes)) {
+) : PatternFlyComponent<HTMLSpanElement>, Span(id = id, baseClass = classes(ComponentType.Badge, classes)) {
 
     var read: Flow<Boolean>
         get() = flowOf(true)

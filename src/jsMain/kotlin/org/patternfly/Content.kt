@@ -6,13 +6,16 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfContent(classes: String? = null, content: Content.() -> Unit = {}): Content =
-    register(Content(classes), content)
+fun HtmlElements.pfContent(
+    id: String? = null,
+    classes: String? = null,
+    content: Content.() -> Unit = {}
+): Content = register(Content(id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Content internal constructor(classes: String?) :
-    PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Content, classes)) {
+class Content internal constructor(id: String?, classes: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Content, classes)) {
     init {
         markAs(ComponentType.Content)
     }

@@ -14,14 +14,14 @@ import kotlin.js.Date
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfNotificationBadge(classes: String? = null): NotificationBadge =
-    register(NotificationBadge(classes), {})
+fun HtmlElements.pfNotificationBadge(id: String? = null, classes: String? = null): NotificationBadge =
+    register(NotificationBadge(id = id, classes = classes), {})
 
 // ------------------------------------------------------ tag
 
-class NotificationBadge(classes: String?) :
+class NotificationBadge(id: String?, classes: String?) :
     PatternFlyComponent<HTMLButtonElement>,
-    Button(baseClass = classes(ComponentType.NotificationBadge, classes)) {
+    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, classes)) {
 
     init {
         markAs(ComponentType.NotificationBadge)

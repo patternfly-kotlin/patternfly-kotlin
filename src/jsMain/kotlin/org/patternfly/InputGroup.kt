@@ -7,15 +7,15 @@ import org.w3c.dom.HTMLDivElement
 // ------------------------------------------------------ dsl
 
 fun HtmlElements.pfInputGroup(
+    id: String? = null,
     classes: String? = null,
     content: InputGroup.() -> Unit = {}
-): InputGroup = register(InputGroup(classes), content)
+): InputGroup = register(InputGroup(id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class InputGroup internal constructor(
-    classes: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.InputGroup, classes)) {
+class InputGroup internal constructor(id: String?, classes: String?) : PatternFlyComponent<HTMLDivElement>,
+    Div(id = id, baseClass = classes(ComponentType.InputGroup, classes)) {
     init {
         markAs(ComponentType.InputGroup)
     }

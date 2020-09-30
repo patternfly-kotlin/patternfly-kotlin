@@ -30,49 +30,56 @@ fun <T> HtmlElements.pfDropdown(
     store: DropdownStore<T> = DropdownStore(),
     align: Align? = null,
     up: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, align, up, classes), content)
+): Dropdown<T> = register(Dropdown(store, align, up, id = id, classes = classes), content)
 
 fun <T> Dropdown<T>.pfDropdownToggle(
+    id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     classes: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, classes), content)
+): DropdownToggle<T> = register(DropdownToggle(this, id = id, classes = classes), content)
 
 fun <T> Dropdown<T>.pfDropdownToggleKebab(
+    id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     classes: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, classes).apply {
+): DropdownToggle<T> = register(DropdownToggle(this, id = id, classes = classes).apply {
     icon = { pfIcon("ellipsis-v".fas()) }
 }, content)
 
 fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
+    id: String? = null,
     classes: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
-): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, classes), content)
+): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, id = id, classes = classes), content)
 
 fun <T> Dropdown<T>.pfDropdownToggleAction(
+    id: String? = null,
     classes: String? = null,
     content: DropdownToggleAction<T>.() -> Unit = {}
-): DropdownToggleAction<T> = register(DropdownToggleAction(this, classes), content)
+): DropdownToggleAction<T> = register(DropdownToggleAction(this, id = id, classes = classes), content)
 
 fun <T> Dropdown<T>.pfDropdownItems(
+    id: String? = null,
     classes: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
 ): DropdownEntries<HTMLUListElement, T> {
     val element = this.register(
-        DropdownEntries<HTMLUListElement, T>(this, "ul", classes), {})
+        DropdownEntries<HTMLUListElement, T>(this, "ul", id = id, classes = classes), {})
     val items = ItemsBuilder<T>().apply(block).build()
     action(items) handledBy this.store.update
     return element
 }
 
 fun <T> Dropdown<T>.pfDropdownGroups(
+    id: String? = null,
     classes: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
 ): DropdownEntries<HTMLDivElement, T> {
     val element = this.register(
-        DropdownEntries<HTMLDivElement, T>(this, "div", classes), {})
+        DropdownEntries<HTMLDivElement, T>(this, "div", id = id, classes = classes), {})
     val groups = GroupsBuilder<T>().apply(block).build()
     action(groups) handledBy this.store.update
     return element
@@ -84,14 +91,14 @@ open class Dropdown<T> internal constructor(
     val store: DropdownStore<T>,
     internal val dropdownAlign: Align?,
     up: Boolean,
+    id: String?,
     classes: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.Dropdown
     +dropdownAlign?.modifier
     +("top".modifier() `when` up)
     +classes
 }) {
-
     lateinit var toggle: DropdownToggleBase<out HTMLElement, T>
 
     val ces = CollapseExpandStore { target ->
@@ -132,9 +139,9 @@ open class Dropdown<T> internal constructor(
 sealed class DropdownToggleBase<E : HTMLElement, T>(
     private val dropdown: Dropdown<T>,
     tagName: String,
-    id: String? = null,
-    baseClass: String? = null,
-) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
+    id: String?,
+    classes: String?,
+) : Tag<E>(tagName = tagName, id = id, baseClass = classes), WithText<E> {
 
     internal lateinit var toggleId: String
     abstract var disabled: Flow<Boolean>
@@ -152,12 +159,13 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
 
 class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
+    id: String?,
     classes: String?,
 ) : DropdownToggleBase<HTMLButtonElement, T>(
     dropdown = dropdown,
     tagName = "button",
-    id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
-    baseClass = classes {
+    id = id,
+    classes = classes {
         +"dropdown".component("toggle")
         +classes
     }) {
@@ -204,12 +212,13 @@ enum class TriState { OFF, INDETERMINATE, ON }
 
 class DropdownToggleCheckbox<T> internal constructor(
     dropdown: Dropdown<T>,
+    id: String?,
     classes: String?,
 ) : DropdownToggleBase<HTMLDivElement, T>(
     dropdown = dropdown,
     tagName = "div",
-    id = null,
-    baseClass = classes {
+    id = id,
+    classes = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
         +classes
@@ -286,12 +295,13 @@ class DropdownToggleCheckbox<T> internal constructor(
 
 class DropdownToggleAction<T> internal constructor(
     dropdown: Dropdown<T>,
+    id: String?,
     classes: String?
 ) : DropdownToggleBase<HTMLDivElement, T>(
     dropdown = dropdown,
     tagName = "div",
-    id = null,
-    baseClass = classes {
+    id = id,
+    classes = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
         +"action".modifier()
@@ -332,8 +342,9 @@ class DropdownToggleAction<T> internal constructor(
 class DropdownEntries<E : HTMLElement, T> internal constructor(
     private val dropdown: Dropdown<T>,
     tagName: String,
+    id: String?,
     classes: String?
-) : Tag<E>(tagName = tagName, baseClass = classes {
+) : Tag<E>(tagName = tagName, id = id, baseClass = classes {
     +"dropdown".component("menu")
     +dropdown.dropdownAlign?.modifier
     +classes

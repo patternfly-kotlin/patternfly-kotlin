@@ -11,93 +11,123 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfToolbar(classes: String? = null, content: Toolbar.() -> Unit = {}): Toolbar =
-    register(Toolbar(classes), content)
+fun HtmlElements.pfToolbar(
+    id: String? = null,
+    classes: String? = null,
+    content: Toolbar.() -> Unit = {}
+): Toolbar = register(Toolbar(id = id, classes = classes), content)
 
-fun Toolbar.pfToolbarContent(classes: String? = null, content: ToolbarContent.() -> Unit = {}): ToolbarContent =
-    register(ToolbarContent(classes), content)
+fun Toolbar.pfToolbarContent(
+    id: String? = null,
+    classes: String? = null,
+    content: ToolbarContent.() -> Unit = {}
+): ToolbarContent = register(ToolbarContent(id = id, classes = classes), content)
 
 fun ToolbarContent.pfToolbarContentSection(
+    id: String? = null,
     classes: String? = null,
     content: ToolbarContentSection.() -> Unit = {}
-): ToolbarContentSection = register(ToolbarContentSection(classes), content)
+): ToolbarContentSection = register(ToolbarContentSection(id = id, classes = classes), content)
 
-fun ToolbarContentSection.pfToolbarGroup(classes: String? = null, content: ToolbarGroup.() -> Unit = {}): ToolbarGroup =
-    register(ToolbarGroup(classes), content)
-
-fun ToolbarContentSection.pfToolbarItem(classes: String? = null, content: ToolbarItem.() -> Unit = {}): ToolbarItem =
-    register(ToolbarItem(classes), content)
-
-fun ToolbarGroup.pfToolbarItem(classes: String? = null, content: ToolbarItem.() -> Unit = {}): ToolbarItem =
-    register(ToolbarItem(classes), content)
-
-fun ToolbarContent.pfToolbarExpandableContent(
-    classes: String? = null,
-    content: ToolbarExpandableContent.() -> Unit = {}
-): ToolbarExpandableContent = register(ToolbarExpandableContent(classes), content)
-
-fun ToolbarExpandableContent.pfToolbarGroup(
+fun ToolbarContentSection.pfToolbarGroup(
+    id: String? = null,
     classes: String? = null,
     content: ToolbarGroup.() -> Unit = {}
-): ToolbarGroup = register(ToolbarGroup(classes), content)
+): ToolbarGroup = register(ToolbarGroup(id = id, classes = classes), content)
+
+fun ToolbarContentSection.pfToolbarItem(
+    id: String? = null,
+    classes: String? = null,
+    content: ToolbarItem.() -> Unit = {}
+): ToolbarItem = register(ToolbarItem(id = id, classes = classes), content)
+
+fun ToolbarGroup.pfToolbarItem(
+    id: String? = null,
+    classes: String? = null,
+    content: ToolbarItem.() -> Unit = {}
+): ToolbarItem = register(ToolbarItem(id = id, classes = classes), content)
+
+fun ToolbarContent.pfToolbarExpandableContent(
+    id: String? = null,
+    classes: String? = null,
+    content: ToolbarExpandableContent.() -> Unit = {}
+): ToolbarExpandableContent = register(ToolbarExpandableContent(id = id, classes = classes), content)
+
+fun ToolbarExpandableContent.pfToolbarGroup(
+    id: String? = null,
+    classes: String? = null,
+    content: ToolbarGroup.() -> Unit = {}
+): ToolbarGroup = register(ToolbarGroup(id = id, classes = classes), content)
 
 fun <T> ToolbarItem.pfBulkSelect(
     itemStore: ItemStore<T>,
+    id: String? = null,
     classes: String? = null,
     content: BulkSelect<T>.() -> Unit = {}
 ): BulkSelect<T> {
     this.domNode.classList += "bulk-select".modifier()
-    return register(BulkSelect(itemStore, classes), content)
+    return register(BulkSelect(itemStore, id = id, classes = classes), content)
 }
 
 fun <T> ToolbarItem.pfSortOptions(
     itemStore: ItemStore<T>,
     options: Map<String, Comparator<T>>,
+    id: String? = null,
     classes: String? = null,
     content: SortOptions<T>.() -> Unit = {}
-): SortOptions<T> = register(SortOptions(itemStore, options, classes), content)
+): SortOptions<T> = register(SortOptions(itemStore, options, id = id, classes = classes), content)
 
 fun <T> ToolbarItem.pfPagination(
     itemStore: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination {
     this.domNode.classList += "pagination".modifier()
-    return register(Pagination(itemStore, itemStore.data.map { it.pageInfo }, pageSizes, compact, classes), content)
+    return register(
+        Pagination(
+            itemStore,
+            itemStore.data.map { it.pageInfo },
+            pageSizes,
+            compact,
+            id = id,
+            classes = classes
+        ), content
+    )
 }
 
 // ------------------------------------------------------ tag
 
-class Toolbar internal constructor(classes: String?) :
-    PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes(ComponentType.Toolbar, classes)) {
+class Toolbar internal constructor(id: String?, classes: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Toolbar, classes)) {
     init {
         markAs(ComponentType.Toolbar)
     }
 }
 
-class ToolbarContent internal constructor(classes: String?) :
-    Div(baseClass = classes("toolbar".component("content"), classes))
+class ToolbarContent internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("toolbar".component("content"), classes))
 
-class ToolbarContentSection internal constructor(classes: String?) :
-    Div(baseClass = classes("toolbar".component("content", "section"), classes))
+class ToolbarContentSection internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("toolbar".component("content", "section"), classes))
 
-class ToolbarGroup internal constructor(classes: String?) :
-    Div(baseClass = classes("toolbar".component("group"), classes))
+class ToolbarGroup internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("toolbar".component("group"), classes))
 
-class ToolbarItem internal constructor(classes: String?) :
-    Div(baseClass = classes("toolbar".component("item"), classes))
+class ToolbarItem internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("toolbar".component("item"), classes))
 
-class ToolbarExpandableContent internal constructor(classes: String?) :
-    Div(baseClass = classes("toolbar".component("expandable", "content"), classes))
+class ToolbarExpandableContent internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), classes))
 
 enum class PreSelection(val text: String) {
     NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
 }
 
-class BulkSelect<T>(itemStore: ItemStore<T>, classes: String?) :
-    Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, classes = classes) {
+class BulkSelect<T>(itemStore: ItemStore<T>, id: String?, classes: String?) :
+    Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, classes = classes) {
 
     init {
         pfDropdownToggleCheckbox {
@@ -133,8 +163,8 @@ sealed class SortOption(val text: String)
 class SortProperty<T>(text: String, val comparator: Comparator<T>) : SortOption(text)
 class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending")
 
-class SortOptions<T>(itemStore: ItemStore<T>, options: Map<String, Comparator<*>>, classes: String?) :
-    OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, classes = classes) {
+class SortOptions<T>(itemStore: ItemStore<T>, options: Map<String, Comparator<*>>, id: String?, classes: String?) :
+    OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, id = id, classes = classes) {
 
     init {
         display = {

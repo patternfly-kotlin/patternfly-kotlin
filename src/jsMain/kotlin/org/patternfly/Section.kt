@@ -6,14 +6,17 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSection(classes: String? = null, content: Section.() -> Unit = {}): Section =
-    register(Section(classes), content)
+fun HtmlElements.pfSection(
+    id: String? = null,
+    classes: String? = null,
+    content: Section.() -> Unit = {}
+): Section = register(Section(id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Section internal constructor(classes: String?) :
+class Section internal constructor(id: String?, classes: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("section", baseClass = classes(ComponentType.Section, classes)) {
+    TextElement("section", id = id, baseClass = classes(ComponentType.Section, classes)) {
 
     init {
         markAs(ComponentType.Section)

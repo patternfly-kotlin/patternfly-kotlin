@@ -9,21 +9,32 @@ import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ dsl
 
-fun Header.pfBrandContainer(classes: String? = null, content: BrandContainer.() -> Unit = {}): BrandContainer =
-    register(BrandContainer(classes("page".component("header", "brand"), classes)), content)
+fun Header.pfBrandContainer(
+    id: String? = null,
+    classes: String? = null,
+    content: BrandContainer.() -> Unit = {}
+): BrandContainer = register(BrandContainer(id = id, classes = classes("page".component("header", "brand"), classes)), content)
 
-fun BrandContainer.pfBrandLink(homeLink: String, classes: String? = null, content: A.() -> Unit = {}): A =
-    register(A(baseClass = classes("page".component("header", "brand", "link"), classes)).apply {
+fun BrandContainer.pfBrandLink(
+    homeLink: String,
+    id: String? = null,
+    classes: String? = null,
+    content: A.() -> Unit = {}
+): A = register(A(id = id, baseClass = classes("page".component("header", "brand", "link"), classes)).apply {
         href = const(homeLink)
     }, content)
 
-fun HtmlElements.pfBrand(src: String, classes: String? = null, content: Img.() -> Unit = {}): Brand =
-    register(Brand(src, classes), content)
+fun HtmlElements.pfBrand(
+    src: String,
+    id: String? = null,
+    classes: String? = null,
+    content: Img.() -> Unit = {}
+): Brand = register(Brand(src = src, id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Brand internal constructor(src: String, classes: String?) :
-    PatternFlyComponent<HTMLImageElement>, Img(baseClass = classes(ComponentType.Brand, classes)) {
+class Brand internal constructor(src: String, id: String?, classes: String?) :
+    PatternFlyComponent<HTMLImageElement>, Img(id = id, baseClass = classes(ComponentType.Brand, classes)) {
 
     init {
         markAs(ComponentType.Brand)
@@ -31,4 +42,4 @@ class Brand internal constructor(src: String, classes: String?) :
     }
 }
 
-class BrandContainer(classes: String?) : Div(baseClass = classes)
+class BrandContainer(id: String?, classes: String?) : Div(id = id, baseClass = classes)

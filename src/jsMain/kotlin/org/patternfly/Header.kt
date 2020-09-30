@@ -6,17 +6,23 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun Page.pfHeader(classes: String? = null, content: Header.() -> Unit = {}): Header =
-    register(Header(classes), content)
+fun Page.pfHeader(
+    id: String? = null,
+    classes: String? = null,
+    content: Header.() -> Unit = {}
+): Header = register(Header(id = id, classes = classes), content)
 
-fun Header.pfHeaderTools(classes: String? = null, content: Div.() -> Unit = {}): Div =
-    register(Div(baseClass = classes("page".component("header", "tools"), classes)), content)
+fun Header.pfHeaderTools(
+    id: String? = null,
+    classes: String? = null,
+    content: Div.() -> Unit = {}
+): Div = register(Div(id = id, baseClass = classes("page".component("header", "tools"), classes)), content)
 
 // ------------------------------------------------------ tag
 
-class Header internal constructor(classes: String?) :
+class Header internal constructor(id: String?, classes: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("header", baseClass = classes(ComponentType.Header, classes)) {
+    TextElement("header", id = id, baseClass = classes(ComponentType.Header, classes)) {
 
     init {
         markAs(ComponentType.Header)

@@ -24,47 +24,56 @@ import org.w3c.dom.events.MouseEvent
 
 fun HtmlElements.pfAlertGroup(
     toast: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: AlertGroup.() -> Unit = {}
-): AlertGroup = register(AlertGroup(toast, classes), content)
+): AlertGroup = register(AlertGroup(toast, id = id, classes = classes), content)
 
 fun HtmlElements.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
     inline: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Alert.() -> Unit = {}
-): Alert = register(Alert(severity, text, closable, inline, classes), content)
+): Alert = register(Alert(severity, text, closable, inline, id = id, classes = classes), content)
 
 fun AlertGroup.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
     inline: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Alert.() -> Unit = {}
 ): Li = register(li("alert-group".component("item")) {
-    pfAlert(severity, text, closable, inline, classes) {
+    pfAlert(severity, text, closable, inline, id = id, classes = classes) {
         content(this)
     }
 }, {})
 
-fun Alert.pfAlertDescription(classes: String? = null, content: Div.() -> Unit = {}): Div =
-    register(div(baseClass = classes("alert".component("description"), classes)) {
+fun Alert.pfAlertDescription(
+    id: String? = null,
+    classes: String? = null,
+    content: Div.() -> Unit = {}
+): Div = register(div(id = id, baseClass = classes("alert".component("description"), classes)) {
         content()
     }, {})
 
-fun Alert.pfAlertActionGroup(classes: String? = null, content: Div.() -> Unit = {}): Div =
-    register(div(baseClass = classes("alert".component("action-group"), classes)) {
+fun Alert.pfAlertActionGroup(
+    id: String? = null,
+    classes: String? = null,
+    content: Div.() -> Unit = {}
+): Div = register(div(id = id, baseClass = classes("alert".component("action-group"), classes)) {
         content()
     }, {})
 
 // ------------------------------------------------------ tag
 
-class AlertGroup internal constructor(toast: Boolean, classes: String?) :
+class AlertGroup internal constructor(toast: Boolean, id: String?, classes: String?) :
     PatternFlyComponent<HTMLUListElement>,
-    Ul(baseClass = classes {
+    Ul(id = id, baseClass = classes {
         +ComponentType.AlertGroup
         +("toast".modifier() `when` toast)
         +classes
@@ -77,13 +86,13 @@ class AlertGroup internal constructor(toast: Boolean, classes: String?) :
         if (toast) {
             MainScope().launch {
                 Notification.store.latest.collect {
-                    val id = Id.unique("alert")
+                    val alertId = Id.unique("alert")
                     val element = pfAlert(it.severity, it.text, true).domNode
-                    element.id = id
+                    element.id = alertId
                     domNode.prepend(element)
-                    element.onmouseover = { stopTimeout(id) }
-                    element.onmouseout = { startTimeout(id, element) }
-                    startTimeout(id, element)
+                    element.onmouseover = { stopTimeout(alertId) }
+                    element.onmouseout = { startTimeout(alertId, element) }
+                    startTimeout(alertId, element)
                 }
             }
         }
@@ -104,8 +113,9 @@ class Alert internal constructor(
     private val text: String,
     closable: Boolean = false,
     inline: Boolean = false,
+    id: String?,
     classes: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.Alert
     +severity.modifier
     +("inline".modifier() `when` inline)
@@ -113,6 +123,7 @@ class Alert internal constructor(
 }) {
 
     private var closeButton: Button? = null
+
     val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {

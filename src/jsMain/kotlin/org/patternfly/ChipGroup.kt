@@ -31,9 +31,10 @@ fun <T> HtmlElements.pfChipGroup(
     text: String? = null,
     limit: Int = 3,
     closable: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: ChipGroup<T>.() -> Unit = {}
-): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, classes), content)
+): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, classes = classes), content)
 
 fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
     val entries = ChipBuilder<T>().apply(block).build()
@@ -47,9 +48,10 @@ class ChipGroup<T> internal constructor(
     text: String?,
     limit: Int,
     closable: Boolean,
+    id: String?,
     classes: String?
 ) : PatternFlyComponent<HTMLDivElement>,
-    Div(baseClass = classes {
+    Div(id = id, baseClass = classes {
         +ComponentType.ChipGroup
         +("category".modifier() `when` (text != null))
         +classes
@@ -57,6 +59,7 @@ class ChipGroup<T> internal constructor(
 
     private var closeButton: Button? = null
     private val expanded = CollapseExpandStore()
+
     val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {
@@ -70,10 +73,10 @@ class ChipGroup<T> internal constructor(
             Listener(emptyFlow())
         }
     }
-    var asText: AsText<T> = { it.toString() }
-    var display: ComponentDisplay<Chip, T> = {
-        {
-            +this@ChipGroup.asText(it)
+
+    var display: (T) -> Chip = {
+        pfChip {
+            +it.toString()
         }
     }
 
@@ -99,11 +102,9 @@ class ChipGroup<T> internal constructor(
                     val visibleItems = if (expanded) items else items.take(limit)
                     visibleItems.forEach { item ->
                         li(baseClass = "chip-group".component("list-item")) {
-                            pfChip {
-                                val content = this@ChipGroup.display(item)
-                                content.invoke(this)
-                                val id = this@ChipGroup.store.identifier(item)
-                                closes.map { id } handledBy this@ChipGroup.store.remove
+                            this@ChipGroup.display(item).apply {
+                                val chipId = this@ChipGroup.store.identifier(item)
+                                closes.map { chipId } handledBy this@ChipGroup.store.remove
                             }
                         }
                     }

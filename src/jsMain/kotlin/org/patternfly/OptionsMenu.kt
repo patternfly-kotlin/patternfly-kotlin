@@ -27,37 +27,42 @@ fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
     align: Align? = null,
     up: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, align, up, classes), content)
+): OptionsMenu<T> = register(OptionsMenu(store, align, up, id = id, classes = classes), content)
 
 fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
+    id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
     classes: String? = null,
     content: OptionsMenuToggle<T>.() -> Unit = {}
-): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, classes), content)
+): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, id = id, classes = classes), content)
 
 fun <T> OptionsMenu<T>.pfOptionsMenuTogglePlain(
+    id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
     classes: String? = null,
     content: OptionsMenuTogglePlain<T>.() -> Unit = {}
-): OptionsMenuTogglePlain<T> = register(OptionsMenuTogglePlain(this, classes), content)
+): OptionsMenuTogglePlain<T> = register(OptionsMenuTogglePlain(this, id = id, classes = classes), content)
 
 fun <T> OptionsMenu<T>.pfOptionsMenuItems(
+    id: String? = null,
     classes: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
 ): OptionsMenuEntries<HTMLUListElement, T> {
     val element = this.register(
-        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", classes), {})
+        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, classes = classes), {})
     val items = ItemsBuilder<T>().apply(block).build()
     action(items) handledBy this.store.update
     return element
 }
 
 fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
+    id: String? = null,
     classes: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
 ): OptionsMenuEntries<HTMLDivElement, T> {
     val element = this.register(
-        OptionsMenuEntries<HTMLDivElement, T>(this, "div", classes), {})
+        OptionsMenuEntries<HTMLDivElement, T>(this, "div", id = id, classes = classes), {})
     val groups = GroupsBuilder<T>().apply(block).build()
     action(groups) handledBy this.store.update
     return element
@@ -69,14 +74,14 @@ open class OptionsMenu<T> internal constructor(
     val store: OptionStore<T>,
     internal val optionsMenuAlign: Align?,
     up: Boolean,
+    id: String?,
     classes: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(baseClass = classes {
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.OptionsMenu
     +optionsMenuAlign?.modifier
     +("top".modifier() `when` up)
     +classes
 }) {
-
     lateinit var toggle: OptionsMenuToggleBase<out HTMLElement, T>
 
     val ces = CollapseExpandStore { target ->
@@ -118,16 +123,16 @@ sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
 
 class OptionsMenuToggle<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
+    id: String?,
     classes: String?,
 ) : OptionsMenuToggleBase<HTMLButtonElement, T>(
     optionsMenu = optionsMenu,
     tagName = "button",
-    id = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
+    id = id,
     baseClass = classes {
         +"options-menu".component("toggle")
         +classes
     }) {
-
     init {
         initToggle(this)
     }
@@ -168,18 +173,18 @@ class OptionsMenuToggle<T> internal constructor(
 
 class OptionsMenuTogglePlain<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
+    id: String?,
     classes: String?,
 ) : OptionsMenuToggleBase<HTMLDivElement, T>(
     optionsMenu = optionsMenu,
     tagName = "div",
-    id = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
+    id = id,
     baseClass = classes {
         +"options-menu".component("toggle")
         +"plain".modifier()
         +"text".modifier()
         +classes
     }) {
-
     private var toggleButton: Button
 
     init {
@@ -218,8 +223,9 @@ class OptionsMenuTogglePlain<T> internal constructor(
 class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
     private val optionsMenu: OptionsMenu<T>,
     tagName: String,
+    id: String?,
     classes: String?
-) : Tag<E>(tagName = tagName, baseClass = classes {
+) : Tag<E>(tagName = tagName, id = id, baseClass = classes {
     +"options-menu".component("menu")
     +optionsMenu.optionsMenuAlign?.modifier
     +classes

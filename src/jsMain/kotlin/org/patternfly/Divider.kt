@@ -9,13 +9,17 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfDivider(variant: DividerVariant = DividerVariant.HR, classes: String? = null): Tag<HTMLElement> =
+fun HtmlElements.pfDivider(
+    variant: DividerVariant = DividerVariant.HR,
+    id: String? = null,
+    classes: String? = null
+): Tag<HTMLElement> =
     when (variant) {
-        DividerVariant.HR -> register(Hr(baseClass = classes("divider".component(), classes)), {})
-        DividerVariant.DIV -> register(Div(baseClass = classes("divider".component(), classes)).apply {
+        DividerVariant.HR -> register(Hr(id = id, baseClass = classes("divider".component(), classes)), {})
+        DividerVariant.DIV -> register(Div(id = id, baseClass = classes("divider".component(), classes)).apply {
             attr("role", "separator")
         }, {})
-        DividerVariant.LI -> register(Li(baseClass = classes("divider".component(), classes)).apply {
+        DividerVariant.LI -> register(Li(id = id, baseClass = classes("divider".component(), classes)).apply {
             attr("role", "separator")
         }, {})
     }

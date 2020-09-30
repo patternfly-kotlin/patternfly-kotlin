@@ -18,17 +18,19 @@ import org.w3c.dom.events.MouseEvent
 
 fun HtmlElements.pfChip(
     readOnly: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Chip.() -> Unit = {}
-): Chip = register(Chip(readOnly, classes), content)
+): Chip = register(Chip(readOnly, id = id, classes = classes), content)
 
 fun Chip.pfBadge(
     min: Int = 0,
     max: Int = 999,
+    id: String? = null,
     classes: String? = null,
     content: Badge.() -> Unit = {}
 ) {
-    insertBadge(this, register(Badge(min, max, classes), content))
+    insertBadge(this, register(Badge(min, max, id = id, classes = classes), content))
 }
 
 private fun insertBadge(chip: Chip, badge: Badge) {
@@ -39,10 +41,10 @@ private fun insertBadge(chip: Chip, badge: Badge) {
 
 // ------------------------------------------------------ tag
 
-class Chip internal constructor(readOnly: Boolean, classes: String?) :
+class Chip internal constructor(readOnly: Boolean, id: String?, classes: String?) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
-    Div(baseClass = classes {
+    Div(id = id, baseClass = classes {
         +ComponentType.Chip
         +("read-only".modifier() `when` readOnly)
         +classes

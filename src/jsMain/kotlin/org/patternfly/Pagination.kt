@@ -24,20 +24,22 @@ fun <T> HtmlElements.pfPagination(
     store: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination =
-    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, classes), content)
+    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, classes = classes), content)
 
 fun HtmlElements.pfPagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
+    id: String? = null,
     classes: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination {
     val store = PageInfoStore(pageInfo)
-    return register(Pagination(store, store.data, pageSizes, compact, classes), content)
+    return register(Pagination(store, store.data, pageSizes, compact, id = id, classes = classes), content)
 }
 
 // ------------------------------------------------------ tag
@@ -47,9 +49,10 @@ class Pagination internal constructor(
     val pageInfoFlow: Flow<PageInfo>,
     pageSizes: Array<Int>,
     compact: Boolean,
+    id: String?,
     classes: String?
 ) : PatternFlyComponent<HTMLDivElement>,
-    Div(baseClass = classes {
+    Div(id = id, baseClass = classes {
         +ComponentType.Pagination
         +("compact".modifier() `when` compact)
         +classes

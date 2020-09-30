@@ -6,14 +6,18 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfIcon(iconClass: String, classes: String? = null, content: Icon.() -> Unit = {}): Icon =
-    register(Icon(iconClass, classes), content)
+fun HtmlElements.pfIcon(
+    iconClass: String,
+    id: String? = null,
+    classes: String? = null,
+    content: Icon.() -> Unit = {}
+): Icon = register(Icon(iconClass, id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String, classes: String?) :
+class Icon internal constructor(iconClass: String, id: String?, classes: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("i", baseClass = classes {
+    TextElement("i", id = id, baseClass = classes {
         +ComponentType.Icon
         +iconClass
         +classes

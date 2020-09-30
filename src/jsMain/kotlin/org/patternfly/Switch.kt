@@ -17,13 +17,16 @@ import org.w3c.dom.HTMLLabelElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSwitch(classes: String? = null, content: Switch.() -> Unit = {}): Switch =
-    register(Switch(classes), content)
+fun HtmlElements.pfSwitch(
+    id: String? = null,
+    classes: String? = null,
+    content: Switch.() -> Unit = {}
+): Switch = register(Switch(id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Switch internal constructor(classes: String?) :
-    PatternFlyComponent<HTMLLabelElement>, Label(baseClass = classes(ComponentType.Switch, classes)) {
+class Switch internal constructor(id: String?, classes: String?) :
+    PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, classes)) {
 
     var label: Flow<String>
         get() = with(labelTag.domNode.textContent) {
@@ -56,11 +59,11 @@ class Switch internal constructor(classes: String?) :
 
     init {
         markAs(ComponentType.Switch)
-        val id = Id.unique("switch")
-        val onId = Id.unique("switch-on")
-        val offId = Id.unique("switch-off")
-        domNode.htmlFor = id
-        input = input(id = id, baseClass = "switch".component("input")) {
+        val inputId = Id.unique(ComponentType.Switch.id, "chk")
+        val onId = Id.unique(ComponentType.Switch.id, "on")
+        val offId = Id.unique(ComponentType.Switch.id, "off")
+        domNode.htmlFor = inputId
+        input = input(id = inputId, baseClass = "switch".component("input")) {
             type = const("checkbox")
             aria["labelledby"] = onId
         }

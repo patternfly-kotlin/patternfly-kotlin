@@ -6,17 +6,17 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSelect(classes: String? = null, content: Select.() -> Unit = {}): Select =
-    register(Select(classes), content)
+fun HtmlElements.pfSelect(
+    id: String? = null,
+    classes: String? = null,
+    content: Select.() -> Unit = {}
+): Select = register(Select(id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class Select internal constructor(classes: String?) :
+class Select internal constructor(id: String?, classes: String?) :
     PatternFlyComponent<HTMLDivElement>,
-    Div(baseClass = classes {
-        +ComponentType.Select
-        +classes
-    }) {
+    Div(id = id, baseClass = classes(ComponentType.Select, classes)) {
     init {
         markAs(ComponentType.Select)
     }

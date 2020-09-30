@@ -18,66 +18,79 @@ import org.w3c.dom.HTMLUListElement
 
 fun <T> HtmlElements.pfDataList(
     store: ItemStore<T>,
+    id: String? = null,
     classes: String? = null,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(store, classes), content)
+): DataList<T> = register(DataList(store, id = id, classes = classes), content)
 
 fun <T> DataListRow<T>.pfDataListAction(
+    id: String? = null,
     classes: String? = null,
     content: DataListAction.() -> Unit = {}
-): DataListAction = register(DataListAction(classes), content)
+): DataListAction = register(DataListAction(id = id, classes = classes), content)
 
-fun <T> DataListContent<T>.pfDataListCell(
+fun DataListContent.pfDataListCell(
+    id: String? = null,
     classes: String? = null,
-    content: DataListCell<T>.() -> Unit = {}
-): DataListCell<T> = register(DataListCell(this.itemStore, this.item, classes), content)
+    content: DataListCell.() -> Unit = {}
+): DataListCell = register(DataListCell(id = id, classes = classes), content)
 
 fun <T> DataListControl<T>.pfDataListCheck(
+    id: String? = null,
     classes: String? = null,
     content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.itemStore, this.item, classes), content)
+): DataListCheck<T> = register(DataListCheck(this.itemStore, this.item, id = id, classes = classes), content)
 
 fun <T> DataListRow<T>.pfDataListContent(
+    id: String? = null,
     classes: String? = null,
-    content: DataListContent<T>.() -> Unit = {}
-): DataListContent<T> = register(DataListContent(this.itemStore, this.item, classes), content)
+    content: DataListContent.() -> Unit = {}
+): DataListContent = register(DataListContent(id = id, classes = classes), content)
 
 fun <T> DataListRow<T>.pfDataListControl(
+    id: String? = null,
     classes: String? = null,
     content: DataListControl<T>.() -> Unit = {}
-): DataListControl<T> = register(DataListControl(this.itemStore, this.item, this.dataListItem, classes), content)
+): DataListControl<T> =
+    register(DataListControl(this.itemStore, this.item, this.dataListItem, id = id, classes = classes), content)
 
 fun <T> DataListItem<T>.pfDataListExpandableContent(
+    id: String? = Id.unique(ComponentType.DataList.id, "ec"),
     classes: String? = null,
     content: DataListExpandableContent<T>.() -> Unit = {}
-): DataListExpandableContent<T> = register(DataListExpandableContent(this, classes), content)
+): DataListExpandableContent<T> = register(DataListExpandableContent(this, id = id, classes = classes), content)
 
 fun <T> DataListExpandableContent<T>.pfDataListExpandableContentBody(
+    id: String? = null,
     classes: String? = null,
-    content: DataListExpandableContentBody<T>.() -> Unit = {}
-): DataListExpandableContentBody<T> =
-    register(DataListExpandableContentBody(classes), content)
+    content: DataListExpandableContentBody.() -> Unit = {}
+): DataListExpandableContentBody =
+    register(DataListExpandableContentBody(id = id, classes = classes), content)
 
 fun <T> DataList<T>.pfDataListItem(
     item: T,
+    id: String? = rowId(itemStore.identifier, item),
     classes: String? = null,
     content: DataListItem<T>.() -> Unit = {}
-): DataListItem<T> = register(DataListItem(this.itemStore, item, classes), content)
+): DataListItem<T> = register(DataListItem(this.itemStore, item, id = id, classes = classes), content)
 
 fun <T> DataListItem<T>.pfDataListRow(
+    id: String? = null,
     classes: String? = null,
     content: DataListRow<T>.() -> Unit = {}
-): DataListRow<T> = register(DataListRow(this.itemStore, this.item, this, classes), content)
+): DataListRow<T> = register(DataListRow(this.itemStore, this.item, this, id = id, classes = classes), content)
 
 fun <T> DataListControl<T>.pfDataListToggle(
+    id: String? = Id.unique(ComponentType.DataList.id, "tgl"),
     classes: String? = null,
     content: DataListToggle<T>.() -> Unit = {}
-): DataListToggle<T> = register(DataListToggle(this.itemStore, this.item, this.dataListItem, classes), content)
+): DataListToggle<T> =
+    register(DataListToggle(this.itemStore, this.item, this.dataListItem, id = id, classes = classes), content)
 
 // ------------------------------------------------------ tag
 
-class DataList<T> internal constructor(internal val itemStore: ItemStore<T>, classes: String?) :
-    PatternFlyComponent<HTMLUListElement>, Ul(baseClass = classes(ComponentType.DataList, classes)) {
+class DataList<T> internal constructor(internal val itemStore: ItemStore<T>, id: String?, classes: String?) :
+    PatternFlyComponent<HTMLUListElement>, Ul(id = id, baseClass = classes(ComponentType.DataList, classes)) {
 
     lateinit var display: (T) -> DataListItem<T>
 
@@ -90,25 +103,28 @@ class DataList<T> internal constructor(internal val itemStore: ItemStore<T>, cla
     }
 }
 
-class DataListAction internal constructor(classes: String?) :
-    Div(baseClass = classes("data-list".component("item-action"), classes))
+class DataListAction internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("data-list".component("item-action"), classes))
 
-class DataListCell<T> internal constructor(itemStore: ItemStore<T>, item: T, classes: String?) :
-    Div(baseClass = classes("data-list".component("cell"), classes)) {
+class DataListCell internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("data-list".component("cell"), classes)) {
     init {
-        attr("rowId", rowId(itemStore.identifier, item))
+        domNode.closest(By.classname("data-list".component("item")))?.let {
+            attr("rowId", it.id)
+        }
     }
 }
 
 class DataListCheck<T> internal constructor(
     private val itemStore: ItemStore<T>,
     private val item: T,
+    id: String?,
     classes: String?
-) : Div(baseClass = classes("data-list".component("check"), classes)) {
+) : Div(id = id, baseClass = classes("data-list".component("check"), classes)) {
     init {
         input {
-            val id = Id.unique(ComponentType.DataList.id, "chk")
-            name = const(id)
+            val inputId = Id.unique(ComponentType.DataList.id, "chk")
+            name = const(inputId)
             domNode.type = "checkbox"
 //            type = const("checkbox") // this causes visual flickering
             aria["invalid"] = false
@@ -121,13 +137,12 @@ class DataListCheck<T> internal constructor(
     }
 }
 
-class DataListContent<T> internal constructor(
-    internal val itemStore: ItemStore<T>,
-    internal val item: T,
-    classes: String?
-) : Div(baseClass = classes("data-list".component("item-content"), classes)) {
+class DataListContent internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("data-list".component("item-content"), classes)) {
     init {
-        attr("rowId", rowId(itemStore.identifier, item))
+        domNode.closest(By.classname("data-list".component("item")))?.let {
+            attr("rowId", it.id)
+        }
     }
 }
 
@@ -135,30 +150,37 @@ class DataListControl<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     internal val item: T,
     internal val dataListItem: DataListItem<T>,
+    id: String?,
     classes: String?
-) : Div(baseClass = classes("data-list".component("item-control"), classes))
+) : Div(id = id, baseClass = classes("data-list".component("item-control"), classes))
 
-class DataListExpandableContent<T> internal constructor(dataListItem: DataListItem<T>, classes: String?) :
-    TextElement("section", baseClass = classes("data-list".component("expandable-content"), classes)) {
+class DataListExpandableContent<T> internal constructor(
+    dataListItem: DataListItem<T>,
+    id: String?,
+    classes: String?
+) : TextElement(
+    "section",
+    id = id,
+    baseClass = classes("data-list".component("expandable-content"), classes)
+) {
     init {
-        val id = Id.unique(ComponentType.DataList.id, "ec")
-        domNode.id = id
         domNode.hidden = true // tp prevent flickering during updates
-        dataListItem.toggleButton?.let {
-            it.aria["controls"] = id
+        if (dataListItem.toggleButton != null && id != null) {
+            dataListItem.toggleButton!!.aria["controls"] = id
         }
         dataListItem.expanded.data.map { !it }.bindAttr("hidden")
     }
 }
 
-class DataListExpandableContentBody<T> internal constructor(classes: String?) :
-    Div(baseClass = classes("data-list".component("expandable-content", "body"), classes))
+class DataListExpandableContentBody internal constructor(id: String?, classes: String?) :
+    Div(id = id, baseClass = classes("data-list".component("expandable-content", "body"), classes))
 
 class DataListItem<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     internal val item: T,
+    id: String?,
     classes: String?
-) : Li(id = rowId<T>(itemStore.identifier, item), baseClass = classes("data-list".component("item"), classes)) {
+) : Li(id = id, baseClass = classes("data-list".component("item"), classes)) {
 
     val expanded: CollapseExpandStore = CollapseExpandStore()
     internal var toggleButton: HTMLButtonElement? = null
@@ -173,10 +195,13 @@ class DataListRow<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     internal val item: T,
     internal val dataListItem: DataListItem<T>,
+    id: String?,
     classes: String?
-) : Div(baseClass = classes("data-list".component("item-row"), classes)) {
+) : Div(id = id, baseClass = classes("data-list".component("item-row"), classes)) {
     init {
-        attr("rowId", rowId(itemStore.identifier, item))
+        domNode.closest(By.classname("data-list".component("item")))?.let {
+            attr("rowId", it.id)
+        }
     }
 }
 
@@ -184,12 +209,11 @@ class DataListToggle<T> internal constructor(
     private val itemStore: ItemStore<T>,
     private val item: T,
     private val dataListItem: DataListItem<T>,
+    id: String?,
     classes: String?
 ) : Div(baseClass = classes("data-list".component("toggle"), classes)) {
     init {
-        val id = Id.unique(ComponentType.DataList.id, "tgl")
-        pfButton("plain".modifier()) {
-            domNode.id = id
+        pfButton(id = id, classes = "plain".modifier()) {
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["labelledby"] = "$id ${this@DataListToggle.itemStore.identifier(this@DataListToggle.item)}"
             aria["label"] = "Details"

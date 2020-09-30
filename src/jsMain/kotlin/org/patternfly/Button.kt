@@ -8,14 +8,23 @@ import org.w3c.dom.HTMLButtonElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfButton(classes: String? = null, content: Button.() -> Unit = {}): Button =
-    register(Button(classes), content)
+fun HtmlElements.pfButton(
+    id: String? = null,
+    classes: String? = null,
+    content: Button.() -> Unit = {}
+): Button =  register(Button(id = id, classes = classes), content)
 
-fun HtmlElements.pfLinkButton(classes: String? = null, content: LinkButton.() -> Unit = {}): LinkButton =
-    register(LinkButton(classes), content)
+fun HtmlElements.pfLinkButton(
+    id: String? = null,
+    classes: String? = null,
+    content: LinkButton.() -> Unit = {}
+): LinkButton = register(LinkButton(id = id, classes = classes), content)
 
-fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Unit = {}): Span =
-    span(baseClass = classes {
+fun Button.pfIcon(
+    position: Position,
+    iconClass: String,
+    content: Icon.() -> Unit = {}
+): Span = span(baseClass = classes {
         +"button".component("icon")
         +position.modifier
     }) {
@@ -24,17 +33,17 @@ fun Button.pfIcon(position: Position, iconClass: String, content: Icon.() -> Uni
 
 // ------------------------------------------------------ tag
 
-class Button internal constructor(classes: String?) :
+class Button internal constructor(id: String?, classes: String?) :
     PatternFlyComponent<HTMLButtonElement>,
-    dev.fritz2.dom.html.Button(baseClass = classes(ComponentType.Button, classes)) {
+    dev.fritz2.dom.html.Button(id = id, baseClass = classes(ComponentType.Button, classes)) {
     init {
         markAs(ComponentType.Button)
     }
 }
 
-class LinkButton internal constructor(classes: String?) :
+class LinkButton internal constructor(id: String?, classes: String?) :
     PatternFlyComponent<HTMLAnchorElement>,
-    A(baseClass = classes(ComponentType.Button, classes)) {
+    A(id = id, baseClass = classes(ComponentType.Button, classes)) {
     init {
         markAs(ComponentType.Button)
     }
