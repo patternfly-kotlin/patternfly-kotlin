@@ -102,9 +102,10 @@ class ChipGroup<T> internal constructor(
                     val visibleItems = if (expanded) items else items.take(limit)
                     visibleItems.forEach { item ->
                         li(baseClass = "chip-group".component("list-item")) {
-                            this@ChipGroup.display(item).apply {
+                            val chip = this@ChipGroup.display(item)
+                            register(chip) {
                                 val chipId = this@ChipGroup.store.identifier(item)
-                                closes.map { chipId } handledBy this@ChipGroup.store.remove
+                                it.closes.map { chipId } handledBy this@ChipGroup.store.remove
                             }
                         }
                     }
