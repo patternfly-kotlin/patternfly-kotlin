@@ -25,9 +25,9 @@ import org.w3c.dom.events.MouseEvent
 fun HtmlElements.pfAlertGroup(
     toast: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: AlertGroup.() -> Unit = {}
-): AlertGroup = register(AlertGroup(toast, id = id, classes = classes), content)
+): AlertGroup = register(AlertGroup(toast, id = id, baseClass = baseClass), content)
 
 fun HtmlElements.pfAlert(
     severity: Severity,
@@ -35,9 +35,9 @@ fun HtmlElements.pfAlert(
     closable: Boolean = false,
     inline: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Alert.() -> Unit = {}
-): Alert = register(Alert(severity, text, closable, inline, id = id, classes = classes), content)
+): Alert = register(Alert(severity, text, closable, inline, id = id, baseClass = baseClass), content)
 
 fun AlertGroup.pfAlert(
     severity: Severity,
@@ -45,38 +45,38 @@ fun AlertGroup.pfAlert(
     closable: Boolean = false,
     inline: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Alert.() -> Unit = {}
 ): Li = register(li("alert-group".component("item")) {
-    pfAlert(severity, text, closable, inline, id = id, classes = classes) {
+    pfAlert(severity, text, closable, inline, id = id, baseClass = baseClass) {
         content(this)
     }
 }, {})
 
 fun Alert.pfAlertDescription(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(div(id = id, baseClass = classes("alert".component("description"), classes)) {
+): Div = register(div(id = id, baseClass = classes("alert".component("description"), baseClass)) {
         content()
     }, {})
 
 fun Alert.pfAlertActionGroup(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(div(id = id, baseClass = classes("alert".component("action-group"), classes)) {
+): Div = register(div(id = id, baseClass = classes("alert".component("action-group"), baseClass)) {
         content()
     }, {})
 
 // ------------------------------------------------------ tag
 
-class AlertGroup internal constructor(toast: Boolean, id: String?, classes: String?) :
+class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLUListElement>,
     Ul(id = id, baseClass = classes {
         +ComponentType.AlertGroup
         +("toast".modifier() `when` toast)
-        +classes
+        +baseClass
     }) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
@@ -114,12 +114,12 @@ class Alert internal constructor(
     closable: Boolean = false,
     inline: Boolean = false,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.Alert
     +severity.modifier
     +("inline".modifier() `when` inline)
-    +classes
+    +baseClass
 }) {
 
     private var closeButton: Button? = null

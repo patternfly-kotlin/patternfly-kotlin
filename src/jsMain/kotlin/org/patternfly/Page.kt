@@ -8,14 +8,14 @@ import org.w3c.dom.HTMLDivElement
 
 fun HtmlElements.pfPage(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Page.() -> Unit = {}
-): Page = register(Page(id = id, classes = classes), content)
+): Page = register(Page(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Page internal constructor(id: String?, classes: String?) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, classes)) {
+class Page internal constructor(id: String?, baseClass: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, baseClass)) {
     init {
         markAs(ComponentType.Page)
     }

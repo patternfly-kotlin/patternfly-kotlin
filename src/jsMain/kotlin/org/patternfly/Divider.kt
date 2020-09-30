@@ -12,14 +12,14 @@ import org.w3c.dom.HTMLElement
 fun HtmlElements.pfDivider(
     variant: DividerVariant = DividerVariant.HR,
     id: String? = null,
-    classes: String? = null
+    baseClass: String? = null
 ): Tag<HTMLElement> =
     when (variant) {
-        DividerVariant.HR -> register(Hr(id = id, baseClass = classes("divider".component(), classes)), {})
-        DividerVariant.DIV -> register(Div(id = id, baseClass = classes("divider".component(), classes)).apply {
+        DividerVariant.HR -> register(Hr(id = id, baseClass = classes("divider".component(), baseClass)), {})
+        DividerVariant.DIV -> register(Div(id = id, baseClass = classes("divider".component(), baseClass)).apply {
             attr("role", "separator")
         }, {})
-        DividerVariant.LI -> register(Li(id = id, baseClass = classes("divider".component(), classes)).apply {
+        DividerVariant.LI -> register(Li(id = id, baseClass = classes("divider".component(), baseClass)).apply {
             attr("role", "separator")
         }, {})
     }

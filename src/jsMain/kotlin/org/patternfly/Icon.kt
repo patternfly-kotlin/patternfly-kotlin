@@ -9,18 +9,18 @@ import org.w3c.dom.HTMLElement
 fun HtmlElements.pfIcon(
     iconClass: String,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Icon.() -> Unit = {}
-): Icon = register(Icon(iconClass, id = id, classes = classes), content)
+): Icon = register(Icon(iconClass, id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String, id: String?, classes: String?) :
+class Icon internal constructor(iconClass: String, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
     TextElement("i", id = id, baseClass = classes {
         +ComponentType.Icon
         +iconClass
-        +classes
+        +baseClass
     }) {
     init {
         markAs(ComponentType.Icon)

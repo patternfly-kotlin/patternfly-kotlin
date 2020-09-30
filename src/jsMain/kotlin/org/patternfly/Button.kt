@@ -10,40 +10,37 @@ import org.w3c.dom.HTMLButtonElement
 
 fun HtmlElements.pfButton(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Button.() -> Unit = {}
-): Button =  register(Button(id = id, classes = classes), content)
+): Button = register(Button(id = id, baseClass = baseClass), content)
 
 fun HtmlElements.pfLinkButton(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: LinkButton.() -> Unit = {}
-): LinkButton = register(LinkButton(id = id, classes = classes), content)
+): LinkButton = register(LinkButton(id = id, baseClass = baseClass), content)
 
 fun Button.pfIcon(
     position: Position,
     iconClass: String,
     content: Icon.() -> Unit = {}
-): Span = span(baseClass = classes {
-        +"button".component("icon")
-        +position.modifier
-    }) {
-        pfIcon(iconClass, content = content)
-    }
+): Span = span(baseClass = classes("button".component("icon"), position.modifier)) {
+    pfIcon(iconClass, content = content)
+}
 
 // ------------------------------------------------------ tag
 
-class Button internal constructor(id: String?, classes: String?) :
+class Button internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLButtonElement>,
-    dev.fritz2.dom.html.Button(id = id, baseClass = classes(ComponentType.Button, classes)) {
+    dev.fritz2.dom.html.Button(id = id, baseClass = classes(ComponentType.Button, baseClass)) {
     init {
         markAs(ComponentType.Button)
     }
 }
 
-class LinkButton internal constructor(id: String?, classes: String?) :
+class LinkButton internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLAnchorElement>,
-    A(id = id, baseClass = classes(ComponentType.Button, classes)) {
+    A(id = id, baseClass = classes(ComponentType.Button, baseClass)) {
     init {
         markAs(ComponentType.Button)
     }

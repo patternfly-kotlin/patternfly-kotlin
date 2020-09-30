@@ -31,43 +31,43 @@ fun <T> HtmlElements.pfDropdown(
     align: Align? = null,
     up: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, align, up, id = id, classes = classes), content)
+): Dropdown<T> = register(Dropdown(store, align, up, id = id, baseClass = baseClass), content)
 
 fun <T> Dropdown<T>.pfDropdownToggle(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
-    classes: String? = null,
+    baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, id = id, classes = classes), content)
+): DropdownToggle<T> = register(DropdownToggle(this, id = id, baseClass = baseClass), content)
 
 fun <T> Dropdown<T>.pfDropdownToggleKebab(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
-    classes: String? = null,
+    baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
-): DropdownToggle<T> = register(DropdownToggle(this, id = id, classes = classes).apply {
+): DropdownToggle<T> = register(DropdownToggle(this, id = id, baseClass = baseClass).apply {
     icon = { pfIcon("ellipsis-v".fas()) }
 }, content)
 
 fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
-): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, id = id, classes = classes), content)
+): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, id = id, baseClass = baseClass), content)
 
 fun <T> Dropdown<T>.pfDropdownToggleAction(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: DropdownToggleAction<T>.() -> Unit = {}
-): DropdownToggleAction<T> = register(DropdownToggleAction(this, id = id, classes = classes), content)
+): DropdownToggleAction<T> = register(DropdownToggleAction(this, id = id, baseClass = baseClass), content)
 
 fun <T> Dropdown<T>.pfDropdownItems(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
 ): DropdownEntries<HTMLUListElement, T> {
     val element = this.register(
-        DropdownEntries<HTMLUListElement, T>(this, "ul", id = id, classes = classes), {})
+        DropdownEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass), {})
     val items = ItemsBuilder<T>().apply(block).build()
     action(items) handledBy this.store.update
     return element
@@ -75,11 +75,11 @@ fun <T> Dropdown<T>.pfDropdownItems(
 
 fun <T> Dropdown<T>.pfDropdownGroups(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
 ): DropdownEntries<HTMLDivElement, T> {
     val element = this.register(
-        DropdownEntries<HTMLDivElement, T>(this, "div", id = id, classes = classes), {})
+        DropdownEntries<HTMLDivElement, T>(this, "div", id = id, baseClass = baseClass), {})
     val groups = GroupsBuilder<T>().apply(block).build()
     action(groups) handledBy this.store.update
     return element
@@ -92,12 +92,12 @@ open class Dropdown<T> internal constructor(
     internal val dropdownAlign: Align?,
     up: Boolean,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.Dropdown
     +dropdownAlign?.modifier
     +("top".modifier() `when` up)
-    +classes
+    +baseClass
 }) {
     lateinit var toggle: DropdownToggleBase<out HTMLElement, T>
 
@@ -140,8 +140,8 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
     private val dropdown: Dropdown<T>,
     tagName: String,
     id: String?,
-    classes: String?,
-) : Tag<E>(tagName = tagName, id = id, baseClass = classes), WithText<E> {
+    baseClass: String?,
+) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
 
     internal lateinit var toggleId: String
     abstract var disabled: Flow<Boolean>
@@ -160,16 +160,12 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
 class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
-    classes: String?,
+    baseClass: String?,
 ) : DropdownToggleBase<HTMLButtonElement, T>(
     dropdown = dropdown,
     tagName = "button",
     id = id,
-    classes = classes {
-        +"dropdown".component("toggle")
-        +classes
-    }) {
-
+    baseClass = classes("dropdown".component("toggle"), baseClass)) {
     init {
         initToggle(this)
     }
@@ -213,15 +209,15 @@ enum class TriState { OFF, INDETERMINATE, ON }
 class DropdownToggleCheckbox<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
-    classes: String?,
+    baseClass: String?,
 ) : DropdownToggleBase<HTMLDivElement, T>(
     dropdown = dropdown,
     tagName = "div",
     id = id,
-    classes = classes {
+    baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
-        +classes
+        +baseClass
     }) {
 
     private val labelTag: Label
@@ -296,16 +292,16 @@ class DropdownToggleCheckbox<T> internal constructor(
 class DropdownToggleAction<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : DropdownToggleBase<HTMLDivElement, T>(
     dropdown = dropdown,
     tagName = "div",
     id = id,
-    classes = classes {
+    baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
         +"action".modifier()
-        +classes
+        +baseClass
     }) {
 
     private var actionButton: Button? = null
@@ -343,11 +339,11 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
     private val dropdown: Dropdown<T>,
     tagName: String,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : Tag<E>(tagName = tagName, id = id, baseClass = classes {
     +"dropdown".component("menu")
     +dropdown.dropdownAlign?.modifier
-    +classes
+    +baseClass
 }) {
     init {
         attr("role", "menu")

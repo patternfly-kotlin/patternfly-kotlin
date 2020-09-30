@@ -19,14 +19,14 @@ import org.w3c.dom.HTMLLabelElement
 
 fun HtmlElements.pfSwitch(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Switch.() -> Unit = {}
-): Switch = register(Switch(id = id, classes = classes), content)
+): Switch = register(Switch(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Switch internal constructor(id: String?, classes: String?) :
-    PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, classes)) {
+class Switch internal constructor(id: String?, baseClass: String?) :
+    PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, baseClass)) {
 
     var label: Flow<String>
         get() = with(labelTag.domNode.textContent) {

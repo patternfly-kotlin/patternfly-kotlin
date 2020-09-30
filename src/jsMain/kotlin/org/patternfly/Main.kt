@@ -8,15 +8,15 @@ import org.w3c.dom.HTMLElement
 
 fun HtmlElements.pfMain(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Main.() -> Unit = {}
-): Main = register(Main(id = id, classes = classes), content)
+): Main = register(Main(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Main internal constructor(id: String?, classes: String?) :
+class Main internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("main", id = id, baseClass = classes(ComponentType.Main, classes)) {
+    TextElement("main", id = id, baseClass = classes(ComponentType.Main, baseClass)) {
     init {
         markAs(ComponentType.Main)
         attr("role", "main")

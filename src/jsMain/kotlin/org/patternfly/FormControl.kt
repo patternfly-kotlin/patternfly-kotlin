@@ -9,18 +9,18 @@ import dev.fritz2.dom.html.TextArea
 
 fun HtmlElements.pfInputFormControl(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Input.() -> Unit = {}
-): Input = register(Input(id = id, baseClass = classes("form-control".component(), classes)), content)
+): Input = register(Input(id = id, baseClass = classes("form-control".component(), baseClass)), content)
 
 fun HtmlElements.pfSelectFormControl(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Select.() -> Unit = {}
-): Select = register(Select(id = id, baseClass = classes("form-control".component(), classes)), content)
+): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass)), content)
 
 fun HtmlElements.pfTextareaFormControl(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: TextArea.() -> Unit = {}
-): TextArea = register(TextArea(id = id, baseClass = classes("form-control".component(), classes)), content)
+): TextArea = register(TextArea(id = id, baseClass = classes("form-control".component(), baseClass)), content)

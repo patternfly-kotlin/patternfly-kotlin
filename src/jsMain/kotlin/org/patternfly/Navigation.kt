@@ -23,70 +23,70 @@ fun <T> HtmlElements.pfHorizontalNavigation(
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
     tertiary: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
 ): Navigation<T> =
-    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, id = id, classes = classes, content), {})
+    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, id = id, baseClass = baseClass, content), {})
 
 fun <T> HtmlElements.pfVerticalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
 ): Navigation<T> =
-    register(Navigation(router, selected, Orientation.VERTICAL, false, id = id, classes = classes, content), {})
+    register(Navigation(router, selected, Orientation.VERTICAL, false, id = id, baseClass = baseClass, content), {})
 
 fun <T> Navigation<T>.pfNavigationGroup(
     text: String,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationGroup<T> = register(NavigationGroup(this, text, id = id, classes = classes, content), {})
+): NavigationGroup<T> = register(NavigationGroup(this, text, id = id, baseClass = baseClass, content), {})
 
 fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
     text: String,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationExpandableGroup<T> =
-    register(NavigationExpandableGroup(this.navigation, text, id = id, classes = classes, content), {})
+    register(NavigationExpandableGroup(this.navigation, text, id = id, baseClass = baseClass, content), {})
 
 fun <T> Navigation<T>.pfNavigationItems(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this, id = id, classes = classes), content)
+): NavigationItems<T> = register(NavigationItems(this, id = id, baseClass = baseClass), content)
 
 fun <T> NavigationGroup<T>.pfNavigationItems(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this.navigation, id = id, classes = classes), content)
+): NavigationItems<T> = register(NavigationItems(this.navigation, id = id, baseClass = baseClass), content)
 
 internal fun <T> TextElement.pfNavigationItems(
     navigation: Navigation<T>,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(navigation, id = id, classes = classes), content)
+): NavigationItems<T> = register(NavigationItems(navigation, id = id, baseClass = baseClass), content)
 
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     text: String,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     selected: ((route: T) -> Boolean)? = null
-): NavigationItem<T> = pfNavigationItem(item, id, classes, selected) { +text }
+): NavigationItem<T> = pfNavigationItem(item, id, baseClass, selected) { +text }
 
 fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     selected: ((route: T) -> Boolean)? = null,
     content: A.() -> Unit = {}
 ): NavigationItem<T> =
-    register(NavigationItem(this.navigation, item, selected, id = id, classes = classes, content), {})
+    register(NavigationItem(this.navigation, item, selected, id = id, baseClass = baseClass, content), {})
 
 // ------------------------------------------------------ tag
 
@@ -96,13 +96,13 @@ class Navigation<T>(
     orientation: Orientation,
     tertiary: Boolean,
     id: String?,
-    classes: String?,
+    baseClass: String?,
     content: Navigation<T>.() -> Unit
 ) : PatternFlyComponent<HTMLElement>,
     TextElement("nav", id = id, baseClass = classes {
         +ComponentType.Navigation
         +("horizontal".modifier() `when` (orientation == Orientation.HORIZONTAL))
-        +classes
+        +baseClass
     }) {
 
     init {
@@ -133,9 +133,9 @@ class NavigationGroup<T> internal constructor(
     internal val navigation: Navigation<T>,
     text: String,
     id: String?,
-    classes: String?,
+    baseClass: String?,
     content: NavigationItems<T>.() -> Unit
-) : Tag<HTMLElement>("section", id = id, baseClass = classes("nav".component("section"), classes)) {
+) : Tag<HTMLElement>("section", id = id, baseClass = classes("nav".component("section"), baseClass)) {
     init {
         h2("nav".component("section", "title"), id) { +text }
         pfNavigationItems {
@@ -148,12 +148,12 @@ class NavigationExpandableGroup<T>(
     private val navigation: Navigation<T>,
     text: String,
     id: String?,
-    classes: String?,
+    baseClass: String?,
     content: NavigationItems<T>.() -> Unit
 ) : Tag<HTMLLIElement>("li", id = id, baseClass = classes {
     +"nav".component("item")
     +"expandable".modifier()
-    +classes
+    +baseClass
 }) {
     private val expanded = CollapseExpandStore()
 
@@ -194,17 +194,17 @@ class NavigationExpandableGroup<T>(
     }
 }
 
-class NavigationItems<T>(internal val navigation: Navigation<T>, id: String?, classes: String?) :
-    Tag<HTMLUListElement>("ul", id = id, baseClass = classes("nav".component("list"), classes))
+class NavigationItems<T>(internal val navigation: Navigation<T>, id: String?, baseClass: String?) :
+    Tag<HTMLUListElement>("ul", id = id, baseClass = classes("nav".component("list"), baseClass))
 
 class NavigationItem<T>(
     private val navigation: Navigation<T>,
     private val item: T,
     private val selected: ((route: T) -> Boolean)?,
     id: String?,
-    classes: String?,
+    baseClass: String?,
     content: A.() -> Unit
-) : Tag<HTMLLIElement>("li", id = id, baseClass = classes("nav".component("item"), classes)) {
+) : Tag<HTMLLIElement>("li", id = id, baseClass = classes("nav".component("item"), baseClass)) {
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo

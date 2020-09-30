@@ -16,133 +16,133 @@ import org.w3c.dom.HTMLElement
 fun <T> HtmlElements.pfCardView(
     store: ItemStore<T>,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardView<T>.() -> Unit = {}
-): CardView<T> = register(CardView(store, id = id, classes = classes), content)
+): CardView<T> = register(CardView(store, id = id, baseClass = baseClass), content)
 
 fun <T> CardView<T>.pfCard(
     item: T,
     selectable: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Card<T>.() -> Unit = {}
-): Card<T> = register(Card(this.itemStore, item, selectable, id = id, classes = classes), content)
+): Card<T> = register(Card(this.itemStore, item, selectable, id = id, baseClass = baseClass), content)
 
 fun <T> Card<T>.pfCardHeader(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardHeader<T>.() -> Unit = {}
-): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, classes = classes), content)
+): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass), content)
 
 fun <T> CardHeader<T>.pfCardHeaderMain(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardHeaderMain<T>.() -> Unit = {}
-): CardHeaderMain<T> = register(CardHeaderMain(this.item, id = id, classes = classes), content)
+): CardHeaderMain<T> = register(CardHeaderMain(this.item, id = id, baseClass = baseClass), content)
 
 fun <T> CardHeader<T>.pfCardActions(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardActions<T>.() -> Unit = {}
-): CardActions<T> = register(CardActions(this.itemStore, this.item, this.card, id = id, classes = classes), content)
+): CardActions<T> = register(CardActions(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
 
 fun <T> CardHeader<T>.pfCardTitle(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, classes = classes), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
 fun <T> CardActions<T>.pfCardCheckbox(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardCheckbox<T>.() -> Unit = {}
-): CardCheckbox<T> = register(CardCheckbox(this.itemStore, this.item, this.card, id = id, classes = classes), content)
+): CardCheckbox<T> = register(CardCheckbox(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
 
 fun <T> Card<T>.pfCardTitle(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, classes = classes), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
 fun <T> Card<T>.pfCardBody(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardBody.() -> Unit = {}
-): CardBody = register(CardBody(id = id, classes = classes), content)
+): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
 
 fun <T> Card<T>.pfCardFooter(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
-): CardFooter = register(CardFooter(id = id, classes = classes), content)
+): CardFooter = register(CardFooter(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ plain card dsl
 
 fun HtmlElements.pfCard(
     selectable: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Card<Unit>.() -> Unit = {}
-): Card<Unit> = register(Card(null, null, selectable, id = id, classes = classes), content)
+): Card<Unit> = register(Card(null, null, selectable, id = id, baseClass = baseClass), content)
 
 fun Card<Unit>.pfCardHeader(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardHeader<Unit>.() -> Unit = {}
-): CardHeader<Unit> = register(CardHeader(null, null, this, id = id, classes = classes), content)
+): CardHeader<Unit> = register(CardHeader(null, null, this, id = id, baseClass = baseClass), content)
 
 fun CardHeader<Unit>.pfCardHeaderMain(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardHeaderMain<Unit>.() -> Unit = {}
-): CardHeaderMain<Unit> = register(CardHeaderMain(null, null, classes), content)
+): CardHeaderMain<Unit> = register(CardHeaderMain(null, null, baseClass), content)
 
 fun CardHeader<Unit>.pfCardActions(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardActions<Unit>.() -> Unit = {}
-): CardActions<Unit> = register(CardActions(null, null, this.card, id = id, classes = classes), content)
+): CardActions<Unit> = register(CardActions(null, null, this.card, id = id, baseClass = baseClass), content)
 
 fun CardHeader<Unit>.pfCardTitle(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, classes = classes), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
 fun CardActions<Unit>.pfCardCheckbox(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardCheckbox<Unit>.() -> Unit = {}
-): CardCheckbox<Unit> = register(CardCheckbox(null, null, this.card, id = id, classes = classes), content)
+): CardCheckbox<Unit> = register(CardCheckbox(null, null, this.card, id = id, baseClass = baseClass), content)
 
 fun Card<Unit>.pfCardTitle(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, classes = classes), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
 fun Card<Unit>.pfCardBody(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardBody.() -> Unit = {}
-): CardBody = register(CardBody(id = id, classes = classes), content)
+): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
 
 fun Card<Unit>.pfCardFooter(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
-): CardFooter = register(CardFooter(id = id, classes = classes), content)
+): CardFooter = register(CardFooter(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
 class CardView<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +"gallery".layout()
     +"gutter".modifier()
-    +classes
+    +baseClass
 }) {
     lateinit var display: (T) -> Card<T>
 
@@ -159,11 +159,11 @@ class Card<T> internal constructor(
     internal val item: T?,
     internal val selectable: Boolean,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLElement>, TextElement("article", id = id, baseClass = classes {
     +ComponentType.Card
     +("selectable".modifier() `when` selectable)
-    +classes
+    +baseClass
 }) {
     val selected = CardStore()
 
@@ -189,22 +189,22 @@ class CardHeader<T> internal constructor(
     internal val item: T?,
     internal val card: Card<T>,
     id: String?,
-    classes: String?
-) : Div(id = id, baseClass = classes("card".component("header"), classes))
+    baseClass: String?
+) : Div(id = id, baseClass = classes("card".component("header"), baseClass))
 
 class CardHeaderMain<T> internal constructor(
     internal val item: T?,
     id: String?,
-    classes: String?
-) : Div(id = id, baseClass = classes("card".component("header", "main"), classes))
+    baseClass: String?
+) : Div(id = id, baseClass = classes("card".component("header", "main"), baseClass))
 
 class CardActions<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val card: Card<T>,
     id: String?,
-    classes: String?
-) : Div(id = id, baseClass = classes("card".component("actions"), classes)) {
+    baseClass: String?
+) : Div(id = id, baseClass = classes("card".component("actions"), baseClass)) {
     init {
         if (card.selectable) {
             domNode.onclick = { it.stopPropagation() }
@@ -217,8 +217,8 @@ class CardCheckbox<T> internal constructor(
     item: T?,
     card: Card<T>,
     id: String?,
-    classes: String?
-) : Div(id = id, baseClass = classes("check".component(), classes)) {
+    baseClass: String?
+) : Div(id = id, baseClass = classes("check".component(), baseClass)) {
     init {
         input(baseClass = "check".component("input")) {
             domNode.type = "checkbox"
@@ -235,14 +235,14 @@ class CardCheckbox<T> internal constructor(
     }
 }
 
-class CardTitle(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("card".component("title"), classes))
+class CardTitle(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("card".component("title"), baseClass))
 
-class CardBody(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("card".component("body"), classes))
+class CardBody(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("card".component("body"), baseClass))
 
-class CardFooter(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("card".component("footer"), classes))
+class CardFooter(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("card".component("footer"), baseClass))
 
 // ------------------------------------------------------ store
 

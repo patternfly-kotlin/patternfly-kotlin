@@ -8,15 +8,15 @@ import org.w3c.dom.HTMLElement
 
 fun HtmlElements.pfSection(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Section.() -> Unit = {}
-): Section = register(Section(id = id, classes = classes), content)
+): Section = register(Section(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Section internal constructor(id: String?, classes: String?) :
+class Section internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("section", id = id, baseClass = classes(ComponentType.Section, classes)) {
+    TextElement("section", id = id, baseClass = classes(ComponentType.Section, baseClass)) {
 
     init {
         markAs(ComponentType.Section)

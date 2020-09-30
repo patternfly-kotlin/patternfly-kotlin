@@ -32,9 +32,9 @@ fun <T> HtmlElements.pfChipGroup(
     limit: Int = 3,
     closable: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: ChipGroup<T>.() -> Unit = {}
-): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, classes = classes), content)
+): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, baseClass = baseClass), content)
 
 fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
     val entries = ChipBuilder<T>().apply(block).build()
@@ -49,12 +49,12 @@ class ChipGroup<T> internal constructor(
     limit: Int,
     closable: Boolean,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>,
     Div(id = id, baseClass = classes {
         +ComponentType.ChipGroup
         +("category".modifier() `when` (text != null))
-        +classes
+        +baseClass
     }) {
 
     private var closeButton: Button? = null

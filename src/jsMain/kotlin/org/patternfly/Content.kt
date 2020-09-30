@@ -8,14 +8,14 @@ import org.w3c.dom.HTMLDivElement
 
 fun HtmlElements.pfContent(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Content.() -> Unit = {}
-): Content = register(Content(id = id, classes = classes), content)
+): Content = register(Content(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Content internal constructor(id: String?, classes: String?) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Content, classes)) {
+class Content internal constructor(id: String?, baseClass: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Content, baseClass)) {
     init {
         markAs(ComponentType.Content)
     }

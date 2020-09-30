@@ -7,24 +7,24 @@ import org.w3c.dom.HTMLDivElement
 
 fun Page.pfSidebar(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Sidebar.() -> Unit = {}
-): Sidebar = register(Sidebar(id = id, classes = classes), content)
+): Sidebar = register(Sidebar(id = id, baseClass = baseClass), content)
 
 fun Sidebar.pfSidebarBody(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: SidebarBody.() -> Unit = {}
-): SidebarBody = register(SidebarBody(id = id, classes = classes), content)
+): SidebarBody = register(SidebarBody(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class Sidebar(id: String?, classes: String?) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Sidebar, classes)) {
+class Sidebar(id: String?, baseClass: String?) :
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Sidebar, baseClass)) {
     init {
         markAs(ComponentType.Sidebar)
     }
 }
 
-class SidebarBody(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("page".component("sidebar", "body"), classes))
+class SidebarBody(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("page".component("sidebar", "body"), baseClass))

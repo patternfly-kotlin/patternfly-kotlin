@@ -25,21 +25,21 @@ fun <T> HtmlElements.pfPagination(
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination =
-    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, classes = classes), content)
+    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass), content)
 
 fun HtmlElements.pfPagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination {
     val store = PageInfoStore(pageInfo)
-    return register(Pagination(store, store.data, pageSizes, compact, id = id, classes = classes), content)
+    return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass), content)
 }
 
 // ------------------------------------------------------ tag
@@ -50,12 +50,12 @@ class Pagination internal constructor(
     pageSizes: Array<Int>,
     compact: Boolean,
     id: String?,
-    classes: String?
+    baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>,
     Div(id = id, baseClass = classes {
         +ComponentType.Pagination
         +("compact".modifier() `when` compact)
-        +classes
+        +baseClass
     }) {
 
     private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()
@@ -87,7 +87,7 @@ class Pagination internal constructor(
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
-                    this@Pagination.controlElements.add(pfButton(classes = "plain".modifier()) {
+                    this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to first page"
                         disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
                         clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
@@ -96,7 +96,7 @@ class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
-                this@Pagination.controlElements.add(pfButton(classes = "plain".modifier()) {
+                this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to previous page"
                     disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
                     clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
@@ -125,7 +125,7 @@ class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
-                this@Pagination.controlElements.add(pfButton(classes = "plain".modifier()) {
+                this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to next page"
                     disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                     clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
@@ -134,7 +134,7 @@ class Pagination internal constructor(
             }
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
-                    this@Pagination.controlElements.add(pfButton(classes = "plain".modifier()) {
+                    this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to last page"
                         disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                         clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage

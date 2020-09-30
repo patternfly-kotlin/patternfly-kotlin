@@ -19,18 +19,18 @@ import org.w3c.dom.events.MouseEvent
 fun HtmlElements.pfChip(
     readOnly: Boolean = false,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Chip.() -> Unit = {}
-): Chip = register(Chip(readOnly, id = id, classes = classes), content)
+): Chip = register(Chip(readOnly, id = id, baseClass = baseClass), content)
 
 fun Chip.pfBadge(
     min: Int = 0,
     max: Int = 999,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Badge.() -> Unit = {}
 ) {
-    insertBadge(this, register(Badge(min, max, id = id, classes = classes), content))
+    insertBadge(this, register(Badge(min, max, id = id, baseClass = baseClass), content))
 }
 
 private fun insertBadge(chip: Chip, badge: Badge) {
@@ -41,13 +41,13 @@ private fun insertBadge(chip: Chip, badge: Badge) {
 
 // ------------------------------------------------------ tag
 
-class Chip internal constructor(readOnly: Boolean, id: String?, classes: String?) :
+class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(id = id, baseClass = classes {
         +ComponentType.Chip
         +("read-only".modifier() `when` readOnly)
-        +classes
+        +baseClass
     }) {
 
     private val textId = Id.unique(ComponentType.Chip.id, "txt")

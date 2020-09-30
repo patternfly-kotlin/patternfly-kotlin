@@ -8,14 +8,14 @@ import org.w3c.dom.HTMLDivElement
 
 fun HtmlElements.pfInputGroup(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: InputGroup.() -> Unit = {}
-): InputGroup = register(InputGroup(id = id, classes = classes), content)
+): InputGroup = register(InputGroup(id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
-class InputGroup internal constructor(id: String?, classes: String?) : PatternFlyComponent<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.InputGroup, classes)) {
+class InputGroup internal constructor(id: String?, baseClass: String?) : PatternFlyComponent<HTMLDivElement>,
+    Div(id = id, baseClass = classes(ComponentType.InputGroup, baseClass)) {
     init {
         markAs(ComponentType.InputGroup)
     }

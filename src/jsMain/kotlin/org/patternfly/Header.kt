@@ -8,22 +8,21 @@ import org.w3c.dom.HTMLElement
 
 fun Page.pfHeader(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Header.() -> Unit = {}
-): Header = register(Header(id = id, classes = classes), content)
+): Header = register(Header(id = id, baseClass = baseClass), content)
 
 fun Header.pfHeaderTools(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("page".component("header", "tools"), classes)), content)
+): Div = register(Div(id = id, baseClass = classes("page".component("header", "tools"), baseClass)), content)
 
 // ------------------------------------------------------ tag
 
-class Header internal constructor(id: String?, classes: String?) :
+class Header internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("header", id = id, baseClass = classes(ComponentType.Header, classes)) {
-
+    TextElement("header", id = id, baseClass = classes(ComponentType.Header, baseClass)) {
     init {
         markAs(ComponentType.Header)
         attr("role", "banner")

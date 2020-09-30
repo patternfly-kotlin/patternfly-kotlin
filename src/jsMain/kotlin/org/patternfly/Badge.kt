@@ -20,9 +20,9 @@ fun HtmlElements.pfBadge(
     min: Int = 0,
     max: Int = 999,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Badge.() -> Unit = {}
-): Badge = register(Badge(min, max, id = id, classes = classes), content)
+): Badge = register(Badge(min, max, id = id, baseClass = baseClass), content)
 
 // ------------------------------------------------------ tag
 
@@ -30,8 +30,8 @@ class Badge internal constructor(
     private val min: Int,
     private val max: Int,
     id: String? = null,
-    classes: String?
-) : PatternFlyComponent<HTMLSpanElement>, Span(id = id, baseClass = classes(ComponentType.Badge, classes)) {
+    baseClass: String?
+) : PatternFlyComponent<HTMLSpanElement>, Span(id = id, baseClass = classes(ComponentType.Badge, baseClass)) {
 
     var read: Flow<Boolean>
         get() = flowOf(true)

@@ -11,27 +11,27 @@ fun HtmlElements.pfEmptyState(
     title: String,
     size: Size? = null,
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyState = register(EmptyState(iconClass, title, size, id = id, classes = classes, content), {})
+): EmptyState = register(EmptyState(iconClass, title, size, id = id, baseClass = baseClass, content), {})
 
 fun EmptyState.pfEmptyStateContent(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyStateContent = register(EmptyStateContent(id = id, classes = classes), content)
+): EmptyStateContent = register(EmptyStateContent(id = id, baseClass = baseClass), content)
 
 fun EmptyStateContent.pfEmptyStateBody(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: EmptyStateBody.() -> Unit = {}
-): EmptyStateBody = register(EmptyStateBody(id = id, classes = classes), content)
+): EmptyStateBody = register(EmptyStateBody(id = id, baseClass = baseClass), content)
 
 fun EmptyStateContent.pfEmptyStateSecondary(
     id: String? = null,
-    classes: String? = null,
+    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), classes)), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass)), content)
 
 // ------------------------------------------------------ tag
 
@@ -40,12 +40,12 @@ class EmptyState(
     title: String,
     size: Size?,
     id: String?,
-    classes: String?,
+    baseClass: String?,
     content: EmptyStateContent.() -> Unit
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.EmptyState
     +size?.modifier
-    +classes
+    +baseClass
 }) {
     init {
         markAs(ComponentType.EmptyState)
@@ -61,8 +61,8 @@ class EmptyState(
     }
 }
 
-class EmptyStateBody(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("empty-state".component("body"), classes))
+class EmptyStateBody(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("empty-state".component("body"), baseClass))
 
-class EmptyStateContent(id: String?, classes: String?) :
-    Div(id = id, baseClass = classes("empty-state".component("content"), classes))
+class EmptyStateContent(id: String?, baseClass: String?) :
+    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass))
