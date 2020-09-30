@@ -1,11 +1,14 @@
 package org.patternfly
 
 import dev.fritz2.dom.WithDomNode
+import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.render
 import org.w3c.dom.DOMTokenList
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.ParentNode
+import org.w3c.dom.asList
 
 // ------------------------------------------------------ token list
 
@@ -17,7 +20,7 @@ operator fun DOMTokenList.minusAssign(value: String) {
     this.remove(value)
 }
 
-// ------------------------------------------------------ node
+// ------------------------------------------------------ parent / child
 
 fun Node?.removeFromParent() {
     if (this != null && this.parentNode != null) {
@@ -25,13 +28,43 @@ fun Node?.removeFromParent() {
     }
 }
 
-// ------------------------------------------------------ element et al
+fun elements(content: HtmlElements.() -> Unit): List<Element> = render {
+    div { content(this) }
+}.domNode.children.asList()
+
+
+fun Element.addAll(elements: Elements) {
+    elements.forEach { this.append(it) }
+}
+
+interface Elements: Iterable<Element> {
+    val elements: List<Element>
+    override fun iterator(): Iterator<Element> = elements.iterator()
+}
+
+// ------------------------------------------------------ aria
 
 val WithDomNode<Element>.aria: Aria
     get() = Aria(this.domNode)
 
 val Element.aria: Aria
     get() = Aria(this)
+
+class Aria(private val element: Element) {
+
+    operator fun contains(name: String): Boolean = element.hasAttribute(name)
+
+    operator fun get(name: String): String = element.getAttribute(attributeSafeKey(name)) ?: ""
+
+    operator fun set(name: String, value: Any) {
+        element.setAttribute(attributeSafeKey(name), value.toString())
+    }
+
+    private fun attributeSafeKey(name: String) =
+        if (name.startsWith("aria-")) name else "aria-$name"
+}
+
+// ------------------------------------------------------ visibility
 
 var Element.hidden
     get() = getAttribute("hidden")?.toBoolean()
@@ -54,12 +87,20 @@ fun Element.hide() {
 }
 
 fun Element.show() {
-    this.unsafeCast<HTMLElement>().style.display = "unset"
+    this.unsafeCast<HTMLElement>().style.display = ""
 }
+
+// ------------------------------------------------------ selector
 
 fun Element.closest(selector: By): Element? = this.closest(selector.selector)
 
 fun Element.matches(selector: By): Boolean = this.matches(selector.selector)
+
+fun ParentNode.querySelector(selector: By) = this.querySelector(selector.selector)
+
+fun ParentNode.querySelectorAll(selector: By) = this.querySelectorAll(selector.selector)
+
+// ------------------------------------------------------ debug
 
 fun Element.debug(): String = buildString {
     append("<${tagName.toLowerCase()}")
@@ -72,22 +113,4 @@ fun Element.debug(): String = buildString {
         }
     }
     append("/>")
-}
-
-fun ParentNode.querySelector(selector: By) = this.querySelector(selector.selector)
-
-fun ParentNode.querySelectorAll(selector: By) = this.querySelectorAll(selector.selector)
-
-class Aria(private val element: Element) {
-
-    operator fun contains(name: String): Boolean = element.hasAttribute(name)
-
-    operator fun get(name: String): String = element.getAttribute(attributeSafeKey(name)) ?: ""
-
-    operator fun set(name: String, value: Any) {
-        element.setAttribute(attributeSafeKey(name), value.toString())
-    }
-
-    private fun attributeSafeKey(name: String) =
-        if (name.startsWith("aria-")) name else "aria-$name"
 }
