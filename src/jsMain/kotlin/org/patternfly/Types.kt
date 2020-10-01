@@ -20,8 +20,6 @@ import org.w3c.dom.set
 
 const val COMPONENT_TYPE = "pfct"
 
-typealias AsText<T> = (T) -> String
-
 typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
 
 internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
@@ -69,7 +67,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     ChipGroup("cpg", "chip-group".component()),
     Content("cnt", "content".component()),
     DataList("dl", "data-list".component()),
-    DataTable("dt", "data-table".component()),
+    DataTable("dt", "table".component()),
     Drawer("dw", "drawer".component()),
     Dropdown("dd", "dropdown".component()),
     EmptyState("es", "empty-state".component()),

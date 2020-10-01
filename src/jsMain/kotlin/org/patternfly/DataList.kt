@@ -9,7 +9,6 @@ import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
-import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
@@ -69,7 +68,7 @@ fun <T> DataListExpandableContent<T>.pfDataListExpandableContentBody(
 
 fun <T> DataList<T>.pfDataListItem(
     item: T,
-    id: String? = rowId(itemStore.identifier, item),
+    id: String? = "${itemStore.identifier(item)}-row",
     baseClass: String? = null,
     content: DataListItem<T>.() -> Unit = {}
 ): DataListItem<T> = register(DataListItem(this.itemStore, item, id = id, baseClass = baseClass), content)
@@ -225,7 +224,3 @@ class DataListToggle<T> internal constructor(
         }
     }
 }
-
-// ------------------------------------------------------ internals
-
-private fun <T> rowId(identifier: IdProvider<T, String>, item: T): String = "${identifier(item)}-row"

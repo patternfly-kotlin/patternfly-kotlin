@@ -10,7 +10,7 @@ fun String.util(): String = "pf-u-$this"
 
 fun String.fas() = "fas fa-$this"
 
-fun String.pfIcon() = "pf-icon pf-icon-$this"
+fun String.pfIcon() = "pficon pf-$this"
 
 private fun combine(prefix: String, main: String, elements: Array<out String>): String = buildString {
     append("$prefix-$main")
