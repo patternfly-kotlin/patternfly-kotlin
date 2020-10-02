@@ -17,9 +17,9 @@ private fun combine(prefix: String, main: String, elements: Array<out String>): 
     if (elements.isNotEmpty()) elements.joinTo(this, "-", "__")
 }
 
-inline fun classes(builderAction: ClassBuilder.() -> Unit): String = ClassBuilder().apply { builderAction() }.build()
+inline fun classes(builderAction: ClassBuilder.() -> Unit): String? = ClassBuilder().apply { builderAction() }.build()
 
-fun classes(vararg classes: String): String = classes.joinToString(" ")
+fun classes(vararg classes: String): String? = classes.joinToString(" ").ifEmpty { null }
 
 internal fun classes(componentType: ComponentType, optionalClass: String? = null): String? =
     classes(componentType.baseClass, optionalClass)
@@ -47,5 +47,5 @@ class ClassBuilder {
         }
     }
 
-    fun build() = builder.toString().trim()
+    fun build(): String? = builder.toString().trim().ifEmpty { null }
 }
