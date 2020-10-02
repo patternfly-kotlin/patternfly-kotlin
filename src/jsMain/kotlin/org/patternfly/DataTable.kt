@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.each
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Caption
+import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Table
 import dev.fritz2.dom.html.Td
@@ -41,66 +42,61 @@ fun DataTableColumns.pfDataTableColumn(
     content: DataTableColumn.() -> Unit = {}
 ): DataTableColumn = register(DataTableColumn(id = id, baseClass = baseClass), content)
 
-fun <T> DataTable<T>.pfDataTableRows(display: (T) -> DataTableRowBase<T>) {
-    registerRows(display)
-}
-
 fun <T> DataTable<T>.pfDataTableRow(block: DataTableRow<T>.() -> Unit = {}): DataTableRow<T> =
     DataTableRow<T>().apply(block)
 
-/*
 fun <T> DataTable<T>.pfDataTableExpandableRow(
-    item: T,
-    content: DataTableExpandableRow<T>.() -> Unit = {}
-): DataTableExpandableRow<T> = DataTableExpandableRow()
-
-fun <T> DataTableExpandableRow<T>.pfDataTableExpandableContent(
-    content: DataTableExpandableRow<T>.() -> Unit = {}
-) {
-
-}
-*/
+    block: DataTableExpandableRow<T>.() -> Unit = {}
+): DataTableExpandableRow<T> = DataTableExpandableRow<T>().apply(block)
 
 fun <T> DataTableRowBase<T>.pfDataTableCell(
     label: String? = null,
     id: String? = null,
     baseClass: String? = null,
-    content: DataTableCell.() -> Unit = {}
+    content: Td.() -> Unit = {}
 ) {
-    cells.add(DataTableCell(label, id = id, baseClass = baseClass, content))
+    cellBuilders.add(CellBuilder(label, id, baseClass, content))
+}
+
+fun <T> DataTableExpandableRow<T>.pfDataTableExpandableContent(
+    id: String? = null,
+    baseClass: String? = null,
+    content: Div.() -> Unit = {}
+) {
+    expandableContentBuilder = ExpandableContentBuilder(
+        id,
+        classes("table".component("expandable-row", "content"), baseClass),
+        content
+    )
 }
 
 fun test() {
     val store = ItemStore<String> { it }
     render {
-        pfDataTable(store) {
+        pfDataTable(store, expandable = true) {
             pfDataTableColumns {
                 pfDataTableColumn { +"First name" }
                 pfDataTableColumn { +"Last name" }
                 pfDataTableColumn { +"Birthday" }
             }
-            pfDataTableRows { item ->
+            display = { item ->
 /*
-                pfDataTableExpandableRow(item) {
-                    pfDataTableCell {
-
-                    }
-                    pfDataTableCell {
-
-                    }
-                    pfDataTableCell {
-
-                    }
-                    pfDataTableExpandableContent {
-
-                    }
-                }
-*/
                 pfDataTableRow {
                     pfDataTableCell("Item") { +item }
                     pfDataTableCell(id = "unique") { +"Empty" }
                     pfDataTableCell(baseClass = "foo") {
                         pfButton(baseClass = "link".modifier()) { +"Click me" }
+                    }
+                }
+*/
+                pfDataTableExpandableRow {
+                    pfDataTableCell("Item") { +item }
+                    pfDataTableCell(id = "unique") { +"Empty" }
+                    pfDataTableCell(baseClass = "foo") {
+                        pfButton(baseClass = "link".modifier()) { +"Click me" }
+                    }
+                    pfDataTableExpandableContent(id = "some-id", baseClass = "some-class") {
+                        +"Lorem ipsum"
                     }
                 }
             }
@@ -121,16 +117,57 @@ class DataTable<T> internal constructor(
     +("expandable".modifier() `when` expandable)
     +baseClass
 }) {
-    lateinit var display: (T) -> DataTableRowBase<T>
+    var display: (T) -> DataTableRowBase<T> = { DataTableRow() }
+        set(value) {
+            bindRows(value)
+            field = value
+        }
 
     init {
         attr("role", "grid")
         markAs(ComponentType.DataTable)
     }
 
-    internal fun registerRows(display: (T) -> DataTableRowBase<T>) {
+    private fun bindRows(display: (T) -> DataTableRowBase<T>) {
         if (expandable) {
-            TODO("Expandable table not yet implemented")
+            itemStore.visible.each { itemStore.identifier(it) }.render { item ->
+                when (val row = display(item)) {
+                    is DataTableRow -> {
+                        console.warn(
+                            """
+pfDataTableRow() was used for the display of a pfDataTable() with expandable=true.
+Consider using pfDataTableExpandableRow() and pfDataTableExpandableContent() or set expandable=false.
+Related data table is: '${this@DataTable.domNode.debug()}'""".trimIndent()
+                        )
+                        tbody {
+                            attr("role", "rowgroup")
+                            tr {
+                                this@DataTable.renderRow(this, item, row)
+                            }
+                        }
+                    }
+                    is DataTableExpandableRow<T> -> {
+                        tbody {
+                            attr("role", "rowgroup")
+                            tr {
+                                this@DataTable.renderRow(this, item, row)
+                            }
+                            tr(baseClass = "table".component("expandable-row")) {
+                                attr("role", "row")
+                                td {
+                                    attr("role", "cell")
+                                    div(
+                                        id = row.expandableContentBuilder.id,
+                                        baseClass = row.expandableContentBuilder.baseClass
+                                    ) {
+                                        row.expandableContentBuilder.content(this)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }.bind()
         } else {
             tbody {
                 attr("role", "rowgroup")
@@ -138,27 +175,36 @@ class DataTable<T> internal constructor(
                     when (val row = display(item)) {
                         is DataTableRow -> {
                             tr {
-                                attr("role", "row")
-                                attr("rowId", "${this@DataTable.itemStore.identifier(item)}-row")
-                                row.cells.forEach { cell ->
-                                    register(cell) { td ->
-                                        td.attr("role", "cell")
-                                        cell.label?.let { label ->
-                                            td.domNode.dataset["label"] = label
-                                        }
-                                        cell.content(td)
-                                    }
-                                }
+                                this@DataTable.renderRow(this, item, row)
                             }
                         }
                         is DataTableExpandableRow<T> -> {
-                            console.warn("Expandable row not supported for ${this@DataTable.domNode.debug()}")
+                            console.warn(
+                                """
+pfDataTableExpandableRow() was used for the display of a pfDataTable() without expandable=true.
+Any expandable content was omitted. Please use either pfDataTableRow() or set expandable=true.
+Related data table is: '${this@DataTable.domNode.debug()}'""".trimIndent()
+                            )
                             tr {
-                                !"Expandable row not supported for ${this@DataTable.domNode.debug()}"
+                                this@DataTable.renderRow(this, item, row)
                             }
                         }
                     }
                 }.bind()
+            }
+        }
+    }
+
+    private fun renderRow(tr: Tr, item: T, row: DataTableRowBase<T>) {
+        with(tr) {
+            attr("role", "row")
+            attr("rowId", "${this@DataTable.itemStore.identifier(item)}-row")
+            row.cellBuilders.forEach { cell ->
+                td(id = cell.id, baseClass = cell.baseClass) {
+                    attr("role", "cell")
+                    cell.label?.let { domNode.dataset["label"] = it }
+                    cell.content(this)
+                }
             }
         }
     }
@@ -197,17 +243,27 @@ class DataTableColumn(id: String?, baseClass: String?) : Th(id = id, baseClass =
     }
 }
 
+// ------------------------------------------------------ row and cell builders
+
 sealed class DataTableRowBase<T> {
-    internal val cells: MutableList<DataTableCell> = mutableListOf()
+    internal val cellBuilders: MutableList<CellBuilder> = mutableListOf()
 }
 
 class DataTableRow<T> : DataTableRowBase<T>()
 
-class DataTableExpandableRow<T> : DataTableRowBase<T>()
+class DataTableExpandableRow<T> : DataTableRowBase<T>() {
+    internal lateinit var expandableContentBuilder: ExpandableContentBuilder
+}
 
-class DataTableCell(
-    internal val label: String?,
-    id: String?,
-    baseClass: String?,
-    internal val content: DataTableCell.() -> Unit
-) : Td(id = id, baseClass = baseClass)
+internal data class CellBuilder(
+    val label: String?,
+    val id: String?,
+    val baseClass: String?,
+    val content: Td.() -> Unit
+)
+
+internal data class ExpandableContentBuilder(
+    val id: String?,
+    val baseClass: String?,
+    val content: Div.() -> Unit
+)
