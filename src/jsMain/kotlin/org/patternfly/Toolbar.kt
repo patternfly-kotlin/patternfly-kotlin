@@ -4,7 +4,6 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -183,15 +182,7 @@ class SortOptions<T> internal constructor(
             }
         }
 
-/*
-        // TODO Select property and order based on ItemStore.sortInfo
-        itemStore.data
-            .map {  items ->
-                if (items.sortInfo != null) {
-                    SortProperty<T>(items.sortInfo.id, items.sortInfo.text, items.sortInfo.comparator)
-                } else null
-            }.filterNotNull()
-*/
+        // TODO Update selection when ItemStore.sortWith has changed
 
         store.selection.unwrap()
             .map { items ->
@@ -202,7 +193,7 @@ class SortOptions<T> internal constructor(
                 } else {
                     null
                 }
-            }.filterNotNull().distinctUntilChanged() handledBy itemStore.sortWith
+            }.filterNotNull() handledBy itemStore.sortWith
     }
 }
 
@@ -226,6 +217,12 @@ class SortProperty<T>(val id: String, text: String, val comparator: Comparator<T
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
+    override fun toString(): String {
+        return "SortProperty(id=$id)"
+    }
+
+
 }
 
 class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending") {
@@ -239,5 +236,9 @@ class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" 
 
     override fun hashCode(): Int {
         return ascending.hashCode()
+    }
+
+    override fun toString(): String {
+        return "SortOrder(ascending=$ascending)"
     }
 }

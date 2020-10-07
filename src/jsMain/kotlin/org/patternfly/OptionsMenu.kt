@@ -233,6 +233,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 }) {
     init {
         attr("role", "menu")
+        attr("hidden", "true")
         aria["labelledby"] = optionsMenu.toggle.toggleId
         optionsMenu.ces.data.map { !it }.bindAttr("hidden")
         optionsMenu.store.data.each().render { entry ->
@@ -282,7 +283,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                 attr("disabled", "true")
                 domNode.classList += "disabled".modifier()
             }
-            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.toggle
+            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.selectItem
             this@OptionsMenuEntries.optionsMenu.display(item).invoke(this)
             if (item.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
@@ -297,25 +298,42 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val toggle: SimpleHandler<Item<T>> = handle { entries, item ->
-        entries.map { entry ->
+    internal val select: SimpleHandler<T> = handle { entries, item ->
+        val wrappedItem = entries.flatMap { entry ->
             when (entry) {
-                is Item<T> -> handleSelection(entry, item)
-                is Group<T> -> {
-                    if (entry.id == item.group?.id) {
-                        val groupItems = entry.items.map { groupEntry ->
-                            when (groupEntry) {
-                                is Item<T> -> handleSelection(groupEntry, item)
-                                else -> groupEntry
-                            }
-                        }
-                        entry.copy(items = groupItems)
-                    } else {
-                        entry
-                    }
-                }
-                else -> entry
+                is Item<T> -> listOf(entry)
+                is Group<T> -> entry.items
+                is Separator<T> -> emptyList()
             }
+        }.filterIsInstance<Item<T>>().find { it.item == item }
+        if (wrappedItem != null) {
+            handleEntries(entries, wrappedItem)
+        } else {
+            entries
+        }
+    }
+
+    internal val selectItem: SimpleHandler<Item<T>> = handle { entries, item ->
+        handleEntries(entries, item)
+    }
+
+    private fun handleEntries(entries: List<Entry<T>>, item: Item<T>): List<Entry<T>> = entries.map { entry ->
+        when (entry) {
+            is Item<T> -> handleSelection(entry, item)
+            is Group<T> -> {
+                if (entry.id == item.group?.id) {
+                    val groupItems = entry.items.map { groupEntry ->
+                        when (groupEntry) {
+                            is Item<T> -> handleSelection(groupEntry, item)
+                            else -> groupEntry
+                        }
+                    }
+                    entry.copy(items = groupItems)
+                } else {
+                    entry
+                }
+            }
+            else -> entry
         }
     }
 
