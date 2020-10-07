@@ -4,6 +4,7 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -71,7 +72,7 @@ fun <T> ToolbarItem.pfBulkSelect(
 
 fun <T> ToolbarItem.pfSortOptions(
     itemStore: ItemStore<T>,
-    options: Map<String, Comparator<T>>,
+    options: List<SortInfo<T>>,
     id: String? = null,
     baseClass: String? = null,
     content: SortOptions<T>.() -> Unit = {}
@@ -122,11 +123,7 @@ class ToolbarItem internal constructor(id: String?, baseClass: String?) :
 class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass))
 
-enum class PreSelection(val text: String) {
-    NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
-}
-
-class BulkSelect<T>(itemStore: ItemStore<T>, id: String?, baseClass: String?) :
+class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?) :
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass) {
 
     init {
@@ -159,12 +156,12 @@ class BulkSelect<T>(itemStore: ItemStore<T>, id: String?, baseClass: String?) :
     }
 }
 
-sealed class SortOption(val text: String)
-class SortProperty<T>(text: String, val comparator: Comparator<T>) : SortOption(text)
-class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending")
-
-class SortOptions<T>(itemStore: ItemStore<T>, options: Map<String, Comparator<*>>, id: String?, baseClass: String?) :
-    OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, id = id, baseClass = baseClass) {
+class SortOptions<T> internal constructor(
+    itemStore: ItemStore<T>,
+    options: List<SortInfo<T>>,
+    id: String?,
+    baseClass: String?
+) : OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, id = id, baseClass = baseClass) {
 
     init {
         display = {
@@ -173,21 +170,74 @@ class SortOptions<T>(itemStore: ItemStore<T>, options: Map<String, Comparator<*>
         pfOptionsMenuToggle { icon = { pfIcon("sort-amount-down".fas()) } }
         pfOptionsMenuGroups {
             pfGroup {
-                options.map { (name, comparator) ->
-                    pfItem(SortProperty(name, comparator))
+                options.forEach {
+                    pfItem(SortProperty(it.id, it.text, it.comparator))
                 }
             }
             pfSeparator()
             pfGroup {
-                pfItem(SortOrder(true)) { selected = true }
+                pfItem(SortOrder(true)) {
+                    selected = true
+                }
                 pfItem(SortOrder(false))
             }
         }
+
+/*
+        // TODO Select property and order based on ItemStore.sortInfo
+        itemStore.data
+            .map {  items ->
+                if (items.sortInfo != null) {
+                    SortProperty<T>(items.sortInfo.id, items.sortInfo.text, items.sortInfo.comparator)
+                } else null
+            }.filterNotNull()
+*/
+
         store.selection.unwrap()
             .map { items ->
                 val property = items.filterIsInstance<SortProperty<T>>().firstOrNull()
-                val order = items.filterIsInstance<SortOrder>().first()
-                if (order.ascending) property?.comparator else property?.comparator?.reversed()
-            }.filterNotNull() handledBy itemStore.sortWith
+                val order = items.filterIsInstance<SortOrder>().firstOrNull()
+                if (property != null && order != null) {
+                    SortInfo(property.id, property.text, property.comparator, order.ascending)
+                } else {
+                    null
+                }
+            }.filterNotNull().distinctUntilChanged() handledBy itemStore.sortWith
+    }
+}
+
+// ------------------------------------------------------ types
+
+enum class PreSelection(val text: String) {
+    NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
+}
+
+sealed class SortOption(var text: String)
+
+class SortProperty<T>(val id: String, text: String, val comparator: Comparator<T>) : SortOption(text) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+        other as SortProperty<*>
+        if (id != other.id) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
+
+class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending") {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+        other as SortOrder
+        if (ascending != other.ascending) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return ascending.hashCode()
     }
 }

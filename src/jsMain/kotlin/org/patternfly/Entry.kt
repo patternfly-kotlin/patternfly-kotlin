@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.map
 
 fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
 
+fun <T> pfGroups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
+
 fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }

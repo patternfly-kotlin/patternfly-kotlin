@@ -8,7 +8,6 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldContainKeys
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
@@ -22,7 +21,7 @@ open class ItemTests : FunSpec({
             items.shouldBeEmpty()
             filters.shouldBeEmpty()
             selected.shouldBeEmpty()
-            comparator shouldBe null
+            sortInfo shouldBe null
         }
     }
 
@@ -34,7 +33,7 @@ open class ItemTests : FunSpec({
                 items shouldContainInOrder numbers
                 filters.shouldBeEmpty()
                 selected.shouldBeEmpty()
-                comparator shouldBe null
+                sortInfo shouldBe null
             }
         }
     }
@@ -83,18 +82,20 @@ open class ItemTests : FunSpec({
         val numbers = listOf(2, 65, 7, 89, 33, 123, 38, 75)
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 
-        numberItems = numberItems.sortWith(naturalOrder())
+        val asc = SortInfo<Int>("nat", "Natural", naturalOrder())
+        numberItems = numberItems.sortWith(asc)
         with(numberItems) {
             all shouldContainInOrder numbers
             items shouldContainInOrder listOf(2, 7, 33, 38, 65, 75, 89, 123)
-            comparator shouldNotBe null
+            sortInfo shouldBe asc
         }
 
-        numberItems = numberItems.sortWith(naturalOrder<Int>().reversed())
+        val desc = asc.toggle()
+        numberItems = numberItems.sortWith(desc)
         with(numberItems) {
             all shouldContainInOrder numbers
             items shouldContainInOrder listOf(123, 89, 75, 65, 38, 33, 7, 2)
-            comparator shouldNotBe null
+            sortInfo shouldBe desc
         }
     }
 

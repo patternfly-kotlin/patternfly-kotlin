@@ -40,7 +40,19 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) :
     }
     val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
 
-    val sortWith: Handler<Comparator<T>> = handle { items, comparator ->
-        items.sortWith(comparator)
+    val sortWith: Handler<SortInfo<T>> = handle { items, sortInfo ->
+        items.sortWith(sortInfo)
+    }
+    val sortOrToggle: Handler<SortInfo<T>> = handle { items, sortInfo ->
+        val newSortInfo = if (items.sortInfo == null) {
+            sortInfo
+        } else {
+            if (items.sortInfo.id == sortInfo.id) {
+                items.sortInfo.toggle()
+            } else {
+                sortInfo
+            }
+        }
+        items.sortWith(newSortInfo)
     }
 }

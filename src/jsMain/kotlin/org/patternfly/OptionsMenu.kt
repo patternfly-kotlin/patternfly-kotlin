@@ -1,6 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.SingleMountPoint
 import dev.fritz2.binding.action
 import dev.fritz2.binding.each
@@ -296,7 +297,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val toggle = handle<Item<T>> { entries, item ->
+    internal val toggle: SimpleHandler<Item<T>> = handle { entries, item ->
         entries.map { entry ->
             when (entry) {
                 is Item<T> -> handleSelection(entry, item)

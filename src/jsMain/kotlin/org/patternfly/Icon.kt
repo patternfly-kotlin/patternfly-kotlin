@@ -2,12 +2,15 @@ package org.patternfly
 
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
 fun HtmlElements.pfIcon(
-    iconClass: String,
+    iconClass: String? = null,
     id: String? = null,
     baseClass: String? = null,
     content: Icon.() -> Unit = {}
@@ -15,15 +18,23 @@ fun HtmlElements.pfIcon(
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String, id: String?, baseClass: String?) :
+class Icon internal constructor(iconClass: String?, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("i", id = id, baseClass = classes {
-        +ComponentType.Icon
-        +iconClass
-        +baseClass
-    }) {
+    TextElement("i", id = id, baseClass = classes(ComponentType.Icon, baseClass)) {
+
+    var iconClass: Flow<String>
+        get() {
+            throw NotImplementedError()
+        }
+        set(value) {
+            (baseClass?.let { value.map { "$baseClass $it" } } ?: value).bindAttr("class")
+        }
+
     init {
         markAs(ComponentType.Icon)
         attr("aria-hidden", "true")
+        iconClass?.let {
+            it.split(' ').forEach { c -> domNode.classList += c }
+        }
     }
 }

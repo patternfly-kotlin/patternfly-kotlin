@@ -13,7 +13,7 @@ data class Items<T>(
     val pageInfo: PageInfo = PageInfo(),
     val filters: Map<String, ItemFilter<T>> = emptyMap(),
     val selected: Set<String> = emptySet(), // selected identifiers
-    val comparator: Comparator<T>? = null
+    val sortInfo: SortInfo<T>? = null
 ) {
     val page: List<T>
         get() = if (items.isEmpty()) listOf() else {
@@ -27,21 +27,21 @@ data class Items<T>(
 
     fun addFilter(name: String, filter: ItemFilter<T>): Items<T> {
         val newFilters = filters + (name to filter)
-        val newItems = items(newFilters, comparator)
+        val newItems = items(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
     fun removeFilter(name: String): Items<T> {
         val newFilters = filters - name
-        val newItems = items(newFilters, comparator)
+        val newItems = items(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
-    fun sortWith(comparator: Comparator<T>): Items<T> {
-        val newItems = items(filters, comparator)
-        return copy(items = newItems, comparator = comparator)
+    fun sortWith(sortInfo: SortInfo<T>): Items<T> {
+        val newItems = items(filters, sortInfo)
+        return copy(items = newItems, sortInfo = sortInfo)
     }
 
     fun selectNone(): Items<T> = copy(selected = emptySet())
@@ -75,14 +75,16 @@ data class Items<T>(
         append(")")
     }
 
-    private fun items(filters: Map<String, ItemFilter<T>>, comparator: Comparator<T>?): List<T> =
+    private fun items(filters: Map<String, ItemFilter<T>>, sortInfo: SortInfo<T>?): List<T> =
         if (filters.isEmpty()) {
-            if (comparator != null) all.sortedWith(comparator) else all
+            if (sortInfo != null) {
+                all.sortedWith(sortInfo.effectiveComparator())
+            } else all
         } else {
             var sequence = all.asSequence()
             filters.values.forEach { sequence = sequence.filter(it) }
-            comparator?.let {
-                sequence = sequence.sortedWith(it)
+            sortInfo?.let {
+                sequence = sequence.sortedWith(it.effectiveComparator())
             }
             sequence.toList()
         }
@@ -148,6 +150,38 @@ data class PageInfo(
         const val DEFAULT_PAGE_SIZE = 10
         val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
     }
+}
+
+// Comparator is never reversed in SortInfo!
+// It's reversed in Items.items() when ascending == false
+class SortInfo<T>(
+    val id: String,
+    val text: String,
+    internal val comparator: Comparator<T>,
+    val ascending: Boolean = true
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as SortInfo<*>
+        if (id != other.id) return false
+        if (ascending != other.ascending) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + ascending.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "SortInfo(id=$id, ascending=$ascending)"
+    }
+
+    internal fun toggle(): SortInfo<T> = SortInfo(id, text, comparator, false)
+
+    internal fun effectiveComparator(): Comparator<T> = if (ascending) comparator else comparator.reversed()
 }
 
 private fun inBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)
