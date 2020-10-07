@@ -179,7 +179,7 @@ class SortInfo<T>(
         return "SortInfo(id=$id, ascending=$ascending)"
     }
 
-    internal fun toggle(): SortInfo<T> = SortInfo(id, text, comparator, false)
+    internal fun toggle(): SortInfo<T> = SortInfo(id, text, comparator, !ascending)
 
     internal fun effectiveComparator(): Comparator<T> = if (ascending) comparator else comparator.reversed()
 }
