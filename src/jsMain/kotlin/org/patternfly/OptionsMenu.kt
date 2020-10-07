@@ -283,7 +283,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                 attr("disabled", "true")
                 domNode.classList += "disabled".modifier()
             }
-            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.selectItem
+            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.select
             this@OptionsMenuEntries.optionsMenu.display(item).invoke(this)
             if (item.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
@@ -298,22 +298,7 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val select: SimpleHandler<T> = handle { entries, item ->
-        val wrappedItem = entries.flatMap { entry ->
-            when (entry) {
-                is Item<T> -> listOf(entry)
-                is Group<T> -> entry.items
-                is Separator<T> -> emptyList()
-            }
-        }.filterIsInstance<Item<T>>().find { it.item == item }
-        if (wrappedItem != null) {
-            handleEntries(entries, wrappedItem)
-        } else {
-            entries
-        }
-    }
-
-    internal val selectItem: SimpleHandler<Item<T>> = handle { entries, item ->
+    internal val select: SimpleHandler<Item<T>> = handle { entries, item ->
         handleEntries(entries, item)
     }
 
