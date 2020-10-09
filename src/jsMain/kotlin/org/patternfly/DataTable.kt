@@ -1,7 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.Patch
-import dev.fritz2.binding.Seq
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Caption
@@ -161,19 +159,10 @@ class DataTable<T> internal constructor(
         }
 
         if (columns.hasToggle) {
-            val seq = itemStore.visible.each { itemStore.identifier(it) }.render { item ->
+            // use shift(1) to keep the thead at index 0
+            itemStore.visible.each { itemStore.identifier(it) }.render { item ->
                 DataTableExpandableBody(this@DataTable, item)
-            }
-            // we have a thead at index 0!
-            val plusOneSeq = Seq(seq.data.map { patch ->
-                when (patch) {
-                    is Patch.Insert -> patch.copy(index = patch.index + 1)
-                    is Patch.InsertMany -> patch.copy(index = patch.index + 1)
-                    is Patch.Delete -> patch.copy(start = patch.start + 1)
-                    is Patch.Move -> patch.copy(from = patch.from + 1, to = patch.to + 1)
-                }
-            })
-            plusOneSeq.bind()
+            }.shift(1).bind()
         } else {
             tbody {
                 attr("role", "rowgroup")

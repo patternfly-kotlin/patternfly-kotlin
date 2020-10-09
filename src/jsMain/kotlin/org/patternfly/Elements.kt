@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.ParentNode
 import org.w3c.dom.asList
+import kotlin.math.floor
 
 // ------------------------------------------------------ token list
 
@@ -87,6 +88,28 @@ fun Element.hide() {
 
 fun Element.show() {
     this.unsafeCast<HTMLElement>().style.display = ""
+}
+
+fun Element?.isInView(container: Element?, partial: Boolean = false): Boolean {
+    if (this != null && container != null) {
+        val containerBounds = container.getBoundingClientRect()
+        val elementBounds = this.getBoundingClientRect()
+        val containerBoundsLeft = floor(containerBounds.left)
+        val containerBoundsRight = floor(containerBounds.right)
+        val elementBoundsLeft = floor(elementBounds.left)
+        val elementBoundsRight = floor(elementBounds.right)
+
+        // Check if in view
+        val totallyInView = elementBoundsLeft >= containerBoundsLeft && elementBoundsRight <= containerBoundsRight;
+        val partiallyInView = partial &&
+                ((elementBoundsLeft < containerBoundsLeft && elementBoundsRight > containerBoundsLeft) ||
+                        (elementBoundsRight > containerBoundsRight && elementBoundsLeft < containerBoundsRight))
+
+        // Return outcome
+        return totallyInView || partiallyInView;
+    } else {
+        return false
+    }
 }
 
 // ------------------------------------------------------ selector

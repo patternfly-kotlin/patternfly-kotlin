@@ -84,6 +84,7 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Select("sel", "select".component()),
     Sidebar("sb", "page".component("sidebar")),
     Switch("sw", "switch".component()),
+    Tabs("tbs"),
     Title("tlt", "title".component()),
     Toolbar("tb", "toolbar".component());
 }
