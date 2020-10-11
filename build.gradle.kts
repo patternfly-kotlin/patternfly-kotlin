@@ -1,7 +1,10 @@
+@file:Suppress("SpellCheckingInspection")
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform") version "1.4.10"
+    id("org.jetbrains.dokka") version "1.4.10"
     `maven-publish`
 }
 
@@ -25,7 +28,7 @@ kotlin {
         tasks.withType<KotlinCompile> {
             kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
         }
-        tasks.withType<Test> {
+        tasks.named<Test>("jvmTest") {
             useJUnitPlatform()
         }
     }
@@ -47,11 +50,13 @@ kotlin {
             }
         }
 
+        @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
             dependencies {
                 implementation("dev.fritz2:core:0.8-SNAPSHOT")
             }
         }
+        @Suppress("UNUSED_VARIABLE")
         val commonTest by getting {
             dependencies {
                 implementation("io.kotest:kotest-framework-api:4.2.5")
@@ -60,11 +65,13 @@ kotlin {
                 implementation("io.kotest:kotest-framework-engine:4.2.5")
             }
         }
+        @Suppress("UNUSED_VARIABLE")
         val jsMain by getting {
             dependencies {
                 implementation("dev.fritz2:core:0.8-SNAPSHOT")
             }
         }
+        @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
                 implementation("io.kotest:kotest-framework-api:4.2.5")

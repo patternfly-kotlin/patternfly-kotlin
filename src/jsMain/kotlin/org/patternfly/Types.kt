@@ -16,11 +16,11 @@ import org.w3c.dom.Text
 import org.w3c.dom.get
 import org.w3c.dom.set
 
-// ------------------------------------------------------ types
-
 const val COMPONENT_TYPE = "pfct"
 
 typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
+
+// ------------------------------------------------------ types
 
 internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
 
@@ -86,7 +86,8 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     Switch("sw", "switch".component()),
     Tabs("tbs"),
     Title("tlt", "title".component()),
-    Toolbar("tb", "toolbar".component());
+    Toolbar("tb", "toolbar".component()),
+    TreeView("tv", "tree-view".component());
 }
 
 enum class Align(val modifier: String) {
@@ -133,3 +134,5 @@ enum class Size(val modifier: String) {
     LG("lg".modifier()),
     MD("md".modifier())
 }
+
+enum class TriState { OFF, INDETERMINATE, ON }

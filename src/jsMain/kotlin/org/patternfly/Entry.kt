@@ -60,12 +60,6 @@ fun <T> Flow<List<Entry<T>>>.flatItems() = this.map {
     }.filterIsInstance<Item<T>>()
 }
 
-fun <T> Flow<List<Item<T>>>.unwrap(): Flow<List<T>> = this.map { items -> items.map { it.item } }
-
-fun <T> Flow<Item<T>>.unwrap(): Flow<T> = this.map { it.item }
-
-fun <T> Flow<Item<T>?>.unwrapOrNull(): Flow<T?> = this.map { it?.item }
-
 // ------------------------------------------------------ data classes
 
 /** Entry used in simple components like [Dropdown], [OptionsMenu] or [Select]. */
@@ -85,13 +79,13 @@ data class Group<T> internal constructor(
 }
 
 data class Item<T> internal constructor(
-    val item: T,
+    override val item: T,
     val disabled: Boolean,
     val selected: Boolean,
     val description: String,
     val icon: (Span.() -> Unit)?,
     internal var group: Group<T>?
-) : Entry<T>() {
+) : Entry<T>(), HasItem<T> {
     override fun toString(): String = buildString {
         append("Item(item=").append(item)
         append(", disabled=").append(disabled)

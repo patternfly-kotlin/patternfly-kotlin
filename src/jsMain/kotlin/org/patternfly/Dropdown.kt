@@ -204,8 +204,6 @@ class DropdownToggle<T> internal constructor(
         }
 }
 
-enum class TriState { OFF, INDETERMINATE, ON }
-
 class DropdownToggleCheckbox<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,

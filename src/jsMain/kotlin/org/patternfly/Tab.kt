@@ -107,7 +107,7 @@ class Tabs<T> internal constructor(
                     }) {
                         button(id = this@Tabs.tabId(tab.item), baseClass = "tabs".component("link")) {
                             aria["controls"] = this@Tabs.contentId(tab.item)
-                            clicks.map { tab.item } handledBy this@Tabs.store.select
+                            clicks.map { tab } handledBy this@Tabs.store.select
                             if (tab.icon != null) {
                                 span(baseClass = "tabs".component("item", "icon")) {
                                     tab.icon.invoke(this)
@@ -245,8 +245,8 @@ class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
 class TabStore<T>(val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
-    val select: SimpleHandler<T> = handle { items, item ->
-        items.map { if (identifier(it.item) == identifier(item)) it.select() else it.unselect() }
+    val select: SimpleHandler<TabItem<T>> = handle { items, tab ->
+        items.map { if (identifier(it.item) == identifier(tab.item)) it.select() else it.unselect() }
     }
 }
 
@@ -259,11 +259,11 @@ data class ScrollButton(
 )
 
 class TabItem<T>(
-    val item: T,
+    override val item: T,
     val selected: Boolean = false,
     internal val icon: (Span.() -> Unit)? = null,
     internal val content: TabContent<T>.() -> Unit = {}
-) {
+) : HasItem<T> {
     internal fun select(): TabItem<T> = TabItem(item, true, icon, content)
     internal fun unselect(): TabItem<T> = TabItem(item, false, icon, content)
 }
