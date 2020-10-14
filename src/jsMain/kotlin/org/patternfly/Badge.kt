@@ -16,7 +16,7 @@ import kotlin.math.max
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfBadge(
+public fun HtmlElements.pfBadge(
     min: Int = 0,
     max: Int = 999,
     id: String? = null,
@@ -26,14 +26,14 @@ fun HtmlElements.pfBadge(
 
 // ------------------------------------------------------ tag
 
-class Badge internal constructor(
+public class Badge internal constructor(
     private val min: Int,
     private val max: Int,
     id: String? = null,
     baseClass: String?
 ) : PatternFlyComponent<HTMLSpanElement>, Span(id = id, baseClass = classes(ComponentType.Badge, baseClass)) {
 
-    var read: Flow<Boolean>
+    public var read: Flow<Boolean>
         get() = flowOf(true)
         set(value) {
             classMap = value.map { mapOf("read".modifier() to it, "unread".modifier() to !it) }
@@ -44,7 +44,7 @@ class Badge internal constructor(
         classMap = read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) }
     }
 
-    fun Flow<Int>.bind(): SingleMountPoint<WithDomNode<Text>> {
+    public fun Flow<Int>.bind(): SingleMountPoint<WithDomNode<Text>> {
         val upstream = this.map {
             val lower = max(it, min)
             val upper = if (lower > max) "$max+" else lower.toString()

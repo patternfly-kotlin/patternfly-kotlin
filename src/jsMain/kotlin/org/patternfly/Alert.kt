@@ -22,14 +22,14 @@ import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfAlertGroup(
+public fun HtmlElements.pfAlertGroup(
     toast: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: AlertGroup.() -> Unit = {}
 ): AlertGroup = register(AlertGroup(toast, id = id, baseClass = baseClass), content)
 
-fun HtmlElements.pfAlert(
+public fun HtmlElements.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
@@ -39,7 +39,7 @@ fun HtmlElements.pfAlert(
     content: Alert.() -> Unit = {}
 ): Alert = register(Alert(severity, text, closable, inline, id = id, baseClass = baseClass), content)
 
-fun AlertGroup.pfAlert(
+public fun AlertGroup.pfAlert(
     severity: Severity,
     text: String,
     closable: Boolean = false,
@@ -53,7 +53,7 @@ fun AlertGroup.pfAlert(
     }
 }, {})
 
-fun Alert.pfAlertDescription(
+public fun Alert.pfAlertDescription(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
@@ -61,7 +61,7 @@ fun Alert.pfAlertDescription(
         content()
     }, {})
 
-fun Alert.pfAlertActionGroup(
+public fun Alert.pfAlertActionGroup(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
@@ -71,7 +71,7 @@ fun Alert.pfAlertActionGroup(
 
 // ------------------------------------------------------ tag
 
-class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?) :
+public class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLUListElement>,
     Ul(id = id, baseClass = classes {
         +ComponentType.AlertGroup
@@ -108,7 +108,7 @@ class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: St
     }
 }
 
-class Alert internal constructor(
+public class Alert internal constructor(
     private val severity: Severity,
     private val text: String,
     closable: Boolean = false,
@@ -124,7 +124,7 @@ class Alert internal constructor(
 
     private var closeButton: Button? = null
 
-    val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
+    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {
                 val listener: (Event) -> Unit = {

@@ -9,22 +9,23 @@ import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ dsl
 
-fun Header.pfBrandContainer(
+public fun Header.pfBrandContainer(
     id: String? = null,
     baseClass: String? = null,
     content: BrandContainer.() -> Unit = {}
-): BrandContainer = register(BrandContainer(id = id, baseClass = classes("page".component("header", "brand"), baseClass)), content)
+): BrandContainer =
+    register(BrandContainer(id = id, baseClass = classes("page".component("header", "brand"), baseClass)), content)
 
-fun BrandContainer.pfBrandLink(
+public fun BrandContainer.pfBrandLink(
     homeLink: String,
     id: String? = null,
     baseClass: String? = null,
     content: A.() -> Unit = {}
 ): A = register(A(id = id, baseClass = classes("page".component("header", "brand", "link"), baseClass)).apply {
-        href = const(homeLink)
-    }, content)
+    href = const(homeLink)
+}, content)
 
-fun HtmlElements.pfBrand(
+public fun HtmlElements.pfBrand(
     src: String,
     id: String? = null,
     baseClass: String? = null,
@@ -33,7 +34,7 @@ fun HtmlElements.pfBrand(
 
 // ------------------------------------------------------ tag
 
-class Brand internal constructor(src: String, id: String?, baseClass: String?) :
+public class Brand internal constructor(src: String, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLImageElement>, Img(id = id, baseClass = classes(ComponentType.Brand, baseClass)) {
 
     init {
@@ -42,4 +43,4 @@ class Brand internal constructor(src: String, id: String?, baseClass: String?) :
     }
 }
 
-class BrandContainer(id: String?, baseClass: String?) : Div(id = id, baseClass = baseClass)
+public class BrandContainer internal constructor(id: String?, baseClass: String?) : Div(id = id, baseClass = baseClass)

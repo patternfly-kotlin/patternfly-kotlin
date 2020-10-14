@@ -4,9 +4,9 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import org.w3c.dom.HTMLDivElement
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ dsl
 
-fun HtmlElements.pfPage(
+public fun HtmlElements.pfPage(
     id: String? = null,
     baseClass: String? = null,
     content: Page.() -> Unit = {}
@@ -14,7 +14,7 @@ fun HtmlElements.pfPage(
 
 // ------------------------------------------------------ tag
 
-class Page internal constructor(id: String?, baseClass: String?) :
+public class Page internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, baseClass)) {
     init {
         markAs(ComponentType.Page)

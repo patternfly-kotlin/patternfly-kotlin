@@ -4,9 +4,9 @@ import dev.fritz2.lenses.IdProvider
 import kotlin.math.max
 import kotlin.math.min
 
-typealias ItemFilter<T> = (T) -> Boolean
+public typealias ItemFilter<T> = (T) -> Boolean
 
-data class Items<T>(
+public data class Items<T>(
     val identifier: IdProvider<T, String>,
     val all: List<T> = emptyList(),
     val items: List<T> = emptyList(),
@@ -22,47 +22,47 @@ data class Items<T>(
             items.subList(from, to)
         }
 
-    fun addAll(items: List<T>): Items<T> =
+    public fun addAll(items: List<T>): Items<T> =
         copy(all = items, items = items, pageInfo = pageInfo.total(items.size))
 
-    fun addFilter(name: String, filter: ItemFilter<T>): Items<T> {
+    public fun addFilter(name: String, filter: ItemFilter<T>): Items<T> {
         val newFilters = filters + (name to filter)
         val newItems = items(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
-    fun removeFilter(name: String): Items<T> {
+    public fun removeFilter(name: String): Items<T> {
         val newFilters = filters - name
         val newItems = items(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
 
-    fun sortWith(sortInfo: SortInfo<T>): Items<T> {
+    public fun sortWith(sortInfo: SortInfo<T>): Items<T> {
         val newItems = items(filters, sortInfo)
         return copy(items = newItems, sortInfo = sortInfo)
     }
 
-    fun selectNone(): Items<T> = copy(selected = emptySet())
+    public fun selectNone(): Items<T> = copy(selected = emptySet())
 
-    fun selectPage(): Items<T> = copy(selected = page.map { identifier(it) }.toSet())
+    public fun selectPage(): Items<T> = copy(selected = page.map { identifier(it) }.toSet())
 
-    fun selectAll(): Items<T> = copy(selected = items.map { identifier(it) }.toSet())
+    public fun selectAll(): Items<T> = copy(selected = items.map { identifier(it) }.toSet())
 
-    fun select(item: T, select: Boolean): Items<T> {
+    public fun select(item: T, select: Boolean): Items<T> {
         val id = identifier(item)
         val newSelection = if (select) selected + id else selected - id
         return copy(selected = newSelection)
     }
 
-    fun toggleSelection(item: T): Items<T> {
+    public fun toggleSelection(item: T): Items<T> {
         val id = identifier(item)
         val newSelection = if (id in selected) selected - id else selected + id
         return copy(selected = newSelection)
     }
 
-    fun isSelected(item: T): Boolean = identifier(item) in selected
+    public fun isSelected(item: T): Boolean = identifier(item) in selected
 
     override fun toString(): String = buildString {
         append("Items(all(").append(all.size).append(")")
@@ -90,7 +90,7 @@ data class Items<T>(
         }
 }
 
-data class PageInfo(
+public data class PageInfo(
     val pageSize: Int = DEFAULT_PAGE_SIZE,
     val page: Int = 0,
     val total: Int = 0,
@@ -115,19 +115,19 @@ data class PageInfo(
 
     val lastPage: Boolean = page == pages - 1
 
-    fun gotoFirstPage(): PageInfo = copy(page = 0)
-    fun gotoPreviousPage(): PageInfo = copy(page = inBounds(page - 1, 0, pages - 1))
-    fun gotoNextPage(): PageInfo = copy(page = inBounds(page + 1, 0, pages - 1))
-    fun gotoLastPage(): PageInfo = copy(page = pages - 1)
-    fun gotoPage(page: Int): PageInfo = copy(page = inBounds(page, 0, pages - 1))
+    public fun gotoFirstPage(): PageInfo = copy(page = 0)
+    public fun gotoPreviousPage(): PageInfo = copy(page = inBounds(page - 1, 0, pages - 1))
+    public fun gotoNextPage(): PageInfo = copy(page = inBounds(page + 1, 0, pages - 1))
+    public fun gotoLastPage(): PageInfo = copy(page = pages - 1)
+    public fun gotoPage(page: Int): PageInfo = copy(page = inBounds(page, 0, pages - 1))
 
-    fun pageSize(pageSize: Int): PageInfo {
+    public fun pageSize(pageSize: Int): PageInfo {
         val pages = safePages(pageSize, total)
         val page = inBounds(page, 0, pages - 1)
         return copy(pageSize = pageSize, page = page)
     }
 
-    fun total(total: Int): PageInfo {
+    public fun total(total: Int): PageInfo {
         val pages = safePages(pageSize, total)
         val page = inBounds(page, 0, pages - 1)
         return copy(page = page, total = total)
@@ -146,19 +146,19 @@ data class PageInfo(
         return max(1, pages)
     }
 
-    companion object {
-        const val DEFAULT_PAGE_SIZE = 10
-        val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
+    public companion object {
+        public const val DEFAULT_PAGE_SIZE: Int = 10
+        public val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
     }
 }
 
 // Comparator is never reversed in SortInfo!
 // It's reversed in Items.items() when ascending == false
-class SortInfo<T>(
-    val id: String,
-    val text: String,
+public class SortInfo<T>(
+    public val id: String,
+    public val text: String,
     internal val comparator: Comparator<T>,
-    val ascending: Boolean = true
+    public val ascending: Boolean = true
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

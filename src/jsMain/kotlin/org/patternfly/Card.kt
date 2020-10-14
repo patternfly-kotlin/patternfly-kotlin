@@ -13,14 +13,14 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ card view dsl
 
-fun <T> HtmlElements.pfCardView(
+public fun <T> HtmlElements.pfCardView(
     store: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
     content: CardView<T>.() -> Unit = {}
 ): CardView<T> = register(CardView(store, id = id, baseClass = baseClass), content)
 
-fun <T> CardView<T>.pfCard(
+public fun <T> CardView<T>.pfCard(
     item: T,
     selectable: Boolean = false,
     id: String? = null,
@@ -28,49 +28,49 @@ fun <T> CardView<T>.pfCard(
     content: Card<T>.() -> Unit = {}
 ): Card<T> = register(Card(this.itemStore, item, selectable, id = id, baseClass = baseClass), content)
 
-fun <T> Card<T>.pfCardHeader(
+public fun <T> Card<T>.pfCardHeader(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeader<T>.() -> Unit = {}
 ): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass), content)
 
-fun <T> CardHeader<T>.pfCardHeaderMain(
+public fun <T> CardHeader<T>.pfCardHeaderMain(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeaderMain<T>.() -> Unit = {}
 ): CardHeaderMain<T> = register(CardHeaderMain(this.item, id = id, baseClass = baseClass), content)
 
-fun <T> CardHeader<T>.pfCardActions(
+public fun <T> CardHeader<T>.pfCardActions(
     id: String? = null,
     baseClass: String? = null,
     content: CardActions<T>.() -> Unit = {}
 ): CardActions<T> = register(CardActions(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
 
-fun <T> CardHeader<T>.pfCardTitle(
+public fun <T> CardHeader<T>.pfCardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
 ): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
-fun <T> CardActions<T>.pfCardCheckbox(
+public fun <T> CardActions<T>.pfCardCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: CardCheckbox<T>.() -> Unit = {}
 ): CardCheckbox<T> = register(CardCheckbox(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
 
-fun <T> Card<T>.pfCardTitle(
+public fun <T> Card<T>.pfCardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
 ): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
-fun <T> Card<T>.pfCardBody(
+public fun <T> Card<T>.pfCardBody(
     id: String? = null,
     baseClass: String? = null,
     content: CardBody.() -> Unit = {}
 ): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
 
-fun <T> Card<T>.pfCardFooter(
+public fun <T> Card<T>.pfCardFooter(
     id: String? = null,
     baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
@@ -78,56 +78,56 @@ fun <T> Card<T>.pfCardFooter(
 
 // ------------------------------------------------------ plain card dsl
 
-fun HtmlElements.pfCard(
+public fun HtmlElements.pfCard(
     selectable: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Card<Unit>.() -> Unit = {}
 ): Card<Unit> = register(Card(null, null, selectable, id = id, baseClass = baseClass), content)
 
-fun Card<Unit>.pfCardHeader(
+public fun Card<Unit>.pfCardHeader(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeader<Unit>.() -> Unit = {}
 ): CardHeader<Unit> = register(CardHeader(null, null, this, id = id, baseClass = baseClass), content)
 
-fun CardHeader<Unit>.pfCardHeaderMain(
+public fun CardHeader<Unit>.pfCardHeaderMain(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeaderMain<Unit>.() -> Unit = {}
 ): CardHeaderMain<Unit> = register(CardHeaderMain(null, null, baseClass), content)
 
-fun CardHeader<Unit>.pfCardActions(
+public fun CardHeader<Unit>.pfCardActions(
     id: String? = null,
     baseClass: String? = null,
     content: CardActions<Unit>.() -> Unit = {}
 ): CardActions<Unit> = register(CardActions(null, null, this.card, id = id, baseClass = baseClass), content)
 
-fun CardHeader<Unit>.pfCardTitle(
+public fun CardHeader<Unit>.pfCardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
 ): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
-fun CardActions<Unit>.pfCardCheckbox(
+public fun CardActions<Unit>.pfCardCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: CardCheckbox<Unit>.() -> Unit = {}
 ): CardCheckbox<Unit> = register(CardCheckbox(null, null, this.card, id = id, baseClass = baseClass), content)
 
-fun Card<Unit>.pfCardTitle(
+public fun Card<Unit>.pfCardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
 ): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
 
-fun Card<Unit>.pfCardBody(
+public fun Card<Unit>.pfCardBody(
     id: String? = null,
     baseClass: String? = null,
     content: CardBody.() -> Unit = {}
 ): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
 
-fun Card<Unit>.pfCardFooter(
+public fun Card<Unit>.pfCardFooter(
     id: String? = null,
     baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
@@ -135,7 +135,7 @@ fun Card<Unit>.pfCardFooter(
 
 // ------------------------------------------------------ tag
 
-class CardView<T> internal constructor(
+public class CardView<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
     baseClass: String?
@@ -144,7 +144,7 @@ class CardView<T> internal constructor(
     +"gutter".modifier()
     +baseClass
 }) {
-    lateinit var display: (T) -> Card<T>
+    public lateinit var display: (T) -> Card<T>
 
     init {
         markAs(ComponentType.CardView)
@@ -154,7 +154,7 @@ class CardView<T> internal constructor(
     }
 }
 
-class Card<T> internal constructor(
+public class Card<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val selectable: Boolean,
@@ -165,7 +165,7 @@ class Card<T> internal constructor(
     +("selectable".modifier() `when` selectable)
     +baseClass
 }) {
-    val selected = CardStore()
+    public val selected: CardStore = CardStore()
 
     init {
         markAs(ComponentType.Card)
@@ -184,7 +184,7 @@ class Card<T> internal constructor(
     }
 }
 
-class CardHeader<T> internal constructor(
+public class CardHeader<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val card: Card<T>,
@@ -192,13 +192,13 @@ class CardHeader<T> internal constructor(
     baseClass: String?
 ) : Div(id = id, baseClass = classes("card".component("header"), baseClass))
 
-class CardHeaderMain<T> internal constructor(
+public class CardHeaderMain<T> internal constructor(
     internal val item: T?,
     id: String?,
     baseClass: String?
 ) : Div(id = id, baseClass = classes("card".component("header", "main"), baseClass))
 
-class CardActions<T> internal constructor(
+public class CardActions<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val card: Card<T>,
@@ -212,7 +212,7 @@ class CardActions<T> internal constructor(
     }
 }
 
-class CardCheckbox<T> internal constructor(
+public class CardCheckbox<T> internal constructor(
     itemStore: ItemStore<T>?,
     item: T?,
     card: Card<T>,
@@ -235,17 +235,17 @@ class CardCheckbox<T> internal constructor(
     }
 }
 
-class CardTitle(id: String?, baseClass: String?) :
+public class CardTitle internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("card".component("title"), baseClass))
 
-class CardBody(id: String?, baseClass: String?) :
+public class CardBody internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("card".component("body"), baseClass))
 
-class CardFooter(id: String?, baseClass: String?) :
+public class CardFooter internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("card".component("footer"), baseClass))
 
 // ------------------------------------------------------ store
 
-class CardStore : RootStore<Boolean>(false) {
+public class CardStore : RootStore<Boolean>(false) {
     internal val toggle = handle { !it }
 }

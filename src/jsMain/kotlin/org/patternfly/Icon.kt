@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfIcon(
+public fun HtmlElements.pfIcon(
     iconClass: String? = null,
     id: String? = null,
     baseClass: String? = null,
@@ -18,11 +18,11 @@ fun HtmlElements.pfIcon(
 
 // ------------------------------------------------------ tag
 
-class Icon internal constructor(iconClass: String?, id: String?, baseClass: String?) :
+public class Icon internal constructor(iconClass: String?, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
     TextElement("i", id = id, baseClass = classes(ComponentType.Icon, baseClass)) {
 
-    var iconClass: Flow<String>
+    public var iconClass: Flow<String>
         get() {
             throw NotImplementedError()
         }

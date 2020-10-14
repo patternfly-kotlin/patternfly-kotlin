@@ -1,6 +1,8 @@
 package org.patternfly
 
+import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.action
 import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Listener
@@ -26,7 +28,7 @@ import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfChipGroup(
+public fun <T> HtmlElements.pfChipGroup(
     store: ChipGroupStore<T> = ChipGroupStore(),
     text: String? = null,
     limit: Int = 3,
@@ -36,15 +38,15 @@ fun <T> HtmlElements.pfChipGroup(
     content: ChipGroup<T>.() -> Unit = {}
 ): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, baseClass = baseClass), content)
 
-fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
+public fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
     val entries = ChipBuilder<T>().apply(block).build()
     action(entries) handledBy this.store.update
 }
 
 // ------------------------------------------------------ tag
 
-class ChipGroup<T> internal constructor(
-    val store: ChipGroupStore<T>,
+public class ChipGroup<T> internal constructor(
+    public val store: ChipGroupStore<T>,
     text: String?,
     limit: Int,
     closable: Boolean,
@@ -60,7 +62,7 @@ class ChipGroup<T> internal constructor(
     private var closeButton: Button? = null
     private val expanded = CollapseExpandStore()
 
-    val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
+    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {
                 val listener: (Event) -> Unit = {
@@ -74,7 +76,7 @@ class ChipGroup<T> internal constructor(
         }
     }
 
-    var display: (T) -> Chip = {
+    public var display: (T) -> Chip = {
         pfChip {
             +it.toString()
         }
@@ -148,28 +150,30 @@ class ChipGroup<T> internal constructor(
 
 // ------------------------------------------------------ store
 
-class ChipBuilder<T> {
-    private val entries: MutableList<T> = mutableListOf()
-
-    operator fun T.unaryPlus() {
-        entries.add(this)
-    }
-
-    operator fun Iterable<T>.unaryPlus() {
-        entries.addAll(this)
-    }
-
-    internal fun build() = entries.toList()
-}
-
-class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
+public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
     RootStore<List<T>>(listOf()) {
 
-    val add = handle<T> { items, item -> items + item }
+    public val add: SimpleHandler<T> = handle { items, item -> items + item }
 
-    val remove = handleAndOffer<String, Int> { items, id ->
+    public val remove: OfferingHandler<String, Int> = handleAndOffer { items, id ->
         val removed = items.filterNot { identifier(it) == id }
         offer(removed.size)
         removed
     }
+}
+
+// ------------------------------------------------------ builder
+
+public class ChipBuilder<T> {
+    private val entries: MutableList<T> = mutableListOf()
+
+    public operator fun T.unaryPlus() {
+        entries.add(this)
+    }
+
+    public operator fun Iterable<T>.unaryPlus() {
+        entries.addAll(this)
+    }
+
+    internal fun build() = entries.toList()
 }

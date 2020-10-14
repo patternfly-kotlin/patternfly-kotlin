@@ -17,7 +17,7 @@ import org.w3c.dom.HTMLLabelElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfSwitch(
+public fun HtmlElements.pfSwitch(
     id: String? = null,
     baseClass: String? = null,
     content: Switch.() -> Unit = {}
@@ -25,10 +25,10 @@ fun HtmlElements.pfSwitch(
 
 // ------------------------------------------------------ tag
 
-class Switch internal constructor(id: String?, baseClass: String?) :
+public class Switch internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, baseClass)) {
 
-    var label: Flow<String>
+    public var label: Flow<String>
         get() = with(labelTag.domNode.textContent) {
             if (this == null) emptyFlow() else flowOf(this)
         }
@@ -37,7 +37,7 @@ class Switch internal constructor(id: String?, baseClass: String?) :
             DomMountPoint(value.map { TextNode(it) }.distinctUntilChanged(), labelTag.domNode)
         }
 
-    var labelOff: Flow<String>
+    public var labelOff: Flow<String>
         get() = with(labelOffTag.domNode.textContent) {
             if (this == null) emptyFlow() else flowOf(this)
         }
@@ -46,13 +46,13 @@ class Switch internal constructor(id: String?, baseClass: String?) :
             DomMountPoint(value.map { TextNode(it) }.distinctUntilChanged(), labelOffTag.domNode)
         }
 
-    var disabled: Flow<Boolean>
+    public var disabled: Flow<Boolean>
         get() = input.disabled
         set(value) {
             input.disabled = value
         }
 
-    val input: Input
+    public val input: Input
     private val toggleTag: Span
     private val labelTag: Span
     private val labelOffTag: Span

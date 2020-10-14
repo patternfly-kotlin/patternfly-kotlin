@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfMain(
+public fun HtmlElements.pfMain(
     id: String? = null,
     baseClass: String? = null,
     content: Main.() -> Unit = {}
@@ -14,7 +14,7 @@ fun HtmlElements.pfMain(
 
 // ------------------------------------------------------ tag
 
-class Main internal constructor(id: String?, baseClass: String?) :
+public class Main internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLElement>,
     TextElement("main", id = id, baseClass = classes(ComponentType.Main, baseClass)) {
     init {

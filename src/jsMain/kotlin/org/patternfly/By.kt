@@ -20,8 +20,8 @@ import org.w3c.dom.Element
  *         By.classname("external").and(By.attribute("hidden")));
  * ```
  */
-interface By {
-    val selector: String
+public interface By {
+    public val selector: String
 
     /**
      * Combines this selector with the given selector. Use this method to express selectors like `button.primary` or
@@ -32,31 +32,31 @@ interface By {
      * By.element("input").and(By.attribute("type", "checkbox"));
      * ```
      */
-    fun and(selector: By): By = combinator(Combinator.AND, selector)
+    public fun and(selector: By): By = combinator(Combinator.AND, selector)
 
     /**
      * Combines this selector with the given selector using the `>` (child) combinator. Selects nodes that are
      * direct children of this element.
      */
-    fun child(selector: By): By = combinator(Combinator.CHILD, selector)
+    public fun child(selector: By): By = combinator(Combinator.CHILD, selector)
 
     /**
      * Combines this selector with the given selector using the (space) combinator. Selects nodes that are descendants
      * of this element.
      */
-    fun desc(selector: By): By = combinator(Combinator.DESCENDANT, selector)
+    public fun desc(selector: By): By = combinator(Combinator.DESCENDANT, selector)
 
     /**
      * Combines this selector with the given selector using the `~` (general sibling) combinator. This means that
      * `selector` follows this element (though not necessarily immediately), and both share the same parent.
      */
-    fun sibling(selector: By): By = combinator(Combinator.SIBLING, selector)
+    public fun sibling(selector: By): By = combinator(Combinator.SIBLING, selector)
 
     /**
      * Combines this selector with the given selector using the `+` (adjacent sibling combinator) combinator. This
      * means that `selector` directly follows this element, and both share the same parent.
      */
-    fun adjacentSibling(selector: By): By = combinator(Combinator.ADJACENT_SIBLING, selector)
+    public fun adjacentSibling(selector: By): By = combinator(Combinator.ADJACENT_SIBLING, selector)
 
     private fun combinator(combinator: Combinator, selector: By): By {
         return ByCombination(this, combinator, selector)
@@ -64,24 +64,24 @@ interface By {
 
     // ------------------------------------------------------ factory methods
 
-    companion object {
+    public companion object {
         /** Returns a selector as-is. */
-        fun selector(selector: String): By = BySelector(selector)
+        public fun selector(selector: String): By = BySelector(selector)
 
         /** Selects an element based on the value of its id attribute. */
-        fun id(id: String): By = ById(id)
+        public fun id(id: String): By = ById(id)
 
         /** Selects elements that have the given element name. */
-        fun element(element: String): By = ByElement(element)
+        public fun element(element: String): By = ByElement(element)
 
         /** Selects elements that have the given element name. */
-        fun element(element: Element): By = ByElement(element.tagName.toLowerCase())
+        public fun element(element: Element): By = ByElement(element.tagName.toLowerCase())
 
         /** Selects elements that have all of the given class attributes. */
-        fun classname(vararg classname: String): By = ByClassname(classname)
+        public fun classname(vararg classname: String): By = ByClassname(classname)
 
         /** Selects elements that have an attribute name of [name]. */
-        fun attribute(name: String): By = ByAttribute(name, null, null)
+        public fun attribute(name: String): By = ByAttribute(name, null, null)
 
         /**
          * Selects all elements that have an attribute name of [name] whose value applies to the given operator.
@@ -89,7 +89,7 @@ interface By {
          * You don't need to enclose the value in quotes. If necessary, quotes are added automatically
          * (see [https://mothereff.in/unquoted-attributes](https://mothereff.in/unquoted-attributes)).
          */
-        fun attribute(name: String, value: String, operator: AttributeOperator = AttributeOperator.EQUALS): By =
+        public fun attribute(name: String, value: String, operator: AttributeOperator = AttributeOperator.EQUALS): By =
             ByAttribute(name, operator, value)
 
         /**
@@ -98,7 +98,7 @@ interface By {
          * If [name] contains "-" it is used as is, otherwise it is expected to be in camelCase and is converted to
          * kebab-case.
          */
-        fun data(name: String): By = ByData(name, null, null)
+        public fun data(name: String): By = ByData(name, null, null)
 
         /**
          * Selects elements that have an attribute name of data-[name] whose value applies to the given operator.
@@ -109,11 +109,11 @@ interface By {
          * You don't need to enclose the value in quotes. If necessary, quotes are added automatically
          * (see [https://mothereff.in/unquoted-attributes](https://mothereff.in/unquoted-attributes)).
          */
-        fun data(name: String, value: String, operator: AttributeOperator = AttributeOperator.EQUALS): By =
+        public fun data(name: String, value: String, operator: AttributeOperator = AttributeOperator.EQUALS): By =
             ByData(name, operator, value)
 
         /** Groups the specified selectors using `,`. */
-        fun group(selectors: Array<By>): By? = ByGroup(selectors)
+        public fun group(selectors: Array<By>): By? = ByGroup(selectors)
     }
 }
 
@@ -195,7 +195,7 @@ private class BySelector(override val selector: String) : By
 // ------------------------------------------------------ enums
 
 /** Operator used for attribute selectors.  */
-enum class AttributeOperator(internal val operator: String) {
+public enum class AttributeOperator(internal val operator: String) {
     /**
      * `[attr=value]`
      * Represents elements with an attribute name of attr whose value is exactly value.

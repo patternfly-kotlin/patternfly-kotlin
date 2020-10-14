@@ -16,14 +16,14 @@ import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfChip(
+public fun HtmlElements.pfChip(
     readOnly: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Chip.() -> Unit = {}
 ): Chip = register(Chip(readOnly, id = id, baseClass = baseClass), content)
 
-fun Chip.pfBadge(
+public fun Chip.pfBadge(
     min: Int = 0,
     max: Int = 999,
     id: String? = null,
@@ -41,7 +41,7 @@ private fun insertBadge(chip: Chip, badge: Badge) {
 
 // ------------------------------------------------------ tag
 
-class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?) :
+public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(id = id, baseClass = classes {
@@ -53,7 +53,8 @@ class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: Strin
     private val textId = Id.unique(ComponentType.Chip.id, "txt")
     private val textElement = span(id = textId, baseClass = "chip".component("text"), content = {})
     private var closeButton: Button? = null
-    val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
+
+    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
         if (closeButton != null) {
             Listener(callbackFlow {
                 val listener: (Event) -> Unit = {

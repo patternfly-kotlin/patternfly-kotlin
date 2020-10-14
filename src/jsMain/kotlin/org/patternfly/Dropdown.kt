@@ -26,7 +26,7 @@ import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfDropdown(
+public fun <T> HtmlElements.pfDropdown(
     store: DropdownStore<T> = DropdownStore(),
     align: Align? = null,
     up: Boolean = false,
@@ -35,13 +35,13 @@ fun <T> HtmlElements.pfDropdown(
     content: Dropdown<T>.() -> Unit = {}
 ): Dropdown<T> = register(Dropdown(store, align, up, id = id, baseClass = baseClass), content)
 
-fun <T> Dropdown<T>.pfDropdownToggle(
+public fun <T> Dropdown<T>.pfDropdownToggle(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
 ): DropdownToggle<T> = register(DropdownToggle(this, id = id, baseClass = baseClass), content)
 
-fun <T> Dropdown<T>.pfDropdownToggleKebab(
+public fun <T> Dropdown<T>.pfDropdownToggleKebab(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
@@ -49,19 +49,19 @@ fun <T> Dropdown<T>.pfDropdownToggleKebab(
     icon = { pfIcon("ellipsis-v".fas()) }
 }, content)
 
-fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
+public fun <T> Dropdown<T>.pfDropdownToggleCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
 ): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, id = id, baseClass = baseClass), content)
 
-fun <T> Dropdown<T>.pfDropdownToggleAction(
+public fun <T> Dropdown<T>.pfDropdownToggleAction(
     id: String? = null,
     baseClass: String? = null,
     content: DropdownToggleAction<T>.() -> Unit = {}
 ): DropdownToggleAction<T> = register(DropdownToggleAction(this, id = id, baseClass = baseClass), content)
 
-fun <T> Dropdown<T>.pfDropdownItems(
+public fun <T> Dropdown<T>.pfDropdownItems(
     id: String? = null,
     baseClass: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
@@ -73,7 +73,7 @@ fun <T> Dropdown<T>.pfDropdownItems(
     return element
 }
 
-fun <T> Dropdown<T>.pfDropdownGroups(
+public fun <T> Dropdown<T>.pfDropdownGroups(
     id: String? = null,
     baseClass: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
@@ -87,8 +87,8 @@ fun <T> Dropdown<T>.pfDropdownGroups(
 
 // ------------------------------------------------------ tag
 
-open class Dropdown<T> internal constructor(
-    val store: DropdownStore<T>,
+public open class Dropdown<T> internal constructor(
+    public val store: DropdownStore<T>,
     internal val dropdownAlign: Align?,
     up: Boolean,
     id: String?,
@@ -99,13 +99,13 @@ open class Dropdown<T> internal constructor(
     +("top".modifier() `when` up)
     +baseClass
 }) {
-    lateinit var toggle: DropdownToggleBase<out HTMLElement, T>
+    public lateinit var toggle: DropdownToggleBase<out HTMLElement, T>
 
-    val ces = CollapseExpandStore { target ->
+    public val ces: CollapseExpandStore = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
     }
 
-    var display: ComponentDisplay<Button, Item<T>> = { item ->
+    public var display: ComponentDisplay<Button, Item<T>> = { item ->
         {
             if (item.description.isNotEmpty()) {
                 div(baseClass = "dropdown".component("menu-item", "main")) {
@@ -136,7 +136,7 @@ open class Dropdown<T> internal constructor(
     }
 }
 
-sealed class DropdownToggleBase<E : HTMLElement, T>(
+public sealed class DropdownToggleBase<E : HTMLElement, T>(
     private val dropdown: Dropdown<T>,
     tagName: String,
     id: String?,
@@ -144,7 +144,7 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
 ) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
 
     internal lateinit var toggleId: String
-    abstract var disabled: Flow<Boolean>
+    public abstract var disabled: Flow<Boolean>
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
@@ -157,7 +157,7 @@ sealed class DropdownToggleBase<E : HTMLElement, T>(
     }
 }
 
-class DropdownToggle<T> internal constructor(
+public class DropdownToggle<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
     baseClass: String?,
@@ -170,7 +170,7 @@ class DropdownToggle<T> internal constructor(
         initToggle(this)
     }
 
-    var content: (Span.() -> Unit)? = null
+    public var content: (Span.() -> Unit)? = null
         set(value) {
             domNode.clear()
             domNode.classList -= "plain".modifier()
@@ -183,7 +183,7 @@ class DropdownToggle<T> internal constructor(
             field = value
         }
 
-    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
+    public var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
         set(value) {
             domNode.clear()
             domNode.classList += "plain".modifier()
@@ -204,7 +204,7 @@ class DropdownToggle<T> internal constructor(
         }
 }
 
-class DropdownToggleCheckbox<T> internal constructor(
+public class DropdownToggleCheckbox<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
     baseClass: String?,
@@ -223,7 +223,7 @@ class DropdownToggleCheckbox<T> internal constructor(
     private val checkId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
     private val textId = Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
 
-    val input: Input = Input(checkId)
+    public val input: Input = Input(checkId)
 
     init {
         labelTag = label(baseClass = "dropdown".component("toggle", "check")) {
@@ -241,7 +241,7 @@ class DropdownToggleCheckbox<T> internal constructor(
         }
     }
 
-    var content: (Span.() -> Unit)? = null
+    public var content: (Span.() -> Unit)? = null
         set(value) {
             labelTag.register(
                 span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
@@ -263,7 +263,7 @@ class DropdownToggleCheckbox<T> internal constructor(
             }
         }
 
-    var triState: Flow<TriState>
+    public var triState: Flow<TriState>
         get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<TriState>(flow) {
@@ -287,7 +287,7 @@ class DropdownToggleCheckbox<T> internal constructor(
         }
 }
 
-class DropdownToggleAction<T> internal constructor(
+public class DropdownToggleAction<T> internal constructor(
     dropdown: Dropdown<T>,
     id: String?,
     baseClass: String?
@@ -311,7 +311,7 @@ class DropdownToggleAction<T> internal constructor(
         pfIcon("caret-down".fas())
     }
 
-    var action: (Button.() -> Unit)? = null
+    public var action: (Button.() -> Unit)? = null
         set(value) {
             actionButton = Button(baseClass = "dropdown".component("toggle", "button")).apply {
                 value?.invoke(this)
@@ -333,7 +333,7 @@ class DropdownToggleAction<T> internal constructor(
         }
 }
 
-class DropdownEntries<E : HTMLElement, T> internal constructor(
+public class DropdownEntries<E : HTMLElement, T> internal constructor(
     private val dropdown: Dropdown<T>,
     tagName: String,
     id: String?,
@@ -400,8 +400,8 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
                 attr("disabled", "true")
                 domNode.classList += "disabled".modifier()
             }
-            clicks.map { item } handledBy this@DropdownEntries.dropdown.store.clicked
             clicks handledBy this@DropdownEntries.dropdown.ces.collapse
+            clicks.map { item } handledBy this@DropdownEntries.dropdown.store.select
             if (item.selected) {
                 domNode.autofocus = true
             }
@@ -412,13 +412,13 @@ class DropdownEntries<E : HTMLElement, T> internal constructor(
 
 // ------------------------------------------------------ store
 
-class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
+public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    val clicked: OfferingHandler<Item<T>, Item<T>> = handleAndOffer { items, item ->
+    public val select: OfferingHandler<Item<T>, Item<T>> = handleAndOffer { items, item ->
         offer(item)
         items
     }
 
-    val items: Flow<List<Item<T>>> = data.flatItems()
-    val groups: Flow<List<Group<T>>> = data.groups()
+    public val items: Flow<List<Item<T>>> = data.flatItems()
+    public val groups: Flow<List<Group<T>>> = data.groups()
 }

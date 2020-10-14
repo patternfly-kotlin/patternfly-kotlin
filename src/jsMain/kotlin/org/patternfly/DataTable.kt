@@ -18,38 +18,38 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfDataTable(
+public fun <T> HtmlElements.pfDataTable(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
     content: DataTable<T>.() -> Unit = {}
 ): DataTable<T> = register(DataTable(itemStore, id = id, baseClass = baseClass), content)
 
-fun <T> DataTable<T>.pfDataTableCaption(
+public fun <T> DataTable<T>.pfDataTableCaption(
     id: String? = null,
     baseClass: String? = null,
     content: DataTableCaption.() -> Unit = {}
 ): DataTableCaption = register(DataTableCaption(id = id, baseClass = baseClass), content)
 
-fun <T> DataTable<T>.pfDataTableColumns(block: Columns<T>.() -> Unit) {
+public fun <T> DataTable<T>.pfDataTableColumns(block: Columns<T>.() -> Unit) {
     columns.apply(block)
     renderTable()
 }
 
-fun <T> Columns<T>.pfDataTableColumn(label: String, block: DataColumn<T>.() -> Unit) {
+public fun <T> Columns<T>.pfDataTableColumn(label: String, block: DataColumn<T>.() -> Unit) {
     val column = DataColumn<T>(label).apply(block)
     add(column)
 }
 
-fun <T> Columns<T>.pfDataTableSimpleColumn(label: String, display: ComponentDisplay<Td, T>) {
+public fun <T> Columns<T>.pfDataTableSimpleColumn(label: String, display: ComponentDisplay<Td, T>) {
     add(DataColumn(label, cellDisplay = display))
 }
 
-fun <T> Columns<T>.pfDataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
+public fun <T> Columns<T>.pfDataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
     add(SelectColumn(selectAll, baseClass))
 }
 
-fun <T> Columns<T>.pfDataTableToggleColumn(
+public fun <T> Columns<T>.pfDataTableToggleColumn(
     fullWidth: Boolean = false,
     noPadding: Boolean = false,
     baseClass: String? = null,
@@ -58,13 +58,13 @@ fun <T> Columns<T>.pfDataTableToggleColumn(
     add(ToggleColumn(fullWidth, noPadding, baseClass, display))
 }
 
-fun <T> Columns<T>.pfDataTableActionColumn(baseClass: String? = null, display: ComponentDisplay<Td, T>) {
+public fun <T> Columns<T>.pfDataTableActionColumn(baseClass: String? = null, display: ComponentDisplay<Td, T>) {
     add(ActionColumn(baseClass, display))
 }
 
 // ------------------------------------------------------ tag
 
-class DataTable<T> internal constructor(
+public class DataTable<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
     baseClass: String?
@@ -176,7 +176,8 @@ class DataTable<T> internal constructor(
     }
 }
 
-class DataTableCaption(id: String?, baseClass: String?) : Caption(id = id, baseClass = baseClass)
+public class DataTableCaption internal constructor(id: String?, baseClass: String?) :
+    Caption(id = id, baseClass = baseClass)
 
 internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T) : TBody() {
     private val expanded: CollapseExpandStore = CollapseExpandStore()
@@ -312,7 +313,7 @@ internal fun <T> Td.renderExpandableContent(
 
 // ------------------------------------------------------ column, row and cell
 
-class Columns<T> : Iterable<Column<T>> {
+public class Columns<T> : Iterable<Column<T>> {
     private val columns: MutableList<Column<T>> = mutableListOf()
 
     internal val hasToggle: Boolean
@@ -340,30 +341,30 @@ class Columns<T> : Iterable<Column<T>> {
     override fun iterator(): Iterator<Column<T>> = columns.iterator()
 }
 
-sealed class Column<T>
+public sealed class Column<T>
 
-class DataColumn<T>(
-    val label: String,
-    var hasId: Boolean = false,
-    var sortInfo: SortInfo<T>? = null,
-    var headerId: String? = null,
-    var headerBaseClass: String? = null,
-    var headerDisplay: (Th.() -> Unit)? = null,
-    var cellBaseClass: String? = null,
-    var cellDisplay: ComponentDisplay<Td, T> = { { !"Please render your item here" } },
+public class DataColumn<T>(
+    public val label: String,
+    public var hasId: Boolean = false,
+    public var sortInfo: SortInfo<T>? = null,
+    public var headerId: String? = null,
+    public var headerBaseClass: String? = null,
+    public var headerDisplay: (Th.() -> Unit)? = null,
+    public var cellBaseClass: String? = null,
+    public var cellDisplay: ComponentDisplay<Td, T> = { { !"Please render your item here" } },
     // TODO configure help: tooltip, popover, custom
 ) : Column<T>()
 
-class SelectColumn<T>(val selectAll: Boolean, var baseClass: String? = null) : Column<T>()
+public class SelectColumn<T>(public val selectAll: Boolean, public var baseClass: String? = null) : Column<T>()
 
-class ToggleColumn<T>(
-    val fullWidth: Boolean,
-    val noPadding: Boolean,
-    var baseClass: String? = null,
-    var display: ComponentDisplay<Div, T> = { { !"Please render your expandable content here" } }
+public class ToggleColumn<T>(
+    public val fullWidth: Boolean,
+    public val noPadding: Boolean,
+    public var baseClass: String? = null,
+    public var display: ComponentDisplay<Div, T> = { { !"Please render your expandable content here" } }
 ) : Column<T>()
 
-class ActionColumn<T>(
-    var baseClass: String? = null,
-    val display: ComponentDisplay<Td, T> = { { !"Please render your actions here" } }
+public class ActionColumn<T>(
+    public var baseClass: String? = null,
+    public val display: ComponentDisplay<Td, T> = { { !"Please render your actions here" } }
 ) : Column<T>()

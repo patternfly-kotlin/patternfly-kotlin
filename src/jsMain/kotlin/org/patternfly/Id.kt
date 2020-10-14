@@ -2,13 +2,13 @@ package org.patternfly
 
 import kotlinx.browser.document
 
-object Id {
+public object Id {
 
     private const val UNIQUE_ID = "id-"
     private var counter: Int = 0
 
     /** Creates an identifier guaranteed to be unique within this document. */
-    fun unique(): String {
+    public fun unique(): String {
         var id: String
         do {
             id = "$UNIQUE_ID$counter"
@@ -22,14 +22,14 @@ object Id {
     }
 
     /** Creates an identifier guaranteed to be unique within this document. The unique part comes last. */
-    fun unique(prefix: String, vararg additionalIds: String): String = "${build(prefix, *additionalIds)}-${unique()}"
+    public fun unique(prefix: String, vararg additionalIds: String): String = "${build(prefix, *additionalIds)}-${unique()}"
 
-    fun build(id: String, vararg additionalIds: String): String {
+    public fun build(id: String, vararg additionalIds: String): String {
         val segments = listOf(id, *additionalIds)
         return segments.joinToString("-") { asId(it) }
     }
 
-    fun asId(text: String): String {
+    public fun asId(text: String): String {
         return text.split("[-\\s]").asSequence()
             .map { it.replace("\\s+".toRegex(), "") }
             .map { it.replace("[^a-zA-Z0-9-_]".toRegex(), "") }

@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfDivider(
+public fun HtmlElements.pfDivider(
     variant: DividerVariant = DividerVariant.HR,
     id: String? = null,
     baseClass: String? = null

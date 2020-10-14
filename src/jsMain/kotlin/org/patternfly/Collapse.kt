@@ -12,27 +12,28 @@ import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 
-typealias CollapsePredicate = (Element) -> Boolean
+public typealias CollapsePredicate = (Element) -> Boolean
 
 // initial data: expanded = false
-class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = null) : RootStore<Boolean>(false) {
+public class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = null) :
+    RootStore<Boolean>(false) {
 
     private var closeHandler: ((Event) -> Unit)? = null
 
-    val collapsed: Flow<Boolean> = data.drop(1).filter { !it } // drop initial state
-    val expanded: Flow<Boolean> = data.drop(1).filter { it } // drop initial state
+    public val collapsed: Flow<Boolean> = data.drop(1).filter { !it } // drop initial state
+    public val expanded: Flow<Boolean> = data.drop(1).filter { it } // drop initial state
 
-    val expand: SimpleHandler<Unit> = handle {
+    public val expand: SimpleHandler<Unit> = handle {
         addCloseHandler()
         true
     }
 
-    val collapse: SimpleHandler<Unit> = handle {
+    public val collapse: SimpleHandler<Unit> = handle {
         removeCloseHandler()
         false
     }
 
-    val toggle = handle { expanded ->
+    public val toggle: SimpleHandler<Unit> = handle { expanded ->
         if (expanded) {
             removeCloseHandler()
             false

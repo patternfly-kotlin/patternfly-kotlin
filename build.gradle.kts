@@ -24,6 +24,8 @@ tasks.withType<KotlinCompile>().all {
 }
 
 kotlin {
+    explicitApi()
+
     jvm {
         tasks.withType<KotlinCompile> {
             kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
@@ -32,6 +34,7 @@ kotlin {
             useJUnitPlatform()
         }
     }
+
     js {
         browser {
             testTask {
@@ -47,6 +50,9 @@ kotlin {
         all {
             languageSettings.apply {
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
             }
         }
 

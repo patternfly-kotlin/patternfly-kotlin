@@ -6,18 +6,18 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ItemStore<T>(val identifier: IdProvider<T, String>) :
+public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
     RootStore<Items<T>>(Items(identifier)), PageInfoHandler {
 
-    val visible: Flow<List<T>> = data.map { it.page }
-    val selected: Flow<Int> = data.map { it.selected.size }
+    public val visible: Flow<List<T>> = data.map { it.page }
+    public val selected: Flow<Int> = data.map { it.selected.size }
 
-    val addAll: Handler<List<T>> = handle { items, newItems -> items.addAll(newItems) }
+    public val addAll: Handler<List<T>> = handle { items, newItems -> items.addAll(newItems) }
 
-    val addFilter: Handler<Pair<String, ItemFilter<T>>> = handle { items, (name, filter) ->
+    public val addFilter: Handler<Pair<String, ItemFilter<T>>> = handle { items, (name, filter) ->
         items.addFilter(name, filter)
     }
-    val removeFilter: Handler<String> = handle { items, name -> items.removeFilter(name) }
+    public val removeFilter: Handler<String> = handle { items, name -> items.removeFilter(name) }
 
     override val gotoFirstPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoFirstPage()) }
     override val gotoPreviousPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoPreviousPage()) }
@@ -32,18 +32,18 @@ class ItemStore<T>(val identifier: IdProvider<T, String>) :
     override val total: Handler<Int> = handle { items, _ -> items } // not implemented!
     override val refresh: Handler<Unit> = handle { it } // not implemented!
 
-    val selectNone: Handler<Unit> = handle { it.selectNone() }
-    val selectVisible: Handler<Unit> = handle { it.selectPage() }
-    val selectAll: Handler<Unit> = handle { it.selectAll() }
-    val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
+    public val selectNone: Handler<Unit> = handle { it.selectNone() }
+    public val selectVisible: Handler<Unit> = handle { it.selectPage() }
+    public val selectAll: Handler<Unit> = handle { it.selectAll() }
+    public val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
         items.select(item, select)
     }
-    val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
+    public val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
 
-    val sortWith: Handler<SortInfo<T>> = handle { items, sortInfo ->
+    public val sortWith: Handler<SortInfo<T>> = handle { items, sortInfo ->
         items.sortWith(sortInfo)
     }
-    val sortOrToggle: Handler<SortInfo<T>> = handle { items, sortInfo ->
+    public val sortOrToggle: Handler<SortInfo<T>> = handle { items, sortInfo ->
         val newSortInfo = if (items.sortInfo == null) {
             sortInfo
         } else {

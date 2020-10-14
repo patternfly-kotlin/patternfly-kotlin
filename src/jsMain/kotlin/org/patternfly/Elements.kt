@@ -7,56 +7,57 @@ import org.w3c.dom.DOMTokenList
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 import org.w3c.dom.ParentNode
 import org.w3c.dom.asList
 import kotlin.math.floor
 
 // ------------------------------------------------------ token list
 
-operator fun DOMTokenList.plusAssign(value: String) {
+public operator fun DOMTokenList.plusAssign(value: String) {
     this.add(value)
 }
 
-operator fun DOMTokenList.minusAssign(value: String) {
+public operator fun DOMTokenList.minusAssign(value: String) {
     this.remove(value)
 }
 
 // ------------------------------------------------------ parent / child
 
-fun Element.appendAll(elements: Elements) {
+public fun Element.appendAll(elements: Elements) {
     elements.forEach { this.appendChild(it) }
 }
 
-fun Node?.removeFromParent() {
+public fun Node?.removeFromParent() {
     if (this != null && this.parentNode != null) {
         this.parentNode!!.removeChild(this)
     }
 }
 
-fun elements(content: HtmlElements.() -> Unit): List<Element> = render {
+public fun elements(content: HtmlElements.() -> Unit): List<Element> = render {
     div { content(this) }
 }.domNode.childNodes.asList().map { it.unsafeCast<Element>() }
 
-interface Elements : Iterable<Element> {
-    val elements: List<Element>
-    override fun iterator(): Iterator<Element> = elements.iterator()
+public interface Elements : Iterable<Element> {
+    public val elements: List<Element>
+    public override fun iterator(): Iterator<Element> = elements.iterator()
 }
 
 // ------------------------------------------------------ aria
 
-val WithDomNode<Element>.aria: Aria
+public val WithDomNode<Element>.aria: Aria
     get() = Aria(this.domNode)
 
-val Element.aria: Aria
+public val Element.aria: Aria
     get() = Aria(this)
 
-class Aria(private val element: Element) {
+public class Aria(private val element: Element) {
 
-    operator fun contains(name: String): Boolean = element.hasAttribute(name)
+    public operator fun contains(name: String): Boolean = element.hasAttribute(name)
 
-    operator fun get(name: String): String = element.getAttribute(attributeSafeKey(name)) ?: ""
+    public operator fun get(name: String): String = element.getAttribute(attributeSafeKey(name)) ?: ""
 
-    operator fun set(name: String, value: Any) {
+    public operator fun set(name: String, value: Any) {
         element.setAttribute(attributeSafeKey(name), value.toString())
     }
 
@@ -66,13 +67,13 @@ class Aria(private val element: Element) {
 
 // ------------------------------------------------------ visibility
 
-var Element.hidden
-    get() = getAttribute("hidden")?.toBoolean()
+public var Element.hidden: Boolean
+    get() = getAttribute("hidden")?.toBoolean() ?: false
     set(value) {
         setAttribute("hidden", value.toString())
     }
 
-var Element.styleHidden: Boolean
+public var Element.styleHidden: Boolean
     get() = this.unsafeCast<HTMLElement>().style.display != "none"
     set(value) {
         if (value) {
@@ -82,15 +83,15 @@ var Element.styleHidden: Boolean
         }
     }
 
-fun Element.hide() {
+public fun Element.hide() {
     this.unsafeCast<HTMLElement>().style.display = "none"
 }
 
-fun Element.show() {
+public fun Element.show() {
     this.unsafeCast<HTMLElement>().style.display = ""
 }
 
-fun Element?.isInView(container: Element?, partial: Boolean = false): Boolean {
+public fun Element?.isInView(container: Element?, partial: Boolean = false): Boolean {
     if (this != null && container != null) {
         val containerBounds = container.getBoundingClientRect()
         val elementBounds = this.getBoundingClientRect()
@@ -114,17 +115,17 @@ fun Element?.isInView(container: Element?, partial: Boolean = false): Boolean {
 
 // ------------------------------------------------------ selector
 
-fun Element.closest(selector: By): Element? = this.closest(selector.selector)
+public fun Element.closest(selector: By): Element? = this.closest(selector.selector)
 
-fun Element.matches(selector: By): Boolean = this.matches(selector.selector)
+public fun Element.matches(selector: By): Boolean = this.matches(selector.selector)
 
-fun ParentNode.querySelector(selector: By) = this.querySelector(selector.selector)
+public fun ParentNode.querySelector(selector: By): Element? = this.querySelector(selector.selector)
 
-fun ParentNode.querySelectorAll(selector: By) = this.querySelectorAll(selector.selector)
+public fun ParentNode.querySelectorAll(selector: By): NodeList = this.querySelectorAll(selector.selector)
 
 // ------------------------------------------------------ debug
 
-fun Element.debug(): String = buildString {
+public fun Element.debug(): String = buildString {
     append("<${tagName.toLowerCase()}")
     getAttributeNames().joinTo(this, " ", " ") { name ->
         buildString {

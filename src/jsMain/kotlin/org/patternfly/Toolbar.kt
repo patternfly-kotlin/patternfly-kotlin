@@ -4,65 +4,62 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfToolbar(
+public fun HtmlElements.pfToolbar(
     id: String? = null,
     baseClass: String? = null,
     content: Toolbar.() -> Unit = {}
 ): Toolbar = register(Toolbar(id = id, baseClass = baseClass), content)
 
-fun Toolbar.pfToolbarContent(
+public fun Toolbar.pfToolbarContent(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarContent.() -> Unit = {}
 ): ToolbarContent = register(ToolbarContent(id = id, baseClass = baseClass), content)
 
-fun ToolbarContent.pfToolbarContentSection(
+public fun ToolbarContent.pfToolbarContentSection(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarContentSection.() -> Unit = {}
 ): ToolbarContentSection = register(ToolbarContentSection(id = id, baseClass = baseClass), content)
 
-fun ToolbarContentSection.pfToolbarGroup(
+public fun ToolbarContentSection.pfToolbarGroup(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarGroup.() -> Unit = {}
 ): ToolbarGroup = register(ToolbarGroup(id = id, baseClass = baseClass), content)
 
-fun ToolbarContentSection.pfToolbarItem(
+public fun ToolbarContentSection.pfToolbarItem(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarItem.() -> Unit = {}
 ): ToolbarItem = register(ToolbarItem(id = id, baseClass = baseClass), content)
 
-fun ToolbarGroup.pfToolbarItem(
+public fun ToolbarGroup.pfToolbarItem(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarItem.() -> Unit = {}
 ): ToolbarItem = register(ToolbarItem(id = id, baseClass = baseClass), content)
 
-fun ToolbarContent.pfToolbarExpandableContent(
+public fun ToolbarContent.pfToolbarExpandableContent(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarExpandableContent.() -> Unit = {}
 ): ToolbarExpandableContent = register(ToolbarExpandableContent(id = id, baseClass = baseClass), content)
 
-fun ToolbarExpandableContent.pfToolbarGroup(
+public fun ToolbarExpandableContent.pfToolbarGroup(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarGroup.() -> Unit = {}
 ): ToolbarGroup = register(ToolbarGroup(id = id, baseClass = baseClass), content)
 
-fun <T> ToolbarItem.pfBulkSelect(
+public fun <T> ToolbarItem.pfBulkSelect(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
@@ -72,7 +69,7 @@ fun <T> ToolbarItem.pfBulkSelect(
     return register(BulkSelect(itemStore, id = id, baseClass = baseClass), content)
 }
 
-fun <T> ToolbarItem.pfSortOptions(
+public fun <T> ToolbarItem.pfSortOptions(
     itemStore: ItemStore<T>,
     options: List<SortInfo<T>>,
     id: String? = null,
@@ -80,7 +77,7 @@ fun <T> ToolbarItem.pfSortOptions(
     content: SortOptions<T>.() -> Unit = {}
 ): SortOptions<T> = register(SortOptions(itemStore, options, id = id, baseClass = baseClass), content)
 
-fun <T> ToolbarItem.pfPagination(
+public fun <T> ToolbarItem.pfPagination(
     itemStore: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
@@ -103,29 +100,29 @@ fun <T> ToolbarItem.pfPagination(
 
 // ------------------------------------------------------ tag
 
-class Toolbar internal constructor(id: String?, baseClass: String?) :
+public class Toolbar internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Toolbar, baseClass)) {
     init {
         markAs(ComponentType.Toolbar)
     }
 }
 
-class ToolbarContent internal constructor(id: String?, baseClass: String?) :
+public class ToolbarContent internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("content"), baseClass))
 
-class ToolbarContentSection internal constructor(id: String?, baseClass: String?) :
+public class ToolbarContentSection internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("content", "section"), baseClass))
 
-class ToolbarGroup internal constructor(id: String?, baseClass: String?) :
+public class ToolbarGroup internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("group"), baseClass))
 
-class ToolbarItem internal constructor(id: String?, baseClass: String?) :
+public class ToolbarItem internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("item"), baseClass))
 
-class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?) :
+public class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass))
 
-class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?) :
+public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?) :
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass) {
 
     init {
@@ -148,9 +145,9 @@ class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, b
         display = {
             { +it.item.text }
         }
-        store.clicked.unwrap().filter { it == PreSelection.NONE }.map { Unit } handledBy itemStore.selectNone
-        store.clicked.unwrap().filter { it == PreSelection.VISIBLE }.map { Unit } handledBy itemStore.selectVisible
-        store.clicked.unwrap().filter { it == PreSelection.ALL }.map { Unit } handledBy itemStore.selectAll
+        store.select.unwrap().filter { it == PreSelection.NONE }.map { Unit } handledBy itemStore.selectNone
+        store.select.unwrap().filter { it == PreSelection.VISIBLE }.map { Unit } handledBy itemStore.selectVisible
+        store.select.unwrap().filter { it == PreSelection.ALL }.map { Unit } handledBy itemStore.selectAll
 
         pfDropdownItems {
             PreSelection.values().map { pfItem(it) }
@@ -158,7 +155,7 @@ class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, b
     }
 }
 
-class SortOptions<T> internal constructor(
+public class SortOptions<T> internal constructor(
     itemStore: ItemStore<T>,
     options: List<SortInfo<T>>,
     id: String?,
@@ -202,13 +199,14 @@ class SortOptions<T> internal constructor(
 
 // ------------------------------------------------------ types
 
-enum class PreSelection(val text: String) {
+public enum class PreSelection(public val text: String) {
     NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
 }
 
-sealed class SortOption(var text: String)
+public sealed class SortOption(public var text: String)
 
-class SortProperty<T>(val id: String, text: String, val comparator: Comparator<T>) : SortOption(text) {
+public class SortProperty<T>(public val id: String, text: String, public val comparator: Comparator<T>) :
+    SortOption(text) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class.js != other::class.js) return false
@@ -228,7 +226,7 @@ class SortProperty<T>(val id: String, text: String, val comparator: Comparator<T
 
 }
 
-class SortOrder(val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending") {
+public class SortOrder(public val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending") {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class.js != other::class.js) return false

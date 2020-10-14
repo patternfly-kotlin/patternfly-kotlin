@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfEmptyState(
+public fun HtmlElements.pfEmptyState(
     iconClass: String,
     title: String,
     size: Size? = null,
@@ -15,19 +15,19 @@ fun HtmlElements.pfEmptyState(
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyState = register(EmptyState(iconClass, title, size, id = id, baseClass = baseClass, content), {})
 
-fun EmptyState.pfEmptyStateContent(
+public fun EmptyState.pfEmptyStateContent(
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyStateContent = register(EmptyStateContent(id = id, baseClass = baseClass), content)
 
-fun EmptyStateContent.pfEmptyStateBody(
+public fun EmptyStateContent.pfEmptyStateBody(
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateBody.() -> Unit = {}
 ): EmptyStateBody = register(EmptyStateBody(id = id, baseClass = baseClass), content)
 
-fun EmptyStateContent.pfEmptyStateSecondary(
+public fun EmptyStateContent.pfEmptyStateSecondary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
@@ -35,7 +35,7 @@ fun EmptyStateContent.pfEmptyStateSecondary(
 
 // ------------------------------------------------------ tag
 
-class EmptyState(
+public class EmptyState internal constructor(
     iconClass: String,
     title: String,
     size: Size?,
@@ -61,8 +61,8 @@ class EmptyState(
     }
 }
 
-class EmptyStateBody(id: String?, baseClass: String?) :
+public class EmptyStateBody internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("empty-state".component("body"), baseClass))
 
-class EmptyStateContent(id: String?, baseClass: String?) :
+public class EmptyStateContent internal constructor(id: String?, baseClass: String?) :
     Div(id = id, baseClass = classes("empty-state".component("content"), baseClass))

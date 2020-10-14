@@ -4,7 +4,7 @@ import dev.fritz2.binding.Patch
 import dev.fritz2.binding.Seq
 import kotlinx.coroutines.flow.map
 
-fun <T> Seq<T>.shift(amount: Int) = Seq(this.data.map { patch ->
+public fun <T> Seq<T>.shift(amount: Int): Seq<T> = Seq(this.data.map { patch ->
     when (patch) {
         is Patch.Insert -> patch.copy(index = patch.index + amount)
         is Patch.InsertMany -> patch.copy(index = patch.index + amount)

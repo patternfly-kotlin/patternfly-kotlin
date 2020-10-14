@@ -20,7 +20,7 @@ import org.w3c.dom.HTMLInputElement
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfPagination(
+public fun <T> HtmlElements.pfPagination(
     store: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
@@ -30,7 +30,7 @@ fun <T> HtmlElements.pfPagination(
 ): Pagination =
     register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass), content)
 
-fun HtmlElements.pfPagination(
+public fun HtmlElements.pfPagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
@@ -44,9 +44,9 @@ fun HtmlElements.pfPagination(
 
 // ------------------------------------------------------ tag
 
-class Pagination internal constructor(
-    val pageInfoHandler: PageInfoHandler,
-    val pageInfoFlow: Flow<PageInfo>,
+public class Pagination internal constructor(
+    public val pageInfoHandler: PageInfoHandler,
+    public val pageInfoFlow: Flow<PageInfo>,
     pageSizes: Array<Int>,
     compact: Boolean,
     id: String?,
@@ -145,7 +145,7 @@ class Pagination internal constructor(
         }
     }
 
-    var disabled: Flow<Boolean>
+    public var disabled: Flow<Boolean>
         get() = throw NotImplementedError()
         set(flow) {
             object : SingleMountPoint<Boolean>(flow) {
@@ -164,7 +164,7 @@ class Pagination internal constructor(
 
 // ------------------------------------------------------ store
 
-fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
+public fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {
         this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.bind(true)
         +" - "
@@ -176,19 +176,19 @@ fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     }
 }
 
-interface PageInfoHandler {
+public interface PageInfoHandler {
 
-    val gotoFirstPage: Handler<Unit>
-    val gotoPreviousPage: Handler<Unit>
-    val gotoNextPage: Handler<Unit>
-    val gotoLastPage: Handler<Unit>
-    val gotoPage: Handler<Int>
-    val pageSize: Handler<Int>
-    val total: Handler<Int>
-    val refresh: Handler<Unit>
+    public val gotoFirstPage: Handler<Unit>
+    public val gotoPreviousPage: Handler<Unit>
+    public val gotoNextPage: Handler<Unit>
+    public val gotoLastPage: Handler<Unit>
+    public val gotoPage: Handler<Int>
+    public val pageSize: Handler<Int>
+    public val total: Handler<Int>
+    public val refresh: Handler<Unit>
 }
 
-class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInfoHandler {
+public class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInfoHandler {
 
     override val gotoFirstPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoFirstPage() }
     override val gotoPreviousPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoPreviousPage() }

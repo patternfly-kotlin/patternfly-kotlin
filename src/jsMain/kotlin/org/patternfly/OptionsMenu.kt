@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.SingleMountPoint
@@ -24,7 +25,7 @@ import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfOptionsMenu(
+public fun <T> HtmlElements.pfOptionsMenu(
     store: OptionStore<T> = OptionStore(),
     align: Align? = null,
     up: Boolean = false,
@@ -33,19 +34,19 @@ fun <T> HtmlElements.pfOptionsMenu(
     content: OptionsMenu<T>.() -> Unit = {}
 ): OptionsMenu<T> = register(OptionsMenu(store, align, up, id = id, baseClass = baseClass), content)
 
-fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
+public fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
     id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
     baseClass: String? = null,
     content: OptionsMenuToggle<T>.() -> Unit = {}
 ): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, id = id, baseClass = baseClass), content)
 
-fun <T> OptionsMenu<T>.pfOptionsMenuTogglePlain(
+public fun <T> OptionsMenu<T>.pfOptionsMenuTogglePlain(
     id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
     baseClass: String? = null,
     content: OptionsMenuTogglePlain<T>.() -> Unit = {}
 ): OptionsMenuTogglePlain<T> = register(OptionsMenuTogglePlain(this, id = id, baseClass = baseClass), content)
 
-fun <T> OptionsMenu<T>.pfOptionsMenuItems(
+public fun <T> OptionsMenu<T>.pfOptionsMenuItems(
     id: String? = null,
     baseClass: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
@@ -57,7 +58,7 @@ fun <T> OptionsMenu<T>.pfOptionsMenuItems(
     return element
 }
 
-fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
+public fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
     id: String? = null,
     baseClass: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
@@ -71,8 +72,8 @@ fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
 
 // ------------------------------------------------------ tag
 
-open class OptionsMenu<T> internal constructor(
-    val store: OptionStore<T>,
+public open class OptionsMenu<T> internal constructor(
+    public val store: OptionStore<T>,
     internal val optionsMenuAlign: Align?,
     up: Boolean,
     id: String?,
@@ -83,13 +84,13 @@ open class OptionsMenu<T> internal constructor(
     +("top".modifier() `when` up)
     +baseClass
 }) {
-    lateinit var toggle: OptionsMenuToggleBase<out HTMLElement, T>
+    public lateinit var toggle: OptionsMenuToggleBase<out HTMLElement, T>
 
-    val ces = CollapseExpandStore { target ->
+    public val ces: CollapseExpandStore = CollapseExpandStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
 
-    var display: ComponentDisplay<Button, Item<T>> = {
+    public var display: ComponentDisplay<Button, Item<T>> = {
         {
             +it.item.toString()
         }
@@ -101,7 +102,7 @@ open class OptionsMenu<T> internal constructor(
     }
 }
 
-sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
+public sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
     private val optionsMenu: OptionsMenu<T>,
     tagName: String,
     id: String? = null,
@@ -109,7 +110,7 @@ sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
 ) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
 
     internal lateinit var toggleId: String
-    abstract var disabled: Flow<Boolean>
+    public abstract var disabled: Flow<Boolean>
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
@@ -122,7 +123,7 @@ sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
     }
 }
 
-class OptionsMenuToggle<T> internal constructor(
+public class OptionsMenuToggle<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
     id: String?,
     baseClass: String?,
@@ -138,7 +139,7 @@ class OptionsMenuToggle<T> internal constructor(
         initToggle(this)
     }
 
-    var content: (Span.() -> Unit)? = null
+    public var content: (Span.() -> Unit)? = null
         set(value) {
             domNode.clear()
             domNode.classList -= "plain".modifier()
@@ -163,7 +164,7 @@ class OptionsMenuToggle<T> internal constructor(
             }
         }
 
-    var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
+    public var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
         set(value) {
             domNode.clear()
             domNode.classList += "plain".modifier()
@@ -172,7 +173,7 @@ class OptionsMenuToggle<T> internal constructor(
         }
 }
 
-class OptionsMenuTogglePlain<T> internal constructor(
+public class OptionsMenuTogglePlain<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
     id: String?,
     baseClass: String?,
@@ -200,7 +201,7 @@ class OptionsMenuTogglePlain<T> internal constructor(
         }
     }
 
-    var content: (Span.() -> Unit)? = null
+    public var content: (Span.() -> Unit)? = null
         set(value) {
             val span = Span(baseClass = "options-menu".component("toggle-text")).apply {
                 value?.invoke(this)
@@ -221,7 +222,7 @@ class OptionsMenuTogglePlain<T> internal constructor(
         }
 }
 
-class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
+public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
     private val optionsMenu: OptionsMenu<T>,
     tagName: String,
     id: String?,
@@ -296,9 +297,10 @@ class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 // ------------------------------------------------------ store
 
-class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
+public class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val select: SimpleHandler<Item<T>> = handle { entries, item ->
+    internal val select: OfferingHandler<Item<T>, Item<T>> = handleAndOffer { entries, item ->
+        offer(item)
         handleEntries(entries, item)
     }
 
@@ -333,10 +335,10 @@ class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
             entry.copy(selected = false)
         }
 
-    val items: Flow<List<Item<T>>> = data.flatItems()
-    val groups: Flow<List<Group<T>>> = data.groups()
-    val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
+    public val items: Flow<List<Item<T>>> = data.flatItems()
+    public val groups: Flow<List<Group<T>>> = data.groups()
+    public val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
         items.filter { it.selected }
     }
-    val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
+    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
 }

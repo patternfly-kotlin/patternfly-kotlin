@@ -16,9 +16,9 @@ import org.w3c.dom.Text
 import org.w3c.dom.get
 import org.w3c.dom.set
 
-const val COMPONENT_TYPE = "pfct"
+public const val COMPONENT_TYPE: String = "pfct"
 
-typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
+public typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
 
 // ------------------------------------------------------ types
 
@@ -55,7 +55,7 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
 // ------------------------------------------------------ enums
 
-enum class ComponentType(val id: String, internal val baseClass: String? = null) {
+public enum class ComponentType(public val id: String, internal val baseClass: String? = null) {
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
     Badge("bdg", "badge".component()),
@@ -90,34 +90,34 @@ enum class ComponentType(val id: String, internal val baseClass: String? = null)
     TreeView("tv", "tree-view".component());
 }
 
-enum class Align(val modifier: String) {
+public enum class Align(public val modifier: String) {
     LEFT("align-left".modifier()), RIGHT("align-right".modifier())
 }
 
-enum class DividerVariant {
+public enum class DividerVariant {
     HR, DIV, LI
 }
 
-enum class ExpansionMode {
+public enum class ExpansionMode {
     SINGLE, MULTI
 }
 
-enum class Orientation {
+public enum class Orientation {
     HORIZONTAL, VERTICAL
 }
 
-enum class Position(val modifier: String) {
+public enum class Position(public val modifier: String) {
     START("start".modifier()), END("end".modifier())
 }
 
-enum class SelectionMode {
+public enum class SelectionMode {
     NONE, SINGLE, MULTIPLE
 }
 
-enum class Severity(
-    val modifier: String?,
-    val iconClass: String,
-    val aria: String
+public enum class Severity(
+    public val modifier: String?,
+    public val iconClass: String,
+    public val aria: String
 ) {
     DEFAULT(null, "bell".fas(), "Default alert"),
     INFO("info".modifier(), "info-circle".fas(), "Info alert"),
@@ -126,7 +126,7 @@ enum class Severity(
     DANGER("danger".modifier(), "exclamation-circle".fas(), "Danger alert");
 }
 
-enum class Size(val modifier: String) {
+public enum class Size(public val modifier: String) {
     XL_4("4xl".modifier()),
     XL_3("3xl".modifier()),
     XL_2("2xl".modifier()),
@@ -135,4 +135,4 @@ enum class Size(val modifier: String) {
     MD("md".modifier())
 }
 
-enum class TriState { OFF, INDETERMINATE, ON }
+public enum class TriState { OFF, INDETERMINATE, ON }

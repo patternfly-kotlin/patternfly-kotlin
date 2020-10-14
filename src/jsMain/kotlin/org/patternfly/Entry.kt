@@ -6,51 +6,51 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ dsl
 
-fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
+public fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
 
-fun <T> pfGroups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
+public fun <T> pfGroups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
 
-fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-fun <T> ItemsBuilder<T>.pfSeparator() {
+public fun <T> ItemsBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
-fun <T> GroupsBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+public fun <T> GroupsBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
-fun <T> GroupsBuilder<T>.pfSeparator() {
+public fun <T> GroupsBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
-fun <T> EntriesBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> EntriesBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-fun <T> EntriesBuilder<T>.pfSeparator() {
+public fun <T> EntriesBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
-fun <T> EntriesBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+public fun <T> EntriesBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
-fun <T> GroupBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> GroupBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-fun <T> GroupBuilder<T>.pfSeparator() {
+public fun <T> GroupBuilder<T>.pfSeparator() {
     entries.add(Separator())
 }
 
 // ------------------------------------------------------ flow extensions
 
-fun <T> Flow<List<Entry<T>>>.groups() = this.map { it.filterIsInstance<Group<T>>() }
+public fun <T> Flow<List<Entry<T>>>.groups(): Flow<List<Group<T>>> = this.map { it.filterIsInstance<Group<T>>() }
 
-fun <T> Flow<List<Entry<T>>>.flatItems() = this.map {
+public fun <T> Flow<List<Entry<T>>>.flatItems(): Flow<List<Item<T>>> = this.map {
     it.flatMap { entry ->
         when (entry) {
             is Item<T> -> listOf(entry)
@@ -62,10 +62,10 @@ fun <T> Flow<List<Entry<T>>>.flatItems() = this.map {
 
 // ------------------------------------------------------ data classes
 
-/** Entry used in simple components like [Dropdown], [OptionsMenu] or [Select]. */
-sealed class Entry<T>
+/** Entry used in components like [Dropdown], [OptionsMenu] or [Select]. */
+public sealed class Entry<T>
 
-data class Group<T> internal constructor(
+public data class Group<T> internal constructor(
     internal val id: String = Id.unique("grp"),
     val title: String?,
     val items: List<Entry<T>>
@@ -78,7 +78,7 @@ data class Group<T> internal constructor(
     }
 }
 
-data class Item<T> internal constructor(
+public data class Item<T> internal constructor(
     override val item: T,
     val disabled: Boolean,
     val selected: Boolean,
@@ -103,35 +103,35 @@ data class Item<T> internal constructor(
     }
 }
 
-class Separator<T> : Entry<T>()
+public class Separator<T> : Entry<T>()
 
-class ItemsBuilder<T> {
+public class ItemsBuilder<T> {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-class EntriesBuilder<T> {
+public class EntriesBuilder<T> {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-class GroupsBuilder<T> {
+public class GroupsBuilder<T> {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-class GroupBuilder<T>(private val title: String?) {
+public class GroupBuilder<T>(private val title: String?) {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): Group<T> = Group(title = title, items = entries).apply {
         items.filterIsInstance<Item<T>>().forEach { it.group = this }
     }
 }
 
-class ItemBuilder<T>(private val item: T) {
-    var disabled: Boolean = false
-    var selected: Boolean = false
-    var description: String = ""
-    var icon: (Span.() -> Unit)? = null
+public class ItemBuilder<T>(private val item: T) {
+    public var disabled: Boolean = false
+    public var selected: Boolean = false
+    public var description: String = ""
+    public var icon: (Span.() -> Unit)? = null
 
     internal fun build(): Item<T> = Item(item, disabled, selected, description, icon, null)
 }

@@ -1,6 +1,6 @@
 package org.patternfly
 
-object Settings {
+public object Settings {
 
-    var notificationTimeout: Int = 8000 // ms
+    public var notificationTimeout: Int = 8000 // ms
 }

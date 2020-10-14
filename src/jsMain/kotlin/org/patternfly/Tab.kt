@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.action
@@ -25,7 +26,7 @@ import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfTabs(
+public fun <T> HtmlElements.pfTabs(
     store: TabStore<T> = TabStore(),
     box: Boolean = false,
     filled: Boolean = false,
@@ -47,7 +48,7 @@ fun <T> HtmlElements.pfTabs(
     return tabs
 }
 
-fun <T> TabItemsBuilder<T>.pfTabItem(
+public fun <T> TabItemsBuilder<T>.pfTabItem(
     item: T,
     selected: Boolean = false,
     icon: (Span.() -> Unit)? = null,
@@ -58,11 +59,11 @@ fun <T> TabItemsBuilder<T>.pfTabItem(
 
 // ------------------------------------------------------ tag
 
-class Tabs<T> internal constructor(
-    val store: TabStore<T>,
-    val box: Boolean,
-    val filled: Boolean,
-    val vertical: Boolean,
+public class Tabs<T> internal constructor(
+    public val store: TabStore<T>,
+    public val box: Boolean,
+    public val filled: Boolean,
+    public val vertical: Boolean,
     id: String?,
     baseClass: String?
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id) {
@@ -155,7 +156,7 @@ class Tabs<T> internal constructor(
         }.map { updateScrollButtons(tabs.domNode) }.filterNotNull() handledBy scrollStore.update
     }
 
-    private fun selectId(tabItem: TabItem<T>) = "${store.identifier(tabItem.item)}-${tabItem.selected}"
+    private fun selectId(tabItem: TabItem<T>) = Id.build(store.identifier(tabItem.item), tabItem.selected.toString())
     private fun tabId(item: T) = Id.build(store.identifier(item), "tab")
     private fun contentId(item: T) = Id.build(store.identifier(item), "cnt")
 
@@ -214,7 +215,7 @@ class Tabs<T> internal constructor(
     }
 }
 
-class TabContent<T> internal constructor(val item: T, tabId: String, contentId: String) :
+public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String) :
     PatternFlyComponent<HTMLElement>,
     TextElement("section", id = contentId, baseClass = classes("tab".component("content"))) {
 
@@ -227,7 +228,7 @@ class TabContent<T> internal constructor(val item: T, tabId: String, contentId: 
 
 // ------------------------------------------------------ store
 
-class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
+internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
 
     val showButtons: SimpleHandler<Boolean> = handle { scrollButton, show ->
         scrollButton.copy(showButtons = show)
@@ -242,25 +243,26 @@ class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
     }
 }
 
-class TabStore<T>(val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
+public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
-    val select: SimpleHandler<TabItem<T>> = handle { items, tab ->
+    public val select: OfferingHandler<TabItem<T>, TabItem<T>> = handleAndOffer { items, tab ->
+        offer(tab)
         items.map { if (identifier(it.item) == identifier(tab.item)) it.select() else it.unselect() }
     }
 }
 
 // ------------------------------------------------------ types
 
-data class ScrollButton(
+public data class ScrollButton(
     val showButtons: Boolean = false,
     val disableLeft: Boolean = true,
     val disableRight: Boolean = false
 )
 
-class TabItem<T>(
+public class TabItem<T>(
     override val item: T,
-    val selected: Boolean = false,
+    public val selected: Boolean = false,
     internal val icon: (Span.() -> Unit)? = null,
     internal val content: TabContent<T>.() -> Unit = {}
 ) : HasItem<T> {
@@ -268,14 +270,14 @@ class TabItem<T>(
     internal fun unselect(): TabItem<T> = TabItem(item, false, icon, content)
 }
 
-class TabItemsBuilder<T> internal constructor(private val tabs: Tabs<T>) {
+public class TabItemsBuilder<T> internal constructor(private val tabs: Tabs<T>) {
     internal val tabItems: MutableList<TabItem<T>> = mutableListOf()
 
-    var itemDisplay: ComponentDisplay<Span, T> = {
+    public var itemDisplay: ComponentDisplay<Span, T> = {
         { +it.toString() }
     }
 
-    var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
+    public var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
 
     internal fun build(): List<TabItem<T>> {
         tabs.tabDisplay = itemDisplay

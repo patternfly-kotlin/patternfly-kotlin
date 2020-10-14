@@ -8,19 +8,19 @@ import org.w3c.dom.HTMLButtonElement
 
 // ------------------------------------------------------ dsl
 
-fun HtmlElements.pfButton(
+public fun HtmlElements.pfButton(
     id: String? = null,
     baseClass: String? = null,
     content: Button.() -> Unit = {}
 ): Button = register(Button(id = id, baseClass = baseClass), content)
 
-fun HtmlElements.pfLinkButton(
+public fun HtmlElements.pfLinkButton(
     id: String? = null,
     baseClass: String? = null,
     content: LinkButton.() -> Unit = {}
 ): LinkButton = register(LinkButton(id = id, baseClass = baseClass), content)
 
-fun Button.pfIcon(
+public fun Button.pfIcon(
     position: Position,
     iconClass: String,
     content: Icon.() -> Unit = {}
@@ -30,7 +30,7 @@ fun Button.pfIcon(
 
 // ------------------------------------------------------ tag
 
-class Button internal constructor(id: String?, baseClass: String?) :
+public class Button internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLButtonElement>,
     dev.fritz2.dom.html.Button(id = id, baseClass = classes(ComponentType.Button, baseClass)) {
     init {
@@ -38,7 +38,7 @@ class Button internal constructor(id: String?, baseClass: String?) :
     }
 }
 
-class LinkButton internal constructor(id: String?, baseClass: String?) :
+public class LinkButton internal constructor(id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLAnchorElement>,
     A(id = id, baseClass = classes(ComponentType.Button, baseClass)) {
     init {

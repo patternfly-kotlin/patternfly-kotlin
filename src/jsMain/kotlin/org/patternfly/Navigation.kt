@@ -18,7 +18,7 @@ import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
-fun <T> HtmlElements.pfHorizontalNavigation(
+public fun <T> HtmlElements.pfHorizontalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
     tertiary: Boolean = false,
@@ -26,9 +26,11 @@ fun <T> HtmlElements.pfHorizontalNavigation(
     baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
 ): Navigation<T> =
-    register(Navigation(router, selected, Orientation.HORIZONTAL, tertiary, id = id, baseClass = baseClass, content), {})
+    register(
+        Navigation(router, selected, Orientation.HORIZONTAL, tertiary, id = id, baseClass = baseClass, content),
+        {})
 
-fun <T> HtmlElements.pfVerticalNavigation(
+public fun <T> HtmlElements.pfVerticalNavigation(
     router: Router<T>,
     selected: (route: T, item: T) -> Boolean = { route, item -> route == item },
     id: String? = null,
@@ -37,14 +39,14 @@ fun <T> HtmlElements.pfVerticalNavigation(
 ): Navigation<T> =
     register(Navigation(router, selected, Orientation.VERTICAL, false, id = id, baseClass = baseClass, content), {})
 
-fun <T> Navigation<T>.pfNavigationGroup(
+public fun <T> Navigation<T>.pfNavigationGroup(
     text: String,
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationGroup<T> = register(NavigationGroup(this, text, id = id, baseClass = baseClass, content), {})
 
-fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
+public fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
     text: String,
     id: String? = null,
     baseClass: String? = null,
@@ -52,13 +54,13 @@ fun <T> NavigationItems<T>.pfNavigationExpandableGroup(
 ): NavigationExpandableGroup<T> =
     register(NavigationExpandableGroup(this.navigation, text, id = id, baseClass = baseClass, content), {})
 
-fun <T> Navigation<T>.pfNavigationItems(
+public fun <T> Navigation<T>.pfNavigationItems(
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(this, id = id, baseClass = baseClass), content)
 
-fun <T> NavigationGroup<T>.pfNavigationItems(
+public fun <T> NavigationGroup<T>.pfNavigationItems(
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
@@ -71,7 +73,7 @@ internal fun <T> TextElement.pfNavigationItems(
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(navigation, id = id, baseClass = baseClass), content)
 
-fun <T> NavigationItems<T>.pfNavigationItem(
+public fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     text: String,
     id: String? = null,
@@ -79,7 +81,7 @@ fun <T> NavigationItems<T>.pfNavigationItem(
     selected: ((route: T) -> Boolean)? = null
 ): NavigationItem<T> = pfNavigationItem(item, id, baseClass, selected) { +text }
 
-fun <T> NavigationItems<T>.pfNavigationItem(
+public fun <T> NavigationItems<T>.pfNavigationItem(
     item: T,
     id: String? = null,
     baseClass: String? = null,
@@ -90,7 +92,7 @@ fun <T> NavigationItems<T>.pfNavigationItem(
 
 // ------------------------------------------------------ tag
 
-class Navigation<T>(
+public class Navigation<T> internal constructor(
     internal val router: Router<T>,
     internal val selected: (route: T, item: T) -> Boolean,
     orientation: Orientation,
@@ -129,7 +131,7 @@ class Navigation<T>(
     }
 }
 
-class NavigationGroup<T> internal constructor(
+public class NavigationGroup<T> internal constructor(
     internal val navigation: Navigation<T>,
     text: String,
     id: String?,
@@ -144,7 +146,7 @@ class NavigationGroup<T> internal constructor(
     }
 }
 
-class NavigationExpandableGroup<T>(
+public class NavigationExpandableGroup<T> internal constructor(
     private val navigation: Navigation<T>,
     text: String,
     id: String?,
@@ -194,10 +196,13 @@ class NavigationExpandableGroup<T>(
     }
 }
 
-class NavigationItems<T>(internal val navigation: Navigation<T>, id: String?, baseClass: String?) :
-    Tag<HTMLUListElement>("ul", id = id, baseClass = classes("nav".component("list"), baseClass))
+public class NavigationItems<T> internal constructor(
+    internal val navigation: Navigation<T>,
+    id: String?,
+    baseClass: String?
+) : Tag<HTMLUListElement>("ul", id = id, baseClass = classes("nav".component("list"), baseClass))
 
-class NavigationItem<T>(
+public class NavigationItem<T> internal constructor(
     private val navigation: Navigation<T>,
     private val item: T,
     private val selected: ((route: T) -> Boolean)?,
