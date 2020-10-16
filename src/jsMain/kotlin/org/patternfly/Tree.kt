@@ -1,7 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.action
 import dev.fritz2.binding.each
 import dev.fritz2.binding.handledBy
@@ -12,9 +11,13 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.render
 import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
@@ -89,16 +92,28 @@ internal fun test() {
 
 // ------------------------------------------------------ tag
 
+private const val TREE_ITEM = "treeItem"
+
 public class TreeView<T> internal constructor(internal val store: TreeStore<T>, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass)) {
+
+    private val tus: TreeUpdateStore = TreeUpdateStore()
 
     init {
         markAs(ComponentType.TreeView)
         ul {
             attr("role", "tree")
-            this@TreeView.store.rootItems.each { this@TreeView.treeItemId(it) }.render { treeItem ->
+            this@TreeView.store.rootItems.each().render { treeItem ->
                 this@TreeView.renderTreeItem(this@ul, treeItem)
             }.bind()
+        }
+
+        MainScope().launch {
+            tus.data.collect {
+                domNode.querySelector(By.data(TREE_ITEM, it))?.let { element ->
+                    console.log("Receive update for $it: ${element.debug()}")
+                }
+            }
         }
     }
 
@@ -112,6 +127,7 @@ public class TreeView<T> internal constructor(internal val store: TreeStore<T>, 
             }) {
                 attr("role", "treeitem")
                 attr("tabindex", "0")
+                domNode.dataset[TREE_ITEM] = this@TreeView.store.identifier(treeItem.item)
                 if (treeItem.hasChildren) {
                     aria["expanded"] = treeItem.expanded
                 }
@@ -120,6 +136,9 @@ public class TreeView<T> internal constructor(internal val store: TreeStore<T>, 
                         if (treeItem.hasChildren) {
                             span(baseClass = "tree-view".component("node", "toggle", "icon")) {
                                 pfIcon("angle-right".fas())
+                                clicks.map {
+                                    this@TreeView.store.identifier(treeItem.item)
+                                } handledBy this@TreeView.tus.update
                             }
                         }
                         span(baseClass = "tree-view".component("node", "text")) {
@@ -127,7 +146,7 @@ public class TreeView<T> internal constructor(internal val store: TreeStore<T>, 
                         }
                     }
                 }
-                if (treeItem.children.isNotEmpty()) {
+                if (treeItem.children.isNotEmpty() && treeItem.expanded) {
                     ul {
                         attr("role", "group")
                         for (childItem in treeItem.children) {
@@ -139,14 +158,6 @@ public class TreeView<T> internal constructor(internal val store: TreeStore<T>, 
         }
         return li
     }
-
-    private fun treeItemId(treeItem: TreeItem<T>) = Id.build(
-        store.identifier(treeItem.item),
-        "exp",
-        treeItem.expanded.toString(),
-        "sel",
-        treeItem.selected.toString(),
-    )
 }
 
 // ------------------------------------------------------ store
@@ -154,27 +165,10 @@ public class TreeView<T> internal constructor(internal val store: TreeStore<T>, 
 public class TreeStore<T>(public val identifier: IdProvider<T, String>) :
     RootStore<TreeItems<T>>(TreeItems(identifier)) {
 
-    internal var currentTreeItem: TreeItem<T>? = null
     public val rootItems: Flow<List<TreeItem<T>>> = data.map { it.rootItems }
+}
 
-    public val current: SimpleHandler<TreeItem<T>> = handle { items, item ->
-        currentTreeItem = item
-        items
-    }
-
-    public val select: SimpleHandler<TreeItem<T>> = handle { items, item ->
-        items.find(item.item)?.let {
-            it.selected = true
-        }
-        items
-    }
-
-    public val toggle: SimpleHandler<TreeItem<T>> = handle { items, item ->
-        items.find(item.item)?.let {
-            it.expanded = !it.expanded
-        }
-        items
-    }
+internal class TreeUpdateStore() : RootStore<String>("", dropInitialData = true) {
 }
 
 // ------------------------------------------------------ type
@@ -253,6 +247,17 @@ public class TreeItem<T>(
             false
         }
     }
+
+    override fun toString(): String = "TreeItem(item=$item, expanded=$expanded, selected=$selected)"
+
+    internal fun treeId(identifier: IdProvider<T, String>): String = buildString {
+        append(identifier(item))
+        append(if (expanded) "1" else "0")
+        append(if (selected) "1" else "0")
+        for (child in children) {
+            append(child.treeId(identifier))
+        }
+    }
 }
 
 // ------------------------------------------------------ builder
@@ -270,7 +275,7 @@ public class TreeItemsBuilder<T> {
 }
 
 public class TreeItemBuilder<T>(private val item: T) {
-    public var expanded: Boolean = true //false
+    public var expanded: Boolean = false
     public var selected: Boolean = false
     public var icon: (Span.() -> Unit)? = null
     public var expandedIcon: (Span.() -> Unit)? = null
