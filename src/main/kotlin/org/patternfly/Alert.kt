@@ -7,6 +7,7 @@ import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Ul
 import kotlinx.browser.window
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -108,6 +109,7 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 public class Alert internal constructor(
     private val severity: Severity,
     private val text: String,

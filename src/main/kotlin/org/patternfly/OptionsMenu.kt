@@ -2,7 +2,6 @@ package org.patternfly
 
 import dev.fritz2.binding.OfferingHandler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.SingleMountPoint
 import dev.fritz2.binding.action
 import dev.fritz2.binding.each

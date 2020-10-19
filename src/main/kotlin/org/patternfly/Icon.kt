@@ -3,7 +3,6 @@ package org.patternfly
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
 

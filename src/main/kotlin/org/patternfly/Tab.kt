@@ -14,6 +14,7 @@ import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -59,6 +60,7 @@ public fun <T> TabItemsBuilder<T>.pfTabItem(
 
 // ------------------------------------------------------ tag
 
+@OptIn(ExperimentalCoroutinesApi::class)
 public class Tabs<T> internal constructor(
     public val store: TabStore<T>,
     public val box: Boolean,

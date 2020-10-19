@@ -4,6 +4,7 @@ import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -41,6 +42,7 @@ private fun insertBadge(chip: Chip, badge: Badge) {
 
 // ------------------------------------------------------ tag
 
+@OptIn(ExperimentalCoroutinesApi::class)
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,

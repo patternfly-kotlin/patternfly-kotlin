@@ -10,6 +10,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -45,6 +46,7 @@ public fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
 
 // ------------------------------------------------------ tag
 
+@OptIn(ExperimentalCoroutinesApi::class)
 public class ChipGroup<T> internal constructor(
     public val store: ChipGroupStore<T>,
     text: String?,
