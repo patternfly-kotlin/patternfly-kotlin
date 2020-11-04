@@ -6,6 +6,9 @@ import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.Ul
+import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.aria
+import dev.fritz2.elemento.removeFromParent
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope

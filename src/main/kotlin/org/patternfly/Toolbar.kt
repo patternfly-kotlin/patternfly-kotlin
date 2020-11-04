@@ -4,6 +4,7 @@ import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
+import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map

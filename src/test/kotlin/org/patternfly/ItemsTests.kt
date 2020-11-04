@@ -13,7 +13,7 @@ import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
 import io.kotest.property.forAll
 
-open class ItemTests : FunSpec({
+open class ItemsTests : FunSpec({
 
     test("New Items") {
         with(Items<Int>({ it.toString() })) {

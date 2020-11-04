@@ -1,14 +1,11 @@
-@file:Suppress("SpellCheckingInspection")
-
 plugins {
-    kotlin("js") version "1.4.10"
-    id("org.jetbrains.dokka") version "1.4.10"
+    kotlin("js") version PluginVersions.js
+    id("org.jetbrains.dokka") version PluginVersions.js
     `maven-publish`
 }
 
-group = "org.patternfly"
-version = "0.1-SNAPSHOT"
-val kotestVersion = "4.3.0"
+group = Constants.group
+version = Constants.version
 
 repositories {
     mavenLocal()
@@ -18,9 +15,19 @@ repositories {
     jcenter()
 }
 
+dependencies {
+    fritz2()
+    implementation(Dependencies.elemento)
+    kotest()
+}
+
 kotlin {
-    explicitApi()
     js {
+        compilations.named("main") {
+            kotlinOptions {
+                freeCompilerArgs += "-Xexplicit-api=strict"
+            }
+        }
         browser {
             testTask {
                 useKarma {
@@ -29,16 +36,21 @@ kotlin {
             }
         }
     }
+}
 
-    sourceSets["main"].dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-        implementation("dev.fritz2:core:0.8-SNAPSHOT")
-    }
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(kotlin.sourceSets.main.get().kotlin)
+}
 
-    sourceSets["test"].dependencies {
-        implementation("io.kotest:kotest-framework-api:$kotestVersion")
-        implementation("io.kotest:kotest-assertions-core:$kotestVersion")
-        implementation("io.kotest:kotest-property:$kotestVersion")
-        implementation("io.kotest:kotest-framework-engine:$kotestVersion")
+publishing {
+    publications {
+        create<MavenPublication>("kotlin") {
+            from(components["kotlin"])
+            artifact(tasks["sourcesJar"])
+            pom {
+                defaultPom()
+            }
+        }
     }
 }

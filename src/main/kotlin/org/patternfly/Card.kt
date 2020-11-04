@@ -7,6 +7,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
+import dev.fritz2.elemento.aria
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement

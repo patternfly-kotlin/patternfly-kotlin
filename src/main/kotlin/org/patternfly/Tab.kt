@@ -12,6 +12,9 @@ import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
+import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.aria
+import dev.fritz2.elemento.isInView
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -245,7 +248,7 @@ internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
     }
 }
 
-public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
+public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
     public val select: OfferingHandler<TabItem<T>, TabItem<T>> = handleAndOffer { items, tab ->

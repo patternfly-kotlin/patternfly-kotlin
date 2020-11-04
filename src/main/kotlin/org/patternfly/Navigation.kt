@@ -6,6 +6,9 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.elemento.By
+import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.querySelector
 import dev.fritz2.routing.Router
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay

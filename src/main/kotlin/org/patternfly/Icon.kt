@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement

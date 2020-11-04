@@ -11,6 +11,10 @@ import dev.fritz2.dom.html.Td
 import dev.fritz2.dom.html.Th
 import dev.fritz2.dom.html.Tr
 import dev.fritz2.dom.states
+import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.aria
+import dev.fritz2.elemento.debug
+import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLTableElement

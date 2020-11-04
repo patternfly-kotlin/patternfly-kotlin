@@ -11,6 +11,7 @@ import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.valuesAsNumber
+import dev.fritz2.elemento.aria
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement

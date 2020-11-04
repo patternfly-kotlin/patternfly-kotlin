@@ -9,6 +9,9 @@ import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.aria
+import dev.fritz2.elemento.removeFromParent
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -152,7 +155,7 @@ public class ChipGroup<T> internal constructor(
 
 // ------------------------------------------------------ store
 
-public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.asId(it.toString()) }) :
+public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<T>>(listOf()) {
 
     public val add: SimpleHandler<T> = handle { items, item -> items + item }
