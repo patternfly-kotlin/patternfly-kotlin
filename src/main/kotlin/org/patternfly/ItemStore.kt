@@ -11,6 +11,7 @@ public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
 
     public val visible: Flow<List<T>> = data.map { it.page }
     public val selected: Flow<Int> = data.map { it.selected.size }
+    public val selection: Flow<List<T>> = data.map { it.selection() }
 
     public val addAll: Handler<List<T>> = handle { items, newItems -> items.addAll(newItems) }
 

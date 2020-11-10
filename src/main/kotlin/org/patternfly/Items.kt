@@ -64,6 +64,10 @@ public data class Items<T>(
 
     public fun isSelected(item: T): Boolean = identifier(item) in selected
 
+    public fun selection(): List<T> = selected.mapNotNull { selectedId ->
+        all.find { identifier(it) == selectedId }
+    }
+
     override fun toString(): String = buildString {
         append("Items(all(").append(all.size).append(")")
         append(",items(").append(items.size).append(")")
