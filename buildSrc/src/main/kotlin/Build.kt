@@ -13,7 +13,7 @@ object PluginVersions {
 
 object Versions {
     const val fritz2 = "0.8-SNAPSHOT"
-    const val elemento = "0.0.1"
+    const val elemento = "0.0.2"
     const val kotest = "4.3.0"
 }
 
@@ -33,7 +33,7 @@ fun DependencyHandler.kotest() {
 }
 
 fun MavenPom.defaultPom() {
-    name.set("mvp")
+    name.set("patternfly-fritz2")
     description.set("Kotlin implementation of PatternFly 4 based on fritz2")
     url.set("https://github.com/patternfly-kotlin/patternfly-fritz2")
     licenses {

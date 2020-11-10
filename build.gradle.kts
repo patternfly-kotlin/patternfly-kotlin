@@ -1,6 +1,6 @@
 plugins {
     kotlin("js") version PluginVersions.js
-    id("org.jetbrains.dokka") version PluginVersions.js
+    id("org.jetbrains.dokka") version PluginVersions.dokka
     `maven-publish`
 }
 
@@ -25,7 +25,7 @@ kotlin {
     js {
         compilations.named("main") {
             kotlinOptions {
-                freeCompilerArgs += "-Xexplicit-api=strict"
+                freeCompilerArgs = listOf("-Xexplicit-api=strict", "-Xopt-in=kotlin.RequiresOptIn")
             }
         }
         browser {
