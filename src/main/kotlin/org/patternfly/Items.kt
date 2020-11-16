@@ -98,7 +98,7 @@ public data class PageInfo(
     val pageSize: Int = DEFAULT_PAGE_SIZE,
     val page: Int = 0,
     val total: Int = 0,
-    private val refreshCounter: Int = 0
+    private val signalUpdate: Int = 0
 ) {
     init {
         require(pageSize > 0) { "Page size must be greater than 0" }
@@ -138,7 +138,7 @@ public data class PageInfo(
     }
 
     internal fun refresh(): PageInfo =
-        copy(refreshCounter = if (refreshCounter == Int.MAX_VALUE) 0 else refreshCounter + 1)
+        copy(signalUpdate = if (signalUpdate == Int.MAX_VALUE) 0 else signalUpdate + 1)
 
     override fun toString(): String = "PageInfo(range=$range,page=($page/$pages),pageSize=$pageSize,total=$total)"
 
