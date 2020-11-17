@@ -171,8 +171,12 @@ public class TreeView<T> internal constructor(
                         }
                         if (this@TreeView.badges && treeItem.hasChildren) {
                             span(baseClass = "tree-view".component("node", "count")) {
+                                val children = if (treeItem.childCount > 0)
+                                    treeItem.childCount
+                                else
+                                    treeItem.children.size
                                 pfBadge {
-                                    +treeItem.childCount.toString()
+                                    +children.toString()
                                 }
                             }
                         }
