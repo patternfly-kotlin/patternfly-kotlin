@@ -1,10 +1,8 @@
 package org.patternfly
 
-import dev.fritz2.binding.each
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Caption
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TBody
 import dev.fritz2.dom.html.Table
 import dev.fritz2.dom.html.Td
@@ -15,6 +13,7 @@ import dev.fritz2.elemento.Id
 import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.debug
 import dev.fritz2.elemento.plusAssign
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLTableElement
@@ -22,18 +21,18 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfDataTable(
+public fun <T> RenderContext.pfDataTable(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
     content: DataTable<T>.() -> Unit = {}
-): DataTable<T> = register(DataTable(itemStore, id = id, baseClass = baseClass), content)
+): DataTable<T> = register(DataTable(itemStore, id = id, baseClass = baseClass, job), content)
 
 public fun <T> DataTable<T>.pfDataTableCaption(
     id: String? = null,
     baseClass: String? = null,
     content: DataTableCaption.() -> Unit = {}
-): DataTableCaption = register(DataTableCaption(id = id, baseClass = baseClass), content)
+): DataTableCaption = register(DataTableCaption(id = id, baseClass = baseClass, job), content)
 
 public fun <T> DataTable<T>.pfDataTableColumns(block: Columns<T>.() -> Unit) {
     columns.apply(block)
@@ -71,12 +70,13 @@ public fun <T> Columns<T>.pfDataTableActionColumn(baseClass: String? = null, dis
 public class DataTable<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : PatternFlyComponent<HTMLTableElement>, Table(id = id, baseClass = classes {
     +ComponentType.DataTable
     +"grid-md".modifier()
     +baseClass
-}) {
+}, job) {
     internal val columns: Columns<T> = Columns()
 
     init {
@@ -119,14 +119,14 @@ public class DataTable<T> internal constructor(
                                 attr("scope", "col")
                                 attr("role", "columnheader")
                                 if (column.sortInfo != null) {
-                                    classMap = this@DataTable.itemStore.data.map {
+                                    classMap(this@DataTable.itemStore.data.map {
                                         mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
-                                    }
-                                    this@DataTable.itemStore.data.map {
+                                    })
+                                    attr("aria-sort", this@DataTable.itemStore.data.map {
                                         if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                                             if (it.sortInfo.ascending) "ascending" else "descending"
                                         } else "none"
-                                    }.bindAttr("aria-sort")
+                                    })
                                 }
                                 if (column.headerDisplay != null) {
                                     column.headerDisplay!!.invoke(this)
@@ -138,8 +138,8 @@ public class DataTable<T> internal constructor(
                                                 +column.label
                                             }
                                             span(baseClass = "table".component("sort", "indicator")) {
-                                                pfIcon {
-                                                    iconClass = this@DataTable.itemStore.data.map {
+                                                icon {
+                                                    iconClass = itemStore.data.map {
                                                         if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                                                             if (it.sortInfo.ascending)
                                                                 "long-arrow-alt-up".fas()
@@ -164,32 +164,32 @@ public class DataTable<T> internal constructor(
 
         if (columns.hasToggle) {
             // use shift(1) to keep the thead at index 0
-            itemStore.visible.each { itemStore.identifier(it) }.render { item ->
-                DataTableExpandableBody(this@DataTable, item)
-            }.shift(1).bind()
+            itemStore.visible.renderEach({ itemStore.identifier(it) }, { item ->
+                DataTableExpandableBody(this@DataTable, item, job)
+            })
         } else {
             tbody {
                 attr("role", "rowgroup")
-                this@DataTable.itemStore.visible.each { this@DataTable.itemStore.identifier(it) }.render { item ->
+                this@DataTable.itemStore.visible.renderEach({ this@DataTable.itemStore.identifier(it) }, { item ->
                     tr {
                         renderCells(this@DataTable, item, "", null)
                     }
-                }.bind()
+                })
             }
         }
     }
 }
 
-public class DataTableCaption internal constructor(id: String?, baseClass: String?) :
-    Caption(id = id, baseClass = baseClass)
+public class DataTableCaption internal constructor(id: String?, baseClass: String?, job: Job) :
+    Caption(id = id, baseClass = baseClass, job)
 
-internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T) : TBody() {
+internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) : TBody(job = job) {
     private val expanded: CollapseExpandStore = CollapseExpandStore()
 
     init {
         val expandableContentId = Id.unique(ComponentType.DataList.id, "ec")
         attr("role", "rowgroup")
-        classMap = expanded.data.map { mapOf("expanded".modifier() to it) }
+        classMap(expanded.data.map { mapOf("expanded".modifier() to it) })
         tr {
             renderCells(dataTable, item, expandableContentId, this@DataTableExpandableBody.expanded)
         }
@@ -197,8 +197,8 @@ internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T) : TB
         if (toggleColumn != null) {
             tr(baseClass = "table".component("expandable-row")) {
                 attr("role", "row")
-                this@DataTableExpandableBody.expanded.data.map { !it }.bindAttr("hidden")
-                classMap = this@DataTableExpandableBody.expanded.data.map { mapOf("expanded".modifier() to it) }
+                attr("hidden", this@DataTableExpandableBody.expanded.data.map { !it })
+                classMap(this@DataTableExpandableBody.expanded.data.map { mapOf("expanded".modifier() to it) })
                 if (toggleColumn.fullWidth) {
                     td {
                         renderExpandableContent(toggleColumn, item, dataTable.columns.size, expandableContentId)
@@ -246,17 +246,17 @@ internal fun <T> Tr.renderCells(
                 if (dataTable.columns.hasToggle) {
                     td(baseClass = classes("table".component("toggle"), column.baseClass)) {
                         attr("role", "cell")
-                        pfButton(baseClass = "plain".modifier()) {
+                        button(baseClass = "plain".modifier()) {
                             aria["labelledby"] = itemId
                             aria["controls"] = expandableContentId
                             aria["label"] = "Details"
                             ces?.let { store ->
-                                classMap = store.data.map { mapOf("expanded".modifier() to it) }
-                                store.data.map { it.toString() }.bindAttr("aria-expanded")
+                                attr("aria-expanded", store.data.map { it.toString() })
+                                classMap(store.data.map { mapOf("expanded".modifier() to it) })
                                 clicks handledBy store.toggle
                             }
                             div(baseClass = "table".component("toggle", "icon")) {
-                                pfIcon("angle-down".fas())
+                                icon("angle-down".fas())
                             }
                         }
                     }
@@ -269,7 +269,7 @@ internal fun <T> Tr.renderCells(
                     attr("role", "cell")
                     input {
                         domNode.type = "checkbox"
-                        checked = dataTable.itemStore.data.map { it.isSelected(item) }
+                        checked(dataTable.itemStore.data.map { it.isSelected(item) })
                         changes.states().map { Pair(item, it) } handledBy dataTable.itemStore.select
                     }
                 }

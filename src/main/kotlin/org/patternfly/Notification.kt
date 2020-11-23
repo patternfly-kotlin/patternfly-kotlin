@@ -2,43 +2,44 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Button
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfNotificationBadge(id: String? = null, baseClass: String? = null): NotificationBadge =
-    register(NotificationBadge(id = id, baseClass = baseClass), {})
+public fun RenderContext.notificationBadge(
+    id: String? = null,
+    baseClass: String? = null,
+): NotificationBadge = register(NotificationBadge(id = id, baseClass = baseClass, job), {})
 
 // ------------------------------------------------------ tag
 
-public class NotificationBadge internal constructor(id: String?, baseClass: String?) :
+public class NotificationBadge internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLButtonElement>,
-    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass)) {
+    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass), job) {
 
     init {
         markAs(ComponentType.NotificationBadge)
-        Notification.store.unread.map { unread ->
+        attr("aria-label", NotificationStore.unread.map { unread ->
             if (unread) "Unread notifications" else "Notifications"
-        }.bindAttr("aria-label")
+        })
         span(baseClass = "notification-badge".component()) {
-            classMap = Notification.store.unread.map { unread ->
+            classMap(NotificationStore.unread.map { unread ->
                 mapOf("read".modifier() to !unread, "unread".modifier() to unread)
-            }
-            pfIcon("bell".fas())
+            })
+            icon("bell".fas())
         }
     }
 }
 
-// ------------------------------------------------------ store
+// ------------------------------------------------------ data & store
 
 public data class Notification(
     val severity: Severity,
@@ -48,21 +49,24 @@ public data class Notification(
     internal val timestamp: Long = Date.now().toLong()
 ) {
     public companion object {
-        public val store: NotificationStore = NotificationStore()
+        public fun error(text: String, details: String? = null): SimpleHandler<Unit> =
+            NotificationStore.push(Notification(Severity.DANGER, text, details))
 
-        public fun error(text: String, details: String? = null): Unit = send(Notification(Severity.DANGER, text, details))
-        public fun info(text: String, details: String? = null): Unit = send(Notification(Severity.INFO, text, details))
-        public fun success(text: String, details: String? = null): Unit = send(Notification(Severity.SUCCESS, text, details))
-        public fun warning(text: String, details: String? = null): Unit = send(Notification(Severity.WARNING, text, details))
+        public fun info(text: String, details: String? = null): SimpleHandler<Unit> =
+            NotificationStore.push(Notification(Severity.INFO, text, details))
 
-        private fun send(notification: Notification) = flowOf(notification) handledBy store.add
+        public fun success(text: String, details: String? = null): SimpleHandler<Unit> =
+            NotificationStore.push(Notification(Severity.SUCCESS, text, details))
+
+        public fun warning(text: String, details: String? = null): SimpleHandler<Unit> =
+            NotificationStore.push(Notification(Severity.WARNING, text, details))
     }
 }
 
-public class NotificationStore : RootStore<List<Notification>>(listOf()) {
-    public val add: SimpleHandler<Notification> = handle { notifications, notification ->
-        notifications + notification
-    }
+public object NotificationStore : RootStore<List<Notification>>(listOf()) {
+
+    public fun push(notification: Notification): SimpleHandler<Unit> =
+        handle { notifications-> notifications + notification }
 
     public val clear: SimpleHandler<Unit> = handle { listOf() }
 

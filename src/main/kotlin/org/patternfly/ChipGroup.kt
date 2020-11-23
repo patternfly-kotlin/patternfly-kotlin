@@ -1,38 +1,33 @@
 package org.patternfly
 
-import dev.fritz2.binding.OfferingHandler
+import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
-import dev.fritz2.binding.action
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.elemento.Id
 import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.removeFromParent
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfChipGroup(
+public fun <T> RenderContext.pfChipGroup(
     store: ChipGroupStore<T> = ChipGroupStore(),
     text: String? = null,
     limit: Int = 3,
@@ -40,46 +35,32 @@ public fun <T> HtmlElements.pfChipGroup(
     id: String? = null,
     baseClass: String? = null,
     content: ChipGroup<T>.() -> Unit = {}
-): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, baseClass = baseClass), content)
+): ChipGroup<T> = register(ChipGroup(store, text, limit, closable, id = id, baseClass = baseClass, job), content)
 
 public fun <T> ChipGroup<T>.pfChips(block: ChipBuilder<T>.() -> Unit) {
-    val entries = ChipBuilder<T>().apply(block).build()
-    action(entries) handledBy this.store.update
+    store.update(ChipBuilder<T>().apply(block).build())
 }
 
 // ------------------------------------------------------ tag
 
-@OptIn(ExperimentalCoroutinesApi::class)
 public class ChipGroup<T> internal constructor(
     public val store: ChipGroupStore<T>,
     text: String?,
     limit: Int,
     closable: Boolean,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
     Div(id = id, baseClass = classes {
         +ComponentType.ChipGroup
         +("category".modifier() `when` (text != null))
         +baseClass
-    }) {
+    }, job) {
 
-    private var closeButton: Button? = null
+    private var closeButton: PushButton? = null
     private val expanded = CollapseExpandStore()
-
-    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
-        if (closeButton != null) {
-            Listener(callbackFlow {
-                val listener: (Event) -> Unit = {
-                    offer(it.unsafeCast<MouseEvent>())
-                }
-                this@ChipGroup.closeButton?.domNode?.addEventListener(Events.click.name, listener)
-                awaitClose { this@ChipGroup.closeButton?.domNode?.removeEventListener(Events.click.name, listener) }
-            })
-        } else {
-            Listener(emptyFlow())
-        }
-    }
+    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 
     public var display: (T) -> Chip = {
         pfChip {
@@ -127,14 +108,14 @@ public class ChipGroup<T> internal constructor(
                         }
                     } else {
                         // reset to collapsed, so that "... more" is shown next time (items.size > limit)
-                        action() handledBy this@ChipGroup.expanded.collapse
+                        this@ChipGroup.expanded.collapse(Unit)
                     }
-                }.launchIn(MainScope())
+                }.launchIn(MainScope() + job)
         }
         if (closable) {
             div(baseClass = "chip-group".component("close")) {
-                this@ChipGroup.closeButton = pfButton("plain".modifier()) {
-                    pfIcon("times-circle".fas())
+                this@ChipGroup.closeButton = button("plain".modifier()) {
+                    icon("times-circle".fas())
                     aria["label"] = "Close chip group"
                     if (labelId != null) {
                         aria["labelledby"] = labelId
@@ -160,9 +141,9 @@ public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = 
 
     public val add: SimpleHandler<T> = handle { items, item -> items + item }
 
-    public val remove: OfferingHandler<String, Int> = handleAndOffer { items, id ->
+    public val remove: EmittingHandler<String, Int> = handleAndEmit { items, id ->
         val removed = items.filterNot { identifier(it) == id }
-        offer(removed.size)
+        emit(removed.size)
         removed
     }
 }

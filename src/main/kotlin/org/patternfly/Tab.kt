@@ -96,7 +96,7 @@ public class Tabs<T> internal constructor(
                 disabled = this@Tabs.scrollStore.data.map { it.disableLeft }
                 this@Tabs.scrollStore.data.map { it.disableLeft.toString() }.bindAttr("aria-hidden")
                 domNode.onclick = { this@Tabs.scrollLeft(this@Tabs.tabs.domNode) }
-                pfIcon("angle-left".fas())
+                icon("angle-left".fas())
             }
             this@Tabs.tabs = ul(baseClass = "tabs".component("list")) {
                 // update scroll buttons, when scroll event has been fired
@@ -132,7 +132,7 @@ public class Tabs<T> internal constructor(
                 disabled = this@Tabs.scrollStore.data.map { it.disableRight }
                 this@Tabs.scrollStore.data.map { it.disableRight.toString() }.bindAttr("aria-hidden")
                 domNode.onclick = { this@Tabs.scrollRight(this@Tabs.tabs.domNode) }
-                pfIcon("angle-right".fas())
+                icon("angle-right".fas())
             }
         }
 

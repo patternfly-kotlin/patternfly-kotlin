@@ -7,19 +7,19 @@ import dev.fritz2.dom.html.TextArea
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfInputFormControl(
+public fun RenderContext.pfInputFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: Input.() -> Unit = {}
 ): Input = register(Input(id = id, baseClass = classes("form-control".component(), baseClass)), content)
 
-public fun HtmlElements.pfSelectFormControl(
+public fun RenderContext.pfSelectFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: Select.() -> Unit = {}
 ): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass)), content)
 
-public fun HtmlElements.pfTextareaFormControl(
+public fun RenderContext.pfTextareaFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: TextArea.() -> Unit = {}

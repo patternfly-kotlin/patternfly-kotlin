@@ -8,6 +8,8 @@ public fun String.modifier(): String = "pf-m-$this"
 
 public fun String.util(): String = "pf-u-$this"
 
+public fun String.far(): String = "far fa-$this"
+
 public fun String.fas(): String = "fas fa-$this"
 
 public fun String.pfIcon(): String = "pficon pf-$this"

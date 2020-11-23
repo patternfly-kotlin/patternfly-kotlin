@@ -1,171 +1,349 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.each
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.Input
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
 import dev.fritz2.elemento.aria
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
+// TODO Implement expandable cards
 // ------------------------------------------------------ card view dsl
 
-public fun <T> HtmlElements.pfCardView(
+/**
+ * Creates a [CardView] component.
+ *
+ * @param store the item store
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression to turn the items in the store into [Card]s
+ */
+public fun <T> RenderContext.cardView(
     store: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
-    content: CardView<T>.() -> Unit = {}
-): CardView<T> = register(CardView(store, id = id, baseClass = baseClass), content)
+    content: CardView<T>.(T) -> Card<T>
+): CardView<T> = register(CardView(store, id = id, baseClass = baseClass, job, content), {})
 
-public fun <T> CardView<T>.pfCard(
+/**
+ * Creates a [Card] component which is part of an [CardViewSamples].
+ *
+ * @param item the item for the card
+ * @param selectable whether the card is selectable
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> CardView<T>.card(
     item: T,
     selectable: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Card<T>.() -> Unit = {}
-): Card<T> = register(Card(this.itemStore, item, selectable, id = id, baseClass = baseClass), content)
+): Card<T> = register(Card(this.itemStore, item, selectable, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Card<T>.pfCardHeader(
+/**
+ * Creates the [CardHeader] container inside a [Card] component. Use a header if you want to add images, actions or a checkbox to the card.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> Card<T>.cardHeader(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeader<T>.() -> Unit = {}
-): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass), content)
+): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> CardHeader<T>.pfCardHeaderMain(
+/**
+ * Creates the [CardHeaderMain] container inside the [CardHeader]. Use this function if you want to add images or other none-text like elements to the header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardHeaderMain
+ */
+public fun <T> CardHeader<T>.cardHeaderMain(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeaderMain<T>.() -> Unit = {}
-): CardHeaderMain<T> = register(CardHeaderMain(this.item, id = id, baseClass = baseClass), content)
+): CardHeaderMain<T> = register(CardHeaderMain(this.item, id = id, baseClass = baseClass, job), content)
 
-public fun <T> CardHeader<T>.pfCardActions(
+/**
+ * Creates the [CardActions] container inside the [CardHeader]. Use this function to group actions in the header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> CardHeader<T>.cardActions(
     id: String? = null,
     baseClass: String? = null,
     content: CardActions<T>.() -> Unit = {}
-): CardActions<T> = register(CardActions(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
+): CardActions<T> =
+    register(CardActions(this.itemStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
 
-public fun <T> CardHeader<T>.pfCardTitle(
-    id: String? = null,
-    baseClass: String? = null,
-    content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
-
-public fun <T> CardActions<T>.pfCardCheckbox(
+/**
+ * Creates a [CardCheckbox] inside the [CardActions]. If the card is selectable, the checkbox is bound to the [Card.selected] store (when used standalone) or the [ItemStore] (when used as part of a [CardView]).
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> CardActions<T>.cardCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: CardCheckbox<T>.() -> Unit = {}
-): CardCheckbox<T> = register(CardCheckbox(this.itemStore, this.item, this.card, id = id, baseClass = baseClass), content)
+): CardCheckbox<T> =
+    register(CardCheckbox(this.itemStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Card<T>.pfCardTitle(
+/**
+ * Creates the [CardTitle] as part of the [CardHeader]. Use this function if you want to place the title in the header together with the actions and / or checkbox.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardTitleInHeader
+ */
+public fun <T> CardHeader<T>.cardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass, job), content)
 
-public fun <T> Card<T>.pfCardBody(
+/**
+ * Creates the [CardTitle] as part of the [Card]. Use this function if you don't need a header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardTitleInCard
+ */
+public fun <T> Card<T>.cardTitle(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardTitle.() -> Unit = {}
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [CardBody] container inside a [Card] component. You can have multiple bodies in one card.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.multipleBodies
+ */
+public fun <T> Card<T>.cardBody(
     id: String? = null,
     baseClass: String? = null,
     content: CardBody.() -> Unit = {}
-): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
+): CardBody = register(CardBody(id = id, baseClass = baseClass, job), content)
 
-public fun <T> Card<T>.pfCardFooter(
+/**
+ * Creates the [CardFooter] container inside a [Card] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> Card<T>.cardFooter(
     id: String? = null,
     baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
-): CardFooter = register(CardFooter(id = id, baseClass = baseClass), content)
+): CardFooter = register(CardFooter(id = id, baseClass = baseClass, job), content)
 
 // ------------------------------------------------------ plain card dsl
 
-public fun HtmlElements.pfCard(
+/**
+ * Creates a standalone [Card] component.
+ *
+ * @param selectable whether the card is selectable
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun RenderContext.card(
     selectable: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Card<Unit>.() -> Unit = {}
-): Card<Unit> = register(Card(null, null, selectable, id = id, baseClass = baseClass), content)
+): Card<Unit> = register(Card(null, null, selectable, id = id, baseClass = baseClass, job), content)
 
-public fun Card<Unit>.pfCardHeader(
+/**
+ * Creates the [CardHeader] container inside a [Card] component. Use a header if you want to add images, actions or a checkbox to the card.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun Card<Unit>.cardHeader(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeader<Unit>.() -> Unit = {}
-): CardHeader<Unit> = register(CardHeader(null, null, this, id = id, baseClass = baseClass), content)
+): CardHeader<Unit> = register(CardHeader(null, null, this, id = id, baseClass = baseClass, job), content)
 
-public fun CardHeader<Unit>.pfCardHeaderMain(
+/**
+ * Creates the [CardHeaderMain] container inside the [CardHeader]. Use this function if you want to add images or other none-text like elements to the header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardHeaderMain
+ */
+public fun CardHeader<Unit>.cardHeaderMain(
     id: String? = null,
     baseClass: String? = null,
     content: CardHeaderMain<Unit>.() -> Unit = {}
-): CardHeaderMain<Unit> = register(CardHeaderMain(null, null, baseClass), content)
+): CardHeaderMain<Unit> = register(CardHeaderMain(null, id = id, baseClass = baseClass, job), content)
 
-public fun CardHeader<Unit>.pfCardActions(
+/**
+ * Creates the [CardActions] container inside the [CardHeader]. Use this function to group actions in the header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun CardHeader<Unit>.cardActions(
     id: String? = null,
     baseClass: String? = null,
     content: CardActions<Unit>.() -> Unit = {}
-): CardActions<Unit> = register(CardActions(null, null, this.card, id = id, baseClass = baseClass), content)
+): CardActions<Unit> = register(CardActions(null, null, this.card, id = id, baseClass = baseClass, job), content)
 
-public fun CardHeader<Unit>.pfCardTitle(
-    id: String? = null,
-    baseClass: String? = null,
-    content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
-
-public fun CardActions<Unit>.pfCardCheckbox(
+/**
+ * Creates a [CardCheckbox] inside the [CardActions]. If the card is selectable, the checkbox is bound to the [Card.selected] store (when used standalone) or the [ItemStore] (when used as part of a [CardView]).
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun CardActions<Unit>.cardCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: CardCheckbox<Unit>.() -> Unit = {}
-): CardCheckbox<Unit> = register(CardCheckbox(null, null, this.card, id = id, baseClass = baseClass), content)
+): CardCheckbox<Unit> = register(CardCheckbox(null, null, this.card, id = id, baseClass = baseClass, job), content)
 
-public fun Card<Unit>.pfCardTitle(
+/**
+ * Creates the [CardTitle] as part of the [CardHeader]. Use this function if you want to place the title in the header together with the actions and / or checkbox.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardTitleInHeader
+ */
+public fun CardHeader<Unit>.cardTitle(
     id: String? = null,
     baseClass: String? = null,
     content: CardTitle.() -> Unit = {}
-): CardTitle = register(CardTitle(id = id, baseClass = baseClass), content)
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass, job), content)
 
-public fun Card<Unit>.pfCardBody(
+/**
+ * Creates the [CardTitle] as part of the [Card]. Use this function if you don't need a header.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.cardTitleInCard
+ */
+public fun Card<Unit>.cardTitle(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardTitle.() -> Unit = {}
+): CardTitle = register(CardTitle(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [CardBody] container inside a [Card] component. You can have multiple bodies in one card.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample CardSamples.multipleBodies
+ */
+public fun Card<Unit>.cardBody(
     id: String? = null,
     baseClass: String? = null,
     content: CardBody.() -> Unit = {}
-): CardBody = register(CardBody(id = id, baseClass = baseClass), content)
+): CardBody = register(CardBody(id = id, baseClass = baseClass, job), content)
 
-public fun Card<Unit>.pfCardFooter(
+/**
+ * Creates the [CardFooter] container inside a [Card] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun Card<Unit>.cardFooter(
     id: String? = null,
     baseClass: String? = null,
     content: CardFooter.() -> Unit = {}
-): CardFooter = register(CardFooter(id = id, baseClass = baseClass), content)
+): CardFooter = register(CardFooter(id = id, baseClass = baseClass, job), content)
 
 // ------------------------------------------------------ tag
 
+/**
+ * PatternFly [card view](https://www.patternfly.org/v4/components/card/design-guidelines/#card-view-usage) component.
+ *
+ * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses an [ItemStore] to store its items and a function to render the cards.
+ *
+ * @param T the type which is used for the single cards in the card view.
+ *
+ * @sample CardViewSamples.cardView
+ */
 public class CardView<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job,
+    content: CardView<T>.(T) -> Card<T>
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +"gallery".layout()
     +"gutter".modifier()
     +baseClass
-}) {
-    public lateinit var display: (T) -> Card<T>
+}, job) {
 
     init {
         markAs(ComponentType.CardView)
-        itemStore.visible.each { itemStore.identifier(it) }.render { item ->
-            display(item)
-        }.bind()
+        itemStore.visible.renderEach({ itemStore.identifier(it) }, { item ->
+            this@CardView.content(item)
+        })
     }
 }
 
+/**
+ * PatternFly [card](https://www.patternfly.org/v4/components/card/design-guidelines) component.
+ *
+ * A card can be used standalone or as part of a [CardView]. If used standalone and the card is [selectable], the card stores its selection state using the [selected] property. If the card is part of a [CardView], the selection is stored in the [ItemStore].
+ *
+ * @sample CardSamples.card
+ */
 public class Card<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val selectable: Boolean,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : PatternFlyComponent<HTMLElement>, TextElement("article", id = id, baseClass = classes {
     +ComponentType.Card
     +("selectable".modifier() `when` selectable)
     +baseClass
-}) {
+}, job) {
+
+    /**
+     * Stores the selection of this card if used standalone (i.e. not as part of a [CardView])
+     */
     public val selected: CardStore = CardStore()
 
     init {
@@ -173,39 +351,53 @@ public class Card<T> internal constructor(
         if (selectable) {
             domNode.tabIndex = 0
             if (itemStore != null && item != null) {
-                classMap = itemStore.data
+                classMap(itemStore.data
                     .map { it.isSelected(item) }
-                    .map { mapOf("selected".modifier() to it) }
+                    .map { mapOf("selected".modifier() to it) })
                 clicks.map { item } handledBy itemStore.toggleSelection
             } else {
-                classMap = selected.data.map { mapOf("selected".modifier() to it) }
+                classMap(selected.data.map { mapOf("selected".modifier() to it) })
                 clicks handledBy selected.toggle
             }
         }
     }
 }
 
+/**
+ * The header container of a [Card].
+ */
 public class CardHeader<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val card: Card<T>,
     id: String?,
-    baseClass: String?
-) : Div(id = id, baseClass = classes("card".component("header"), baseClass))
+    baseClass: String?,
+    job: Job
+) : Div(id = id, baseClass = classes("card".component("header"), baseClass), job)
 
+/**
+ * A container in the [CardHeader] used to to add images or other none-text like elements to the header.
+ *
+ * @sample CardSamples.cardHeaderMain
+ */
 public class CardHeaderMain<T> internal constructor(
     internal val item: T?,
     id: String?,
-    baseClass: String?
-) : Div(id = id, baseClass = classes("card".component("header", "main"), baseClass))
+    baseClass: String?,
+    job: Job
+) : Div(id = id, baseClass = classes("card".component("header", "main"), baseClass), job)
 
+/**
+ * A container to group actions in the [CardHeader].
+ */
 public class CardActions<T> internal constructor(
     internal val itemStore: ItemStore<T>?,
     internal val item: T?,
     internal val card: Card<T>,
     id: String?,
-    baseClass: String?
-) : Div(id = id, baseClass = classes("card".component("actions"), baseClass)) {
+    baseClass: String?,
+    job: Job
+) : Div(id = id, baseClass = classes("card".component("actions"), baseClass), job) {
     init {
         if (card.selectable) {
             domNode.onclick = { it.stopPropagation() }
@@ -213,40 +405,57 @@ public class CardActions<T> internal constructor(
     }
 }
 
+/**
+ * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to the [Card.selected] store. If the card is part of a [CardView], the checkbox is bound to the selection state in [ItemStore].
+ */
 public class CardCheckbox<T> internal constructor(
     itemStore: ItemStore<T>?,
     item: T?,
     card: Card<T>,
     id: String?,
-    baseClass: String?
-) : Div(id = id, baseClass = classes("check".component(), baseClass)) {
+    baseClass: String?,
+    job: Job
+) : Input(id = id, baseClass = baseClass, job) {
+
     init {
-        input(baseClass = "check".component("input")) {
-            domNode.type = "checkbox"
-//            type = const("checkbox") // this causes visual flickering
-            aria["invalid"] = false
-            if (itemStore != null && item != null) {
-                checked = itemStore.data.map { it.isSelected(item) }
-                changes.states().map { Pair(item, it) } handledBy itemStore.select
-            } else {
-                checked = card.selected.data
-                changes.states() handledBy card.selected.update
-            }
+        type("checkbox")
+        aria["invalid"] = false
+        if (itemStore != null && item != null) {
+            checked(itemStore.data.map { it.isSelected(item) })
+            changes.states().map { Pair(item, it) } handledBy itemStore.select
+        } else {
+            checked(card.selected.data)
+            changes.states() handledBy card.selected.update
         }
     }
 }
 
-public class CardTitle internal constructor(id: String?, baseClass: String?) :
-    Div(id = id, baseClass = classes("card".component("title"), baseClass))
+/**
+ * The title of a [Card].
+ */
+public class CardTitle internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("card".component("title"), baseClass), job)
 
-public class CardBody internal constructor(id: String?, baseClass: String?) :
-    Div(id = id, baseClass = classes("card".component("body"), baseClass))
+/**
+ * The body of a [Card]. You can have multiple bodies in one card.
+ *
+ * @sample CardSamples.multipleBodies
+ */
+public class CardBody internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("card".component("body"), baseClass), job)
 
-public class CardFooter internal constructor(id: String?, baseClass: String?) :
-    Div(id = id, baseClass = classes("card".component("footer"), baseClass))
+
+/**
+ * The title of a [Card].
+ */
+public class CardFooter internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("card".component("footer"), baseClass), job)
 
 // ------------------------------------------------------ store
 
+/**
+ * Store to hold the selection of a [Card] when used standalone.
+ */
 public class CardStore : RootStore<Boolean>(false) {
     internal val toggle = handle { !it }
 }

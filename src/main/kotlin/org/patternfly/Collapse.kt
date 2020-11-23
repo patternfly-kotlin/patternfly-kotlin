@@ -5,6 +5,7 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.dom.html.Events
 import kotlinx.browser.document
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
@@ -48,7 +49,7 @@ public class CollapseExpandStore(private val collapsePredicate: CollapsePredicat
             closeHandler = {
                 if (collapsePredicate.invoke((it.target.unsafeCast<Element>()))) {
                     removeCloseHandler()
-                    launch {
+                    MainScope().launch {
                         enqueue(QueuedUpdate({ false }, ::errorHandler))
                     }
                 }

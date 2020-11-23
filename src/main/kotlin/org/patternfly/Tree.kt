@@ -88,7 +88,9 @@ private fun test() {
 
 // ------------------------------------------------------ tag
 
-private const val TREE_ITEM = "treeItem"
+private const val TREE_ITEM = "ti"
+private const val EXPANDED_ICON = TREE_ITEM + "ei"
+private const val COLLAPSED_ICON = TREE_ITEM + "ci"
 
 public class TreeView<T> internal constructor(
     private val identifier: IdProvider<T, String>,
@@ -136,7 +138,7 @@ public class TreeView<T> internal constructor(
                         if (treeItem.hasChildren) {
                             div(baseClass = "tree-view".component("node", "toggle")) {
                                 span(baseClass = "tree-view".component("node", "toggle", "icon")) {
-                                    pfIcon("angle-right".fas())
+                                    icon("angle-right".fas())
                                 }
                             }
                         }
@@ -156,10 +158,12 @@ public class TreeView<T> internal constructor(
                                 when (val icons = it(treeItem.item)) {
                                     is SingleIcon -> icons.icon(this)
                                     is ColExIcon -> {
-                                        icons.collapsed(this)
+                                        icons.collapsed(this).domNode.apply {
+                                            dataset[COLLAPSED_ICON] = ""
+                                        }
                                         icons.expanded(this).domNode.apply {
                                             styleHidden = true
-                                            dataset["${TREE_ITEM}ExpandedIcon"] = ""
+                                            dataset[EXPANDED_ICON] = ""
                                         }
                                     }
                                 }
@@ -175,7 +179,7 @@ public class TreeView<T> internal constructor(
                                     treeItem.childCount
                                 else
                                     treeItem.children.size
-                                pfBadge {
+                                badge {
                                     +children.toString()
                                 }
                             }
@@ -209,7 +213,7 @@ public class TreeView<T> internal constructor(
     }
 
     private fun expand(li: Element, treeItems: List<TreeItem<T>>) {
-        // TODO Change icon
+        flipIcons(li, true)
         li.appendChild(render {
             ul {
                 attr("role", "group")
@@ -225,12 +229,21 @@ public class TreeView<T> internal constructor(
     }
 
     private fun collapse(li: Element) {
-        // TODO Change icon
+        flipIcons(li, false)
         li.aria["expanded"] = false
         li.classList -= "expanded".modifier()
         li.querySelector(By.element("ul").and(By.attribute("role", "group"))).removeFromParent()
 
         // TODO trigger collapse event
+    }
+
+    private fun flipIcons(li: Element, expand: Boolean) {
+        val collapsedIcon = li.querySelector(By.data(COLLAPSED_ICON))
+        val expandedIcon = li.querySelector(By.data(EXPANDED_ICON))
+        if (collapsedIcon != null && expandedIcon != null) {
+            collapsedIcon.styleHidden = expand
+            expandedIcon.styleHidden = !expand
+        }
     }
 
     private fun select(button: Element) {

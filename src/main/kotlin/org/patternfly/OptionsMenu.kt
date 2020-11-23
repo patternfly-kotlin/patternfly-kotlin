@@ -153,7 +153,7 @@ public class OptionsMenuToggle<T> internal constructor(
                 value?.invoke(this)
             }, {})
             register(span(baseClass = "options-menu".component("toggle", "icon")) {
-                pfIcon("caret-down".fas())
+                icon("caret-down".fas())
             }, {})
             field = value
         }
@@ -202,7 +202,7 @@ public class OptionsMenuTogglePlain<T> internal constructor(
         ) {
             this@OptionsMenuTogglePlain.initToggle(this)
             span(baseClass = "options-menu".component("toggle", "button", "icon")) {
-                pfIcon("caret-down".fas())
+                icon("caret-down".fas())
             }
         }
     }
@@ -294,7 +294,7 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
             this@OptionsMenuEntries.optionsMenu.display(item).invoke(this)
             if (item.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
-                    pfIcon("check".fas())
+                    icon("check".fas())
                 }
             }
         }

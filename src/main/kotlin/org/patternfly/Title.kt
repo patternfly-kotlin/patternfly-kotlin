@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLHeadingElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfTitle(
+public fun RenderContext.pfTitle(
     level: Int = 1,
     size: Size = Size.XL_2,
     id: String? = null,

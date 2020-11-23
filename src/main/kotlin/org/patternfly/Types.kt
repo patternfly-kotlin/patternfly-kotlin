@@ -33,6 +33,7 @@ internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
 }
 
 // Delegates the text related methods to another element
+@Deprecated("Find a replacement!")
 internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
 
     override fun text(value: String): Node = appendText(value)
@@ -59,7 +60,6 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
     Badge("bdg", "badge".component()),
-    Brand("brd", "brand".component()),
     Button("btn", "button".component()),
     Card("crd", "card".component()),
     CardView("cv"),
@@ -71,7 +71,6 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
     Drawer("dw", "drawer".component()),
     Dropdown("dd", "dropdown".component()),
     EmptyState("es", "empty-state".component()),
-    Header("hdr", "page".component("header")),
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
     Main("mn", "page".component("main")),
@@ -79,10 +78,11 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
     NotificationBadge("nb", "button".component()),
     OptionsMenu("opt", "options-menu".component()),
     Page("pg", "page".component()),
+    PageHeader("pgh", "page".component("header")),
+    PageSidebar("pgs", "page".component("sidebar")),
     Pagination("pgn", "pagination".component()),
     Section("se", "page".component("main-section")),
     Select("sel", "select".component()),
-    Sidebar("sb", "page".component("sidebar")),
     Switch("sw", "switch".component()),
     Tabs("tbs"),
     Title("tlt", "title".component()),
@@ -92,6 +92,18 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
 
 public enum class Align(public val modifier: String) {
     LEFT("align-left".modifier()), RIGHT("align-right".modifier())
+}
+
+public enum class ButtonVariation(internal val modifier: String) {
+    control("control".modifier()),
+    danger("danger".modifier()),
+    `inline`("inline".modifier()),
+    link("link".modifier()),
+    plain("plain".modifier()),
+    primary("primariy".modifier()),
+    secondary("secondary".modifier()),
+    tertiary("tertiary".modifier()),
+    warning("warning".modifier()),
 }
 
 public enum class DividerVariant {
@@ -106,8 +118,9 @@ public enum class Orientation {
     HORIZONTAL, VERTICAL
 }
 
-public enum class Position(public val modifier: String) {
-    START("start".modifier()), END("end".modifier())
+public enum class IconPosition(public val modifier: String) {
+    ICON_FIRST("start".modifier()),
+    ICON_LAST("end".modifier())
 }
 
 public enum class SelectionMode {
@@ -117,13 +130,12 @@ public enum class SelectionMode {
 public enum class Severity(
     public val modifier: String?,
     public val iconClass: String,
-    public val aria: String
 ) {
-    DEFAULT(null, "bell".fas(), "Default alert"),
-    INFO("info".modifier(), "info-circle".fas(), "Info alert"),
-    SUCCESS("success".modifier(), "check-circle".fas(), "Success alert"),
-    WARNING("warning".modifier(), "exclamation-triangle".fas(), "Warning alert"),
-    DANGER("danger".modifier(), "exclamation-circle".fas(), "Danger alert");
+    DEFAULT(null, "bell".fas()),
+    INFO("info".modifier(), "info-circle".fas()),
+    SUCCESS("success".modifier(), "check-circle".fas()),
+    WARNING("warning".modifier(), "exclamation-triangle".fas()),
+    DANGER("danger".modifier(), "exclamation-circle".fas());
 }
 
 public enum class Size(public val modifier: String) {

@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfEmptyState(
+public fun RenderContext.pfEmptyState(
     iconClass: String,
     title: String,
     size: Size? = null,
@@ -50,7 +50,7 @@ public class EmptyState internal constructor(
     init {
         markAs(ComponentType.EmptyState)
         pfEmptyStateContent {
-            pfIcon(iconClass).apply {
+            icon(iconClass).apply {
                 domNode.classList.add("empty-state".component("icon"))
             }
             pfTitle(size = Size.LG) {

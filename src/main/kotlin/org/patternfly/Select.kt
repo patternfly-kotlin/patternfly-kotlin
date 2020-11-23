@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfSelect(
+public fun RenderContext.pfSelect(
     id: String? = null,
     baseClass: String? = null,
     content: Select.() -> Unit = {}

@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfInputGroup(
+public fun RenderContext.pfInputGroup(
     id: String? = null,
     baseClass: String? = null,
     content: InputGroup.() -> Unit = {}

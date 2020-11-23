@@ -31,7 +31,7 @@ public fun <T> HtmlElements.pfPagination(
 ): Pagination =
     register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass), content)
 
-public fun HtmlElements.pfPagination(
+public fun RenderContext.pfPagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
@@ -77,7 +77,7 @@ public class Pagination internal constructor(
             }
             pfOptionsMenuItems {
                 pageSizes.forEachIndexed { index, pageSize ->
-                    pfItem(pageSize) {
+                    item(pageSize) {
                         selected = index == 0
                     }
                 }
@@ -88,20 +88,20 @@ public class Pagination internal constructor(
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
-                    this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
+                    this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to first page"
                         disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
                         clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
-                        pfIcon("angle-double-left".fas())
+                        icon("angle-double-left".fas())
                     }.domNode)
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
-                this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
+                this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to previous page"
                     disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
                     clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
-                    pfIcon("angle-left".fas())
+                    icon("angle-left".fas())
                 }.domNode)
             }
             if (!compact) {
@@ -126,20 +126,20 @@ public class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
-                this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
+                this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to next page"
                     disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                     clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
-                    pfIcon("angle-right".fas())
+                    icon("angle-right".fas())
                 }.domNode)
             }
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
-                    this@Pagination.controlElements.add(pfButton(baseClass = "plain".modifier()) {
+                    this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to last page"
                         disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
                         clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
-                        pfIcon("angle-double-right".fas())
+                        icon("angle-double-right".fas())
                     }.domNode)
                 }
             }

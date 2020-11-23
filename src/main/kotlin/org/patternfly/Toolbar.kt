@@ -12,7 +12,7 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfToolbar(
+public fun RenderContext.pfToolbar(
     id: String? = null,
     baseClass: String? = null,
     content: Toolbar.() -> Unit = {}
@@ -127,7 +127,7 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass) {
 
     init {
-        pfDropdownToggleCheckbox {
+        toggleCheckbox {
             content = {
                 itemStore.selected.map {
                     if (it == 0) "" else "$it selected"
@@ -150,8 +150,8 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
         store.select.unwrap().filter { it == PreSelection.VISIBLE }.map { Unit } handledBy itemStore.selectVisible
         store.select.unwrap().filter { it == PreSelection.ALL }.map { Unit } handledBy itemStore.selectAll
 
-        pfDropdownItems {
-            PreSelection.values().map { pfItem(it) }
+        items {
+            PreSelection.values().map { item(it) }
         }
     }
 }
@@ -167,19 +167,19 @@ public class SortOptions<T> internal constructor(
         display = {
             { +it.item.text }
         }
-        pfOptionsMenuToggle { icon = { pfIcon("sort-amount-down".fas()) } }
+        pfOptionsMenuToggle { icon = { icon("sort-amount-down".fas()) } }
         pfOptionsMenuGroups {
-            pfGroup {
+            group {
                 options.forEach {
-                    pfItem(SortProperty(it.id, it.text, it.comparator))
+                    item(SortProperty(it.id, it.text, it.comparator))
                 }
             }
-            pfSeparator()
-            pfGroup {
-                pfItem(SortOrder(true)) {
+            separator()
+            group {
+                item(SortOrder(true)) {
                     selected = true
                 }
-                pfItem(SortOrder(false))
+                item(SortOrder(false))
             }
         }
 

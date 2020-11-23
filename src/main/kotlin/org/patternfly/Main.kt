@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfMain(
+public fun RenderContext.pfMain(
     id: String? = null,
     baseClass: String? = null,
     content: Main.() -> Unit = {}

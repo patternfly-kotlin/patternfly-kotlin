@@ -11,39 +11,39 @@ public fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> =
 
 public fun <T> pfGroups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
 
-public fun <T> ItemsBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> ItemsBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-public fun <T> ItemsBuilder<T>.pfSeparator() {
+public fun <T> ItemsBuilder<T>.separator() {
     entries.add(Separator())
 }
 
-public fun <T> GroupsBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+public fun <T> GroupsBuilder<T>.group(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
-public fun <T> GroupsBuilder<T>.pfSeparator() {
+public fun <T> GroupsBuilder<T>.separator() {
     entries.add(Separator())
 }
 
-public fun <T> EntriesBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> EntriesBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-public fun <T> EntriesBuilder<T>.pfSeparator() {
+public fun <T> EntriesBuilder<T>.separator() {
     entries.add(Separator())
 }
 
-public fun <T> EntriesBuilder<T>.pfGroup(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
+public fun <T> EntriesBuilder<T>.group(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
-public fun <T> GroupBuilder<T>.pfItem(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
+public fun <T> GroupBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
-public fun <T> GroupBuilder<T>.pfSeparator() {
+public fun <T> GroupBuilder<T>.separator() {
     entries.add(Separator())
 }
 

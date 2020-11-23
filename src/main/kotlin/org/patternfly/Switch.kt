@@ -20,7 +20,7 @@ import org.w3c.dom.HTMLLabelElement
 
 // ------------------------------------------------------ dsl
 
-public fun HtmlElements.pfSwitch(
+public fun RenderContext.pfSwitch(
     id: String? = null,
     baseClass: String? = null,
     content: Switch.() -> Unit = {}
@@ -72,7 +72,7 @@ public class Switch internal constructor(id: String?, baseClass: String?) :
         }
         toggleTag = span(baseClass = "switch".component("toggle")) {
             span(baseClass = "switch".component("toggle", "icon")) {
-                pfIcon("check".fas())
+                icon("check".fas())
             }
         }
         labelTag = span(id = onId, baseClass = "switch".component("label")) {
