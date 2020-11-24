@@ -73,7 +73,8 @@ public fun DrawerActions.pfDrawerClose(
 
 // ------------------------------------------------------ tag
 
-public class Drawer internal constructor(id: String?, baseClass: String?, job: Job) :
+public class
+Drawer internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Drawer, baseClass), job) {
 
     public val expanded: CollapseExpandStore = CollapseExpandStore()

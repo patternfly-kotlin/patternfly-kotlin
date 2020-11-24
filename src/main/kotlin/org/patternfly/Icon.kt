@@ -38,7 +38,7 @@ public fun RenderContext.icon(
  *
  * @sample IconSamples.icons
  */
-public class Icon internal constructor(internal var iconClass: String, id: String?, baseClass: String?, job: Job) :
+public class Icon internal constructor(private var iconClass: String, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
     TextElement("i", id = id, baseClass = classes {
         +ComponentType.Icon
@@ -51,15 +51,15 @@ public class Icon internal constructor(internal var iconClass: String, id: Strin
         attr("aria-hidden", "true")
     }
 
-    public fun iconClass(iconClass: String) {
-        domNode.classList -= this.iconClass
-        domNode.classList += iconClass
-        this.iconClass = iconClass
-    }
-
     public fun iconClass(iconClass: Flow<String>) {
         mountSingle(job, iconClass) { v, _ ->
             iconClass(v)
         }
+    }
+
+    private fun iconClass(iconClass: String) {
+        domNode.classList -= this.iconClass
+        domNode.classList += iconClass
+        this.iconClass = iconClass
     }
 }

@@ -21,38 +21,38 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
-public fun <T> RenderContext.pfDataTable(
+public fun <T> RenderContext.dataTable(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
     content: DataTable<T>.() -> Unit = {}
 ): DataTable<T> = register(DataTable(itemStore, id = id, baseClass = baseClass, job), content)
 
-public fun <T> DataTable<T>.pfDataTableCaption(
+public fun <T> DataTable<T>.dataTableCaption(
     id: String? = null,
     baseClass: String? = null,
     content: DataTableCaption.() -> Unit = {}
 ): DataTableCaption = register(DataTableCaption(id = id, baseClass = baseClass, job), content)
 
-public fun <T> DataTable<T>.pfDataTableColumns(block: Columns<T>.() -> Unit) {
+public fun <T> DataTable<T>.dataTableColumns(block: Columns<T>.() -> Unit) {
     columns.apply(block)
     renderTable()
 }
 
-public fun <T> Columns<T>.pfDataTableColumn(label: String, block: DataColumn<T>.() -> Unit) {
+public fun <T> Columns<T>.dataTableColumn(label: String, block: DataColumn<T>.() -> Unit) {
     val column = DataColumn<T>(label).apply(block)
     add(column)
 }
 
-public fun <T> Columns<T>.pfDataTableSimpleColumn(label: String, display: ComponentDisplay<Td, T>) {
+public fun <T> Columns<T>.dataTableSimpleColumn(label: String, display: ComponentDisplay<Td, T>) {
     add(DataColumn(label, cellDisplay = display))
 }
 
-public fun <T> Columns<T>.pfDataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
+public fun <T> Columns<T>.sataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
     add(SelectColumn(selectAll, baseClass))
 }
 
-public fun <T> Columns<T>.pfDataTableToggleColumn(
+public fun <T> Columns<T>.dataTableToggleColumn(
     fullWidth: Boolean = false,
     noPadding: Boolean = false,
     baseClass: String? = null,
@@ -61,12 +61,17 @@ public fun <T> Columns<T>.pfDataTableToggleColumn(
     add(ToggleColumn(fullWidth, noPadding, baseClass, display))
 }
 
-public fun <T> Columns<T>.pfDataTableActionColumn(baseClass: String? = null, display: ComponentDisplay<Td, T>) {
+public fun <T> Columns<T>.dataTableActionColumn(baseClass: String? = null, display: ComponentDisplay<Td, T>) {
     add(ActionColumn(baseClass, display))
 }
 
 // ------------------------------------------------------ tag
 
+/**
+ * PatternFly [table](https://www.patternfly.org/v4/components/table/design-guidelines) component.
+ *
+ * A table is used to display large data sets that can be easily laid out in a simple grid with column headers. The table uses a [display] function to render the items in the ItemStore.
+ */
 public class DataTable<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
@@ -82,6 +87,11 @@ public class DataTable<T> internal constructor(
     init {
         attr("role", "grid")
         markAs(ComponentType.DataTable)
+    }
+
+    public fun display(display: Columns<T>.(T) -> Unit) {
+        display(columns, )
+        renderTable()
     }
 
     internal fun renderTable() {
@@ -138,15 +148,15 @@ public class DataTable<T> internal constructor(
                                                 +column.label
                                             }
                                             span(baseClass = "table".component("sort", "indicator")) {
-                                                icon {
-                                                    iconClass = itemStore.data.map {
+                                                icon("arrows-alt-v".fas()) {
+                                                    iconClass(this@DataTable.itemStore.data.map {
                                                         if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                                                             if (it.sortInfo.ascending)
                                                                 "long-arrow-alt-up".fas()
                                                             else
                                                                 "long-arrow-alt-down".fas()
                                                         } else "arrows-alt-v".fas()
-                                                    }
+                                                    })
                                                 }
                                             }
                                         }
@@ -357,7 +367,12 @@ public class DataColumn<T>(
     public var cellBaseClass: String? = null,
     public var cellDisplay: ComponentDisplay<Td, T> = { { !"Please render your item here" } },
     // TODO configure help: tooltip, popover, custom
-) : Column<T>()
+) : Column<T>() {
+
+    public fun cellDisplay(display: ComponentDisplay2<Td, T>) {
+
+    }
+}
 
 public class SelectColumn<T>(public val selectAll: Boolean, public var baseClass: String? = null) : Column<T>()
 

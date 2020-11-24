@@ -1,24 +1,22 @@
 package org.patternfly
 
-import dev.fritz2.binding.SingleMountPoint
-import dev.fritz2.dom.DomMountPoint
-import dev.fritz2.dom.DomMountPointPreserveOrder
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.WithText
+import dev.fritz2.dom.mountDomNode
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
-import org.w3c.dom.Text
 import org.w3c.dom.get
 import org.w3c.dom.set
 
 public const val COMPONENT_TYPE: String = "pfct"
 
 public typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
+public typealias ComponentDisplay2<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
 
@@ -33,25 +31,19 @@ internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
 }
 
 // Delegates the text related methods to another element
-@Deprecated("Find a replacement!")
 internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
 
-    override fun text(value: String): Node = appendText(value)
-
-    override operator fun String.unaryPlus(): Node = appendText(this)
-
-    override fun Flow<String>.bind(preserveOrder: Boolean): SingleMountPoint<WithDomNode<Text>> {
-        val upstream = this.map {
-            TextNode(it)
-        }.distinctUntilChanged()
-
-        return if (preserveOrder) DomMountPointPreserveOrder(upstream, delegate())
-        else DomMountPoint(upstream, delegate())
+    override fun Flow<String>.asText() {
+        mountDomNode(job, delegate(), this.map { TextNode(it) })
     }
 
-    fun delegate(): D
+    override fun <T> Flow<T>.asText() {
+        mountDomNode(job, delegate(), this.map { TextNode(it.toString()) })
+    }
 
-    fun appendText(text: String): Node = delegate().appendChild(TextNode(text).domNode)
+    override operator fun String.unaryPlus(): Node = delegate().appendChild(document.createTextNode(this))
+
+    fun delegate(): D
 }
 
 // ------------------------------------------------------ enums
@@ -65,7 +57,6 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
     CardView("cv"),
     Chip("chp", "chip".component()),
     ChipGroup("cpg", "chip-group".component()),
-    Content("cnt", "content".component()),
     DataList("dl", "data-list".component()),
     DataTable("dt", "table".component()),
     Drawer("dw", "drawer".component()),

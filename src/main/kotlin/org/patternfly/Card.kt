@@ -21,17 +21,17 @@ import org.w3c.dom.HTMLElement
  * @param store the item store
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression to turn the items in the store into [Card]s
+ * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.cardView(
     store: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
-    content: CardView<T>.(T) -> Card<T>
-): CardView<T> = register(CardView(store, id = id, baseClass = baseClass, job, content), {})
+    content: CardView<T>.() -> Unit = {}
+): CardView<T> = register(CardView(store, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [Card] component which is part of an [CardViewSamples].
+ * Creates a [Card] component which is part of an [CardView].
  *
  * @param item the item for the card
  * @param selectable whether the card is selectable
@@ -295,9 +295,9 @@ public fun Card<Unit>.cardFooter(
 /**
  * PatternFly [card view](https://www.patternfly.org/v4/components/card/design-guidelines/#card-view-usage) component.
  *
- * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses an [ItemStore] to store its items and a function to render the cards.
+ * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemStore] as [Card]s.
  *
- * @param T the type which is used for the single cards in the card view.
+ * @param T the type which is used for the [Card]s in this card view.
  *
  * @sample CardViewSamples.cardView
  */
@@ -305,8 +305,7 @@ public class CardView<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     id: String?,
     baseClass: String?,
-    job: Job,
-    content: CardView<T>.(T) -> Card<T>
+    job: Job
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +"gallery".layout()
     +"gutter".modifier()
@@ -315,8 +314,14 @@ public class CardView<T> internal constructor(
 
     init {
         markAs(ComponentType.CardView)
+    }
+
+    /**
+     * Defines how to display the items in the [ItemStore] as [Card]s. Call this function *before* populating the store.
+     */
+    public fun display(display: (T) -> Card<T>) {
         itemStore.visible.renderEach({ itemStore.identifier(it) }, { item ->
-            this@CardView.content(item)
+            display(item)
         })
     }
 }
@@ -342,7 +347,7 @@ public class Card<T> internal constructor(
 }, job) {
 
     /**
-     * Stores the selection of this card if used standalone (i.e. not as part of a [CardView])
+     * Stores the selection of this card if this card is used standalone (i.e. not as part of a [CardView])
      */
     public val selected: CardStore = CardStore()
 
@@ -406,7 +411,7 @@ public class CardActions<T> internal constructor(
 }
 
 /**
- * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to the [Card.selected] store. If the card is part of a [CardView], the checkbox is bound to the selection state in [ItemStore].
+ * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to the [Card.selected] store. If the card is part of a [CardView], the checkbox is bound to the selection state of the [ItemStore].
  */
 public class CardCheckbox<T> internal constructor(
     itemStore: ItemStore<T>?,

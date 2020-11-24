@@ -39,13 +39,13 @@ public fun <T> RenderContext.dropdown(
     content: Dropdown<T>.() -> Unit = {}
 ): Dropdown<T> = register(Dropdown(store, align, up, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Dropdown<T>.toggle(
+public fun <T> Dropdown<T>.dropdownToggle(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
 ): DropdownToggle<T> = register(DropdownToggle(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Dropdown<T>.toggleKebab(
+public fun <T> Dropdown<T>.dropdownKebabToggle(
     id: String? = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
     baseClass: String? = null,
     content: DropdownToggle<T>.() -> Unit = {}
@@ -55,19 +55,19 @@ public fun <T> Dropdown<T>.toggleKebab(
     }, content
 )
 
-public fun <T> Dropdown<T>.toggleCheckbox(
+public fun <T> Dropdown<T>.dropdownCheckboxToggle(
     id: String? = null,
     baseClass: String? = null,
     content: DropdownToggleCheckbox<T>.() -> Unit = {}
 ): DropdownToggleCheckbox<T> = register(DropdownToggleCheckbox(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Dropdown<T>.toggleAction(
+public fun <T> Dropdown<T>.dropdownActionToggle(
     id: String? = null,
     baseClass: String? = null,
     content: DropdownToggleAction<T>.() -> Unit = {}
 ): DropdownToggleAction<T> = register(DropdownToggleAction(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> Dropdown<T>.items(
+public fun <T> Dropdown<T>.dropdownItems(
     id: String? = null,
     baseClass: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
@@ -79,7 +79,7 @@ public fun <T> Dropdown<T>.items(
     return element
 }
 
-public fun <T> Dropdown<T>.groups(
+public fun <T> Dropdown<T>.dropdownGroups(
     id: String? = null,
     baseClass: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
@@ -140,6 +140,16 @@ public open class Dropdown<T> internal constructor(
     init {
         markAs(ComponentType.Dropdown)
         classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+    }
+
+    public fun display(display: ComponentDisplay2<Button, T>) {
+        store.data.renderEach { entry ->
+            button {
+                if (entry is Item<T>) {
+                    display.invoke(this, entry.item)
+                }
+            }
+        }
     }
 }
 

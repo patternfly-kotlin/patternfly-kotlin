@@ -68,7 +68,9 @@ public fun RenderContext.linkButton(
 ): LinkButton = register(LinkButton(variation, id = id, baseClass = baseClass, job), content)
 
 /**
- * Adds an [Icon] to a [PushButton] or [LinkButton]. The icon is added inside a container to controls the margin between the icon and the button text.
+ * Adds an [Icon] to a [PushButton] or [LinkButton]. Use this function if you also want to add other elements like text to the button. This function adds the icons inside a container that controls the margin between the icon and the other elements (like the text).
+ *
+ * If you only want to add an icon, you don't have to use this function.
  *
  * @param iconPosition the position of the icon
  * @param id the ID of the icon element
@@ -76,6 +78,7 @@ public fun RenderContext.linkButton(
  * @param content a lambda expression for setting up the icon component
  *
  * @sample ButtonSamples.buttonIcon
+ * @sample ButtonSamples.justIcon
  */
 public fun ButtonLike.buttonIcon(
     iconPosition: IconPosition,

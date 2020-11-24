@@ -1,8 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.states
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.flow.filter
@@ -127,7 +125,7 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass) {
 
     init {
-        toggleCheckbox {
+        dropdownCheckboxToggle {
             content = {
                 itemStore.selected.map {
                     if (it == 0) "" else "$it selected"
@@ -150,7 +148,7 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
         store.select.unwrap().filter { it == PreSelection.VISIBLE }.map { Unit } handledBy itemStore.selectVisible
         store.select.unwrap().filter { it == PreSelection.ALL }.map { Unit } handledBy itemStore.selectAll
 
-        items {
+        dropdownItems {
             PreSelection.values().map { item(it) }
         }
     }
