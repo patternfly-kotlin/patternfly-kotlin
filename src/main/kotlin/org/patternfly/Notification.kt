@@ -4,6 +4,7 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,9 +28,9 @@ public class NotificationBadge internal constructor(id: String?, baseClass: Stri
 
     init {
         markAs(ComponentType.NotificationBadge)
-        attr("aria-label", NotificationStore.unread.map { unread ->
+        aria["label"] = NotificationStore.unread.map { unread ->
             if (unread) "Unread notifications" else "Notifications"
-        })
+        }
         span(baseClass = "notification-badge".component()) {
             classMap(NotificationStore.unread.map { unread ->
                 mapOf("read".modifier() to !unread, "unread".modifier() to unread)
@@ -66,7 +67,7 @@ public data class Notification(
 public object NotificationStore : RootStore<List<Notification>>(listOf()) {
 
     public fun push(notification: Notification): SimpleHandler<Unit> =
-        handle { notifications-> notifications + notification }
+        handle { notifications -> notifications + notification }
 
     public val clear: SimpleHandler<Unit> = handle { listOf() }
 

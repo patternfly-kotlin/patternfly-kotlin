@@ -6,6 +6,7 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.Id
+import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.querySelector
 import dev.fritz2.routing.Router
 import kotlinx.coroutines.Job
@@ -14,6 +15,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.patternfly.Orientation.HORIZONTAL
+import org.patternfly.Orientation.VERTICAL
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
@@ -27,9 +30,8 @@ public fun <T> RenderContext.horizontalNavigation(
     id: String? = null,
     baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
-): Navigation<T> = register(
-    Navigation(router, selected, Orientation.HORIZONTAL, tertiary, id = id, baseClass = baseClass, job, content),
-    {})
+): Navigation<T> =
+    register(Navigation(router, selected, HORIZONTAL, tertiary, id = id, baseClass = baseClass, job, content), {})
 
 public fun <T> RenderContext.verticalNavigation(
     router: Router<T>,
@@ -38,8 +40,7 @@ public fun <T> RenderContext.verticalNavigation(
     baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
 ): Navigation<T> = register(
-    Navigation(router, selected, Orientation.VERTICAL, false, id = id, baseClass = baseClass, job, content),
-    {})
+    Navigation(router, selected, VERTICAL, false, id = id, baseClass = baseClass, job, content), {})
 
 public fun <T> Navigation<T>.group(
     text: String,
@@ -54,7 +55,7 @@ public fun <T> NavigationItems<T>.expandableGroup(
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationExpandableGroup<T> =
-    register(NavigationExpandableGroup(this.navigation, text, id = id, baseClass = baseClass, job, content), {})
+    register(NavigationExpandableGroup(navigation, text, id = id, baseClass = baseClass, job, content), {})
 
 public fun <T> Navigation<T>.items(
     id: String? = null,
@@ -66,7 +67,7 @@ public fun <T> NavigationGroup<T>.items(
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
-): NavigationItems<T> = register(NavigationItems(this.navigation, id = id, baseClass = baseClass, job), content)
+): NavigationItems<T> = register(NavigationItems(navigation, id = id, baseClass = baseClass, job), content)
 
 internal fun <T> TextElement.items(
     navigation: Navigation<T>,
@@ -90,7 +91,7 @@ public fun <T> NavigationItems<T>.navigationItem(
     selected: ((route: T) -> Boolean)? = null,
     content: A.() -> Unit = {}
 ): NavigationItem<T> =
-    register(NavigationItem(this.navigation, item, selected, id = id, baseClass = baseClass, job, content), {})
+    register(NavigationItem(navigation, item, selected, id = id, baseClass = baseClass, job, content), {})
 
 // ------------------------------------------------------ tag
 
@@ -106,27 +107,27 @@ public class Navigation<T> internal constructor(
 ) : PatternFlyComponent<HTMLElement>,
     TextElement("nav", id = id, baseClass = classes {
         +ComponentType.Navigation
-        +("horizontal".modifier() `when` (orientation == Orientation.HORIZONTAL))
+        +("horizontal".modifier() `when` (orientation == HORIZONTAL))
         +baseClass
     }, job) {
 
     init {
         markAs(ComponentType.Navigation)
         if (!tertiary) {
-            attr("aria-label", "Global")
+            aria["label"] = "Global"
         }
-        if (orientation == Orientation.HORIZONTAL) {
+        if (orientation == HORIZONTAL) {
             // domNode.classList += "scrollable".modifier() // TODO Implement scrolling
             button("nav".component("scroll", "button")) {
-                attr("aria-label", "Scroll left")
+                aria["label"] = "Scroll left"
                 disabled(true) // TODO Implement scrolling
                 icon("angle-left".fas())
             }
         }
         content(this)
-        if (orientation == Orientation.HORIZONTAL) {
+        if (orientation == HORIZONTAL) {
             button("nav".component("scroll", "button")) {
-                attr("aria-label", "Scroll right")
+                aria["label"] = "Scroll right"
                 disabled(true) // TODO Implement scrolling
                 icon("angle-right".fas())
             }
@@ -183,7 +184,7 @@ public class NavigationExpandableGroup<T> internal constructor(
         a("nav".component("link"), linkId) {
             +text
             clicks handledBy this@NavigationExpandableGroup.expanded.toggle
-            attr("aria-expanded", this@NavigationExpandableGroup.expanded.data.map { it.toString() })
+            aria["expanded"] = this@NavigationExpandableGroup.expanded.data.map { it.toString() }
 
             span("nav".component("toggle")) {
                 span("nav".component("toggle", "icon")) {
@@ -192,9 +193,9 @@ public class NavigationExpandableGroup<T> internal constructor(
             }
         }
         section("nav".component("subnav")) {
-            attr("aria-labelledby", linkId)
+            aria["labelledby"] = linkId
             attr("hidden", this@NavigationExpandableGroup.expanded.data.map { !it })
-            items(navigation) {
+            items(this@NavigationExpandableGroup.navigation) {
                 content(this)
             }
         }
@@ -223,9 +224,8 @@ public class NavigationItem<T> internal constructor(
             classMap(this@NavigationItem.navigation.router.map { route ->
                 mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
             })
-            attr("aria-current", this@NavigationItem.navigation.router
+            aria["current"] = this@NavigationItem.navigation.router
                 .map { route -> if (this@NavigationItem.calculateSelection(route)) "page" else "" }
-            )
             content(this)
         }
     }

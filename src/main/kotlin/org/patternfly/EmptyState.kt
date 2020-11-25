@@ -1,37 +1,38 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
+import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun RenderContext.pfEmptyState(
+public fun RenderContext.emptyState(
     iconClass: String,
     title: String,
     size: Size? = null,
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyState = register(EmptyState(iconClass, title, size, id = id, baseClass = baseClass, content), {})
+): EmptyState = register(EmptyState(iconClass, title, size, id = id, baseClass = baseClass, job, content), {})
 
-public fun EmptyState.pfEmptyStateContent(
+public fun EmptyState.emptyStateContent(
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyStateContent = register(EmptyStateContent(id = id, baseClass = baseClass), content)
+): EmptyStateContent = register(EmptyStateContent(id = id, baseClass = baseClass, job), content)
 
-public fun EmptyStateContent.pfEmptyStateBody(
+public fun EmptyStateContent.emptyStateBody(
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateBody.() -> Unit = {}
-): EmptyStateBody = register(EmptyStateBody(id = id, baseClass = baseClass), content)
+): EmptyStateBody = register(EmptyStateBody(id = id, baseClass = baseClass, job), content)
 
-public fun EmptyStateContent.pfEmptyStateSecondary(
+public fun EmptyStateContent.emptyStateSecondary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass)), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass), job), content)
 
 // ------------------------------------------------------ tag
 
@@ -41,19 +42,21 @@ public class EmptyState internal constructor(
     size: Size?,
     id: String?,
     baseClass: String?,
+    job: Job,
     content: EmptyStateContent.() -> Unit
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.EmptyState
     +size?.modifier
     +baseClass
-}) {
+}, job) {
+
     init {
         markAs(ComponentType.EmptyState)
-        pfEmptyStateContent {
+        emptyStateContent {
             icon(iconClass).apply {
                 domNode.classList.add("empty-state".component("icon"))
             }
-            pfTitle(size = Size.LG) {
+            title(size = Size.LG) {
                 +title
             }
             content(this)
@@ -61,8 +64,8 @@ public class EmptyState internal constructor(
     }
 }
 
-public class EmptyStateBody internal constructor(id: String?, baseClass: String?) :
-    Div(id = id, baseClass = classes("empty-state".component("body"), baseClass))
+public class EmptyStateBody internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job)
 
-public class EmptyStateContent internal constructor(id: String?, baseClass: String?) :
-    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass))
+public class EmptyStateContent internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass), job)

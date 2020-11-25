@@ -1,21 +1,24 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
+import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun RenderContext.pfInputGroup(
+public fun RenderContext.inputGroup(
     id: String? = null,
     baseClass: String? = null,
     content: InputGroup.() -> Unit = {}
-): InputGroup = register(InputGroup(id = id, baseClass = baseClass), content)
+): InputGroup = register(InputGroup(id = id, baseClass = baseClass, job), content)
 
 // ------------------------------------------------------ tag
 
-public class InputGroup internal constructor(id: String?, baseClass: String?) : PatternFlyComponent<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.InputGroup, baseClass)) {
+public class InputGroup internal constructor(id: String?, baseClass: String?, job: Job) :
+    PatternFlyComponent<HTMLDivElement>,
+    Div(id = id, baseClass = classes(ComponentType.InputGroup, baseClass), job) {
+
     init {
         markAs(ComponentType.InputGroup)
     }

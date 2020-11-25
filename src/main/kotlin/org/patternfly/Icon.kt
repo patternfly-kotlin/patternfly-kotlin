@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
@@ -48,7 +49,7 @@ public class Icon internal constructor(private var iconClass: String, id: String
 
     init {
         markAs(ComponentType.Icon)
-        attr("aria-hidden", "true")
+        aria["hidden"] = true
     }
 
     public fun iconClass(iconClass: Flow<String>) {

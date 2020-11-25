@@ -53,7 +53,7 @@ public inline fun classes(builderAction: ClassBuilder.() -> Unit): String? =
 /**
  * Combines the specified classes using " " as the separator.
  *
- * @sample CSSSamples.classesVarArg
+ * @sample CSSSamples.classesVararg
  */
 public fun classes(vararg classes: String): String? = classes.joinToString(" ").ifEmpty { null }
 

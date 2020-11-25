@@ -1,14 +1,11 @@
 package org.patternfly
 
-import dev.fritz2.binding.OfferingHandler
+import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
-import dev.fritz2.binding.action
-import dev.fritz2.binding.each
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
@@ -18,6 +15,7 @@ import dev.fritz2.elemento.isInView
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,7 +28,7 @@ import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfTabs(
+public fun <T> RenderContext.pfTabs(
     store: TabStore<T> = TabStore(),
     box: Boolean = false,
     filled: Boolean = false,
@@ -45,10 +43,11 @@ public fun <T> HtmlElements.pfTabs(
         filled = filled,
         vertical = vertical,
         id = id,
-        baseClass = baseClass
+        baseClass = baseClass,
+        job
     ), {})
     val tabItems = TabItemsBuilder(tabs).apply(block).build()
-    action(tabItems) handledBy store.update
+    store.update(tabItems)
     return tabs
 }
 
@@ -70,8 +69,9 @@ public class Tabs<T> internal constructor(
     public val filled: Boolean,
     public val vertical: Boolean,
     id: String?,
-    baseClass: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id) {
+    baseClass: String?,
+    job: Job
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job) {
 
     private val scrollStore = ScrollButtonStore()
     private lateinit var tabs: Ul
@@ -88,13 +88,13 @@ public class Tabs<T> internal constructor(
             +("vertical".modifier() `when` vertical)
             +baseClass
         }) {
-            classMap = this@Tabs.scrollStore.data.map {
+            classMap(this@Tabs.scrollStore.data.map {
                 mapOf("scrollable".modifier() to (!this@Tabs.vertical && it.showButtons))
-            }
+            })
             button(baseClass = "tabs".component("scroll", "button")) {
                 aria["label"] = "Scroll left"
-                disabled = this@Tabs.scrollStore.data.map { it.disableLeft }
-                this@Tabs.scrollStore.data.map { it.disableLeft.toString() }.bindAttr("aria-hidden")
+                disabled(this@Tabs.scrollStore.data.map { it.disableLeft })
+                aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableLeft.toString() }
                 domNode.onclick = { this@Tabs.scrollLeft(this@Tabs.tabs.domNode) }
                 icon("angle-left".fas())
             }
@@ -106,7 +106,7 @@ public class Tabs<T> internal constructor(
                     .filterNotNull()
                     .handledBy(this@Tabs.scrollStore.update)
 
-                this@Tabs.store.data.each { this@Tabs.selectId(it) }.render { tab ->
+                this@Tabs.store.data.renderEach({ this@Tabs.selectId(it) }, { tab ->
                     li(baseClass = classes {
                         +"tabs".component("item")
                         +("current".modifier() `when` tab.selected)
@@ -125,20 +125,19 @@ public class Tabs<T> internal constructor(
                             }
                         }
                     }
-                }.bind()
+                })
             }
             button(baseClass = "tabs".component("scroll", "button")) {
                 aria["label"] = "Scroll right"
-                disabled = this@Tabs.scrollStore.data.map { it.disableRight }
-                this@Tabs.scrollStore.data.map { it.disableRight.toString() }.bindAttr("aria-hidden")
+                disabled(this@Tabs.scrollStore.data.map { it.disableRight })
+                aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableRight.toString() }
                 domNode.onclick = { this@Tabs.scrollRight(this@Tabs.tabs.domNode) }
                 icon("angle-right".fas())
             }
         }
 
-        // use shift(1) to keep the tabs at index 0
-        store.data.each { selectId(it) }.render { tab ->
-            register(TabContent(tab.item, tabId(tab.item), contentId(tab.item)), {
+        store.data.renderEach({ selectId(it) }, { tab ->
+            register(TabContent(tab.item, tabId(tab.item), contentId(tab.item), job), {
                 if (!tab.selected) {
                     it.attr("hidden", "")
                 }
@@ -148,7 +147,20 @@ public class Tabs<T> internal constructor(
                 }
                 tab.content(it)
             })
-        }.shift(1).bind()
+        })
+        // use shift(1) to keep the tabs at index 0
+//        store.data.each { selectId(it) }.render { tab ->
+//            register(TabContent(tab.item, tabId(tab.item), contentId(tab.item)), {
+//                if (!tab.selected) {
+//                    it.attr("hidden", "")
+//                }
+//                contentDisplay?.let { display ->
+//                    val content = display.invoke(it.item)
+//                    content.invoke(it)
+//                }
+//                tab.content(it)
+//            })
+//        }.shift(1).bind()
 
         // update scroll buttons, when tab items have been updated
         store.data.map { updateScrollButtons(tabs.domNode) }.filterNotNull() handledBy scrollStore.update
@@ -215,14 +227,14 @@ public class Tabs<T> internal constructor(
             }
         }
         if (firstElementOutOfView != null) {
-            tabs.scrollLeft += firstElementOutOfView.scrollWidth;
+            tabs.scrollLeft += firstElementOutOfView.scrollWidth
         }
     }
 }
 
-public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String) :
+public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("section", id = contentId, baseClass = classes("tab".component("content"))) {
+    TextElement("section", id = contentId, baseClass = classes("tab".component("content")), job) {
 
     init {
         aria["labeledby"] = tabId
@@ -251,8 +263,8 @@ internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
 public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
-    public val select: OfferingHandler<TabItem<T>, TabItem<T>> = handleAndOffer { items, tab ->
-        offer(tab)
+    public val select: EmittingHandler<TabItem<T>, TabItem<T>> = handleAndEmit { items, tab ->
+        emit(tab)
         items.map { if (identifier(it.item) == identifier(tab.item)) it.select() else it.unselect() }
     }
 }

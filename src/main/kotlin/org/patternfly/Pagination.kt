@@ -2,16 +2,14 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SingleMountPoint
-import dev.fritz2.binding.action
-import dev.fritz2.binding.const
-import dev.fritz2.binding.handledBy
+import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.valuesAsNumber
 import dev.fritz2.elemento.aria
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement
@@ -21,17 +19,19 @@ import org.w3c.dom.HTMLInputElement
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfPagination(
+public fun <T> RenderContext.pagination(
     store: ItemStore<T>,
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Pagination.() -> Unit = {}
-): Pagination =
-    register(Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass), content)
+): Pagination = register(
+    Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass, job),
+    content
+)
 
-public fun RenderContext.pfPagination(
+public fun RenderContext.pagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
@@ -40,7 +40,7 @@ public fun RenderContext.pfPagination(
     content: Pagination.() -> Unit = {}
 ): Pagination {
     val store = PageInfoStore(pageInfo)
-    return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass), content)
+    return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass, job), content)
 }
 
 // ------------------------------------------------------ tag
@@ -51,13 +51,14 @@ public class Pagination internal constructor(
     pageSizes: Array<Int>,
     compact: Boolean,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
     Div(id = id, baseClass = classes {
         +ComponentType.Pagination
         +("compact".modifier() `when` compact)
         +baseClass
-    }) {
+    }, job) {
 
     private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()
     private var inputElement: HTMLInputElement? = null
@@ -68,14 +69,14 @@ public class Pagination internal constructor(
         div(baseClass = "pagination".component("total-items")) {
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
-        optionsMenu = pfOptionsMenu {
+        optionsMenu = optionsMenu {
             display = {
                 { +"${it.item} per page" }
             }
-            pfOptionsMenuTogglePlain {
+            optionsMenuTogglePlain {
                 content = { this@Pagination.pageInfoFlow.showRange().invoke(this) }
             }
-            pfOptionsMenuItems {
+            optionsMenuItems {
                 pageSizes.forEachIndexed { index, pageSize ->
                     item(pageSize) {
                         selected = index == 0
@@ -90,7 +91,7 @@ public class Pagination internal constructor(
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
                     this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to first page"
-                        disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
+                        disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
                         clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
                         icon("angle-double-left".fas())
                     }.domNode)
@@ -99,7 +100,7 @@ public class Pagination internal constructor(
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
                 this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to previous page"
-                    disabled = this@Pagination.pageInfoFlow.map { it.firstPage }
+                    disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
                     clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
                     icon("angle-left".fas())
                 }.domNode)
@@ -108,11 +109,11 @@ public class Pagination internal constructor(
                 div(baseClass = "pagination".component("nav", "page-select")) {
                     this@Pagination.inputElement = input(baseClass = "form-control".component()) {
                         aria["label"] = "Current page"
-                        type = const("number")
-                        min = const("1")
-                        max = this@Pagination.pageInfoFlow.map { it.pages.toString() }
-                        disabled = this@Pagination.pageInfoFlow.map { it.pages < 2 }
-                        value = this@Pagination.pageInfoFlow.map { (if (it.total == 0) 0 else it.page + 1).toString() }
+                        type("number")
+                        min("1")
+                        max(this@Pagination.pageInfoFlow.map { it.pages.toString() })
+                        disabled(this@Pagination.pageInfoFlow.map { it.pages < 2 })
+                        value(this@Pagination.pageInfoFlow.map { (if (it.total == 0) 0 else it.page + 1).toString() })
                         changes.valuesAsNumber()
                             .map { it.toInt() - 1 } handledBy this@Pagination.pageInfoHandler.gotoPage
                     }.domNode
@@ -121,14 +122,14 @@ public class Pagination internal constructor(
                         +"of "
                         this@Pagination.pageInfoFlow.map {
                             if (it.total == 0) "0" else it.pages.toString()
-                        }.bind(true)
+                        }.asText()
                     }
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
                 this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                     aria["label"] = "Go to next page"
-                    disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
+                    disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
                     clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
                     icon("angle-right".fas())
                 }.domNode)
@@ -137,7 +138,7 @@ public class Pagination internal constructor(
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
                     this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
                         aria["label"] = "Go to last page"
-                        disabled = this@Pagination.pageInfoFlow.map { it.lastPage }
+                        disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
                         clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
                         icon("angle-double-right".fas())
                     }.domNode)
@@ -146,34 +147,30 @@ public class Pagination internal constructor(
         }
     }
 
-    public var disabled: Flow<Boolean>
-        get() = throw NotImplementedError()
-        set(flow) {
-            object : SingleMountPoint<Boolean>(flow) {
-                override fun set(value: Boolean, last: Boolean?) {
-                    optionsMenu.toggle.disabled = const(value)
-                    if (value) {
-                        controlElements.forEach { it.disabled = true }
-                        inputElement?.let { it.disabled = true }
-                    } else {
-                        action() handledBy pageInfoHandler.refresh
-                    }
-                }
+    public fun disabled(value: Flow<Boolean>) {
+        optionsMenu.toggle.disabled(value)
+        mountSingle(job, value) { v, _ ->
+            if (v) {
+                controlElements.forEach { it.disabled = true }
+                inputElement?.let { it.disabled = true }
+            } else {
+                pageInfoHandler.refresh(Unit)
             }
         }
+    }
 }
 
 // ------------------------------------------------------ store
 
 public fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {
-        this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.bind(true)
+        this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.asText()
         +" - "
-        this@showRange.map { it.range.last.toString() }.bind(true)
+        this@showRange.map { it.range.last.toString() }.asText()
     }
     domNode.appendChild(TextNode(" of ").domNode)
     b {
-        this@showRange.map { it.total.toString() }.bind()
+        this@showRange.map { it.total.toString() }.asText()
     }
 }
 

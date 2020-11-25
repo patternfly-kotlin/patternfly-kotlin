@@ -262,17 +262,41 @@ internal interface ChipSamples {
 
 internal interface ChipGroupSamples {
 
-    fun RenderContext.chipGroupStatic() {
-        chipGroup {
-            +"Static demo"
+    fun RenderContext.vararg() {
+        chipGroup<String> {
+            +"Vararg demo"
+            chips("Foo", "Bar")
+        }
+    }
+
+    fun RenderContext.list() {
+        chipGroup<String> {
+            +"List demo"
+            chips(listOf("Foo", "Bar"))
+        }
+    }
+
+    fun RenderContext.builder() {
+        chipGroup<String> {
+            +"Builder demo"
             chips {
-                chip { +"Foo" }
-                chip { +"Bar" }
+                +"Foo"
+                add("Bar")
             }
         }
     }
 
-    fun RenderContext.chipGroupStore() {
+    fun RenderContext.display() {
+        chipGroup<String> {
+            +"Display demo"
+            display {
+                chip { +it.toUpperCase() }
+            }
+            chips("Foo", "Bar")
+        }
+    }
+
+    fun RenderContext.store() {
         data class Demo(val id: String, val name: String)
 
         val store = ChipGroupStore<Demo> { it.id }
@@ -292,13 +316,10 @@ internal interface ChipGroupSamples {
     }
 
     fun RenderContext.closes() {
-        chipGroup(closable = true) {
+        chipGroup<String>(closable = true) {
             +"Close me"
+            chips("Foo", "Bar")
             closes handledBy Notification.info("You did it!")
-            chips {
-                chip { +"Foo" }
-                chip { +"Bar" }
-            }
         }
     }
 }
@@ -320,7 +341,7 @@ internal interface CSSSamples {
         }
     }
 
-    fun classesVarArg() {
+    fun classesVararg() {
         val classes: String? = classes(
             "button".component(),
             "plain".modifier(),
@@ -379,9 +400,6 @@ internal interface DataTableSamples {
             dataTableCaption { +"Demo Data" }
             dataTableColumns {
                 dataTableColumn("Name") {
-                    cellDisplay { demo ->
-                        +demo.name
-                    }
                 }
             }
         }
@@ -391,6 +409,35 @@ internal interface DataTableSamples {
                 Demo("foo", "Foo"),
                 Demo("bar", "Bar")
             )
+        )
+    }
+}
+
+internal interface DropdownSamples {
+
+    fun RenderContext.dropdownStatic() {
+        dropdown<String> {
+            dropdownToggle()
+            dropdownItems {
+                item("Foo")
+            }
+        }
+    }
+
+    fun RenderContext.dropdownStore() {
+        data class Demo(val id: String, val name: String)
+
+        val store = DropdownStore<Demo>()
+        dropdown(store) {
+            display { demo ->
+            }
+        }
+
+        store.addAll(
+            items {
+                item(Demo("foo", "Foo"))
+                item(Demo("bar", "Bar"))
+            }
         )
     }
 }
@@ -430,6 +477,15 @@ internal class PageSamples {
                         navigationItem("#item1", "Item 1")
                         navigationItem("#item2", "Item 2")
                     }
+                }
+            }
+            pageMain {
+                pageSection {
+                    h1 { +"Welcome" }
+                    p { +"Lorem ipsum" }
+                }
+                pageSection {
+                    +"Another section"
                 }
             }
         }

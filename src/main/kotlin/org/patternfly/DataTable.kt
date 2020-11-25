@@ -89,11 +89,6 @@ public class DataTable<T> internal constructor(
         markAs(ComponentType.DataTable)
     }
 
-    public fun display(display: Columns<T>.(T) -> Unit) {
-        display(columns, )
-        renderTable()
-    }
-
     internal fun renderTable() {
         if (columns.hasToggle) {
             domNode.classList += "expandable".modifier()
@@ -112,9 +107,9 @@ public class DataTable<T> internal constructor(
                                         domNode.type = "checkbox"
                                         aria["label"] = "Select all"
                                         changes.states().filter { !it }
-                                            .map { Unit } handledBy this@DataTable.itemStore.selectNone
+                                            .map { } handledBy this@DataTable.itemStore.selectNone
                                         changes.states().filter { it }
-                                            .map { Unit } handledBy this@DataTable.itemStore.selectAll
+                                            .map { } handledBy this@DataTable.itemStore.selectAll
                                     }
                                 }
                             } else {
@@ -129,13 +124,13 @@ public class DataTable<T> internal constructor(
                                 attr("scope", "col")
                                 attr("role", "columnheader")
                                 if (column.sortInfo != null) {
-                                    classMap(this@DataTable.itemStore.data.map {
-                                        mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
-                                    })
-                                    attr("aria-sort", this@DataTable.itemStore.data.map {
+                                    aria["sort"] = this@DataTable.itemStore.data.map {
                                         if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                                             if (it.sortInfo.ascending) "ascending" else "descending"
                                         } else "none"
+                                    }
+                                    classMap(this@DataTable.itemStore.data.map {
+                                        mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
                                     })
                                 }
                                 if (column.headerDisplay != null) {
@@ -173,7 +168,7 @@ public class DataTable<T> internal constructor(
         }
 
         if (columns.hasToggle) {
-            // use shift(1) to keep the thead at index 0
+            // TODO implement shift(1) to keep the thead at index 0
             itemStore.visible.renderEach({ itemStore.identifier(it) }, { item ->
                 DataTableExpandableBody(this@DataTable, item, job)
             })
@@ -189,6 +184,15 @@ public class DataTable<T> internal constructor(
         }
     }
 }
+
+// public fun <T> Seq<T>.shift(amount: Int): Seq<T> = Seq(this.data.map { patch ->
+//    when (patch) {
+//        is Patch.Insert -> patch.copy(index = patch.index + amount)
+//        is Patch.InsertMany -> patch.copy(index = patch.index + amount)
+//        is Patch.Delete -> patch.copy(start = patch.start + amount)
+//        is Patch.Move -> patch.copy(from = patch.from + amount, to = patch.to + amount)
+//    }
+//})
 
 public class DataTableCaption internal constructor(id: String?, baseClass: String?, job: Job) :
     Caption(id = id, baseClass = baseClass, job)
@@ -261,7 +265,7 @@ internal fun <T> Tr.renderCells(
                             aria["controls"] = expandableContentId
                             aria["label"] = "Details"
                             ces?.let { store ->
-                                attr("aria-expanded", store.data.map { it.toString() })
+                                aria["expancded"] = store.data.map { it.toString() }
                                 classMap(store.data.map { mapOf("expanded".modifier() to it) })
                                 clicks handledBy store.toggle
                             }
@@ -368,10 +372,6 @@ public class DataColumn<T>(
     public var cellDisplay: ComponentDisplay<Td, T> = { { !"Please render your item here" } },
     // TODO configure help: tooltip, popover, custom
 ) : Column<T>() {
-
-    public fun cellDisplay(display: ComponentDisplay2<Td, T>) {
-
-    }
 }
 
 public class SelectColumn<T>(public val selectAll: Boolean, public var baseClass: String? = null) : Column<T>()

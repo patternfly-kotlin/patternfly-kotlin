@@ -357,13 +357,13 @@ public class DataListToggle<T> internal constructor(
     init {
         button(id = id, baseClass = "plain".modifier()) {
             this@DataListToggle.dataListItem.toggleButton = domNode
-            aria["labelledby"] = "$id ${this@DataListToggle.itemStore.identifier(this@DataListToggle.item)}"
             aria["label"] = "Details"
+            aria["labelledby"] = "$id ${this@DataListToggle.itemStore.identifier(this@DataListToggle.item)}"
+            aria["expanded"] = this@DataListToggle.dataListItem.expanded.data.map { it.toString() }
             div(baseClass = "data-list".component("toggle", "icon")) {
                 icon("angle-right".fas())
             }
             clicks handledBy this@DataListToggle.dataListItem.expanded.toggle
-            attr("aria-expanded", this@DataListToggle.dataListItem.expanded.data.map { it.toString() })
         }
     }
 }

@@ -1,17 +1,13 @@
 package org.patternfly
 
-import dev.fritz2.binding.OfferingHandler
+import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SingleMountPoint
-import dev.fritz2.binding.action
-import dev.fritz2.binding.each
-import dev.fritz2.binding.handledBy
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.Id
@@ -20,6 +16,7 @@ import dev.fritz2.elemento.debug
 import dev.fritz2.elemento.matches
 import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -31,48 +28,49 @@ import org.w3c.dom.HTMLUListElement
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfOptionsMenu(
+public fun <T> RenderContext.optionsMenu(
     store: OptionStore<T> = OptionStore(),
     align: Align? = null,
     up: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, align, up, id = id, baseClass = baseClass), content)
+): OptionsMenu<T> = register(OptionsMenu(store, align, up, id = id, baseClass = baseClass, job), content)
 
-public fun <T> OptionsMenu<T>.pfOptionsMenuToggle(
+public fun <T> OptionsMenu<T>.optionsMenuToggle(
     id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
     baseClass: String? = null,
     content: OptionsMenuToggle<T>.() -> Unit = {}
-): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, id = id, baseClass = baseClass), content)
+): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> OptionsMenu<T>.pfOptionsMenuTogglePlain(
+public fun <T> OptionsMenu<T>.optionsMenuTogglePlain(
     id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
     baseClass: String? = null,
     content: OptionsMenuTogglePlain<T>.() -> Unit = {}
-): OptionsMenuTogglePlain<T> = register(OptionsMenuTogglePlain(this, id = id, baseClass = baseClass), content)
+): OptionsMenuTogglePlain<T> =
+    register(OptionsMenuTogglePlain(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> OptionsMenu<T>.pfOptionsMenuItems(
+public fun <T> OptionsMenu<T>.optionsMenuItems(
     id: String? = null,
     baseClass: String? = null,
     block: ItemsBuilder<T>.() -> Unit = {}
 ): OptionsMenuEntries<HTMLUListElement, T> {
     val element = this.register(
-        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass), {})
+        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass, job), {})
     val items = ItemsBuilder<T>().apply(block).build()
-    action(items) handledBy this.store.update
+    this.store.update(items)
     return element
 }
 
-public fun <T> OptionsMenu<T>.pfOptionsMenuGroups(
+public fun <T> OptionsMenu<T>.optionsMenuGroups(
     id: String? = null,
     baseClass: String? = null,
     block: GroupsBuilder<T>.() -> Unit = {}
 ): OptionsMenuEntries<HTMLDivElement, T> {
     val element = this.register(
-        OptionsMenuEntries<HTMLDivElement, T>(this, "div", id = id, baseClass = baseClass), {})
+        OptionsMenuEntries<HTMLDivElement, T>(this, "div", id = id, baseClass = baseClass, job), {})
     val groups = GroupsBuilder<T>().apply(block).build()
-    action(groups) handledBy this.store.update
+    this.store.update(groups)
     return element
 }
 
@@ -83,13 +81,14 @@ public open class OptionsMenu<T> internal constructor(
     internal val optionsMenuAlign: Align?,
     up: Boolean,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
     +ComponentType.OptionsMenu
     +optionsMenuAlign?.modifier
     +("top".modifier() `when` up)
     +baseClass
-}) {
+}, job) {
     public lateinit var toggle: OptionsMenuToggleBase<out HTMLElement, T>
 
     public val ces: CollapseExpandStore = CollapseExpandStore { target ->
@@ -104,7 +103,7 @@ public open class OptionsMenu<T> internal constructor(
 
     init {
         markAs(ComponentType.OptionsMenu)
-        classMap = ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
+        classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
     }
 }
 
@@ -113,17 +112,19 @@ public sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
     tagName: String,
     id: String? = null,
     baseClass: String? = null,
-) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass), WithText<E> {
+    job: Job
+) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass, job), WithText<E> {
 
     internal lateinit var toggleId: String
-    public abstract var disabled: Flow<Boolean>
+
+    public abstract fun disabled(value: Flow<Boolean>)
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
             aria["haspopup"] = "listbox"
+            aria["expanded"] = this@OptionsMenuToggleBase.optionsMenu.ces.data.map { it.toString() }
             clicks handledBy this@OptionsMenuToggleBase.optionsMenu.ces.toggle
             this@OptionsMenuToggleBase.toggleId = id ?: Id.unique()
-            this@OptionsMenuToggleBase.optionsMenu.ces.data.map { it.toString() }.bindAttr("aria-expanded")
         }
         optionsMenu.toggle = this
     }
@@ -133,6 +134,7 @@ public class OptionsMenuToggle<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
     id: String?,
     baseClass: String?,
+    job: Job
 ) : OptionsMenuToggleBase<HTMLButtonElement, T>(
     optionsMenu = optionsMenu,
     tagName = "button",
@@ -140,7 +142,9 @@ public class OptionsMenuToggle<T> internal constructor(
     baseClass = classes {
         +"options-menu".component("toggle")
         +baseClass
-    }) {
+    }, job
+) {
+
     init {
         initToggle(this)
     }
@@ -158,17 +162,9 @@ public class OptionsMenuToggle<T> internal constructor(
             field = value
         }
 
-    override var disabled: Flow<Boolean>
-        get() {
-            throw NotImplementedError()
-        }
-        set(flow) {
-            object : SingleMountPoint<Boolean>(flow) {
-                override fun set(value: Boolean, last: Boolean?) {
-                    domNode.disabled = value
-                }
-            }
-        }
+    public override fun disabled(value: Flow<Boolean>) {
+        attr("disabled", value)
+    }
 
     public var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
         set(value) {
@@ -183,6 +179,7 @@ public class OptionsMenuTogglePlain<T> internal constructor(
     optionsMenu: OptionsMenu<T>,
     id: String?,
     baseClass: String?,
+    job: Job
 ) : OptionsMenuToggleBase<HTMLDivElement, T>(
     optionsMenu = optionsMenu,
     tagName = "div",
@@ -192,7 +189,9 @@ public class OptionsMenuTogglePlain<T> internal constructor(
         +"plain".modifier()
         +"text".modifier()
         +baseClass
-    }) {
+    }, job
+) {
+
     private var toggleButton: Button
 
     init {
@@ -209,41 +208,37 @@ public class OptionsMenuTogglePlain<T> internal constructor(
 
     public var content: (Span.() -> Unit)? = null
         set(value) {
-            val span = Span(baseClass = "options-menu".component("toggle-text")).apply {
+            val span = Span(baseClass = "options-menu".component("toggle-text"), job = job).apply {
                 value?.invoke(this)
             }
             domNode.prepend(span.domNode)
             field = value
         }
 
-    override var disabled: Flow<Boolean>
-        get() = throw NotImplementedError()
-        set(flow) {
-            object : SingleMountPoint<Boolean>(flow) {
-                override fun set(value: Boolean, last: Boolean?) {
-                    domNode.classList.toggle("disabled".modifier(), value)
-                    toggleButton.domNode.disabled = value
-                }
-            }
-        }
+    public override fun disabled(value: Flow<Boolean>) {
+        classMap(value.map { mapOf("disabled".modifier() to it) })
+        toggleButton.attr("disabled", value)
+    }
 }
 
 public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
     private val optionsMenu: OptionsMenu<T>,
     tagName: String,
     id: String?,
-    baseClass: String?
+    baseClass: String?,
+    job: Job
 ) : Tag<E>(tagName = tagName, id = id, baseClass = classes {
     +"options-menu".component("menu")
     +optionsMenu.optionsMenuAlign?.modifier
     +baseClass
-}) {
+}, job) {
+
     init {
         attr("role", "menu")
         attr("hidden", "true")
         aria["labelledby"] = optionsMenu.toggle.toggleId
-        optionsMenu.ces.data.map { !it }.bindAttr("hidden")
-        optionsMenu.store.data.each().render { entry ->
+        attr("hidden", optionsMenu.ces.data.map { !it })
+        optionsMenu.store.data.renderEach { entry ->
             when (entry) {
                 is Item<T> -> {
                     li(content = itemContent(entry))
@@ -260,7 +255,7 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                                         li(content = this@OptionsMenuEntries.itemContent(groupEntry))
                                     }
                                     is Separator<T> -> {
-                                        pfDivider(DividerVariant.LI)
+                                        divider(DividerVariant.LI)
                                     }
                                     else -> {
                                         console.warn("Nested groups are not supported for ${this@OptionsMenuEntries.optionsMenu.domNode.debug()}")
@@ -272,13 +267,13 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                 }
                 is Separator<T> -> {
                     if (domNode.tagName.toLowerCase() == "ul") {
-                        pfDivider(DividerVariant.LI)
+                        divider(DividerVariant.LI)
                     } else {
-                        pfDivider(DividerVariant.DIV)
+                        divider(DividerVariant.DIV)
                     }
                 }
             }
-        }.bind()
+        }
     }
 
     private fun itemContent(item: Item<T>): Li.() -> Unit = {
@@ -305,8 +300,8 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 public class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val select: OfferingHandler<Item<T>, Item<T>> = handleAndOffer { entries, item ->
-        offer(item)
+    internal val select: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, item ->
+        emit(item)
         handleEntries(entries, item)
     }
 

@@ -2,11 +2,12 @@ package org.patternfly
 
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.HtmlElements
 import dev.fritz2.dom.html.Li
+import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.render
+import dev.fritz2.dom.html.renderElement
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.minusAssign
@@ -16,6 +17,7 @@ import dev.fritz2.elemento.querySelectorAll
 import dev.fritz2.elemento.removeFromParent
 import dev.fritz2.elemento.styleHidden
 import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.dom.clear
@@ -27,7 +29,7 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
-public fun <T> HtmlElements.pfTreeView(
+public fun <T> RenderContext.pfTreeView(
     identifier: IdProvider<T, String>,
     checkboxes: Boolean = false,
     badges: Boolean = false,
@@ -35,7 +37,7 @@ public fun <T> HtmlElements.pfTreeView(
     baseClass: String? = null,
     content: TreeView<T>.() -> Unit = {}
 ): TreeView<T> = register(
-    TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass), content
+    TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job), content
 )
 
 public fun <T> pfTree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
@@ -75,7 +77,7 @@ private fun test() {
         pfTreeView<String>({ it }) {
             icons = {
                 SingleIcon {
-                    pfIcon("user".fas())
+                    icon("user".fas())
                 }
             }
             fetchItems = { (1..10).map { pfTreeItem(it.toString()) } }
@@ -97,8 +99,9 @@ public class TreeView<T> internal constructor(
     private val checkboxes: Boolean,
     private val badges: Boolean,
     id: String?,
-    baseClass: String?
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass)) {
+    baseClass: String?,
+    job: Job
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
     private val ul: Ul
     public var display: ComponentDisplay<Span, T> = {
@@ -214,7 +217,7 @@ public class TreeView<T> internal constructor(
 
     private fun expand(li: Element, treeItems: List<TreeItem<T>>) {
         flipIcons(li, true)
-        li.appendChild(render {
+        li.appendChild(renderElement {
             ul {
                 attr("role", "group")
                 for (childItem in treeItems) {
@@ -265,10 +268,10 @@ public class TreeView<T> internal constructor(
 public typealias TreeIconProvider<T> = (T) -> TreeIcon
 
 public sealed class TreeIcon
-public class SingleIcon(public val icon: HtmlElements.() -> Tag<HTMLElement>) : TreeIcon()
+public class SingleIcon(public val icon: RenderContext.() -> Tag<HTMLElement>) : TreeIcon()
 public class ColExIcon(
-    public val collapsed: HtmlElements.() -> Tag<HTMLElement>,
-    public val expanded: HtmlElements.() -> Tag<HTMLElement>
+    public val collapsed: RenderContext.() -> Tag<HTMLElement>,
+    public val expanded: RenderContext.() -> Tag<HTMLElement>
 ) : TreeIcon()
 
 public class Tree<T> {

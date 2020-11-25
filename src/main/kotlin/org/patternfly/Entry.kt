@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ dsl
 
-public fun <T> pfItems(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
+public fun <T> items(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
 
-public fun <T> pfGroups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
+public fun <T> groups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
 
 public fun <T> ItemsBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
@@ -70,14 +70,7 @@ public data class Group<T> internal constructor(
     internal val id: String = Id.unique("grp"),
     val title: String?,
     val items: List<Entry<T>>
-) : Entry<T>() {
-    override fun toString(): String = buildString {
-        append("Group(id=").append(id)
-        append(", items=")
-        items.joinTo(this, prefix = "[", postfix = "]")
-        append(")")
-    }
-}
+) : Entry<T>()
 
 public data class Item<T> internal constructor(
     override val item: T,
@@ -86,23 +79,7 @@ public data class Item<T> internal constructor(
     val description: String,
     val icon: (Span.() -> Unit)?,
     internal var group: Group<T>?
-) : Entry<T>(), HasItem<T> {
-    override fun toString(): String = buildString {
-        append("Item(item=").append(item)
-        append(", disabled=").append(disabled)
-        append(", selected=").append(selected)
-        if (description.isNotEmpty()) {
-            append(", description=").append(description)
-        }
-        if (icon != null) {
-            append(", with icon")
-        }
-        group?.let {
-            append(", group=").append(it.id)
-        }
-        append(")")
-    }
-}
+) : Entry<T>(), HasItem<T>
 
 public class Separator<T> : Entry<T>()
 

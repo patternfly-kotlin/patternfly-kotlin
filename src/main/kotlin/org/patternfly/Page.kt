@@ -7,9 +7,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import dev.fritz2.dom.html.render
-import dev.fritz2.routing.Router
-import dev.fritz2.routing.StringRoute
+import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.map
@@ -92,6 +90,32 @@ public fun Page.sidebar(
     return sidebar
 }
 
+/**
+ * Creates the [PageMain] container inside the [Page].
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun Page.pageMain(
+    id: String? = null,
+    baseClass: String? = null,
+    content: PageMain.() -> Unit = {}
+): PageMain = register(PageMain(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [PageSection] container inside the [PageMain] container.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun PageMain.pageSection(
+    id: String? = null,
+    baseClass: String? = null,
+    content: PageSection.() -> Unit = {}
+): PageSection = register(PageSection(id = id, baseClass = baseClass, job), content)
+
 // ------------------------------------------------------ tag
 
 /**
@@ -140,11 +164,10 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
         div(baseClass = "page".component("header", "brand", "toggle")) {
             attr("hidden", sidebarStore.data.map { !it.visible })
             classMap(sidebarStore.data.map { mapOf("display-none".util() to it.visible) })
-            button(plain) {
-                attr("aria-expanded", sidebarStore.data.map { it.expanded.toString() })
+            clickButton(plain) {
+                aria["expanded"] = sidebarStore.data.map { it.expanded.toString() }
                 icon("bars".fas())
-                clicks handledBy sidebarStore.toggle
-            }
+            } handledBy sidebarStore.toggle
         }
         this@Brand.link = a(baseClass = "page".component("header", "brand", "link")) {
             href("#")
@@ -189,6 +212,32 @@ public class Sidebar internal constructor(
         div(baseClass = "page".component("sidebar", "body")) {
             content(this)
         }
+    }
+}
+
+/**
+ * Main container of the [Page].
+ */
+public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
+    PatternFlyComponent<HTMLElement>,
+    TextElement("main", id = id, baseClass = classes(ComponentType.Main, baseClass), job) {
+
+    init {
+        markAs(ComponentType.Main)
+        attr("role", "main")
+        attr("tabindex", "-1")
+    }
+}
+
+/**
+ * Page section container inside the [PageMain] container.
+ */
+public class PageSection internal constructor(id: String?, baseClass: String?, job: Job) :
+    PatternFlyComponent<HTMLElement>,
+    TextElement("section", id = id, baseClass = classes(ComponentType.Section, baseClass), job) {
+
+    init {
+        markAs(ComponentType.Section)
     }
 }
 

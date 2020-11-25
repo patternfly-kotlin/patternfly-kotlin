@@ -210,7 +210,7 @@ public class Alert internal constructor(
 }, job) {
 
     private var closeButton: PushButton? = null
-    private val aria: Pair<String, String> = when (severity) {
+    private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
         Severity.INFO -> "Info alert" to "Close info alert"
         Severity.SUCCESS -> "Success alert" to "Close success alert"
@@ -227,13 +227,13 @@ public class Alert internal constructor(
 
     init {
         markAs(ComponentType.Alert)
-        attr("aria-label", aria.first)
+        aria["label"] = ariaLabels.first
         div(baseClass = "alert".component("icon")) {
             icon(this@Alert.severity.iconClass)
         }
         h4(baseClass = "alert".component("title")) {
             span(baseClass = "pf-screen-reader") {
-                +this@Alert.aria.first
+                +this@Alert.ariaLabels.first
             }
             +this@Alert.text
         }
@@ -241,7 +241,7 @@ public class Alert internal constructor(
             div(baseClass = "alert".component("action")) {
                 this@Alert.closeButton = pushButton(plain) {
                     icon("times".fas())
-                    aria["label"] = this@Alert.aria.second
+                    aria["label"] = this@Alert.ariaLabels.second
                     domNode.addEventListener(Events.click.name, this@Alert::close)
                 }
             }

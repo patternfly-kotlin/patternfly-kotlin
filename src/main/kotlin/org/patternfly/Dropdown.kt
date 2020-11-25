@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithText
@@ -168,7 +169,7 @@ public sealed class DropdownToggleBase<E : HTMLElement, T>(
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
         with(toggleTag) {
             aria["haspopup"] = true
-            attr("aria-expanded", this@DropdownToggleBase.dropdown.ces.data.map { it.toString() })
+            aria["expanded"] = this@DropdownToggleBase.dropdown.ces.data.map { it.toString() }
             this@DropdownToggleBase.toggleId = id ?: Id.unique()
             clicks handledBy this@DropdownToggleBase.dropdown.ces.toggle
         }
@@ -233,6 +234,7 @@ public class DropdownToggleCheckbox<T> internal constructor(
     },
     job
 ) {
+
     private val labelTag: Label
     private val toggleButton: Button
     private val checkId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
@@ -256,7 +258,7 @@ public class DropdownToggleCheckbox<T> internal constructor(
         }
     }
 
-    public fun label(label: Span.() -> Unit?) {
+    public fun text(label: Span.() -> Unit?) {
         labelTag.register(
             span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
                 aria["hidden"] = true
@@ -363,7 +365,7 @@ public class DropdownEntries<E : HTMLElement, T> internal constructor(
                                         li(content = this@DropdownEntries.itemContent(groupEntry))
                                     }
                                     is Separator<T> -> {
-                                        pfDivider(DividerVariant.LI)
+                                        divider(DividerVariant.LI)
                                     }
                                     else -> {
                                         console.warn("Nested groups are not supported for ${this@DropdownEntries.dropdown.domNode.debug()}")
@@ -375,9 +377,9 @@ public class DropdownEntries<E : HTMLElement, T> internal constructor(
                 }
                 is Separator<T> -> {
                     if (domNode.tagName.toLowerCase() == "ul") {
-                        pfDivider(DividerVariant.LI)
+                        divider(DividerVariant.LI)
                     } else {
-                        pfDivider(DividerVariant.DIV)
+                        divider(DividerVariant.DIV)
                     }
                 }
             }
@@ -410,6 +412,11 @@ public class DropdownEntries<E : HTMLElement, T> internal constructor(
 // ------------------------------------------------------ store
 
 public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
+
+    /**
+     * Adds all specified items to the list of items.
+     */
+    public val addAll: SimpleHandler<List<Entry<T>>> = handle { items, newItems -> items + newItems }
 
     public val select: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
         emit(item)
