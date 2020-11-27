@@ -42,7 +42,7 @@ public fun <T> RenderContext.verticalNavigation(
 ): Navigation<T> = register(
     Navigation(router, selected, VERTICAL, false, id = id, baseClass = baseClass, job, content), {})
 
-public fun <T> Navigation<T>.group(
+public fun <T> Navigation<T>.navigationGroup(
     text: String,
     id: String? = null,
     baseClass: String? = null,
@@ -57,19 +57,19 @@ public fun <T> NavigationItems<T>.expandableGroup(
 ): NavigationExpandableGroup<T> =
     register(NavigationExpandableGroup(navigation, text, id = id, baseClass = baseClass, job, content), {})
 
-public fun <T> Navigation<T>.items(
+public fun <T> Navigation<T>.navigationItems(
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(this, id = id, baseClass = baseClass, job), content)
 
-public fun <T> NavigationGroup<T>.items(
+public fun <T> NavigationGroup<T>.navigationItems(
     id: String? = null,
     baseClass: String? = null,
     content: NavigationItems<T>.() -> Unit = {}
 ): NavigationItems<T> = register(NavigationItems(navigation, id = id, baseClass = baseClass, job), content)
 
-internal fun <T> TextElement.items(
+internal fun <T> TextElement.navigationItems(
     navigation: Navigation<T>,
     id: String? = null,
     baseClass: String? = null,
@@ -145,7 +145,7 @@ public class NavigationGroup<T> internal constructor(
 ) : Tag<HTMLElement>("section", id = id, baseClass = classes("nav".component("section"), baseClass), job) {
     init {
         h2("nav".component("section", "title"), id) { +text }
-        items {
+        navigationItems {
             content(this)
         }
     }
@@ -195,7 +195,7 @@ public class NavigationExpandableGroup<T> internal constructor(
         section("nav".component("subnav")) {
             aria["labelledby"] = linkId
             attr("hidden", this@NavigationExpandableGroup.expanded.data.map { !it })
-            items(this@NavigationExpandableGroup.navigation) {
+            navigationItems(this@NavigationExpandableGroup.navigation) {
                 content(this)
             }
         }

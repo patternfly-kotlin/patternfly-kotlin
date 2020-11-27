@@ -50,6 +50,9 @@ public data class Notification(
     internal val timestamp: Long = Date.now().toLong()
 ) {
     public companion object {
+        public fun default(text: String, details: String? = null): SimpleHandler<Unit> =
+            NotificationStore.push(Notification(Severity.DEFAULT, text, details))
+
         public fun error(text: String, details: String? = null): SimpleHandler<Unit> =
             NotificationStore.push(Notification(Severity.DANGER, text, details))
 
@@ -61,6 +64,11 @@ public data class Notification(
 
         public fun warning(text: String, details: String? = null): SimpleHandler<Unit> =
             NotificationStore.push(Notification(Severity.WARNING, text, details))
+
+        public fun add(text: String, details: String? = null) {
+            val notification = Notification(Severity.INFO, text, details)
+            NotificationStore.add.invoke(notification)
+        }
     }
 }
 
@@ -68,6 +76,10 @@ public object NotificationStore : RootStore<List<Notification>>(listOf()) {
 
     public fun push(notification: Notification): SimpleHandler<Unit> =
         handle { notifications -> notifications + notification }
+
+    public val add: SimpleHandler<Notification> = handle { notifications, notification ->
+        notifications + notification
+    }
 
     public val clear: SimpleHandler<Unit> = handle { listOf() }
 

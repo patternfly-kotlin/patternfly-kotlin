@@ -54,9 +54,21 @@ public class Switch internal constructor(id: String?, baseClass: String?, job: J
         }
     }
 
+    public fun label(value: String) {
+        with(labelTag) {
+            +value
+        }
+    }
+
     public fun label(value: Flow<String>) {
         with(labelTag) {
             value.asText()
+        }
+    }
+
+    public fun labelOff(value: String) {
+        with(labelOffTag) {
+            +value
         }
     }
 
@@ -64,6 +76,10 @@ public class Switch internal constructor(id: String?, baseClass: String?, job: J
         with(labelOffTag) {
             value.asText()
         }
+    }
+
+    public fun disabled(value: Boolean) {
+        input.disabled(value)
     }
 
     public fun disabled(value: Flow<Boolean>) {

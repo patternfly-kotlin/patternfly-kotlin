@@ -117,6 +117,7 @@ public sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
 
     internal lateinit var toggleId: String
 
+    public abstract fun disabled(value: Boolean)
     public abstract fun disabled(value: Flow<Boolean>)
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
@@ -161,6 +162,10 @@ public class OptionsMenuToggle<T> internal constructor(
             }, {})
             field = value
         }
+
+    public override fun disabled(value: Boolean) {
+        attr("disabled", value)
+    }
 
     public override fun disabled(value: Flow<Boolean>) {
         attr("disabled", value)
@@ -214,6 +219,11 @@ public class OptionsMenuTogglePlain<T> internal constructor(
             domNode.prepend(span.domNode)
             field = value
         }
+
+    public override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        toggleButton.attr("disabled", value)
+    }
 
     public override fun disabled(value: Flow<Boolean>) {
         classMap(value.map { mapOf("disabled".modifier() to it) })

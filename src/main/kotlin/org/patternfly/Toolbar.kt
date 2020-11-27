@@ -12,55 +12,55 @@ import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
 
-public fun RenderContext.pfToolbar(
+public fun RenderContext.toolbar(
     id: String? = null,
     baseClass: String? = null,
     content: Toolbar.() -> Unit = {}
 ): Toolbar = register(Toolbar(id = id, baseClass = baseClass, job), content)
 
-public fun Toolbar.pfToolbarContent(
+public fun Toolbar.toolbarContent(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarContent.() -> Unit = {}
 ): ToolbarContent = register(ToolbarContent(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarContent.pfToolbarContentSection(
+public fun ToolbarContent.toolbarContentSection(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarContentSection.() -> Unit = {}
 ): ToolbarContentSection = register(ToolbarContentSection(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarContentSection.pfToolbarGroup(
+public fun ToolbarContentSection.toolbarGroup(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarGroup.() -> Unit = {}
 ): ToolbarGroup = register(ToolbarGroup(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarContentSection.pfToolbarItem(
+public fun ToolbarContentSection.toolbarItem(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarItem.() -> Unit = {}
 ): ToolbarItem = register(ToolbarItem(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarGroup.pfToolbarItem(
+public fun ToolbarGroup.toolbarItem(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarItem.() -> Unit = {}
 ): ToolbarItem = register(ToolbarItem(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarContent.pfToolbarExpandableContent(
+public fun ToolbarContent.toolbarExpandableContent(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarExpandableContent.() -> Unit = {}
 ): ToolbarExpandableContent = register(ToolbarExpandableContent(id = id, baseClass = baseClass, job), content)
 
-public fun ToolbarExpandableContent.pfToolbarGroup(
+public fun ToolbarExpandableContent.toolbarGroup(
     id: String? = null,
     baseClass: String? = null,
     content: ToolbarGroup.() -> Unit = {}
 ): ToolbarGroup = register(ToolbarGroup(id = id, baseClass = baseClass, job), content)
 
-public fun <T> ToolbarItem.pfBulkSelect(
+public fun <T> ToolbarItem.bulkSelect(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
@@ -70,7 +70,7 @@ public fun <T> ToolbarItem.pfBulkSelect(
     return register(BulkSelect(itemStore, id = id, baseClass = baseClass, job), content)
 }
 
-public fun <T> ToolbarItem.pfSortOptions(
+public fun <T> ToolbarItem.sortOptions(
     itemStore: ItemStore<T>,
     options: List<SortInfo<T>>,
     id: String? = null,

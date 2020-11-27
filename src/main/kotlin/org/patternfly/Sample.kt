@@ -459,21 +459,21 @@ internal class PageSamples {
             pageHeader(id = "foo") {
                 brand {
                     home("#home")
-                    image("/assets/logo.svg")
+                    img("/assets/logo.svg")
                 }
                 horizontalNavigation(router) {
-                    items {
+                    navigationItems {
                         navigationItem("#item1", "Item 1")
                         navigationItem("#item2", "Item 2")
                     }
                 }
-                tools {
+                headerTools {
                     notificationBadge()
                 }
             }
-            sidebar {
+            pageSidebar {
                 verticalNavigation(router) {
-                    items {
+                    navigationItems {
                         navigationItem("#item1", "Item 1")
                         navigationItem("#item2", "Item 2")
                     }

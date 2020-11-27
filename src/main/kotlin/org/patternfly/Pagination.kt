@@ -147,6 +147,12 @@ public class Pagination internal constructor(
         }
     }
 
+    public fun disabled(value: Boolean) {
+        optionsMenu.toggle.disabled(value)
+        controlElements.forEach { it.disabled = value }
+        inputElement?.let { it.disabled = value }
+    }
+
     public fun disabled(value: Flow<Boolean>) {
         optionsMenu.toggle.disabled(value)
         mountSingle(job, value) { v, _ ->

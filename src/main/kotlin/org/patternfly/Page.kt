@@ -10,10 +10,12 @@ import dev.fritz2.dom.html.TextElement
 import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
+import org.w3c.dom.Document
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -30,7 +32,11 @@ public fun RenderContext.page(
     id: String? = null,
     baseClass: String? = null,
     content: Page.() -> Unit = {}
-): Page = register(Page(id = id, baseClass = baseClass, job), content)
+): Page {
+    val page = Page(id = id, baseClass = baseClass, job)
+    Singletons.page = page
+    return register(page, content)
+}
 
 /**
  * Creates the [Header] component inside the [Page].
@@ -43,7 +49,11 @@ public fun Page.pageHeader(
     id: String? = null,
     baseClass: String? = null,
     content: Header.() -> Unit = {}
-): Header = register(Header(this, id = id, baseClass = baseClass, job), content)
+): Header {
+    val header = Header(this, id = id, baseClass = baseClass, job)
+    Singletons.header = header
+    return register(header, content)
+}
 
 /**
  * Creates the [Brand] component inside the [Header].
@@ -65,7 +75,7 @@ public fun Header.brand(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun Header.tools(
+public fun Header.headerTools(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
@@ -78,14 +88,15 @@ public fun Header.tools(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun Page.sidebar(
+public fun Page.pageSidebar(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
 ): Sidebar {
     val sidebar = register(Sidebar(this.sidebarStore, id = id, baseClass = baseClass, job, content), {})
+    Singletons.sidebar = sidebar
     (MainScope() + job).launch {
-        sidebarStore.show(Unit)
+        sidebarStore.visible(true)
     }
     return sidebar
 }
@@ -101,16 +112,20 @@ public fun Page.pageMain(
     id: String? = null,
     baseClass: String? = null,
     content: PageMain.() -> Unit = {}
-): PageMain = register(PageMain(id = id, baseClass = baseClass, job), content)
+): PageMain {
+    val pageMain = PageMain(id = id, baseClass = baseClass, job)
+    Singletons.pageMain = pageMain
+    return register(pageMain, content)
+}
 
 /**
- * Creates a [PageSection] container inside the [PageMain] container.
+ * Creates a [PageSection] container.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun PageMain.pageSection(
+public fun RenderContext.pageSection(
     id: String? = null,
     baseClass: String? = null,
     content: PageSection.() -> Unit = {}
@@ -158,7 +173,7 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
     Div(id = id, baseClass = classes("page".component("header", "brand"), baseClass), job) {
 
     private var link: A
-    private lateinit var image: Img
+    private lateinit var img: Img
 
     init {
         div(baseClass = "page".component("header", "brand", "toggle")) {
@@ -171,16 +186,22 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
         }
         this@Brand.link = a(baseClass = "page".component("header", "brand", "link")) {
             href("#")
-            this@Brand.image = img(baseClass = "brand".component()) {}
+            this@Brand.img = img(baseClass = "brand".component()) {}
         }
     }
 
+    /**
+     * Sets the link to the homepage of the application.
+     */
     public fun home(href: String) {
         link.href(href)
     }
 
-    public fun image(src: String, content: Img.() -> Unit = {}) {
-        image.apply(content).src(src)
+    /**
+     * Sets the image for the brand.
+     */
+    public fun img(src: String, content: Img.() -> Unit = {}) {
+        img.apply(content).src(src)
     }
 }
 
@@ -188,11 +209,11 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
  * [PatternFly sidebar](https://www.patternfly.org/v4/components/page/design-guidelines) component.
  *
  * If a sidebar is added to the page, a toggle button is displayed in the [Header] to toggle and expand the sidebar.
- * If you want to show hide the sidebar manually (e.g. because some views don't require a sidebar), please use
+ * If you want to show and hide the sidebar manually (e.g. because some views don't require a sidebar), please use
  * [SidebarStore].
  */
 public class Sidebar internal constructor(
-    sidebarStore: SidebarStore,
+    private val sidebarStore: SidebarStore,
     id: String?,
     baseClass: String?,
     job: Job,
@@ -213,6 +234,15 @@ public class Sidebar internal constructor(
             content(this)
         }
     }
+
+    public fun visible(value: Boolean) {
+        sidebarStore.visible(value)
+    }
+
+    public fun visible(value: Flow<Boolean>) {
+        value handledBy sidebarStore.visible
+    }
+
 }
 
 /**
@@ -243,10 +273,27 @@ public class PageSection internal constructor(id: String?, baseClass: String?, j
 
 // ------------------------------------------------------ store
 
-public data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
+internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 
-public class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
+internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
 
-    public val show: SimpleHandler<Unit> = handle { it.copy(visible = false) }
-    public val toggle: SimpleHandler<Unit> = handle { it.copy(expanded = !it.expanded) }
+    val visible: SimpleHandler<Boolean> = handle { status, visible ->
+        status.copy(visible = visible)
+    }
+
+    val toggle: SimpleHandler<Unit> = handle { it.copy(expanded = !it.expanded) }
+}
+
+// ------------------------------------------------------ singleton
+
+public fun Document.page(): Page? = Singletons.page
+public fun Document.pageHeader(): Header? = Singletons.header
+public fun Document.pageSidebar(): Sidebar? = Singletons.sidebar
+public fun Document.pageMain(): PageMain? = Singletons.pageMain
+
+internal object Singletons {
+    var page: Page? = null
+    var header: Header? = null
+    var sidebar: Sidebar? = null
+    var pageMain: PageMain? = null
 }

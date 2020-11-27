@@ -48,7 +48,7 @@ public fun <T> Columns<T>.dataTableSimpleColumn(label: String, display: Componen
     add(DataColumn(label, cellDisplay = display))
 }
 
-public fun <T> Columns<T>.sataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
+public fun <T> Columns<T>.dataTableSelectColumn(selectAll: Boolean = false, baseClass: String? = null) {
     add(SelectColumn(selectAll, baseClass))
 }
 

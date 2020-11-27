@@ -28,7 +28,7 @@ import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
 
-public fun <T> RenderContext.pfTabs(
+public fun <T> RenderContext.tabs(
     store: TabStore<T> = TabStore(),
     box: Boolean = false,
     filled: Boolean = false,
@@ -51,7 +51,7 @@ public fun <T> RenderContext.pfTabs(
     return tabs
 }
 
-public fun <T> TabItemsBuilder<T>.pfTabItem(
+public fun <T> TabItemsBuilder<T>.tabItem(
     item: T,
     selected: Boolean = false,
     icon: (Span.() -> Unit)? = null,

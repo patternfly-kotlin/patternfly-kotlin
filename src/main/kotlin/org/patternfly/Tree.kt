@@ -29,7 +29,7 @@ import org.w3c.dom.set
 
 // ------------------------------------------------------ dsl
 
-public fun <T> RenderContext.pfTreeView(
+public fun <T> RenderContext.treeView(
     identifier: IdProvider<T, String>,
     checkboxes: Boolean = false,
     badges: Boolean = false,
@@ -40,33 +40,33 @@ public fun <T> RenderContext.pfTreeView(
     TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job), content
 )
 
-public fun <T> pfTree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
+public fun <T> tree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
 
-public fun <T> pfTreeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
+public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
     TreeItemBuilder(item).apply(block).build()
 
-public fun <T> TreeView<T>.pfTree(block: TreeBuilder<T>.() -> Unit = {}) {
+public fun <T> TreeView<T>.tree(block: TreeBuilder<T>.() -> Unit = {}) {
     setTree(TreeBuilder<T>().apply(block).build())
 }
 
-public fun <T> TreeBuilder<T>.pfTreeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}) {
+public fun <T> TreeBuilder<T>.treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}) {
     val builder = TreeItemBuilder(item).apply(block)
     builders.add(builder)
 }
 
-public fun <T> TreeItemBuilder<T>.pfChildren(block: TreeBuilder<T>.() -> Unit = {}) {
+public fun <T> TreeItemBuilder<T>.children(block: TreeBuilder<T>.() -> Unit = {}) {
     childrenBuilder.apply(block)
 }
 
 private fun test() {
     render {
-        pfTreeView<String>({ it }) {
-            pfTree {
-                pfTreeItem("Foo")
-                pfTreeItem("Bar") {
-                    pfChildren {
-                        pfTreeItem("Child 1")
-                        pfTreeItem("Child 2")
+        treeView<String>({ it }) {
+            tree {
+                treeItem("Foo")
+                treeItem("Bar") {
+                    children {
+                        treeItem("Child 1")
+                        treeItem("Child 2")
                     }
                 }
             }
@@ -74,15 +74,15 @@ private fun test() {
     }
 
     render {
-        pfTreeView<String>({ it }) {
+        treeView<String>({ it }) {
             icons = {
                 SingleIcon {
                     icon("user".fas())
                 }
             }
-            fetchItems = { (1..10).map { pfTreeItem(it.toString()) } }
-            pfTree {
-                pfTreeItem("Root")
+            fetchItems = { (1..10).map { treeItem(it.toString()) } }
+            tree {
+                treeItem("Root")
             }
         }
     }

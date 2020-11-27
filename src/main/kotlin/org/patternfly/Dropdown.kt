@@ -22,6 +22,7 @@ import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
@@ -164,6 +165,7 @@ public sealed class DropdownToggleBase<E : HTMLElement, T>(
 
     internal lateinit var toggleId: String
 
+    public abstract fun disabled(value: Boolean)
     public abstract fun disabled(value: Flow<Boolean>)
 
     internal fun initToggle(toggleTag: Tag<HTMLElement>) {
@@ -213,6 +215,10 @@ public class DropdownToggle<T> internal constructor(
             field = value
         }
 
+    override fun disabled(value: Boolean) {
+        attr("disabled", value)
+    }
+
     override fun disabled(value: Flow<Boolean>) {
         attr("disabled", value)
     }
@@ -258,12 +264,18 @@ public class DropdownToggleCheckbox<T> internal constructor(
         }
     }
 
-    public fun text(label: Span.() -> Unit?) {
+    public fun text(label: Span.() -> Unit) {
         labelTag.register(
             span(id = textId, baseClass = "dropdown".component("toggle", "text")) {
                 aria["hidden"] = true
                 label(this)
             }, {})
+    }
+
+    override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        input.attr("disabled", value)
+        toggleButton.attr("disabled", value)
     }
 
     override fun disabled(value: Flow<Boolean>) {
@@ -323,6 +335,12 @@ public class DropdownToggleAction<T> internal constructor(
             action(this)
         }
         domNode.prepend(actionButton?.domNode)
+    }
+
+    override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        toggleButton.disabled(value)
+        actionButton?.disabled(value)
     }
 
     override fun disabled(value: Flow<Boolean>) {

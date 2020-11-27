@@ -92,8 +92,16 @@ public class ChipsBuilder<T> {
         chips.add(this)
     }
 
+    public operator fun List<T>.unaryPlus() {
+        chips.addAll(this)
+    }
+
     public fun add(chip: T) {
         chips.add(chip)
+    }
+
+    public fun addAll(chips: List<T>) {
+        this.chips.addAll(chips)
     }
 }
 
