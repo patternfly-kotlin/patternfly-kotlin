@@ -10,12 +10,12 @@ import dev.fritz2.dom.html.render
 import dev.fritz2.dom.html.renderElement
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.aria
+import dev.fritz2.elemento.displayNone
 import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import dev.fritz2.elemento.querySelector
 import dev.fritz2.elemento.querySelectorAll
 import dev.fritz2.elemento.removeFromParent
-import dev.fritz2.elemento.styleHidden
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -165,7 +165,7 @@ public class TreeView<T> internal constructor(
                                             dataset[COLLAPSED_ICON] = ""
                                         }
                                         icons.expanded(this).domNode.apply {
-                                            styleHidden = true
+                                            displayNone = true
                                             dataset[EXPANDED_ICON] = ""
                                         }
                                     }
@@ -244,8 +244,8 @@ public class TreeView<T> internal constructor(
         val collapsedIcon = li.querySelector(By.data(COLLAPSED_ICON))
         val expandedIcon = li.querySelector(By.data(EXPANDED_ICON))
         if (collapsedIcon != null && expandedIcon != null) {
-            collapsedIcon.styleHidden = expand
-            expandedIcon.styleHidden = !expand
+            collapsedIcon.displayNone = expand
+            expandedIcon.displayNone = !expand
         }
     }
 

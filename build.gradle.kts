@@ -23,9 +23,10 @@ dependencies {
 
 kotlin {
     js {
+        explicitApi()
         compilations.named("main") {
             kotlinOptions {
-                freeCompilerArgs = listOf("-Xexplicit-api=strict", "-Xopt-in=kotlin.RequiresOptIn")
+                freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
             }
         }
         browser {

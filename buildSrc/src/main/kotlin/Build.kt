@@ -3,17 +3,17 @@ import org.gradle.api.publish.maven.MavenPom
 
 object Constants {
     const val group = "org.patternfly"
-    const val version = "0.0.3"
+    const val version = "0.0.4"
 }
 
 object PluginVersions {
-    const val js = "1.4.10"
+    const val js = "1.4.20"
     const val dokka = "1.4.10"
 }
 
 object Versions {
     const val fritz2 = "0.8-SNAPSHOT"
-    const val elemento = "0.0.3"
+    const val elemento = "0.0.4"
     const val kotest = "4.3.0"
 }
 

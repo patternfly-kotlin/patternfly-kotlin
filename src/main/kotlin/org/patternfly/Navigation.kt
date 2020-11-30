@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import org.patternfly.Orientation.HORIZONTAL
 import org.patternfly.Orientation.VERTICAL
 import org.w3c.dom.HTMLElement
@@ -172,8 +173,8 @@ public class NavigationExpandableGroup<T> internal constructor(
             expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
         }
         // it might interfere with router flow, which also modifies the class list
-        MainScope().launch {
-            this@NavigationExpandableGroup.navigation.router.collect {
+        (MainScope() + job).launch {
+            this@NavigationExpandableGroup.navigation.router.data.collect {
                 delay(333) // wait a little bit before testing for the current modifier
                 val selector = By.classname("nav".component("link"), "current".modifier())
                 val containsCurrent = domNode.querySelector(selector) != null
@@ -221,10 +222,10 @@ public class NavigationItem<T> internal constructor(
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo
-            classMap(this@NavigationItem.navigation.router.map { route ->
+            classMap(this@NavigationItem.navigation.router.data.map { route ->
                 mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
             })
-            aria["current"] = this@NavigationItem.navigation.router
+            aria["current"] = this@NavigationItem.navigation.router.data
                 .map { route -> if (this@NavigationItem.calculateSelection(route)) "page" else "" }
             content(this)
         }
