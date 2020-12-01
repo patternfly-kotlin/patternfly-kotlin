@@ -472,10 +472,12 @@ internal class PageSamples {
                 }
             }
             pageSidebar {
-                verticalNavigation(router) {
-                    navigationItems {
-                        navigationItem("#item1", "Item 1")
-                        navigationItem("#item2", "Item 2")
+                sidebarBody {
+                    verticalNavigation(router) {
+                        navigationItems {
+                            navigationItem("#item1", "Item 1")
+                            navigationItem("#item2", "Item 2")
+                        }
                     }
                 }
             }

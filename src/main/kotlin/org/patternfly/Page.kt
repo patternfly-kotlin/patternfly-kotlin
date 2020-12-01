@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
+import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
@@ -9,13 +10,9 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
-import org.w3c.dom.Document
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -32,11 +29,7 @@ public fun RenderContext.page(
     id: String? = null,
     baseClass: String? = null,
     content: Page.() -> Unit = {}
-): Page {
-    val page = Page(id = id, baseClass = baseClass, job)
-    Singletons.page = page
-    return register(page, content)
-}
+): Page = register(Page(id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [Header] component inside the [Page].
@@ -49,11 +42,7 @@ public fun Page.pageHeader(
     id: String? = null,
     baseClass: String? = null,
     content: Header.() -> Unit = {}
-): Header {
-    val header = Header(this, id = id, baseClass = baseClass, job)
-    Singletons.header = header
-    return register(header, content)
-}
+): Header = register(Header(this, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [Brand] component inside the [Header].
@@ -91,15 +80,21 @@ public fun Header.headerTools(
 public fun Page.pageSidebar(
     id: String? = null,
     baseClass: String? = null,
+    content: Sidebar.() -> Unit = {}
+): Sidebar = register(Sidebar(sidebarStore, id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates the body container inside the [Sidebar] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun Sidebar.sidebarBody(
+    id: String? = null,
+    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Sidebar {
-    val sidebar = register(Sidebar(this.sidebarStore, id = id, baseClass = baseClass, job, content), {})
-    Singletons.sidebar = sidebar
-    (MainScope() + job).launch {
-        sidebarStore.visible(true)
-    }
-    return sidebar
-}
+): Div = register(Div(id = id, baseClass = classes("page".component("sidebar", "body"), baseClass), job), content)
 
 /**
  * Creates the [PageMain] container inside the [Page].
@@ -112,11 +107,7 @@ public fun Page.pageMain(
     id: String? = null,
     baseClass: String? = null,
     content: PageMain.() -> Unit = {}
-): PageMain {
-    val pageMain = PageMain(id = id, baseClass = baseClass, job)
-    Singletons.pageMain = pageMain
-    return register(pageMain, content)
-}
+): PageMain = register(PageMain(id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates a [PageSection] container.
@@ -209,15 +200,14 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
  * [PatternFly sidebar](https://www.patternfly.org/v4/components/page/design-guidelines) component.
  *
  * If a sidebar is added to the page, a toggle button is displayed in the [Header] to toggle and expand the sidebar.
- * If you want to show and hide the sidebar manually (e.g. because some views don't require a sidebar), please use
- * [SidebarStore].
+ *
+ * To show & hide the sidebar (e.g. because some views don't require a sidebar) you can use the [visible] functions.
  */
 public class Sidebar internal constructor(
     private val sidebarStore: SidebarStore,
     id: String?,
     baseClass: String?,
-    job: Job,
-    content: Div.() -> Unit
+    job: Job
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.PageSidebar, baseClass), job) {
 
     init {
@@ -225,24 +215,28 @@ public class Sidebar internal constructor(
         attr("hidden", sidebarStore.data.map { !it.visible })
         classMap(sidebarStore.data.map {
             mapOf(
-                "display-none".util() to it.visible,
+                "display-none".util() to !it.visible,
                 "collapsed".modifier() to !it.expanded,
                 "expanded".modifier() to it.expanded
             )
         })
-        div(baseClass = "page".component("sidebar", "body")) {
-            content(this)
-        }
     }
 
+    /**
+     * Manually show & hide the sidebar.
+     */
     public fun visible(value: Boolean) {
         sidebarStore.visible(value)
     }
 
+    /**
+     * Collects the values from the stream to show & hide the sidebar.
+     */
     public fun visible(value: Flow<Boolean>) {
-        value handledBy sidebarStore.visible
+        mountSingle(job, value) { v, _ ->
+            visible(v)
+        }
     }
-
 }
 
 /**
@@ -282,18 +276,4 @@ internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = f
     }
 
     val toggle: SimpleHandler<Unit> = handle { it.copy(expanded = !it.expanded) }
-}
-
-// ------------------------------------------------------ singleton
-
-public fun Document.page(): Page? = Singletons.page
-public fun Document.pageHeader(): Header? = Singletons.header
-public fun Document.pageSidebar(): Sidebar? = Singletons.sidebar
-public fun Document.pageMain(): PageMain? = Singletons.pageMain
-
-internal object Singletons {
-    var page: Page? = null
-    var header: Header? = null
-    var sidebar: Sidebar? = null
-    var pageMain: PageMain? = null
 }
