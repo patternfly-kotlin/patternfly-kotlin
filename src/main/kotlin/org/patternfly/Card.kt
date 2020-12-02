@@ -403,6 +403,7 @@ public class CardActions<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : Div(id = id, baseClass = classes("card".component("actions"), baseClass), job) {
+
     init {
         if (card.selectable) {
             domNode.onclick = { it.stopPropagation() }

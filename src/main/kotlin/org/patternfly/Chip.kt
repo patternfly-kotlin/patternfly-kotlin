@@ -93,9 +93,7 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
     init {
         markAs(ComponentType.Chip)
         val textId = Id.unique(ComponentType.Chip.id, "txt")
-        textElement = span(id = textId, baseClass = "chip".component("text")) {
-
-        }
+        textElement = span(id = textId, baseClass = "chip".component("text")) {}
         if (!readOnly) {
             closeButton = pushButton(ButtonVariation.plain) {
                 icon("times".fas())
@@ -108,7 +106,7 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
 
     override fun delegate(): HTMLSpanElement = textElement.domNode
 
-    private fun close(ignore: Event) {
+    private fun close(@Suppress("UNUSED_PARAMETER") ignore: Event) {
         closeButton?.domNode?.removeEventListener(Events.click.name, ::close)
         domNode.removeFromParent()
     }

@@ -1,8 +1,8 @@
 package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
@@ -19,7 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -54,7 +54,7 @@ public fun <T> RenderContext.chipGroup(
 ): ChipGroup<T> = register(ChipGroup(store, limit, closable, id = id, baseClass = baseClass, job), content)
 
 /**
- * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the function provided to [ChipGroup.display].
+ * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
  * @sample ChipGroupSamples.vararg
  */
@@ -63,7 +63,7 @@ public fun <T> ChipGroup<T>.chips(vararg chips: T) {
 }
 
 /**
- * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the function provided to [ChipGroup.display].
+ * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
  * @sample ChipGroupSamples.list
  */
@@ -72,7 +72,7 @@ public fun <T> ChipGroup<T>.chips(chips: List<T>) {
 }
 
 /**
- * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the function provided to [ChipGroup.display].
+ * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
  * @sample ChipGroupSamples.builder
  */
@@ -110,7 +110,9 @@ public class ChipsBuilder<T> {
 /**
  * PatternFly [chip group](https://www.patternfly.org/v4/components/chip-group/design-guidelines) component.
  *
- * A chip group contains an optional text, a list of chips and an optional close button. The data for the chips is managed by a [ChipGroupStore] and rendered by the [display] function which defaults to `{ chip { +it.toString() } }`.
+ * A chip group contains an optional text, a list of chips and an optional close button. The data for the chips is managed by a [ChipGroupStore] and rendered by the [display] function which defaults to
+ *
+ * `{ chip { +it.toString() } }`
  *
  * The items can be added to the [ChipGroupStore] using different ways (see samples).
  *
@@ -180,10 +182,8 @@ public class ChipGroup<T> internal constructor(
                 }.launchIn(MainScope() + job)
 
             (MainScope() + job).launch {
-                this@ChipGroup.store.remove.distinctUntilChanged().collect { size ->
-                    if (size == 0) {
-                        domNode.removeFromParent()
-                    }
+                this@ChipGroup.store.data.filter { it.isEmpty() }.collect {
+                    domNode.removeFromParent()
                 }
             }
         }
@@ -244,7 +244,9 @@ public class ChipGroup<T> internal constructor(
 // ------------------------------------------------------ store
 
 /**
- * Store containing a list of items used by the [ChipGroup] component. Each item is identified by the specified [IdProvider].
+ * Store containing a list of items used by the [ChipGroup] component. Each item is identified by the specified [IdProvider] which defaults to
+ *
+ * `{ Id.build(it.toString()) }`
  *
  * @sample ChipGroupSamples.store
  */
@@ -254,19 +256,20 @@ public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = 
     /**
      * Adds the specified item to the list of items.
      */
-    public val add: SimpleHandler<T> = handle { items, item -> items + item }
+    public val add: Handler<T> = handle { items, item -> items + item }
 
     /**
      * Adds all specified items to the list of items.
      */
-    public val addAll: SimpleHandler<List<T>> = handle { items, newItems -> items + newItems }
+    public val addAll: Handler<List<T>> = handle { items, newItems -> items + newItems }
 
     /**
-     * Removes the specified item from the list of items and emits the new size of the remaining items.
+     * Removes the specified item from the list of items and emits it (if found).
+     *
+     * @sample ChipGroupSamples.remove
      */
-    public val remove: EmittingHandler<String, Int> = handleAndEmit { items, id ->
-        val removed = items.filterNot { identifier(it) == id }
-        emit(removed.size)
-        removed
+    public val remove: EmittingHandler<String, T?> = handleAndEmit { items, id ->
+        emit(items.find { identifier(it) == id })
+        items.filterNot { identifier(it) == id }
     }
 }

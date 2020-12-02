@@ -13,7 +13,6 @@ import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.matches
 import dev.fritz2.elemento.querySelector
 import dev.fritz2.elemento.removeFromParent
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
+import org.w3c.dom.Document
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -34,15 +34,14 @@ import org.w3c.dom.events.MouseEvent
 internal val TOAST_ALERT_GROUP = Id.unique("toast", ComponentType.AlertGroup.id)
 
 /**
- * Creates the singleton toast [AlertGroup] component and adds it to the body element. If the toast alert group has already been added to the DOM, this function does nothing.
+ * Creates the singleton toast [AlertGroup] component and adds it to the body of this document. If the toast alert group has already been added to the DOM, this function does nothing.
  *
+ * @receiver the document
  * @param baseClass optional CSS class that should be applied to the element
  */
-public fun installToastAlertGroup(baseClass: String? = null) {
-    if (document.querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
-        document.body?.prepend(renderElement {
-            register(AlertGroup(true, TOAST_ALERT_GROUP, baseClass, job), {})
-        }.domNode)
+public fun Document.addToastAlertGroup(baseClass: String? = null) {
+    if (querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
+        body?.prepend(renderElement { AlertGroup(true, TOAST_ALERT_GROUP, baseClass, job) }.domNode)
     }
 }
 
@@ -165,12 +164,15 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
             (MainScope() + job).launch {
                 NotificationStore.latest.collect {
                     val alertId = Id.unique("alert")
-                    val element = alert(it.severity, it.text, true).domNode
-                    element.id = alertId
-                    domNode.prepend(element)
-                    element.onmouseover = { stopTimeout(alertId) }
-                    element.onmouseout = { startTimeout(alertId, element) }
-                    startTimeout(alertId, element)
+                    domNode.prepend(renderElement {
+                        alert(it.severity, it.text, true, id = alertId) {
+                            with(domNode) {
+                                onmouseover = { this@AlertGroup.stopTimeout(alertId) }
+                                onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
+                                this@AlertGroup.startTimeout(alertId, this)
+                            }
+                        }
+                    }.domNode)
                 }
             }
         }
@@ -248,7 +250,7 @@ public class Alert internal constructor(
         }
     }
 
-    private fun close(ignore: Event) {
+    private fun close(@Suppress("UNUSED_PARAMETER") ignore: Event) {
         closeButton?.domNode?.removeEventListener(Events.click.name, ::close)
         if (domNode.parentElement?.matches(By.classname("alert-group".component("item"))) == true) {
             domNode.parentElement.removeFromParent()

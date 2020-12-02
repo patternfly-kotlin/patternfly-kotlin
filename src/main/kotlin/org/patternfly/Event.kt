@@ -10,16 +10,17 @@ import kotlinx.coroutines.flow.emptyFlow
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 
+// Taken from dev.fritz2.dom.WithEvents.subscribe()
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun <T : Element, E : Event> subscribe(domNode: WithDomNode<T>?, type: EventType<E>): Listener<E, T> =
-    if (domNode != null) {
+internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: EventType<E>): Listener<E, T> =
+    if (wdn != null) {
         Listener(callbackFlow {
             val listener: (Event) -> Unit = {
                 offer(it.unsafeCast<E>())
             }
-            domNode.domNode.addEventListener(type.name, listener)
+            wdn.domNode.addEventListener(type.name, listener)
 
-            awaitClose { domNode.domNode.removeEventListener(type.name, listener) }
+            awaitClose { wdn.domNode.removeEventListener(type.name, listener) }
         })
     } else {
         Listener(emptyFlow())

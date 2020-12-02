@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
@@ -33,12 +34,22 @@ public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
     override val total: Handler<Int> = handle { items, _ -> items } // not implemented!
     override val refresh: Handler<Unit> = handle { it } // not implemented!
 
-    public val selectNone: Handler<Unit> = handle { it.selectNone() }
-    public val selectVisible: Handler<Unit> = handle { it.selectPage() }
-    public val selectAll: Handler<Unit> = handle { it.selectAll() }
-    public val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
-        items.select(item, select)
+    public val preSelect: Handler<PreSelection> = handle { items, preSelection ->
+        when(preSelection) {
+            PreSelection.NONE -> items.selectNone()
+            PreSelection.PAGE -> items.selectPage()
+            PreSelection.ALL -> items.selectAll()
+        }
     }
+    public val selectNone: Handler<Unit> = handle { it.selectNone() }
+    public val selectPage: Handler<Unit> = handle { it.selectPage() }
+    public val selectAll: Handler<Unit> = handle { it.selectAll() }
+    public val select: EmittingHandler<Pair<T, Boolean>, Pair<T, Boolean>> =
+        handleAndEmit { items, (item, select) ->
+            val updatedItems = items.select(item, select)
+            emit(item to updatedItems.isSelected(item))
+            updatedItems
+        }
     public val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
 
     public val sortWith: Handler<SortInfo<T>> = handle { items, sortInfo ->

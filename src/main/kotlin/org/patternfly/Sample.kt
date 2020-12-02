@@ -322,6 +322,16 @@ internal interface ChipGroupSamples {
             closes handledBy Notification.info("You did it!")
         }
     }
+
+    fun RenderContext.remove() {
+        chipGroup<String> {
+            +"Remove one"
+            chips("Foo", "Bar")
+            store.remove handledBy Notification.add { chip ->
+                info("You removed $chip.")
+            }
+        }
+    }
 }
 
 internal interface CSSSamples {
@@ -334,7 +344,7 @@ internal interface CSSSamples {
 
     fun classesDsl() {
         val disabled = Random.nextBoolean()
-        val classes: String? = classes {
+        val classes = classes {
             +"button".component()
             +"plain".modifier()
             +("disabled".modifier() `when` disabled)
@@ -342,7 +352,7 @@ internal interface CSSSamples {
     }
 
     fun classesVararg() {
-        val classes: String? = classes(
+        val classes = classes(
             "button".component(),
             "plain".modifier(),
             "disabled".modifier()
@@ -365,7 +375,7 @@ internal interface DataListSamples {
                             dataListCheck()
                         }
                         dataListContent {
-                            dataListCell { +demo.name }
+                            dataListCell(id = demo.id) { +demo.name }
                         }
                         dataListAction {
                             pushButton(primary) { +"Edit" }
@@ -373,9 +383,7 @@ internal interface DataListSamples {
                         }
                     }
                     dataListExpandableContent {
-                        dataListExpandableContentBody {
-                            +"More details about ${demo.name}"
-                        }
+                        +"More details about ${demo.name}"
                     }
                 }
             }
@@ -387,6 +395,43 @@ internal interface DataListSamples {
                 Demo("bar", "Bar")
             )
         )
+    }
+
+    fun RenderContext.collapseExpandHandler() {
+        dataList(ItemStore<String> { it }) {
+            display { item ->
+                dataListItem(item) {
+                    ces.data handledBy Notification.add { expanded ->
+                        info("Expanded state of $item: $expanded.")
+                    }
+                    dataListRow {
+                        dataListControl { dataListToggle() }
+                        dataListContent { dataListCell { +item } }
+                    }
+                    dataListExpandableContent { +"More details about $item" }
+                }
+            }
+        }
+    }
+
+    fun RenderContext.selects() {
+        data class Demo(val id: String, val name: String)
+
+        val store = ItemStore<Demo> { it.id }
+        store.select handledBy Notification.add { (demo, selected) ->
+            default("${demo.name} selected: $selected.")
+        }
+
+        dataList(store) {
+            display { demo ->
+                dataListItem(demo) {
+                    dataListRow {
+                        dataListControl { dataListCheck() }
+                        dataListContent { dataListCell { +demo.name } }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -451,7 +496,22 @@ internal interface IconSamples {
     }
 }
 
-internal class PageSamples {
+internal interface NotificationSamples {
+
+    fun RenderContext.add() {
+        dropdown<Int> {
+            dropdownToggle()
+            dropdownItems {
+                (1..3).forEach { item(it) }
+                store.select handledBy Notification.add { item ->
+                    info("You selected ${item.unwrap()}")
+                }
+            }
+        }
+    }
+}
+
+internal interface PageSamples {
 
     fun RenderContext.typicalSetup() {
         val router = Router(StringRoute("#home"))

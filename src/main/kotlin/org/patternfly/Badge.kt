@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
@@ -74,6 +75,14 @@ public class Badge internal constructor(
      * Sets the value of this badge. If the value is numeric, it is adjusted so that it is within the bounds of
      * [min] and [max].
      */
+    public fun value(value: Flow<String>) {
+        mountSingle(job, value) { v, _ -> value(v) }
+    }
+
+    /**
+     * Sets the value of this badge. If the value is numeric, it is adjusted so that it is within the bounds of
+     * [min] and [max].
+     */
     public fun value(value: String) {
         val numeric = value.toIntOrNull()
         val text = if (numeric != null) {
@@ -83,13 +92,13 @@ public class Badge internal constructor(
     }
 
     /** Sets the value of this badge. The value is adjusted so that it is within the bounds of [min] and [max]. */
-    public fun value(value: Int) {
-        this.domNode.textContent = applyBounds(value)
+    public fun value(value: Flow<Int>) {
+        mountSingle(job, value) { v, _ -> value(v) }
     }
 
     /** Sets the value of this badge. The value is adjusted so that it is within the bounds of [min] and [max]. */
-    public fun value(value: Flow<Int>) {
-        mountDomNode(job, domNode, value.map { TextNode(applyBounds(it)) }.distinctUntilChanged())
+    public fun value(value: Int) {
+        this.domNode.textContent = applyBounds(value)
     }
 
     private fun applyBounds(value: Int): String = when {

@@ -8,7 +8,7 @@ package org.patternfly
 public fun String.component(vararg elements: String): String = combine("pf-c", this, elements)
 
 /**
- * Creates a PatternFly layout CSS class starting with `pf-c-`.
+ * Creates a PatternFly layout CSS class starting with `pf-l-`.
  */
 public fun String.layout(vararg elements: String): String = combine("pf-l", this, elements)
 
@@ -47,7 +47,7 @@ private fun combine(prefix: String, main: String, elements: Array<out String>): 
  *
  * @sample CSSSamples.classesDsl
  */
-public inline fun classes(builderAction: ClassBuilder.() -> Unit): String? =
+public fun classes(builderAction: ClassBuilder.() -> Unit): String? =
     ClassBuilder().apply { builderAction() }.build()
 
 /**
@@ -85,6 +85,8 @@ public class ClassBuilder {
 
     /**
      * Adds the specified CSS class if the `condition == true`.
+     *
+     * @sample CSSSamples.classesDsl
      */
     public infix fun String.`when`(condition: Boolean): String? = if (condition) this else null
 
@@ -94,8 +96,5 @@ public class ClassBuilder {
         }
     }
 
-    /**
-     * Builds the combined CSS class.
-     */
-    public fun build(): String? = builder.toString().trim().ifEmpty { null }
+    internal fun build(): String? = builder.toString().trim().ifEmpty { null }
 }

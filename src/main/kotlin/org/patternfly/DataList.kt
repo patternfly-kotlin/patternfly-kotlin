@@ -106,28 +106,14 @@ public fun <T> DataListRow<T>.dataListControl(
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param content a lambda expression for setting up the expandable content container
  */
 public fun <T> DataListItem<T>.dataListExpandableContent(
     id: String? = Id.unique(ComponentType.DataList.id, "ec"),
     baseClass: String? = null,
-    content: DataListExpandableContent<T>.() -> Unit = {}
+    content: Div.() -> Unit = {}
 ): DataListExpandableContent<T> =
-    register(DataListExpandableContent(this, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListExpandableContentBody] container inside the [DataListExpandableContent].
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListExpandableContent<T>.dataListExpandableContentBody(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListExpandableContentBody.() -> Unit = {}
-): DataListExpandableContentBody =
-    register(DataListExpandableContentBody(id = id, baseClass = baseClass, job), content)
+    register(DataListExpandableContent(this, id = id, baseClass = baseClass, job, content), {})
 
 /**
  * Creates the [DataListItem] container. All other elements are nested inside this container.
@@ -177,6 +163,8 @@ public fun <T> DataListControl<T>.dataListToggle(
  *
  * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in the [ItemStore] as [DataListItem]s.
  *
+ * One of the elements in the [display] should use the [ItemStore.identifier] to assign an id. This id is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ *
  * @param T the type which is used for the [DataListItem]s in this data list.
  *
  * @sample DataListSamples.dataList
@@ -212,6 +200,7 @@ public class DataListAction internal constructor(id: String?, baseClass: String?
  */
 public class DataListCell internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job) {
+
     init {
         domNode.closest(By.classname("data-list".component("item")))?.let {
             attr("rowId", it.id)
@@ -221,6 +210,10 @@ public class DataListCell internal constructor(id: String?, baseClass: String?, 
 
 /**
  * Checkbox to (de)select a data item. The checkbox is bound to the selection state of the [ItemStore].
+ *
+ * You can use the [ItemStore] to track the selection of an item.
+ *
+ * @sample DataListSamples.selects
  */
 public class DataListCheck<T> internal constructor(
     private val itemStore: ItemStore<T>,
@@ -238,9 +231,7 @@ public class DataListCheck<T> internal constructor(
             checked(this@DataListCheck.itemStore.data.map { it.isSelected(this@DataListCheck.item) })
             aria["invalid"] = false
             aria["labelledby"] = this@DataListCheck.itemStore.identifier(this@DataListCheck.item)
-            changes.states()
-                .map { (this@DataListCheck.item to it) }
-                .handledBy(this@DataListCheck.itemStore.select)
+            changes.states().map { (this@DataListCheck.item to it) } handledBy this@DataListCheck.itemStore.select
         }
     }
 }
@@ -277,27 +268,26 @@ public class DataListExpandableContent<T> internal constructor(
     dataListItem: DataListItem<T>,
     id: String?,
     baseClass: String?,
-    job: Job
+    job: Job,
+    content: Div.() -> Unit
 ) : TextElement(
     "section",
     id = id,
     baseClass = classes("data-list".component("expandable-content"), baseClass),
     job
 ) {
+
     init {
         domNode.hidden = true // tp prevent flickering during updates
         if (dataListItem.toggleButton != null && id != null) {
             dataListItem.toggleButton!!.aria["controls"] = id
         }
-        attr("hidden", dataListItem.expanded.data.map { !it })
+        attr("hidden", dataListItem.ces.data.map { !it })
+        div(baseClass = "data-list".component("expandable-content", "body")) {
+            content(this)
+        }
     }
 }
-
-/**
- * Container for the actual content inside a [DataListExpandableContent].
- */
-public class DataListExpandableContentBody internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("data-list".component("expandable-content", "body"), baseClass), job)
 
 /**
  * Container for an item in a [DataList]. All other elements are nested inside this container.
@@ -311,14 +301,16 @@ public class DataListItem<T> internal constructor(
 ) : Li(id = id, baseClass = classes("data-list".component("item"), baseClass), job) {
 
     /**
-     * Manages the expand / collapse state of the [DataListExpandableContent].
+     * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
+     *
+     * @sample DataListSamples.collapseExpandHandler
      */
-    public val expanded: CollapseExpandStore = CollapseExpandStore()
+    public val ces: CollapseExpandStore = CollapseExpandStore()
 
     internal var toggleButton: HTMLButtonElement? = null
 
     init {
-        classMap(expanded.data.map { mapOf("expanded".modifier() to it) })
+        classMap(ces.data.map { mapOf("expanded".modifier() to it) })
         aria["labelledby"] = itemStore.identifier(item)
     }
 }
@@ -359,11 +351,11 @@ public class DataListToggle<T> internal constructor(
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["label"] = "Details"
             aria["labelledby"] = "$id ${this@DataListToggle.itemStore.identifier(this@DataListToggle.item)}"
-            aria["expanded"] = this@DataListToggle.dataListItem.expanded.data.map { it.toString() }
+            aria["expanded"] = this@DataListToggle.dataListItem.ces.data.map { it.toString() }
             div(baseClass = "data-list".component("toggle", "icon")) {
                 icon("angle-right".fas())
             }
-            clicks handledBy this@DataListToggle.dataListItem.expanded.toggle
+            clicks handledBy this@DataListToggle.dataListItem.ces.toggle
         }
     }
 }

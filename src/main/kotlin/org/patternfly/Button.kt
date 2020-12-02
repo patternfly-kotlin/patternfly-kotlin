@@ -141,6 +141,8 @@ public class LinkButton internal constructor(
 
 /**
  * Container for an icon inside a [PushButton] or [LinkButton]. The container controls a margin between the icon and the button text depending on the value of [IconPosition].
+ *
+ * @sample ButtonSamples.buttonIcon
  */
 public class ButtonIcon internal constructor(
     iconPosition: IconPosition,

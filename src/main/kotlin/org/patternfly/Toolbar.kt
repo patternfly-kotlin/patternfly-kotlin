@@ -147,9 +147,7 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
         display = {
             { +it.item.text }
         }
-        store.select.unwrap().filter { it == PreSelection.NONE }.map { Unit } handledBy itemStore.selectNone
-        store.select.unwrap().filter { it == PreSelection.VISIBLE }.map { Unit } handledBy itemStore.selectVisible
-        store.select.unwrap().filter { it == PreSelection.ALL }.map { Unit } handledBy itemStore.selectAll
+        store.select.unwrap() handledBy itemStore.preSelect
 
         dropdownItems {
             PreSelection.values().map { item(it) }
@@ -203,7 +201,7 @@ public class SortOptions<T> internal constructor(
 // ------------------------------------------------------ types
 
 public enum class PreSelection(public val text: String) {
-    NONE("Select none"), VISIBLE("Select visible"), ALL("Select all")
+    NONE("Select none"), PAGE("Select visible"), ALL("Select all")
 }
 
 public sealed class SortOption(public var text: String)

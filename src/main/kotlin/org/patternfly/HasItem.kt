@@ -12,3 +12,5 @@ public fun <T> Flow<List<HasItem<T>>>.unwrap(): Flow<List<T>> = this.map { items
 public fun <T> Flow<HasItem<T>>.unwrap(): Flow<T> = this.map { it.item }
 
 public fun <T> Flow<HasItem<T>?>.unwrapOrNull(): Flow<T?> = this.map { it?.item }
+
+public fun <T> HasItem<T>.unwrap(): T = this.item
