@@ -7,8 +7,9 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
-    RootStore<Items<T>>(Items(identifier)), PageInfoHandler {
+public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
+    WithIdProvider<T>,
+    RootStore<Items<T>>(Items(idProvider)), PageInfoHandler {
 
     public val visible: Flow<List<T>> = data.map { it.page }
     public val selected: Flow<Int> = data.map { it.selected.size }
@@ -35,7 +36,7 @@ public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
     override val refresh: Handler<Unit> = handle { it } // not implemented!
 
     public val preSelect: Handler<PreSelection> = handle { items, preSelection ->
-        when(preSelection) {
+        when (preSelection) {
             PreSelection.NONE -> items.selectNone()
             PreSelection.PAGE -> items.selectPage()
             PreSelection.ALL -> items.selectAll()
@@ -48,6 +49,12 @@ public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
         handleAndEmit { items, (item, select) ->
             val updatedItems = items.select(item, select)
             emit(item to updatedItems.isSelected(item))
+            updatedItems
+        }
+    public val selectItem: EmittingHandler<T, T> =
+        handleAndEmit { items, item ->
+            val updatedItems = items.selectOnly(item)
+            emit(item)
             updatedItems
         }
     public val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
@@ -66,5 +73,9 @@ public class ItemStore<T>(public val identifier: IdProvider<T, String>) :
             }
         }
         items.sortWith(newSortInfo)
+    }
+
+    internal companion object {
+        internal val NOOP: ItemStore<Unit> = ItemStore()
     }
 }

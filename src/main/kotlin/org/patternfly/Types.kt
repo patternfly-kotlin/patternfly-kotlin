@@ -4,6 +4,7 @@ import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.WithText
 import dev.fritz2.dom.mountDomNode
+import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
@@ -13,10 +14,15 @@ import org.w3c.dom.Node
 import org.w3c.dom.get
 import org.w3c.dom.set
 
-public const val COMPONENT_TYPE: String = "pfct"
+private const val COMPONENT_TYPE: String = "pfct"
 
-public typealias ComponentDisplay<C, T> = (T) -> C.() -> Unit
-public typealias ComponentDisplay2<C, T> = C.(T) -> Unit
+/**
+ * Generic display function for components.
+ */
+public typealias ComponentDisplay<C, T> = C.(T) -> Unit
+
+@Deprecated("Please use ComponentDisplay", replaceWith = ReplaceWith("ComponentDisplay"))
+public typealias OldComponentDisplay<C, T> = (T) -> C.() -> Unit
 
 // ------------------------------------------------------ types
 
@@ -28,6 +34,21 @@ internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
             domNode.dataset["ouiaComponentType"] = componentType.name
         }
     }
+}
+
+/**
+ * Interface meant to be implemented by components which want to have an easy access to an item ID. These components can then use [itemId] to assign an ID.
+ *
+ * @sample WithIdProviderSamples.useItemId
+ */
+public interface WithIdProvider<T> {
+
+    public val idProvider: IdProvider<T, String>
+
+    /**
+     * Use this function to get an item ID. Shortcut for `idProvider.invoke(item)`.
+     */
+    public fun itemId(item: T): String = idProvider(item)
 }
 
 // Delegates the text related methods to another element
@@ -83,6 +104,27 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
 
 public enum class Align(public val modifier: String) {
     LEFT("align-left".modifier()), RIGHT("align-right".modifier())
+}
+
+/**
+ * Enum for the [DataTable] selection mode.
+ */
+public enum class DataTableSelection {
+
+    /**
+     * Multiple rows can be selected using checkboxes. The table header contains an additional checkbox to select all rows.
+     */
+    MULTIPLE_ALL,
+
+    /**
+     * Multiple rows can be selected using checkboxes.
+     */
+    MULTIPLE,
+
+    /**
+     * Only one row can be selected at a time using radio buttons.
+     */
+    SINGLE
 }
 
 public enum class ButtonVariation(internal val modifier: String) {

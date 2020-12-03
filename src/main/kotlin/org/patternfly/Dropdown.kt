@@ -22,7 +22,6 @@ import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
@@ -114,7 +113,7 @@ public open class Dropdown<T> internal constructor(
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
     }
 
-    public var display: ComponentDisplay<Button, Item<T>> = { item ->
+    public var display: OldComponentDisplay<Button, Item<T>> = { item ->
         {
             if (item.description.isNotEmpty()) {
                 div(baseClass = "dropdown".component("menu-item", "main")) {
@@ -144,7 +143,7 @@ public open class Dropdown<T> internal constructor(
         classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
     }
 
-    public fun display(display: ComponentDisplay2<Button, T>) {
+    public fun display(display: ComponentDisplay<Button, T>) {
         store.data.renderEach { entry ->
             button {
                 if (entry is Item<T>) {

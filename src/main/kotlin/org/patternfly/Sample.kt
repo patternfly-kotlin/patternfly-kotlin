@@ -227,7 +227,7 @@ internal interface CardViewSamples {
                             cardCheckbox()
                         }
                     }
-                    cardBody { +demo.name }
+                    cardBody(id = itemId(demo)) { +demo.name }
                 }
             }
         }
@@ -375,7 +375,9 @@ internal interface DataListSamples {
                             dataListCheck()
                         }
                         dataListContent {
-                            dataListCell(id = demo.id) { +demo.name }
+                            dataListCell(id = itemId(demo)) {
+                                +demo.name
+                            }
                         }
                         dataListAction {
                             pushButton(primary) { +"Edit" }
@@ -398,7 +400,7 @@ internal interface DataListSamples {
     }
 
     fun RenderContext.collapseExpandHandler() {
-        dataList(ItemStore<String> { it }) {
+        dataList<String> {
             display { item ->
                 dataListItem(item) {
                     ces.data handledBy Notification.add { expanded ->
@@ -442,9 +444,35 @@ internal interface DataTableSamples {
 
         val store = ItemStore<Demo> { it.id }
         dataTable(store) {
-            dataTableCaption { +"Demo Data" }
+            dataTableCaption { +"Demo Table" }
             dataTableColumns {
+                dataTableToggleColumn { demo ->
+                    +"More details about ${demo.name}"
+                }
+                dataTableSelectColumn()
+                dataTableColumn("Id") {
+                    cellDisplay { demo ->
+                        span(id = itemId(demo)) { +demo.id }
+                    }
+                }
                 dataTableColumn("Name") {
+                    sortInfo("name", "Name") { a, b ->
+                        a.name.compareTo(b.name)
+                    }
+                    cellDisplay { demo -> +demo.name }
+                }
+                dataTableActionColumn {
+                    pushButton(plain) { icon("pencil".fas()) }
+                }
+                dataTableActionColumn { demo ->
+                    dropdown<String>(align = RIGHT) {
+                        dropdownKebabToggle()
+                        dropdownItems {
+                            item("Action 1")
+                            item("Action 2")
+                            item("Remove ${demo.name}")
+                        }
+                    }
                 }
             }
         }
@@ -455,6 +483,129 @@ internal interface DataTableSamples {
                 Demo("bar", "Bar")
             )
         )
+    }
+
+    fun RenderContext.dataColumns() {
+        dataTable<String> {
+            dataTableColumns {
+                dataTableColumn("Item") {
+                    sortInfo(SortInfo("item", "Item", naturalOrder()))
+                    cellDisplay {
+                        span(id = itemId(it)) { +it }
+                    }
+                }
+                dataTableColumn("Shout") {
+                    headerDisplay { icon("volume-up") }
+                    cellDisplay { +it.toUpperCase() }
+                }
+            }
+        }
+    }
+
+    fun RenderContext.selects() {
+        data class Demo(val id: String, val name: String)
+
+        val store = ItemStore<Demo> { it.id }
+        store.select handledBy Notification.add { (demo, selected) ->
+            default("${demo.name} selected: $selected.")
+        }
+
+        dataTable(store) {
+            dataTableColumns {
+                dataTableSelectColumn()
+                dataTableColumn("Name") {
+                    cellDisplay { +it.name }
+                }
+            }
+        }
+    }
+}
+
+internal interface DrawerSamples {
+
+    fun RenderContext.drawerSetup() {
+        val store = ItemStore<String>()
+
+        drawer {
+            drawerSection {
+                +"Primary detail demo"
+            }
+            drawerContent {
+                drawerBody {
+                    dataList(store, selectableRows = true) {
+                        display { item ->
+                            dataListItem(item) {
+                                dataListRow { +item }
+                            }
+                        }
+                    }
+                }
+            }
+            drawerPanel {
+                drawerFirstBody {
+                    h2 { +"Details of selected item" }
+                }
+                drawerBody {
+                    store.selectItem.asText()
+                }
+            }
+        }
+
+        store.addAll(listOf("One", "Two", "Three"))
+    }
+
+    fun RenderContext.collapseExpandHandler() {
+        drawer {
+            ces.data handledBy Notification.add { expanded ->
+                info("Expanded state of drawer: $expanded.")
+            }
+            drawerContent {
+                drawerBody { +"Drawer content" }
+            }
+            drawerPanel {
+                drawerFirstBody {
+                    +"Drawer panel"
+                }
+            }
+        }
+    }
+
+    fun RenderContext.drawerContents() {
+        drawer {
+            drawerContent {
+                drawerBody { +"Actual" }
+                drawerBody { +"content" }
+                drawerBody { +"goes here" }
+            }
+        }
+    }
+
+    fun RenderContext.drawerPanels() {
+        drawer {
+            drawerPanel {
+                drawerFirstBody { +"Title" }
+                drawerBody { +"additional" }
+                drawerBody { +"content" }
+            }
+        }
+    }
+
+    fun RenderContext.customHead() {
+        drawer {
+            drawerPanel {
+                drawerBody {
+                    drawerHead {
+                        title { +"Title" }
+                        drawerActions {
+                            drawerClose()
+                        }
+                        +"Additional text below the title"
+                    }
+                }
+                drawerBody { +"additional" }
+                drawerBody { +"content" }
+            }
+        }
     }
 }
 
@@ -548,6 +699,21 @@ internal interface PageSamples {
                 }
                 pageSection {
                     +"Another section"
+                }
+            }
+        }
+    }
+}
+
+internal interface WithIdProviderSamples {
+
+    fun RenderContext.useItemId() {
+        dataList<String> {
+            display {
+                dataListItem(it) {
+                    dataListRow(id = itemId(it)) {
+                        +it
+                    }
                 }
             }
         }

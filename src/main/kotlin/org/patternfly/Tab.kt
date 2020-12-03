@@ -75,8 +75,8 @@ public class Tabs<T> internal constructor(
 
     private val scrollStore = ScrollButtonStore()
     private lateinit var tabs: Ul
-    internal lateinit var tabDisplay: ComponentDisplay<Span, T>
-    internal var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
+    internal lateinit var tabDisplay: OldComponentDisplay<Span, T>
+    internal var contentDisplay: OldComponentDisplay<TabContent<T>, T>? = null
 
     init {
         markAs(ComponentType.Tabs)
@@ -290,11 +290,11 @@ public class TabItem<T>(
 public class TabItemsBuilder<T> internal constructor(private val tabs: Tabs<T>) {
     internal val tabItems: MutableList<TabItem<T>> = mutableListOf()
 
-    public var itemDisplay: ComponentDisplay<Span, T> = {
+    public var itemDisplay: OldComponentDisplay<Span, T> = {
         { +it.toString() }
     }
 
-    public var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
+    public var contentDisplay: OldComponentDisplay<TabContent<T>, T>? = null
 
     internal fun build(): List<TabItem<T>> {
         tabs.tabDisplay = itemDisplay

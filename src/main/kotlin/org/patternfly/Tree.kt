@@ -104,7 +104,7 @@ public class TreeView<T> internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
     private val ul: Ul
-    public var display: ComponentDisplay<Span, T> = {
+    public var display: OldComponentDisplay<Span, T> = {
         { +it.toString() }
     }
     public var icons: TreeIconProvider<T>? = null

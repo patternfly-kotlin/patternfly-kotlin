@@ -82,7 +82,7 @@ open class ItemsTests : FunSpec({
         val numbers = listOf(2, 65, 7, 89, 33, 123, 38, 75)
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 
-        val asc = SortInfo<Int>("nat", "Natural", naturalOrder())
+        val asc = SortInfo<Int>("nat", "Natural", comparator = naturalOrder())
         numberItems = numberItems.sortWith(asc)
         with(numberItems) {
             all shouldContainInOrder numbers

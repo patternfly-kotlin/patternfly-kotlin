@@ -11,26 +11,31 @@ import dev.fritz2.elemento.Id
 import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.closest
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
+// TODO draggable rows
+//  breakpoints
 // ------------------------------------------------------ dsl
 
 /**
  * Creates a [DataList] component.
  *
  * @param store the item store
+ * @param selectableRows whether the rows are selectable
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.dataList(
-    store: ItemStore<T>,
+    store: ItemStore<T> = ItemStore(),
+    selectableRows: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(store, id = id, baseClass = baseClass, job), content)
+): DataList<T> = register(DataList(store, selectableRows, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [DataListAction] container in the [DataListRow].
@@ -52,11 +57,11 @@ public fun <T> DataListRow<T>.dataListAction(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun DataListContent.dataListCell(
+public fun <T> DataListContent<T>.dataListCell(
     id: String? = null,
     baseClass: String? = null,
-    content: DataListCell.() -> Unit = {}
-): DataListCell = register(DataListCell(id = id, baseClass = baseClass, job), content)
+    content: DataListCell<T>.() -> Unit = {}
+): DataListCell<T> = register(DataListCell(itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates a [DataListCheck] inside the [DataListControl] container.
@@ -81,8 +86,8 @@ public fun <T> DataListControl<T>.dataListCheck(
 public fun <T> DataListRow<T>.dataListContent(
     id: String? = null,
     baseClass: String? = null,
-    content: DataListContent.() -> Unit = {}
-): DataListContent = register(DataListContent(id = id, baseClass = baseClass, job), content)
+    content: DataListContent<T>.() -> Unit = {}
+): DataListContent<T> = register(DataListContent(itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [DataListControl] container inside the [DataListRow].
@@ -124,10 +129,10 @@ public fun <T> DataListItem<T>.dataListExpandableContent(
  */
 public fun <T> DataList<T>.dataListItem(
     item: T,
-    id: String? = "${itemStore.identifier(item)}-row",
+    id: String? = "${itemStore.idProvider(item)}-row",
     baseClass: String? = null,
     content: DataListItem<T>.() -> Unit = {}
-): DataListItem<T> = register(DataListItem(this.itemStore, item, id = id, baseClass = baseClass, job), content)
+): DataListItem<T> = register(DataListItem(this.itemStore, item, this, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [DataListRow] inside the [DataListItem] container.
@@ -161,9 +166,9 @@ public fun <T> DataListControl<T>.dataListToggle(
 /**
  * PatternFly [data list](https://www.patternfly.org/v4/components/data-list/design-guidelines) component.
  *
- * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in the [ItemStore] as [DataListItem]s.
+ * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in an [ItemStore] as [DataListItem]s.
  *
- * One of the elements in the [display] should use the [ItemStore.identifier] to assign an id. This id is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ * One of the elements in the [display] should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
  *
  * @param T the type which is used for the [DataListItem]s in this data list.
  *
@@ -171,6 +176,7 @@ public fun <T> DataListControl<T>.dataListToggle(
  */
 public class DataList<T> internal constructor(
     internal val itemStore: ItemStore<T>,
+    internal val selectableRows: Boolean,
     id: String?,
     baseClass: String?,
     job: Job
@@ -185,7 +191,7 @@ public class DataList<T> internal constructor(
      * Defines how to display the items in the [ItemStore] as [DataListItem]s. Call this function *before* populating the store.
      */
     public fun display(display: (T) -> DataListItem<T>) {
-        itemStore.visible.renderEach({ itemStore.identifier(it) }, { item -> display(item) })
+        itemStore.visible.renderEach({ itemStore.idProvider(it) }, { item -> display(item) })
     }
 }
 
@@ -198,7 +204,8 @@ public class DataListAction internal constructor(id: String?, baseClass: String?
 /**
  * A cell in a [DataListContent] container. Cells are usually used to display properties of the items.
  */
-public class DataListCell internal constructor(id: String?, baseClass: String?, job: Job) :
+public class DataListCell<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
+    WithIdProvider<T> by itemStore,
     Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job) {
 
     init {
@@ -230,7 +237,7 @@ public class DataListCheck<T> internal constructor(
             type("checkbox")
             checked(this@DataListCheck.itemStore.data.map { it.isSelected(this@DataListCheck.item) })
             aria["invalid"] = false
-            aria["labelledby"] = this@DataListCheck.itemStore.identifier(this@DataListCheck.item)
+            aria["labelledby"] = this@DataListCheck.itemStore.idProvider(this@DataListCheck.item)
             changes.states().map { (this@DataListCheck.item to it) } handledBy this@DataListCheck.itemStore.select
         }
     }
@@ -239,7 +246,12 @@ public class DataListCheck<T> internal constructor(
 /**
  * Container for [DataListCell]s in a [DataListRow].
  */
-public class DataListContent internal constructor(id: String?, baseClass: String?, job: Job) :
+public class DataListContent<T> internal constructor(
+    internal val itemStore: ItemStore<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemStore,
     Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job) {
 
     init {
@@ -295,10 +307,16 @@ public class DataListExpandableContent<T> internal constructor(
 public class DataListItem<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     internal val item: T,
+    dataList: DataList<T>,
     id: String?,
     baseClass: String?,
     job: Job
-) : Li(id = id, baseClass = classes("data-list".component("item"), baseClass), job) {
+) : WithIdProvider<T> by itemStore,
+    Li(id = id, baseClass = classes {
+        +"data-list".component("item")
+        +("selectable".modifier() `when` dataList.selectableRows)
+        +baseClass
+    }, job) {
 
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
@@ -310,8 +328,23 @@ public class DataListItem<T> internal constructor(
     internal var toggleButton: HTMLButtonElement? = null
 
     init {
-        classMap(ces.data.map { mapOf("expanded".modifier() to it) })
-        aria["labelledby"] = itemStore.identifier(item)
+        aria["labelledby"] = itemStore.idProvider(item)
+        if (dataList.selectableRows) {
+            classMap(ces.data
+                .combine(itemStore.data.map { it.isSelected(item) }) { expanded, selected ->
+                    expanded to selected
+                }
+                .map { (expanded, selected) ->
+                    mapOf(
+                        "expanded".modifier() to expanded,
+                        "selected".modifier() to selected
+                    )
+                }
+            )
+            clicks.map { item } handledBy itemStore.selectItem
+        } else {
+            classMap(ces.data.map { mapOf("expanded".modifier() to it) })
+        }
     }
 }
 
@@ -325,7 +358,8 @@ public class DataListRow<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job) {
+) : WithIdProvider<T> by itemStore,
+    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job) {
 
     init {
         domNode.closest(By.classname("data-list".component("item")))?.let {
@@ -350,7 +384,7 @@ public class DataListToggle<T> internal constructor(
         button(id = id, baseClass = "plain".modifier()) {
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["label"] = "Details"
-            aria["labelledby"] = "$id ${this@DataListToggle.itemStore.identifier(this@DataListToggle.item)}"
+            aria["labelledby"] = "$id ${this@DataListToggle.itemStore.idProvider(this@DataListToggle.item)}"
             aria["expanded"] = this@DataListToggle.dataListItem.ces.data.map { it.toString() }
             div(baseClass = "data-list".component("toggle", "icon")) {
                 icon("angle-right".fas())
@@ -359,3 +393,4 @@ public class DataListToggle<T> internal constructor(
         }
     }
 }
+

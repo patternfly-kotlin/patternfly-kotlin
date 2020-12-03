@@ -56,6 +56,10 @@ public data class Items<T>(
         return copy(selected = newSelection)
     }
 
+    public fun selectOnly(item: T): Items<T> {
+        return copy(selected = setOf(identifier(item)))
+    }
+
     public fun toggleSelection(item: T): Items<T> {
         val id = identifier(item)
         val newSelection = if (id in selected) selected - id else selected + id

@@ -95,7 +95,7 @@ public open class OptionsMenu<T> internal constructor(
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
 
-    public var display: ComponentDisplay<Button, Item<T>> = {
+    public var display: OldComponentDisplay<Button, Item<T>> = {
         {
             +it.item.toString()
         }
