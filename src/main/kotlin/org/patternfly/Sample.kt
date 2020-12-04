@@ -542,7 +542,7 @@ internal interface DrawerSamples {
                 }
             }
             drawerPanel {
-                drawerFirstBody {
+                drawerBodyWithClose {
                     h2 { +"Details of selected item" }
                 }
                 drawerBody {
@@ -563,7 +563,7 @@ internal interface DrawerSamples {
                 drawerBody { +"Drawer content" }
             }
             drawerPanel {
-                drawerFirstBody {
+                drawerBodyWithClose {
                     +"Drawer panel"
                 }
             }
@@ -583,23 +583,20 @@ internal interface DrawerSamples {
     fun RenderContext.drawerPanels() {
         drawer {
             drawerPanel {
-                drawerFirstBody { +"Title" }
+                drawerBodyWithClose { +"Title" }
                 drawerBody { +"additional" }
                 drawerBody { +"content" }
             }
         }
-    }
-
-    fun RenderContext.customHead() {
+        // is the same as
         drawer {
             drawerPanel {
                 drawerBody {
                     drawerHead {
-                        title { +"Title" }
+                        +"Title"
                         drawerActions {
                             drawerClose()
                         }
-                        +"Additional text below the title"
                     }
                 }
                 drawerBody { +"additional" }

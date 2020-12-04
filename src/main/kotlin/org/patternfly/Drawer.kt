@@ -2,7 +2,6 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.renderElement
 import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -77,7 +76,7 @@ public fun Drawer.drawerPanel(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the [DrawerHead]
  */
-public fun DrawerPanel.drawerFirstBody(
+public fun DrawerPanel.drawerBodyWithClose(
     id: String? = null,
     baseClass: String? = null,
     content: DrawerHead.() -> Unit = {}
@@ -202,10 +201,9 @@ public class DrawerActions internal constructor(
 /**
  * Container for the content inside [DrawerContent] and [DrawerPanel].
  *
- * Use this class to add content to [DrawerContent]s and [DrawerPanel]s. If used for the [DrawerPanel] you normally add a [DrawerHead], [DrawerActions] and a [DrawerClose] to the [DrawerBody]. You can use [drawerFirstBody] as a shortcut. If you want to have full control you can put the components together on your own though.
+ * Use this class to add content to [DrawerContent]s and [DrawerPanel]s. If used for the [DrawerPanel] you normally add a [DrawerHead], [DrawerActions] and a [DrawerClose] to the [DrawerBody]. You can use [drawerBodyWithClose] as a shortcut. If you want to have full control you can put the components together on your own though.
  *
  * @sample DrawerSamples.drawerPanels
- * @sample DrawerSamples.customHead
  */
 public class DrawerBody internal constructor(internal val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("drawer".component("body"), baseClass), job)
