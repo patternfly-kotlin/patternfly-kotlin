@@ -8,7 +8,7 @@ object Constants {
 
 object PluginVersions {
     const val js = "1.4.20"
-    const val dokka = "1.4.10"
+    const val dokka = "1.4.20"
 }
 
 object Versions {
