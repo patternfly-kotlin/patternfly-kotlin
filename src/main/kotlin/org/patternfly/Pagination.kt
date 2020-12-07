@@ -12,6 +12,7 @@ import dev.fritz2.elemento.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -89,7 +90,7 @@ public class Pagination internal constructor(
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
-                    this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
+                    this@Pagination.controlElements.add(pushButton(plain) {
                         aria["label"] = "Go to first page"
                         disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
                         clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
@@ -98,7 +99,7 @@ public class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
-                this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
+                this@Pagination.controlElements.add(pushButton(plain) {
                     aria["label"] = "Go to previous page"
                     disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
                     clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
@@ -127,7 +128,7 @@ public class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
-                this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
+                this@Pagination.controlElements.add(pushButton(plain) {
                     aria["label"] = "Go to next page"
                     disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
                     clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
@@ -136,7 +137,7 @@ public class Pagination internal constructor(
             }
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
-                    this@Pagination.controlElements.add(button(baseClass = "plain".modifier()) {
+                    this@Pagination.controlElements.add(pushButton(plain) {
                         aria["label"] = "Go to last page"
                         disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
                         clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage

@@ -57,8 +57,7 @@ public fun <T> OptionsMenu<T>.optionsMenuItems(
 ): OptionsMenuEntries<HTMLUListElement, T> {
     val element = this.register(
         OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass, job), {})
-    val items = ItemsBuilder<T>().apply(block).build()
-    this.store.update(items)
+    this.store.update(ItemsBuilder<T>().apply(block).build())
     return element
 }
 
@@ -69,8 +68,7 @@ public fun <T> OptionsMenu<T>.optionsMenuGroups(
 ): OptionsMenuEntries<HTMLDivElement, T> {
     val element = this.register(
         OptionsMenuEntries<HTMLDivElement, T>(this, "div", id = id, baseClass = baseClass, job), {})
-    val groups = GroupsBuilder<T>().apply(block).build()
-    this.store.update(groups)
+    this.store.update(GroupsBuilder<T>().apply(block).build())
     return element
 }
 
@@ -310,9 +308,28 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
 
 public class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val select: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, item ->
+    public val items: Flow<List<Item<T>>> = data.flatItems()
+    public val groups: Flow<List<Group<T>>> = data.groups()
+    public val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
+        items.filter { it.selected }
+    }
+    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
+
+
+    /**
+     * Selects and emits the specified item. Use this handler if you just want to handle the payload of [Item] and don't need the [Item] instance itself.
+     */
+    public val select: EmittingHandler<Item<T>, T> = handleAndEmit { items, item ->
+        emit(item.item)
+        handleEntries(items, item)
+    }
+
+    /**
+     * Selects and emits the specified item. Use this handler if you need the [Item] instance.
+     */
+    public val selectItem: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
         emit(item)
-        handleEntries(entries, item)
+        handleEntries(items, item)
     }
 
     private fun handleEntries(entries: List<Entry<T>>, item: Item<T>): List<Entry<T>> = entries.map { entry ->
@@ -345,11 +362,4 @@ public class OptionStore<T> : RootStore<List<Entry<T>>>(listOf()) {
         } else {
             entry.copy(selected = false)
         }
-
-    public val items: Flow<List<Item<T>>> = data.flatItems()
-    public val groups: Flow<List<Group<T>>> = data.groups()
-    public val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
-        items.filter { it.selected }
-    }
-    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
 }

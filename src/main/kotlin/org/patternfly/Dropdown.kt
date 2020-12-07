@@ -3,8 +3,10 @@ package org.patternfly
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
+import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
+import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Input
@@ -12,19 +14,23 @@ import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.dom.html.Ul
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.Id
 import dev.fritz2.elemento.aria
 import dev.fritz2.elemento.debug
 import dev.fritz2.elemento.matches
-import dev.fritz2.elemento.plusAssign
+import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import org.w3c.dom.Comment
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.Node
 import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
@@ -33,6 +39,7 @@ import org.w3c.dom.events.MouseEvent
  * Creates a [Dropdown] component.
  *
  * @param store the store for the dropdown
+ * @param grouped whether the dropdown contains groups or just flat items
  * @param align the alignment of the dropdown
  * @param up controls the direction of the dropdown menu
  * @param id the ID of the element
@@ -41,12 +48,13 @@ import org.w3c.dom.events.MouseEvent
  */
 public fun <T> RenderContext.dropdown(
     store: DropdownStore<T> = DropdownStore(),
+    grouped: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Dropdown<T>.() -> Unit = {}
-): Dropdown<T> = register(Dropdown(store, align, up, id = id, baseClass = baseClass, job), content)
+): Dropdown<T> = register(Dropdown(store, grouped, align, up, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates a text toggle.
@@ -56,8 +64,12 @@ public fun <T> RenderContext.dropdown(
  *
  * @sample DropdownSamples.textToggle
  */
-public fun <T> Dropdown<T>.textToggle(baseClass: String? = null, content: Span.() -> Unit) {
-    toggle = register(TextToggle(this, baseClass, job, content), {})
+public fun <T> Dropdown<T>.textToggle(
+    vararg variation: ButtonVariation,
+    baseClass: String? = null,
+    content: Span.() -> Unit
+) {
+    assignToggle(TextToggle(this, variation, baseClass, job, content))
 }
 
 /**
@@ -69,7 +81,7 @@ public fun <T> Dropdown<T>.textToggle(baseClass: String? = null, content: Span.(
  * @sample DropdownSamples.iconToggle
  */
 public fun <T> Dropdown<T>.iconToggle(baseClass: String? = null, content: Button.() -> Unit) {
-    toggle = register(IconToggle(this, baseClass, job, content), {})
+    assignToggle(IconToggle(this, baseClass, job, content))
 }
 
 /**
@@ -80,9 +92,9 @@ public fun <T> Dropdown<T>.iconToggle(baseClass: String? = null, content: Button
  * @sample DropdownSamples.kebabToggle
  */
 public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
-    toggle = register(IconToggle(this, baseClass, job) {
+    assignToggle(IconToggle(this, baseClass, job) {
         icon("ellipsis-v".fas())
-    }, {})
+    })
 }
 
 /**
@@ -93,8 +105,8 @@ public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
  *
  * @sample DropdownSamples.checkboxToggle
  */
-public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: CheckboxToggle.() -> Unit) {
-    toggle = register(CheckboxToggleContainer(this, baseClass, job, content), {})
+public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: CheckboxToggle.() -> Unit = {}) {
+    assignToggle(CheckboxToggleContainer(this, baseClass, job, content))
 }
 
 /**
@@ -110,7 +122,7 @@ public fun <T> Dropdown<T>.actionToggle(
     content: Button.() -> Unit
 ): Listener<MouseEvent, HTMLButtonElement> {
     val actionToggle = ActionToggle(this, baseClass, job, content)
-    toggle = register(actionToggle, {})
+    assignToggle(actionToggle)
     return actionToggle.clickEvents!!
 }
 
@@ -126,9 +138,9 @@ public fun <T> Dropdown<T>.customToggle(
     baseClass: String? = null,
     content: CustomToggle<T>.() -> Unit
 ): CustomToggle<T> {
-    val customToggle = register(CustomToggle(this, baseClass, job), content)
-    toggle = customToggle
-    return customToggle
+    val toggle = CustomToggle(this, baseClass, job).apply(content)
+    assignToggle(toggle)
+    return toggle
 }
 
 /**
@@ -160,31 +172,20 @@ public fun <T> CustomToggle<T>.toggleIcon(baseClass: String? = null): Span =
     }
 
 /**
- * Starts a block to add dropdown items using the DSL. Use this function if you don't need groups.
+ * Starts a block to add flat dropdown items using the DSL.
  */
-public fun <T> Dropdown<T>.items(
-    id: String? = null,
-    baseClass: String? = null,
-    block: ItemsBuilder<T>.() -> Unit = {}
-) {
-    register(
-        DropdownMenu<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass, job), {})
-    val items = ItemsBuilder<T>().apply(block).build()
-    store.update(items)
+public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
+    store.update(ItemsBuilder<T>().apply(block).build())
 }
 
 /**
  * Starts a block to add dropdown groups using the DSL.
  */
-public fun <T> Dropdown<T>.groups(
-    id: String? = null,
-    baseClass: String? = null,
-    block: GroupsBuilder<T>.() -> Unit = {}
-) {
-    register(
-        DropdownMenu<HTMLDivElement, T>(this, "div", id = id, baseClass = baseClass, job), {})
-    val groups = GroupsBuilder<T>().apply(block).build()
-    store.update(groups)
+public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
+    if (!grouped) {
+        console.warn("Dropdown ${domNode.debug()} has not been created using `grouped = true`")
+    }
+    store.update(GroupsBuilder<T>().apply(block).build())
 }
 
 // ------------------------------------------------------ dropdown tag
@@ -201,7 +202,7 @@ public fun <T> Dropdown<T>.groups(
  * - action toggle
  * - custom toggle
  *
- * The data in the menu are wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
  *
  * **Adding entries**
  *
@@ -216,9 +217,10 @@ public fun <T> Dropdown<T>.groups(
  * @sample DropdownSamples.dropdownDsl
  * @sample DropdownSamples.dropdownStore
  */
-public open class Dropdown<T> internal constructor(
+public class Dropdown<T> internal constructor(
     public val store: DropdownStore<T>,
-    internal val dropdownAlign: Align?,
+    internal val grouped: Boolean,
+    dropdownAlign: Align?,
     up: Boolean,
     id: String?,
     baseClass: String?,
@@ -255,7 +257,7 @@ public open class Dropdown<T> internal constructor(
         }
     }
 
-    internal var toggle: DropdownToggle<T> = NoopToggle()
+    private var toggle: DropdownToggle<T, Node> = RecordingToggle()
     internal val toggleId: String = Id.unique(ComponentType.Dropdown.id, "tgl")
 
     /**
@@ -270,6 +272,107 @@ public open class Dropdown<T> internal constructor(
     init {
         markAs(ComponentType.Dropdown)
         classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+
+        val classes = classes {
+            +"dropdown".component("menu")
+            +dropdownAlign?.modifier
+        }
+        val tag = if (grouped) {
+            div(baseClass = classes) {
+                attr("hidden", true)
+            }
+        } else {
+            ul(baseClass = classes) {
+                attr("hidden", true)
+            }
+        }
+        with (tag) {
+            attr("role", "menu")
+            attr("hidden", this@Dropdown.ces.data.map { !it })
+            aria["labelledby"] = this@Dropdown.toggleId
+
+            this@Dropdown.store.data.renderEach { entry ->
+                when (entry) {
+                    is Item<T> -> {
+                        li(content = this@Dropdown.itemContent(entry))
+                    }
+                    is Group<T> -> {
+                        section(baseClass = "dropdown".component("group")) {
+                            entry.title?.let {
+                                h1(baseClass = "dropdown".component("group", "title")) { +it }
+                            }
+                            ul {
+                                entry.items.forEach { groupEntry ->
+                                    when (groupEntry) {
+                                        is Item<T> -> {
+                                            li(content = this@Dropdown.itemContent(groupEntry))
+                                        }
+                                        is Separator<T> -> {
+                                            divider(DividerVariant.LI)
+                                        }
+                                        else -> {
+                                            console.warn("Nested groups are not supported for ${domNode.debug()}")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is Separator<T> -> {
+                        if (domNode.tagName.toLowerCase() == "ul") {
+                            divider(DividerVariant.LI)
+                        } else {
+                            divider(DividerVariant.DIV)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun itemContent(item: Item<T>): Li.() -> Unit = {
+        attr("role", "menuitem")
+        button(baseClass = classes {
+            +"dropdown".component("menu-item")
+            +("icon".modifier() `when` (item.icon != null))
+            +("description".modifier() `when` item.description.isNotEmpty())
+            +("disabled".modifier() `when` item.disabled)
+        }) {
+            attr("tabindex", "-1")
+            if (item.disabled) {
+                aria["disabled"] = true
+                attr("disabled", "true")
+            }
+            if (item.selected) {
+                domNode.autofocus = true
+            }
+            if (this@Dropdown.customDisplay != null) {
+                this@Dropdown.customDisplay?.invoke(this, item.item)
+            } else {
+                this@Dropdown.defaultDisplay.invoke(this, item)
+            }
+            clicks handledBy this@Dropdown.ces.collapse
+            clicks.map { item } handledBy this@Dropdown.store.selectItemHandler
+            clicks.map { item.item } handledBy this@Dropdown.store.selectHandler
+
+            val sf: MutableStateFlow<T> = MutableStateFlow(item.item)
+            sf.value = item.item
+
+        }
+    }
+
+    internal fun <N : Node> assignToggle(toggle: DropdownToggle<T, N>) {
+        // when switching from the recording to a valid toggle
+        // replay the recorded values (if any)
+        if (this.toggle is RecordingToggle<T> && toggle !is RecordingToggle<T>) {
+            domNode.prepend(toggle.domNode)
+            (this.toggle as RecordingToggle<T>).playback(toggle)
+            this.toggle = toggle
+
+        } else {
+            console.warn("Reassignment of dropdown toggle not supported. Toggle for dropdown ${domNode.debug()} has already assigned been to ${this.toggle::class.simpleName}.")
+        }
+
     }
 
     /**
@@ -286,38 +389,80 @@ public open class Dropdown<T> internal constructor(
         this.customDisplay = display
     }
 
-    internal fun render(item: Item<T>, button: Button) {
-        if (customDisplay != null) {
-            customDisplay?.invoke(button, item.item)
-        } else {
-            defaultDisplay.invoke(button, item)
-        }
+    /**
+     * Disables or enables the dropdown toggle.
+     */
+    public fun disabled(value: Boolean) {
+        toggle.disabled(value)
+    }
+
+    /**
+     * Disables or enables the dropdown toggle based on the values from the flow.
+     */
+    public fun disabled(value: Flow<Boolean>) {
+        toggle.disabled(value)
     }
 }
 
 // ------------------------------------------------------ dropdown toggle
 
-internal interface DropdownToggle<T> {
-
-    fun initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
-        with(tag) {
-            domNode.id = dropdown.toggleId
-            aria["haspopup"] = true
-            aria["expanded"] = dropdown.ces.data.map { it.toString() }
-            clicks handledBy dropdown.ces.toggle
-        }
+internal fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
+    with(tag) {
+        domNode.id = dropdown.toggleId
+        aria["haspopup"] = true
+        aria["expanded"] = dropdown.ces.data.map { it.toString() }
+        clicks handledBy dropdown.ces.toggle
     }
 }
 
-internal class NoopToggle<T> : DropdownToggle<T>
+/**
+ * Common interface for all dropdown toggle variants.
+ */
+public interface DropdownToggle<T, out N : Node> : WithDomNode<N> {
+
+    /**
+     * Disables or enables the dropdown toggle.
+     */
+    public fun disabled(value: Boolean)
+
+    /**
+     * Disables or enables the dropdown toggle based on the values from the flow.
+     */
+    public fun disabled(value: Flow<Boolean>)
+}
+
+internal class RecordingToggle<T> : DropdownToggle<T, Comment> {
+
+    private var recordedBoolean: Boolean? = null
+    private var recordedFlow: Flow<Boolean>? = null
+    override val domNode: Comment = document.createComment("noop toggle")
+
+    override fun disabled(value: Boolean) {
+        recordedBoolean = value
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        recordedFlow = value
+    }
+
+    internal fun <N : Node> playback(toggle: DropdownToggle<T, N>) {
+        recordedBoolean?.let { toggle.disabled(it) }
+        recordedFlow?.let { toggle.disabled(it) }
+    }
+}
 
 internal class TextToggle<T>(
     dropdown: Dropdown<T>,
+    variations: Array<out ButtonVariation>,
     baseClass: String?,
     job: Job,
     content: Span.() -> Unit
-) : DropdownToggle<T>,
-    Button(baseClass = classes("dropdown".component("toggle"), baseClass), job = job) {
+) : DropdownToggle<T, HTMLButtonElement>,
+    Button(baseClass = classes {
+        +"dropdown".component("toggle")
+        +variations.joinToString(" ") { it.modifier }
+        +baseClass
+    }, job = job) {
 
     init {
         initToggle(dropdown, this)
@@ -328,6 +473,14 @@ internal class TextToggle<T>(
             icon("caret-down".fas())
         }
     }
+
+    override fun disabled(value: Boolean) {
+        disabled(value, trueValue = "")
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        disabled(value, trueValue = "")
+    }
 }
 
 internal class IconToggle<T>(
@@ -335,7 +488,7 @@ internal class IconToggle<T>(
     baseClass: String?,
     job: Job,
     content: Button.() -> Unit
-) : DropdownToggle<T>,
+) : DropdownToggle<T, HTMLButtonElement>,
     Button(baseClass = classes {
         +"dropdown".component("toggle")
         +"plain".modifier()
@@ -346,6 +499,14 @@ internal class IconToggle<T>(
         initToggle(dropdown, this)
         content(this)
     }
+
+    override fun disabled(value: Boolean) {
+        disabled(value, trueValue = "")
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        disabled(value, trueValue = "")
+    }
 }
 
 internal class CheckboxToggleContainer<T>(
@@ -353,7 +514,7 @@ internal class CheckboxToggleContainer<T>(
     baseClass: String?,
     job: Job,
     content: CheckboxToggle.() -> Unit,
-) : DropdownToggle<T>,
+) : DropdownToggle<T, HTMLDivElement>,
     Div(baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
@@ -361,6 +522,7 @@ internal class CheckboxToggleContainer<T>(
     }, job = job) {
 
     private val label: Label
+    private val button: Button
     private lateinit var checkbox: Input
 
     init {
@@ -371,10 +533,22 @@ internal class CheckboxToggleContainer<T>(
                 type("checkbox")
             }
         }
-        initToggle(dropdown, button(baseClass = "dropdown".component("toggle", "button")) {
+        button = button(baseClass = "dropdown".component("toggle", "button")) {
             icon("caret-down".fas())
-        })
+        }
+        initToggle(dropdown, button)
         CheckboxToggle(label, checkbox, job).apply(content)
+    }
+
+    override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        checkbox.disabled(value)
+        button.disabled(value)
+
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        mountSingle(job, value) { v, _ -> disabled(v) }
     }
 }
 
@@ -422,7 +596,7 @@ internal class ActionToggle<T>(
     baseClass: String?,
     job: Job,
     content: Button.() -> Unit
-) : DropdownToggle<T>,
+) : DropdownToggle<T, HTMLDivElement>,
     Div(baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
@@ -430,16 +604,29 @@ internal class ActionToggle<T>(
         +baseClass
     }, job = job) {
 
+    private val actionButton: Button
+    private val toggleButton: Button
     internal var clickEvents: Listener<MouseEvent, HTMLButtonElement>? = null
 
     init {
-        button(baseClass = "dropdown".component("toggle", "button")) {
+        actionButton = button(baseClass = "dropdown".component("toggle", "button")) {
             this@ActionToggle.clickEvents = clicks
             content(this)
         }
-        initToggle(dropdown, button(baseClass = "dropdown".component("toggle", "button")) {
+        toggleButton = button(baseClass = "dropdown".component("toggle", "button")) {
             icon("caret-down".fas())
-        })
+        }
+        initToggle(dropdown, toggleButton)
+    }
+
+    override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        actionButton.disabled(value)
+        toggleButton.disabled(value)
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        mountSingle(job, value) { v, _ -> disabled(v) }
     }
 }
 
@@ -449,91 +636,19 @@ internal class ActionToggle<T>(
  * @sample DropdownSamples.customToggle
  */
 public class CustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, job: Job) :
-    DropdownToggle<T>,
+    DropdownToggle<T, HTMLButtonElement>,
     Button(baseClass = classes("dropdown".component("toggle"), baseClass), job = job) {
 
     init {
         initToggle(dropdown, this)
     }
-}
 
-// ------------------------------------------------------ dropdown menu
-
-internal class DropdownMenu<E : HTMLElement, T> internal constructor(
-    private val dropdown: Dropdown<T>,
-    tagName: String,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : Tag<E>(tagName = tagName, id = id, baseClass = classes {
-    +"dropdown".component("menu")
-    +dropdown.dropdownAlign?.modifier
-    +baseClass
-}, job) {
-
-    init {
-        attr("role", "menu")
-        attr("hidden", dropdown.ces.data.map { !it })
-        aria["labelledby"] = dropdown.toggleId
-
-        dropdown.store.data.renderEach { entry ->
-            when (entry) {
-                is Item<T> -> {
-                    li(content = itemContent(entry))
-                }
-                is Group<T> -> {
-                    section(baseClass = "dropdown".component("group")) {
-                        entry.title?.let {
-                            h1(baseClass = "dropdown".component("group", "title")) { +it }
-                        }
-                        ul {
-                            entry.items.forEach { groupEntry ->
-                                when (groupEntry) {
-                                    is Item<T> -> {
-                                        li(content = this@DropdownMenu.itemContent(groupEntry))
-                                    }
-                                    is Separator<T> -> {
-                                        divider(DividerVariant.LI)
-                                    }
-                                    else -> {
-                                        console.warn("Nested groups are not supported for ${this@DropdownMenu.dropdown.domNode.debug()}")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                is Separator<T> -> {
-                    if (domNode.tagName.toLowerCase() == "ul") {
-                        divider(DividerVariant.LI)
-                    } else {
-                        divider(DividerVariant.DIV)
-                    }
-                }
-            }
-        }
+    override fun disabled(value: Boolean) {
+        disabled(value, trueValue = "")
     }
 
-    private fun itemContent(item: Item<T>): Li.() -> Unit = {
-        attr("role", "menuitem")
-        button(baseClass = classes {
-            +"dropdown".component("menu-item")
-            +("icon".modifier() `when` (item.icon != null))
-            +("description".modifier() `when` item.description.isNotEmpty())
-        }) {
-            attr("tabindex", "-1")
-            if (item.disabled) {
-                aria["disabled"] = true
-                attr("disabled", "true")
-                domNode.classList += "disabled".modifier()
-            }
-            clicks handledBy this@DropdownMenu.dropdown.ces.collapse
-            clicks.map { item } handledBy this@DropdownMenu.dropdown.store.select
-            if (item.selected) {
-                domNode.autofocus = true
-            }
-            this@DropdownMenu.dropdown.render(item, this)
-        }
+    override fun disabled(value: Flow<Boolean>) {
+        disabled(value, trueValue = "")
     }
 }
 
@@ -544,13 +659,33 @@ internal class DropdownMenu<E : HTMLElement, T> internal constructor(
  */
 public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
+    internal val selectHandler: EmittingHandler<T, T> = handleAndEmit { items, item ->
+        emit(item)
+        items
+    }
+
+    internal val selectItemHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
+        emit(item)
+        items
+    }
+
     /**
-     * Returns a flow containing a list of all items in all groups (if any).
+     * Flow with the last selected item data. Use this flow if you just want to handle the payload of [Item] and don't need the [Item] instance itself.
+     */
+    public val select: Flow<T> = selectHandler
+
+    /**
+     * Flow with the last selected item. Use this flow if you need the [Item] instance.
+     */
+    public val selectItem: Flow<Item<T>> = selectItemHandler
+
+    /**
+     * Flow containing a list of all items in all groups (if any).
      */
     public val items: Flow<List<Item<T>>> = data.flatItems()
 
     /**
-     * Returns a flow containing a list of all groups.
+     * Flow containing a list of all groups.
      */
     public val groups: Flow<List<Group<T>>> = data.groups()
 
@@ -567,12 +702,4 @@ public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
      * Adds all specified items to the list of entries.
      */
     public val addAllItems: SimpleHandler<List<Entry<T>>> = handle { items, newItems -> items + newItems }
-
-    /**
-     * Selects and emits the specified item.
-     */
-    public val select: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
-        emit(item)
-        items
-    }
 }

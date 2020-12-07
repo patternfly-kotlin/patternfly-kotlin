@@ -2,11 +2,12 @@ package org.patternfly
 
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.Input
+import dev.fritz2.elemento.debug
 import kotlinx.coroutines.flow.Flow
 
 public fun Input.triState(value: TriState) {
-    checked(value.checked)
-    indeterminate(value.indeterminate)
+    domNode.checked = value.checked
+    domNode.indeterminate = value.indeterminate
 }
 
 public fun Input.triState(value: Flow<TriState>) {

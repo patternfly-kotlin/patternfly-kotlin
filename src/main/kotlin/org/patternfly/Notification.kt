@@ -138,31 +138,31 @@ public data class Notification(
          * Creates a handler which adds a static [Notification] with severity [Severity.DEFAULT]
          */
         public fun default(text: String, details: String? = null): Handler<Unit> =
-            addInternal(Notification(Severity.DEFAULT, text, details))
+            addInternal { default(text, details) }
 
         /**
          * Creates a handler which adds a static [Notification] with severity [Severity.DANGER]
          */
         public fun error(text: String, details: String? = null): Handler<Unit> =
-            addInternal(Notification(Severity.DANGER, text, details))
+            addInternal { error(text, details) }
 
         /**
          * Creates a handler which adds a static [Notification] with severity [Severity.INFO]
          */
         public fun info(text: String, details: String? = null): Handler<Unit> =
-            addInternal(Notification(Severity.INFO, text, details))
+            addInternal { info(text, details) }
 
         /**
          * Creates a handler which adds a static [Notification] with severity [Severity.SUCCESS]
          */
         public fun success(text: String, details: String? = null): Handler<Unit> =
-            addInternal(Notification(Severity.SUCCESS, text, details))
+            addInternal { success(text, details) }
 
         /**
          * Creates a handler which adds a static [Notification] with severity [Severity.WARNING]
          */
         public fun warning(text: String, details: String? = null): Handler<Unit> =
-            addInternal(Notification(Severity.WARNING, text, details))
+            addInternal { warning(text, details) }
 
         /**
          * Creates a handler which adds the notification created by the specified function.
@@ -215,9 +215,6 @@ public object NotificationStore : RootStore<List<Notification>>(listOf()) {
      * Removes all notifications from this store.
      */
     public val clear: Handler<Unit> = handle { listOf() }
-
-    internal fun addInternal(notification: Notification): Handler<Unit> =
-        handle { notifications -> notifications + notification }
 
     internal fun <T> addInternal(block: NotificationScope.(T) -> Notification): Handler<T> =
         handle { notifications, notification ->

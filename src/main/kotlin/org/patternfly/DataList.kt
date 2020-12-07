@@ -13,6 +13,7 @@ import dev.fritz2.elemento.closest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.plain
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
@@ -381,7 +382,7 @@ public class DataListToggle<T> internal constructor(
 ) : Div(baseClass = classes("data-list".component("toggle"), baseClass), job = job) {
 
     init {
-        button(id = id, baseClass = "plain".modifier()) {
+        clickButton(plain) {
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["label"] = "Details"
             aria["labelledby"] = "$id ${this@DataListToggle.itemStore.idProvider(this@DataListToggle.item)}"
@@ -389,8 +390,7 @@ public class DataListToggle<T> internal constructor(
             div(baseClass = "data-list".component("toggle", "icon")) {
                 icon("angle-right".fas())
             }
-            clicks handledBy this@DataListToggle.dataListItem.ces.toggle
-        }
+        } handledBy this@DataListToggle.dataListItem.ces.toggle
     }
 }
 

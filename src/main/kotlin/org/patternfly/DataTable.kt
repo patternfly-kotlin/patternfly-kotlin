@@ -16,6 +16,7 @@ import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.plain
 import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE
@@ -200,6 +201,7 @@ public class DataTable<T> internal constructor(
                         is DataColumn<T> -> {
                             th(baseClass = classes {
                                 +("table".component("sort") `when` (column.sortInfo != null))
+                                +column.headerClass
                             }) {
                                 attr("scope", "col")
                                 attr("role", "columnheader")
@@ -248,31 +250,29 @@ public class DataTable<T> internal constructor(
         }
 
         if (columns.hasToggle) {
-            // TODO implement shift(1) to keep the thead at index 0
-            itemStore.visible.renderEach({ itemStore.idProvider(it) }, { item ->
-                DataTableExpandableBody(this@DataTable, item, job)
-            })
+            this@DataTable.itemStore.visible.renderShifted(
+                1,
+                this,
+                { itemStore.idProvider(it) },
+                { item ->
+                    DataTableExpandableBody(this@DataTable, item, job)
+                }
+            )
         } else {
             tbody {
                 attr("role", "rowgroup")
-                this@DataTable.itemStore.visible.renderEach({ this@DataTable.itemStore.idProvider(it) }, { item ->
-                    tr {
-                        renderCells(this@DataTable, item, "", null)
+                this@DataTable.itemStore.visible.renderEach(
+                    { this@DataTable.itemStore.idProvider(it) },
+                    { item ->
+                        tr {
+                            renderCells(this@DataTable, item, "", null)
+                        }
                     }
-                })
+                )
             }
         }
     }
 }
-
-// public fun <T> Seq<T>.shift(amount: Int): Seq<T> = Seq(this.data.map { patch ->
-//    when (patch) {
-//        is Patch.Insert -> patch.copy(index = patch.index + amount)
-//        is Patch.InsertMany -> patch.copy(index = patch.index + amount)
-//        is Patch.Delete -> patch.copy(start = patch.start + amount)
-//        is Patch.Move -> patch.copy(from = patch.from + amount, to = patch.to + amount)
-//    }
-//})
 
 /**
  * A container to add a caption above the data table.
@@ -323,7 +323,7 @@ internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job:
                 }
             }
         } else {
-            console.error("No pfDataTableToggleColumn() defined for ${dataTable.domNode.debug()}")
+            console.error("No dataTableToggleColumn() defined for ${dataTable.domNode.debug()}")
         }
     }
 }
@@ -346,7 +346,7 @@ internal fun <T> Tr.renderCells(
                         baseClass = classes("table".component("toggle"), column.baseClass)
                     ) {
                         attr("role", "cell")
-                        button(baseClass = "plain".modifier()) {
+                        pushButton(plain) {
                             aria["labelledby"] = itemId
                             aria["controls"] = expandableContentId
                             aria["label"] = "Details"
@@ -482,6 +482,7 @@ public class DataColumn<T>(
 ) : Column<T>(columns, id, baseClass), WithIdProvider<T> by columns.dataTable.itemStore {
 
     internal var cellDisplay: ComponentDisplay<Td, T> = { +it.toString() }
+    internal var headerClass: String? = null
     internal var headerDisplay: (Th.() -> Unit)? = null
     internal var sortInfo: SortInfo<T>? = null
 
@@ -490,6 +491,13 @@ public class DataColumn<T>(
      */
     public fun cellDisplay(display: ComponentDisplay<Td, T>) {
         this.cellDisplay = display
+    }
+
+    /**
+     * Adds additional classes to the header cell.
+     */
+    public fun headerClass(classes: String) {
+        this.headerClass = classes
     }
 
     /**

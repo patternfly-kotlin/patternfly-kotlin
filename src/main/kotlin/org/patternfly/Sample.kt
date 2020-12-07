@@ -25,9 +25,9 @@ import kotlin.random.Random
 
 // ------------------------------------------------------ samples a-z
 
-internal class AlertSamples {
+public interface AlertSamples {
 
-    fun RenderContext.alert() {
+    public fun RenderContext.alert() {
         alert(INFO, "Alert title") {
             alertDescription { +"Lorem ipsum dolor sit amet." }
             alertActions {
@@ -37,7 +37,7 @@ internal class AlertSamples {
         }
     }
 
-    fun RenderContext.alertGroup() {
+    public fun RenderContext.alertGroup() {
         alertGroup {
             alert(INFO, "Just saying.", inline = true)
             alert(SUCCESS, "Well done!", inline = true)
@@ -46,13 +46,13 @@ internal class AlertSamples {
         }
     }
 
-    fun RenderContext.description() {
+    public fun RenderContext.description() {
         alert(INFO, "Alert title") {
             alertDescription { +"Lorem ipsum dolor sit amet." }
         }
     }
 
-    fun RenderContext.actions() {
+    public fun RenderContext.actions() {
         alert(INFO, "Alert title") {
             alertActions {
                 pushButton(inline, link) { +"View details" }
@@ -61,16 +61,16 @@ internal class AlertSamples {
         }
     }
 
-    fun RenderContext.closes() {
+    public fun RenderContext.closes() {
         alert(INFO, "Close me", closable = true) {
             closes handledBy Notification.info("You did it!")
         }
     }
 }
 
-internal class BadgeSamples {
+public interface BadgeSamples {
 
-    fun RenderContext.badge() {
+    public fun RenderContext.badge() {
         val values = flowOf(1, 2, 3)
         badge { +"Label" }
         badge {
@@ -85,26 +85,26 @@ internal class BadgeSamples {
     }
 }
 
-internal class ButtonSamples {
+public interface ButtonSamples {
 
-    fun RenderContext.pushButton() {
+    public fun RenderContext.pushButton() {
         pushButton { +"Button" }
     }
 
-    fun RenderContext.linkButton() {
+    public fun RenderContext.linkButton() {
         linkButton {
             +"PatternFly"
             href("https://patternfly.org")
         }
     }
 
-    fun Div.clickButton() {
+    public fun Div.clickButton() {
         clickButton(primary) {
             +"Click me"
         } handledBy Notification.info("Score!")
     }
 
-    fun RenderContext.buttonIcon() {
+    public fun RenderContext.buttonIcon() {
         pushButton {
             buttonIcon(ICON_FIRST, "user".fas())
             +"User"
@@ -118,16 +118,16 @@ internal class ButtonSamples {
         }
     }
 
-    fun RenderContext.justIcon() {
+    public fun RenderContext.justIcon() {
         pushButton(plain) {
             icon("user".fas())
         }
     }
 }
 
-internal interface CardSamples {
+public interface CardSamples {
 
-    fun RenderContext.card() {
+    public fun RenderContext.card() {
         card {
             cardHeader {
                 cardHeaderMain {
@@ -154,7 +154,7 @@ internal interface CardSamples {
         }
     }
 
-    fun RenderContext.cardHeaderMain() {
+    public fun RenderContext.cardHeaderMain() {
         card {
             cardHeader {
                 cardHeaderMain {
@@ -167,7 +167,7 @@ internal interface CardSamples {
         }
     }
 
-    fun RenderContext.cardTitleInHeader() {
+    public fun RenderContext.cardTitleInHeader() {
         card {
             cardHeader {
                 cardActions {
@@ -188,7 +188,7 @@ internal interface CardSamples {
         }
     }
 
-    fun RenderContext.cardTitleInCard() {
+    public fun RenderContext.cardTitleInCard() {
         card {
             cardTitle { +"Title" }
             cardBody { +"Body" }
@@ -196,7 +196,7 @@ internal interface CardSamples {
         }
     }
 
-    fun RenderContext.multipleBodies() {
+    public fun RenderContext.multipleBodies() {
         card {
             cardTitle { +"Title" }
             cardBody { +"Body" }
@@ -207,9 +207,9 @@ internal interface CardSamples {
     }
 }
 
-internal interface CardViewSamples {
+public interface CardViewSamples {
 
-    fun RenderContext.cardView() {
+    public fun RenderContext.cardView() {
         data class Demo(val id: String, val name: String)
 
         val store = ItemStore<Demo> { it.id }
@@ -243,9 +243,9 @@ internal interface CardViewSamples {
     }
 }
 
-internal interface ChipSamples {
+public interface ChipSamples {
 
-    fun RenderContext.chip() {
+    public fun RenderContext.chip() {
         chip { +"Chip" }
         chip(readOnly = true) { +"Read-only chip" }
         chip {
@@ -254,7 +254,7 @@ internal interface ChipSamples {
         }
     }
 
-    fun RenderContext.closes() {
+    public fun RenderContext.closes() {
         chip {
             +"Close me"
             closes handledBy Notification.info("You did it!")
@@ -262,23 +262,23 @@ internal interface ChipSamples {
     }
 }
 
-internal interface ChipGroupSamples {
+public interface ChipGroupSamples {
 
-    fun RenderContext.vararg() {
+    public fun RenderContext.vararg() {
         chipGroup<String> {
             +"Vararg demo"
             chips("Foo", "Bar")
         }
     }
 
-    fun RenderContext.list() {
+    public fun RenderContext.list() {
         chipGroup<String> {
             +"List demo"
             chips(listOf("Foo", "Bar"))
         }
     }
 
-    fun RenderContext.builder() {
+    public fun RenderContext.builder() {
         chipGroup<String> {
             +"Builder demo"
             chips {
@@ -288,7 +288,7 @@ internal interface ChipGroupSamples {
         }
     }
 
-    fun RenderContext.display() {
+    public fun RenderContext.display() {
         chipGroup<String> {
             +"Display demo"
             display {
@@ -298,7 +298,7 @@ internal interface ChipGroupSamples {
         }
     }
 
-    fun RenderContext.store() {
+    public fun RenderContext.store() {
         data class Demo(val id: String, val name: String)
 
         val store = ChipGroupStore<Demo> { it.id }
@@ -317,7 +317,7 @@ internal interface ChipGroupSamples {
         )
     }
 
-    fun RenderContext.closes() {
+    public fun RenderContext.closes() {
         chipGroup<String>(closable = true) {
             +"Close me"
             chips("Foo", "Bar")
@@ -325,7 +325,7 @@ internal interface ChipGroupSamples {
         }
     }
 
-    fun RenderContext.remove() {
+    public fun RenderContext.remove() {
         chipGroup<String> {
             +"Remove one"
             chips("Foo", "Bar")
@@ -336,15 +336,15 @@ internal interface ChipGroupSamples {
     }
 }
 
-internal interface CSSSamples {
+public interface CSSSamples {
 
-    fun component() {
+    public fun component() {
         "card".component() // pf-c-card
         "card".component("header") // pf-c-card__header
         "card".component("header", "main") // pf-c-card__header-main
     }
 
-    fun classesDsl() {
+    public fun classesDsl() {
         val disabled = Random.nextBoolean()
         val classes = classes {
             +"button".component()
@@ -353,7 +353,7 @@ internal interface CSSSamples {
         }
     }
 
-    fun classesVararg() {
+    public fun classesVararg() {
         val classes = classes(
             "button".component(),
             "plain".modifier(),
@@ -362,9 +362,9 @@ internal interface CSSSamples {
     }
 }
 
-internal interface DataListSamples {
+public interface DataListSamples {
 
-    fun RenderContext.dataList() {
+    public fun RenderContext.dataList() {
         data class Demo(val id: String, val name: String)
 
         val store = ItemStore<Demo> { it.id }
@@ -401,7 +401,7 @@ internal interface DataListSamples {
         )
     }
 
-    fun RenderContext.ces() {
+    public fun RenderContext.ces() {
         dataList<String> {
             display { item ->
                 dataListItem(item) {
@@ -418,7 +418,7 @@ internal interface DataListSamples {
         }
     }
 
-    fun RenderContext.selects() {
+    public fun RenderContext.selects() {
         data class Demo(val id: String, val name: String)
 
         val store = ItemStore<Demo> { it.id }
@@ -439,9 +439,9 @@ internal interface DataListSamples {
     }
 }
 
-internal interface DataTableSamples {
+public interface DataTableSamples {
 
-    fun RenderContext.dataTable() {
+    public fun RenderContext.dataTable() {
         data class Demo(val id: String, val name: String)
 
         val store = ItemStore<Demo> { it.id }
@@ -487,7 +487,7 @@ internal interface DataTableSamples {
         )
     }
 
-    fun RenderContext.dataColumns() {
+    public fun RenderContext.dataColumns() {
         dataTable<String> {
             dataTableColumns {
                 dataTableColumn("Item") {
@@ -504,7 +504,7 @@ internal interface DataTableSamples {
         }
     }
 
-    fun RenderContext.selects() {
+    public fun RenderContext.selects() {
         data class Demo(val id: String, val name: String)
 
         val store = ItemStore<Demo> { it.id }
@@ -523,9 +523,9 @@ internal interface DataTableSamples {
     }
 }
 
-internal interface DrawerSamples {
+public interface DrawerSamples {
 
-    fun RenderContext.drawerSetup() {
+    public fun RenderContext.drawerSetup() {
         val store = ItemStore<String>()
 
         drawer {
@@ -556,7 +556,7 @@ internal interface DrawerSamples {
         store.addAll(listOf("One", "Two", "Three"))
     }
 
-    fun RenderContext.ces() {
+    public fun RenderContext.ces() {
         drawer {
             ces.data handledBy Notification.add { expanded ->
                 info("Expanded state of drawer: $expanded.")
@@ -572,7 +572,7 @@ internal interface DrawerSamples {
         }
     }
 
-    fun RenderContext.drawerContents() {
+    public fun RenderContext.drawerContents() {
         drawer {
             drawerContent {
                 drawerBody { +"Actual" }
@@ -582,7 +582,7 @@ internal interface DrawerSamples {
         }
     }
 
-    fun RenderContext.drawerPanels() {
+    public fun RenderContext.drawerPanels() {
         drawer {
             drawerPanel {
                 drawerBodyWithClose { +"Title" }
@@ -608,9 +608,9 @@ internal interface DrawerSamples {
     }
 }
 
-internal interface DropdownSamples {
+public interface DropdownSamples {
 
-    fun RenderContext.dropdownDsl() {
+    public fun RenderContext.dropdownDsl() {
         dropdown<String> {
             textToggle { +"Choose one" }
             groups {
@@ -620,13 +620,14 @@ internal interface DropdownSamples {
                         description = "Item description"
                     }
                 }
+                separator()
                 group("Group 1") {
                     item("Item 1")
-                    separator()
                     item("Item 2") {
                         disabled = true
                     }
                 }
+                separator()
                 group("Group 2") {
                     item("Item 1")
                     item("Item 2")
@@ -635,10 +636,14 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.dropdownStore() {
+    public fun RenderContext.dropdownStore() {
         data class Demo(val id: String, val name: String)
 
-        val store = DropdownStore<Demo>()
+        val store = DropdownStore<Demo>().apply {
+            select handledBy Notification.add { demo ->
+                info("You selected ${demo.name}")
+            }
+        }
         dropdown(store) {
             textToggle { +"Choose one" }
             display { demo -> +demo.name }
@@ -652,7 +657,7 @@ internal interface DropdownSamples {
         )
     }
 
-    fun RenderContext.ces() {
+    public fun RenderContext.ces() {
         dropdown<String> {
             ces.data handledBy Notification.add { expanded ->
                 info("Expanded state of dropdown: $expanded.")
@@ -665,7 +670,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.textToggle() {
+    public fun RenderContext.textToggle() {
         dropdown<String> {
             textToggle { +"Text" }
             items {
@@ -675,7 +680,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.iconToggle() {
+    public fun RenderContext.iconToggle() {
         dropdown<String> {
             iconToggle { icon("user".fas()) }
             items {
@@ -685,7 +690,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.kebabToggle() {
+    public fun RenderContext.kebabToggle() {
         dropdown<String> {
             kebabToggle()
             items {
@@ -695,7 +700,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.checkboxToggle() {
+    public fun RenderContext.checkboxToggle() {
         dropdown<String> {
             checkboxToggle {
                 text { +"Text" }
@@ -710,7 +715,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.actionToggle() {
+    public fun RenderContext.actionToggle() {
         dropdown<String> {
             actionToggle {
                 +"Action"
@@ -731,7 +736,7 @@ internal interface DropdownSamples {
         }
     }
 
-    fun RenderContext.customToggle() {
+    public fun RenderContext.customToggle() {
         dropdown<String> {
             customToggle {
                 toggleImage {
@@ -748,33 +753,33 @@ internal interface DropdownSamples {
     }
 }
 
-internal interface IconSamples {
+public interface IconSamples {
 
-    fun RenderContext.icons() {
+    public fun RenderContext.icons() {
         icon("bundle".pfIcon())
         icon("clock".far())
         icon("bars".fas())
     }
 }
 
-internal interface NotificationSamples {
+public interface NotificationSamples {
 
-    fun RenderContext.add() {
+    public fun RenderContext.add() {
         dropdown<Int> {
             textToggle { +"1, 2 or 3" }
             items {
                 (1..3).forEach { item(it) }
                 store.select handledBy Notification.add { item ->
-                    info("You selected ${item.unwrap()}")
+                    info("You selected $item")
                 }
             }
         }
     }
 }
 
-internal interface PageSamples {
+public interface PageSamples {
 
-    fun RenderContext.typicalSetup() {
+    public fun RenderContext.typicalSetup() {
         val router = Router(StringRoute("#home"))
         page {
             pageHeader(id = "foo") {
@@ -815,9 +820,9 @@ internal interface PageSamples {
     }
 }
 
-internal interface WithIdProviderSamples {
+public interface WithIdProviderSamples {
 
-    fun RenderContext.useItemId() {
+    public fun RenderContext.useItemId() {
         // this ID provider will be used below
         val idProvider: IdProvider<String, String> = { Id.build(it) }
 

@@ -137,7 +137,7 @@ public enum class ButtonVariation(internal val modifier: String) {
     `inline`("inline".modifier()),
     link("link".modifier()),
     plain("plain".modifier()),
-    primary("primariy".modifier()),
+    primary("primary".modifier()),
     secondary("secondary".modifier()),
     tertiary("tertiary".modifier()),
     warning("warning".modifier()),

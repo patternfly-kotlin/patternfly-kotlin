@@ -64,10 +64,35 @@ public fun <T> ToolbarItem.bulkSelect(
     itemStore: ItemStore<T>,
     id: String? = null,
     baseClass: String? = null,
-    content: BulkSelect<T>.() -> Unit = {}
-): BulkSelect<T> {
-    this.domNode.classList += "bulk-select".modifier()
-    return register(BulkSelect(itemStore, id = id, baseClass = baseClass, job), content)
+    content: Dropdown<PreSelection>.() -> Unit = {}
+): Dropdown<PreSelection> {
+    domNode.classList += "bulk-select".modifier()
+    val dropdownStore = DropdownStore<PreSelection>().apply {
+        select handledBy itemStore.preSelect
+        addAll(PreSelection.values().asList())
+    }
+    return dropdown(dropdownStore, id = id, baseClass = baseClass) {
+        checkboxToggle {
+            text {
+                itemStore.selected.map {
+                    if (it == 0) "" else "$it selected"
+                }.asText()
+            }
+            checkbox {
+                triState(itemStore.data.map {
+                    when {
+                        it.selected.isEmpty() -> TriState.OFF
+                        it.selected.size == it.items.size -> TriState.ON
+                        else -> TriState.INDETERMINATE
+                    }
+                })
+                changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
+                changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
+            }
+        }
+        display { +it.text }
+        content(this)
+    }
 }
 
 public fun <T> ToolbarItem.sortOptions(
@@ -123,35 +148,6 @@ public class ToolbarItem internal constructor(id: String?, baseClass: String?, j
 
 public class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass), job)
-
-public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
-    Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass, job) {
-
-    init {
-        checkboxToggle {
-            text {
-                itemStore.selected.map {
-                    if (it == 0) "" else "$it selected"
-                }.asText()
-            }
-            checkbox {
-                triState(itemStore.data.map {
-                    when {
-                        it.selected.isEmpty() -> TriState.OFF
-                        it.selected.size == it.items.size -> TriState.ON
-                        else -> TriState.INDETERMINATE
-                    }
-                })
-                changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
-                changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
-            }
-        }
-        store.select.unwrap() handledBy itemStore.preSelect
-        items {
-            PreSelection.values().map { item(it) }
-        }
-    }
-}
 
 public class SortOptions<T> internal constructor(
     itemStore: ItemStore<T>,

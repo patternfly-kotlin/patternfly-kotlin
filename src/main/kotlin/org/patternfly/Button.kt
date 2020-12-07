@@ -16,22 +16,22 @@ import org.w3c.dom.events.MouseEvent
 /**
  * Creates a [PushButton] component. This component uses a `<button/>` element.
  *
- * @param variation variations to control the visual representation of the button
+ * @param variations variations to control the visual representation of the button
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
 public fun RenderContext.pushButton(
-    vararg variation: ButtonVariation,
+    vararg variations: ButtonVariation,
     id: String? = null,
     baseClass: String? = null,
     content: PushButton.() -> Unit = {}
-): PushButton = register(PushButton(variation, id = id, baseClass = baseClass, job), content)
+): PushButton = register(PushButton(variations, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates a [PushButton] component and returns a [Listener] (basically a [Flow]) in order to combine the button declaration directly to a fitting _handler_.
  *
- * @param variation variations to control the visual representation of the button
+ * @param variations variations to control the visual representation of the button
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
@@ -39,13 +39,13 @@ public fun RenderContext.pushButton(
  * @sample ButtonSamples.clickButton
  */
 public fun RenderContext.clickButton(
-    vararg variation: ButtonVariation,
+    vararg variations: ButtonVariation,
     id: String? = null,
     baseClass: String? = null,
     content: PushButton.() -> Unit = {}
 ): Listener<MouseEvent, HTMLButtonElement> {
     var clickEvents: Listener<MouseEvent, HTMLButtonElement>? = null
-    pushButton(*variation, id = id, baseClass = baseClass) {
+    pushButton(*variations, id = id, baseClass = baseClass) {
         content(this)
         clickEvents = clicks
     }
@@ -55,17 +55,17 @@ public fun RenderContext.clickButton(
 /**
  * Creates a [LinkButton] component. This component uses an `<a/>` element.
  *
- * @param variation variations to control the visual representation of the button
+ * @param variations variations to control the visual representation of the button
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
 public fun RenderContext.linkButton(
-    vararg variation: ButtonVariation,
+    vararg variations: ButtonVariation,
     id: String? = null,
     baseClass: String? = null,
     content: LinkButton.() -> Unit = {}
-): LinkButton = register(LinkButton(variation, id = id, baseClass = baseClass, job), content)
+): LinkButton = register(LinkButton(variations, id = id, baseClass = baseClass, job), content)
 
 /**
  * Adds an [Icon] to a [PushButton] or [LinkButton]. Use this function if you also want to add other elements like text to the button. This function adds the icons inside a container that controls the margin between the icon and the other elements (like the text).

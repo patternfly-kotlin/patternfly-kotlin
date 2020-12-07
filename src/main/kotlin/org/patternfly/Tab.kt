@@ -136,31 +136,23 @@ public class Tabs<T> internal constructor(
             }
         }
 
-        store.data.renderEach({ selectId(it) }, { tab ->
-            register(TabContent(tab.item, tabId(tab.item), contentId(tab.item), job), {
-                if (!tab.selected) {
-                    it.attr("hidden", "")
-                }
-                contentDisplay?.let { display ->
-                    val content = display.invoke(it.item)
-                    content.invoke(it)
-                }
-                tab.content(it)
-            })
-        })
-        // use shift(1) to keep the tabs at index 0
-//        store.data.each { selectId(it) }.render { tab ->
-//            register(TabContent(tab.item, tabId(tab.item), contentId(tab.item)), {
-//                if (!tab.selected) {
-//                    it.attr("hidden", "")
-//                }
-//                contentDisplay?.let { display ->
-//                    val content = display.invoke(it.item)
-//                    content.invoke(it)
-//                }
-//                tab.content(it)
-//            })
-//        }.shift(1).bind()
+        store.data.renderShifted(
+            1,
+            this,
+            { selectId(it) },
+            { tab ->
+                register(TabContent(tab.item, tabId(tab.item), contentId(tab.item), job), {
+                    if (!tab.selected) {
+                        it.attr("hidden", "")
+                    }
+                    contentDisplay?.let { display ->
+                        val content = display.invoke(it.item)
+                        content.invoke(it)
+                    }
+                    tab.content(it)
+                })
+            }
+        )
 
         // update scroll buttons, when tab items have been updated
         store.data.map { updateScrollButtons(tabs.domNode) }.filterNotNull() handledBy scrollStore.update

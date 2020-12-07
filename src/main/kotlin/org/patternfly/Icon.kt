@@ -8,6 +8,7 @@ import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
@@ -39,7 +40,7 @@ public fun RenderContext.icon(
  *
  * @sample IconSamples.icons
  */
-public class Icon internal constructor(private var iconClass: String, id: String?, baseClass: String?, job: Job) :
+public class Icon internal constructor(iconClass: String, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
     TextElement("i", id = id, baseClass = classes {
         +ComponentType.Icon
@@ -59,8 +60,10 @@ public class Icon internal constructor(private var iconClass: String, id: String
     }
 
     private fun iconClass(iconClass: String) {
-        domNode.classList -= this.iconClass
-        domNode.classList += iconClass
-        this.iconClass = iconClass
+        attr("class", classes {
+            +ComponentType.Icon
+            +iconClass
+            +baseClass
+        })
     }
 }

@@ -7,6 +7,12 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ dsl
 
+public fun <T> items(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> =
+    ItemsBuilder<T>().apply(block).build()
+
+public fun <T> groups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> =
+    GroupsBuilder<T>().apply(block).build()
+
 public fun <T> ItemsBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
@@ -21,18 +27,6 @@ public fun <T> GroupsBuilder<T>.group(title: String? = null, block: GroupBuilder
 
 public fun <T> GroupsBuilder<T>.separator() {
     entries.add(Separator())
-}
-
-public fun <T> EntriesBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
-    entries.add(ItemBuilder(item).apply(block).build())
-}
-
-public fun <T> EntriesBuilder<T>.separator() {
-    entries.add(Separator())
-}
-
-public fun <T> EntriesBuilder<T>.group(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
-    entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
 public fun <T> GroupBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
@@ -83,29 +77,24 @@ public data class Item<T> internal constructor(
 
 public class Separator<T> : Entry<T>()
 
-public class ItemsBuilder<T> {
+public class ItemsBuilder<T> internal constructor() {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-public class EntriesBuilder<T> {
+public class GroupsBuilder<T> internal constructor() {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-public class GroupsBuilder<T> {
-    internal val entries: MutableList<Entry<T>> = mutableListOf()
-    internal fun build(): List<Entry<T>> = entries
-}
-
-public class GroupBuilder<T>(private val title: String?) {
+public class GroupBuilder<T> internal constructor(private val title: String?) {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): Group<T> = Group(title = title, items = entries).apply {
         items.filterIsInstance<Item<T>>().forEach { it.group = this }
     }
 }
 
-public class ItemBuilder<T>(private val item: T) {
+public class ItemBuilder<T> internal constructor(private val item: T) {
     public var disabled: Boolean = false
     public var selected: Boolean = false
     public var description: String = ""

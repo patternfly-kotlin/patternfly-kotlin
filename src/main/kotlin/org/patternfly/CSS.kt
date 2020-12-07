@@ -33,9 +33,9 @@ public fun String.far(): String = "far fa-$this"
 public fun String.fas(): String = "fas fa-$this"
 
 /**
- * Creates a PatternFly icon CSS class starting with `pficon pf--`.
+ * Creates a PatternFly icon CSS class starting with `pf-icon-`.
  */
-public fun String.pfIcon(): String = "pficon pf-$this"
+public fun String.pfIcon(): String = "pf-icon-$this"
 
 private fun combine(prefix: String, main: String, elements: Array<out String>): String = buildString {
     append("$prefix-$main")
