@@ -26,27 +26,31 @@ public typealias OldComponentDisplay<C, T> = (T) -> C.() -> Unit
 
 // ------------------------------------------------------ types
 
-internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E> {
-
-    fun markAs(componentType: ComponentType) {
-        domNode.dataset[COMPONENT_TYPE] = componentType.id
-        if (window.localStorage["ouia"].toString() == "true") {
-            domNode.dataset["ouiaComponentType"] = componentType.name
-        }
+internal fun <E : HTMLElement> PatternFlyComponent<E>.markAs(componentType: ComponentType) {
+    domNode.dataset[COMPONENT_TYPE] = componentType.id
+    if (window.localStorage["ouia"].toString() == "true") {
+        domNode.dataset["ouiaComponentType"] = componentType.name
     }
 }
 
+internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E>
+
 /**
- * Interface meant to be implemented by components which want to have an easy access to an item ID. These components can then use [itemId] to assign an ID.
+ * Interface meant to be implemented by components which want to have an easy access to an item ID based on [IdProvider]. These components can for example use [itemId] to set the ID attribute on their DOM element.
+ *
+ * This interface is implemented by most of the components which are part of [CardView], [DataList] and [DataTable]. These implementations use the ID provider of the [ItemStore]: [ItemStore.idProvider].
  *
  * @sample WithIdProviderSamples.useItemId
  */
 public interface WithIdProvider<T> {
 
+    /**
+     * The [IdProvider] used by this interface.
+     */
     public val idProvider: IdProvider<T, String>
 
     /**
-     * Use this function to get an item ID. Shortcut for `idProvider.invoke(item)`.
+     * Provides an easy access to the item ID. Shortcut for `idProvider.invoke(item)`.
      */
     public fun itemId(item: T): String = idProvider(item)
 }
@@ -180,4 +184,8 @@ public enum class Size(public val modifier: String) {
     MD("md".modifier())
 }
 
-public enum class TriState { OFF, INDETERMINATE, ON }
+public enum class TriState(internal val checked: Boolean, internal val indeterminate: Boolean) {
+    OFF(false, false),
+    INDETERMINATE(false, true),
+    ON(true, false)
+}

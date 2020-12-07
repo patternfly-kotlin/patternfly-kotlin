@@ -321,7 +321,7 @@ public class DataListItem<T> internal constructor(
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample DataListSamples.collapseExpandHandler
+     * @sample DataListSamples.ces
      */
     public val ces: CollapseExpandStore = CollapseExpandStore()
 

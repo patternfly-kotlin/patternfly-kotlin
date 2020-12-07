@@ -4,6 +4,8 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.elemento.Id
+import dev.fritz2.lenses.IdProvider
 import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import kotlinx.coroutines.flow.flowOf
@@ -133,8 +135,8 @@ internal interface CardSamples {
                 }
                 cardActions {
                     dropdown<String>(align = RIGHT) {
-                        dropdownKebabToggle()
-                        dropdownItems {
+                        kebabToggle()
+                        items {
                             item("Item 1")
                             item("Disabled Item") {
                                 disabled = true
@@ -170,8 +172,8 @@ internal interface CardSamples {
             cardHeader {
                 cardActions {
                     dropdown<String>(align = RIGHT) {
-                        dropdownKebabToggle()
-                        dropdownItems {
+                        kebabToggle()
+                        items {
                             item("Item 1")
                             item("Disabled Item") { disabled = true }
                             separator()
@@ -218,8 +220,8 @@ internal interface CardViewSamples {
                         cardTitle { +"Demo" }
                         cardActions {
                             dropdown<String>(align = RIGHT) {
-                                dropdownKebabToggle()
-                                dropdownItems {
+                                kebabToggle()
+                                items {
                                     item("Edit")
                                     item("Remove")
                                 }
@@ -399,7 +401,7 @@ internal interface DataListSamples {
         )
     }
 
-    fun RenderContext.collapseExpandHandler() {
+    fun RenderContext.ces() {
         dataList<String> {
             display { item ->
                 dataListItem(item) {
@@ -466,8 +468,8 @@ internal interface DataTableSamples {
                 }
                 dataTableActionColumn { demo ->
                     dropdown<String>(align = RIGHT) {
-                        dropdownKebabToggle()
-                        dropdownItems {
+                        kebabToggle()
+                        items {
                             item("Action 1")
                             item("Action 2")
                             item("Remove ${demo.name}")
@@ -554,7 +556,7 @@ internal interface DrawerSamples {
         store.addAll(listOf("One", "Two", "Three"))
     }
 
-    fun RenderContext.collapseExpandHandler() {
+    fun RenderContext.ces() {
         drawer {
             ces.data handledBy Notification.add { expanded ->
                 info("Expanded state of drawer: $expanded.")
@@ -608,11 +610,27 @@ internal interface DrawerSamples {
 
 internal interface DropdownSamples {
 
-    fun RenderContext.dropdownStatic() {
+    fun RenderContext.dropdownDsl() {
         dropdown<String> {
-            dropdownToggle()
-            dropdownItems {
-                item("Foo")
+            textToggle { +"Choose one" }
+            groups {
+                group { // w/o title
+                    item("Item 1")
+                    item("Item 2") {
+                        description = "Item description"
+                    }
+                }
+                group("Group 1") {
+                    item("Item 1")
+                    separator()
+                    item("Item 2") {
+                        disabled = true
+                    }
+                }
+                group("Group 2") {
+                    item("Item 1")
+                    item("Item 2")
+                }
             }
         }
     }
@@ -622,16 +640,111 @@ internal interface DropdownSamples {
 
         val store = DropdownStore<Demo>()
         dropdown(store) {
-            display { demo ->
-            }
+            textToggle { +"Choose one" }
+            display { demo -> +demo.name }
         }
 
         store.addAll(
-            items {
-                item(Demo("foo", "Foo"))
-                item(Demo("bar", "Bar"))
-            }
+            listOf(
+                Demo("foo", "Foo"),
+                Demo("bar", "Bar")
+            )
         )
+    }
+
+    fun RenderContext.ces() {
+        dropdown<String> {
+            ces.data handledBy Notification.add { expanded ->
+                info("Expanded state of dropdown: $expanded.")
+            }
+            textToggle { +"Choose one" }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.textToggle() {
+        dropdown<String> {
+            textToggle { +"Text" }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.iconToggle() {
+        dropdown<String> {
+            iconToggle { icon("user".fas()) }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.kebabToggle() {
+        dropdown<String> {
+            kebabToggle()
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.checkboxToggle() {
+        dropdown<String> {
+            checkboxToggle {
+                text { +"Text" }
+                checkbox {
+                    checked(true)
+                }
+            }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.actionToggle() {
+        dropdown<String> {
+            actionToggle {
+                +"Action"
+            } handledBy Notification.info("Action clicked")
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+        dropdown<String> {
+            actionToggle {
+                icon("cog".fas())
+            }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun RenderContext.customToggle() {
+        dropdown<String> {
+            customToggle {
+                toggleImage {
+                    img { src("./logo.svg") }
+                }
+                toggleText { +"Some text" }
+                toggleIcon()
+            }
+            items {
+                item("Foo")
+                item("Bar")
+            }
+        }
     }
 }
 
@@ -648,8 +761,8 @@ internal interface NotificationSamples {
 
     fun RenderContext.add() {
         dropdown<Int> {
-            dropdownToggle()
-            dropdownItems {
+            textToggle { +"1, 2 or 3" }
+            items {
                 (1..3).forEach { item(it) }
                 store.select handledBy Notification.add { item ->
                     info("You selected ${item.unwrap()}")
@@ -705,7 +818,10 @@ internal interface PageSamples {
 internal interface WithIdProviderSamples {
 
     fun RenderContext.useItemId() {
-        dataList<String> {
+        // this ID provider will be used below
+        val idProvider: IdProvider<String, String> = { Id.build(it) }
+
+        dataList(ItemStore(idProvider)) {
             display {
                 dataListItem(it) {
                     dataListRow(id = itemId(it)) {

@@ -128,28 +128,26 @@ public class BulkSelect<T> internal constructor(itemStore: ItemStore<T>, id: Str
     Dropdown<PreSelection>(DropdownStore(), dropdownAlign = null, up = false, id = id, baseClass = baseClass, job) {
 
     init {
-        dropdownCheckboxToggle {
+        checkboxToggle {
             text {
                 itemStore.selected.map {
                     if (it == 0) "" else "$it selected"
                 }.asText()
             }
-            triState(itemStore.data.map {
-                when {
-                    it.selected.isEmpty() -> TriState.OFF
-                    it.selected.size == it.items.size -> TriState.ON
-                    else -> TriState.INDETERMINATE
-                }
-            })
-            input.changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
-            input.changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
-        }
-        display = {
-            { +it.item.text }
+            checkbox {
+                triState(itemStore.data.map {
+                    when {
+                        it.selected.isEmpty() -> TriState.OFF
+                        it.selected.size == it.items.size -> TriState.ON
+                        else -> TriState.INDETERMINATE
+                    }
+                })
+                changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
+                changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
+            }
         }
         store.select.unwrap() handledBy itemStore.preSelect
-
-        dropdownItems {
+        items {
             PreSelection.values().map { item(it) }
         }
     }

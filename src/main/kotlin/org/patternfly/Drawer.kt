@@ -176,7 +176,7 @@ public class Drawer internal constructor(id: String?, baseClass: String?, job: J
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [Drawer]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample DrawerSamples.collapseExpandHandler
+     * @sample DrawerSamples.ces
      */
     public val ces: CollapseExpandStore = CollapseExpandStore()
 

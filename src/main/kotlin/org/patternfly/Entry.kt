@@ -7,10 +7,6 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ dsl
 
-public fun <T> items(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> = ItemsBuilder<T>().apply(block).build()
-
-public fun <T> groups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> = GroupsBuilder<T>().apply(block).build()
-
 public fun <T> ItemsBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
@@ -63,7 +59,11 @@ public fun <T> Flow<List<Entry<T>>>.flatItems(): Flow<List<Item<T>>> = this.map 
 
 // ------------------------------------------------------ data classes
 
-/** Entry used in components like [Dropdown], [OptionsMenu] or [Select]. */
+/**
+ * Entry used in components like [Dropdown], [OptionsMenu] or [Select].
+ *
+ * Each entry is either an [Item] or a [Group] of [Item]s.
+ */
 public sealed class Entry<T>
 
 public data class Group<T> internal constructor(
