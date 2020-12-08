@@ -14,7 +14,6 @@ import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
-import dev.fritz2.dom.html.Ul
 import dev.fritz2.elemento.By
 import dev.fritz2.elemento.Id
 import dev.fritz2.elemento.aria
@@ -24,7 +23,6 @@ import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.Comment
 import org.w3c.dom.HTMLButtonElement

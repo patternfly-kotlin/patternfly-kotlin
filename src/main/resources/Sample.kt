@@ -10,6 +10,8 @@ import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import kotlinx.coroutines.flow.flowOf
 import org.patternfly.Align.RIGHT
+import org.patternfly.ButtonVariation.inline
+import org.patternfly.ButtonVariation.link
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
@@ -17,16 +19,14 @@ import org.patternfly.IconPosition.ICON_FIRST
 import org.patternfly.IconPosition.ICON_LAST
 import kotlin.random.Random
 
-// ------------------------------------------------------ samples a-z
-
-public interface AlertSamples {
+public object AlertSamples {
 
     public fun RenderContext.alert() {
         alert(Severity.INFO, "Alert title") {
             alertDescription { +"Lorem ipsum dolor sit amet." }
             alertActions {
-                pushButton(ButtonVariation.inline, ButtonVariation.link) { +"View details" }
-                pushButton(ButtonVariation.inline, ButtonVariation.link) { +"Ignore" }
+                pushButton(inline, link) { +"View details" }
+                pushButton(inline, link) { +"Ignore" }
             }
         }
     }
@@ -49,8 +49,8 @@ public interface AlertSamples {
     public fun RenderContext.actions() {
         alert(Severity.INFO, "Alert title") {
             alertActions {
-                pushButton(ButtonVariation.inline, ButtonVariation.link) { +"View details" }
-                pushButton(ButtonVariation.inline, ButtonVariation.link) { +"Ignore" }
+                pushButton(inline, link) { +"View details" }
+                pushButton(inline, link) { +"Ignore" }
             }
         }
     }
@@ -62,7 +62,7 @@ public interface AlertSamples {
     }
 }
 
-public interface BadgeSamples {
+public object BadgeSamples {
 
     public fun RenderContext.badge() {
         val values = flowOf(1, 2, 3)
@@ -79,7 +79,7 @@ public interface BadgeSamples {
     }
 }
 
-public interface ButtonSamples {
+public object ButtonSamples {
 
     public fun RenderContext.pushButton() {
         pushButton { +"Button" }
@@ -119,7 +119,7 @@ public interface ButtonSamples {
     }
 }
 
-public interface CardSamples {
+public object CardSamples {
 
     public fun RenderContext.card() {
         card {
@@ -201,7 +201,7 @@ public interface CardSamples {
     }
 }
 
-public interface CardViewSamples {
+public object CardViewSamples {
 
     public fun RenderContext.cardView() {
         data class Demo(val id: String, val name: String)
@@ -237,7 +237,7 @@ public interface CardViewSamples {
     }
 }
 
-public interface ChipSamples {
+public object ChipSamples {
 
     public fun RenderContext.chip() {
         chip { +"Chip" }
@@ -256,7 +256,7 @@ public interface ChipSamples {
     }
 }
 
-public interface ChipGroupSamples {
+public object ChipGroupSamples {
 
     public fun RenderContext.vararg() {
         chipGroup<String> {
@@ -330,7 +330,7 @@ public interface ChipGroupSamples {
     }
 }
 
-public interface CSSSamples {
+public object CSSSamples {
 
     public fun component() {
         "card".component() // pf-c-card
@@ -356,7 +356,7 @@ public interface CSSSamples {
     }
 }
 
-public interface DataListSamples {
+public object DataListSamples {
 
     public fun RenderContext.dataList() {
         data class Demo(val id: String, val name: String)
@@ -433,7 +433,7 @@ public interface DataListSamples {
     }
 }
 
-public interface DataTableSamples {
+public object DataTableSamples {
 
     public fun RenderContext.dataTable() {
         data class Demo(val id: String, val name: String)
@@ -517,7 +517,7 @@ public interface DataTableSamples {
     }
 }
 
-public interface DrawerSamples {
+public object DrawerSamples {
 
     public fun RenderContext.drawerSetup() {
         val store = ItemStore<String>()
@@ -602,7 +602,7 @@ public interface DrawerSamples {
     }
 }
 
-public interface DropdownSamples {
+public object DropdownSamples {
 
     public fun RenderContext.dropdownDsl() {
         dropdown<String> {
@@ -747,7 +747,7 @@ public interface DropdownSamples {
     }
 }
 
-public interface IconSamples {
+public object IconSamples {
 
     public fun RenderContext.icons() {
         icon("bundle".pfIcon())
@@ -756,7 +756,7 @@ public interface IconSamples {
     }
 }
 
-public interface NotificationSamples {
+public object NotificationSamples {
 
     public fun RenderContext.add() {
         dropdown<Int> {
@@ -771,7 +771,7 @@ public interface NotificationSamples {
     }
 }
 
-public interface PageSamples {
+public object PageSamples {
 
     public fun RenderContext.typicalSetup() {
         val router = Router(StringRoute("#home"))
@@ -814,7 +814,7 @@ public interface PageSamples {
     }
 }
 
-public interface WithIdProviderSamples {
+public object WithIdProviderSamples {
 
     public fun RenderContext.useItemId() {
         // this ID provider will be used below

@@ -1,5 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaTask
-
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
@@ -46,10 +44,10 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(kotlin.sourceSets.main.get().kotlin)
 }
 
-tasks.withType<DokkaTask>().configureEach {
+tasks.dokkaHtml.configure {
     dokkaSourceSets {
         named("main") {
-            samples.from("src/main/kotlin/org/patternfly/Samples.kt")
+            samples.from(listOf("src/main/resources/Sample.kt"))
         }
     }
 }

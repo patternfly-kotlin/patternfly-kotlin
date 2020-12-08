@@ -4,11 +4,8 @@ import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.minusAssign
-import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl

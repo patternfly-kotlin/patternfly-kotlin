@@ -1,15 +1,12 @@
 package org.patternfly
 
 import dev.fritz2.binding.mountSingle
-import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
-import dev.fritz2.dom.mountDomNode
 import dev.fritz2.elemento.minusAssign
 import dev.fritz2.elemento.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLSpanElement
 
