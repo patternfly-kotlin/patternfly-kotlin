@@ -68,7 +68,7 @@ public fun Chip.badge(
  *
  * If the chip is not created as read-only, the chip is closeable.
  *
- * @sample ChipSamples.chip
+ * @sample org.patternfly.ChipSample.chip
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?, job: Job) :
@@ -86,7 +86,7 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
     /**
      * Listener for the close button (if any).
      *
-     * @sample ChipSamples.closes
+     * @sample org.patternfly.ChipSample.closes
      */
     public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 

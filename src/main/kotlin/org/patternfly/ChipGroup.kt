@@ -56,7 +56,7 @@ public fun <T> RenderContext.chipGroup(
 /**
  * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
- * @sample ChipGroupSamples.vararg
+ * @sample org.patternfly.ChipGroupSample.vararg
  */
 public fun <T> ChipGroup<T>.chips(vararg chips: T) {
     store.addAll(chips.asList())
@@ -65,7 +65,7 @@ public fun <T> ChipGroup<T>.chips(vararg chips: T) {
 /**
  * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
- * @sample ChipGroupSamples.list
+ * @sample org.patternfly.ChipGroupSample.list
  */
 public fun <T> ChipGroup<T>.chips(chips: List<T>) {
     store.addAll(chips)
@@ -74,7 +74,7 @@ public fun <T> ChipGroup<T>.chips(chips: List<T>) {
 /**
  * Adds the specified items to the [ChipGroupStore]. The items are displayed according to the [ChipGroup.display] function.
  *
- * @sample ChipGroupSamples.builder
+ * @sample org.patternfly.ChipGroupSample.builder
  */
 public fun <T> ChipGroup<T>.chips(block: ChipsBuilder<T>.() -> Unit) {
     store.addAll(ChipsBuilder<T>().apply(block).chips)
@@ -83,7 +83,7 @@ public fun <T> ChipGroup<T>.chips(block: ChipsBuilder<T>.() -> Unit) {
 /**
  * Builder for adding items to the [ChipGroupStore].
  *
- * @sample ChipGroupSamples.builder
+ * @sample org.patternfly.ChipGroupSample.builder
  */
 public class ChipsBuilder<T> {
     internal val chips: MutableList<T> = mutableListOf()
@@ -118,10 +118,10 @@ public class ChipsBuilder<T> {
  *
  * @param T the type which is used for the single [Chip]s (matters only if a store is used)
  *
- * @sample ChipGroupSamples.vararg
- * @sample ChipGroupSamples.list
- * @sample ChipGroupSamples.builder
- * @sample ChipGroupSamples.store
+ * @sample org.patternfly.ChipGroupSample.vararg
+ * @sample org.patternfly.ChipGroupSample.list
+ * @sample org.patternfly.ChipGroupSample.builder
+ * @sample org.patternfly.ChipGroupSample.store
  */
 public class ChipGroup<T> internal constructor(
     public val store: ChipGroupStore<T>,
@@ -145,7 +145,7 @@ public class ChipGroup<T> internal constructor(
     /**
      * Listener for the close button (if any).
      *
-     * @sample ChipGroupSamples.closes
+     * @sample org.patternfly.ChipGroupSample.closes
      */
     public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 
@@ -206,7 +206,7 @@ public class ChipGroup<T> internal constructor(
      *
      * Please call this function *before* populating the store.
      *
-     * @sample ChipGroupSamples.display
+     * @sample org.patternfly.ChipGroupSample.display
      */
     public fun display(display: (T) -> Chip) {
         this.display = display
@@ -248,7 +248,7 @@ public class ChipGroup<T> internal constructor(
  *
  * `{ Id.build(it.toString()) }`
  *
- * @sample ChipGroupSamples.store
+ * @sample org.patternfly.ChipGroupSample.store
  */
 public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<T>>(listOf()) {
@@ -266,7 +266,7 @@ public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = 
     /**
      * Removes the specified item from the list of items and emits it (if found).
      *
-     * @sample ChipGroupSamples.remove
+     * @sample org.patternfly.ChipGroupSample.remove
      */
     public val remove: EmittingHandler<String, T?> = handleAndEmit { items, id ->
         emit(items.find { identifier(it) == id })

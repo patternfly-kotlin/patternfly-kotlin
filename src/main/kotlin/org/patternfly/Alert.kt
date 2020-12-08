@@ -111,7 +111,7 @@ public fun AlertGroup.alert(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample AlertSamples.description
+ * @sample org.patternfly.AlertSample.description
  */
 public fun Alert.alertDescription(
     id: String? = null,
@@ -128,7 +128,7 @@ public fun Alert.alertDescription(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample AlertSamples.actions
+ * @sample org.patternfly.AlertSample.actions
  */
 public fun Alert.alertActions(
     id: String? = null,
@@ -146,7 +146,7 @@ public fun Alert.alertActions(
  * An alert group is used to stack and position [Alert]s. Besides the singleton toast alert group,
  * alert groups are most often used to group inline alerts.
  *
- * @sample AlertSamples.alertGroup
+ * @sample org.patternfly.AlertSample.alertGroup
  */
 public class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLUListElement>,
@@ -193,7 +193,7 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
  *
  * Alerts are used to notify the user about a change in status or other event.
  *
- * @sample AlertSamples.alert
+ * @sample org.patternfly.AlertSample.alert
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 public class Alert internal constructor(
@@ -223,7 +223,7 @@ public class Alert internal constructor(
     /**
      * Listener for the close button (if any).
      *
-     * @sample AlertSamples.closes
+     * @sample org.patternfly.AlertSample.closes
      */
     public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 

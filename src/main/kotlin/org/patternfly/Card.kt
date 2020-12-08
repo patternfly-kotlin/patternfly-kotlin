@@ -84,7 +84,7 @@ public fun <T> Card<T>.cardHeader(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample CardSamples.cardHeaderMain
+ * @sample org.patternfly.CardSample.cardHeaderMain
  */
 public fun <T> CardHeader<T>.cardHeaderMain(
     id: String? = null,
@@ -127,7 +127,7 @@ public fun <T> CardActions<T>.cardCheckbox(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample CardSamples.cardTitleInHeader
+ * @sample org.patternfly.CardSample.cardTitleInHeader
  */
 public fun <T> CardHeader<T>.cardTitle(
     id: String? = null,
@@ -142,7 +142,7 @@ public fun <T> CardHeader<T>.cardTitle(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample CardSamples.cardTitleInCard
+ * @sample org.patternfly.CardSample.cardTitleInCard
  */
 public fun <T> Card<T>.cardTitle(
     id: String? = null,
@@ -157,7 +157,7 @@ public fun <T> Card<T>.cardTitle(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample CardSamples.multipleBodies
+ * @sample org.patternfly.CardSample.multipleBodies
  */
 public fun <T> Card<T>.cardBody(
     id: String? = null,
@@ -187,7 +187,7 @@ public fun <T> Card<T>.cardFooter(
  *
  * @param T the type which is used for the [Card]s in this card view.
  *
- * @sample CardViewSamples.cardView
+ * @sample org.patternfly.CardViewSample.cardView
  */
 public class CardView<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -219,7 +219,7 @@ public class CardView<T> internal constructor(
  *
  * A card can be used standalone or as part of a [CardView]. If used standalone and the card is [selectable], the card stores its selection state using the [selected] property. If the card is part of a [CardView], the selection is stored in the [ItemStore].
  *
- * @sample CardSamples.card
+ * @sample org.patternfly.CardSample.card
  */
 public class Card<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -274,7 +274,7 @@ public class CardHeader<T> internal constructor(
 /**
  * A container in the [CardHeader] used to to add images or other none-text like elements to the header.
  *
- * @sample CardSamples.cardHeaderMain
+ * @sample org.patternfly.CardSample.cardHeaderMain
  */
 public class CardHeaderMain<T> internal constructor(
     itemStore: ItemStore<T>,
@@ -337,7 +337,7 @@ public class CardTitle<T> internal constructor(itemStore: ItemStore<T>, id: Stri
 /**
  * The body of a [Card]. You can have multiple bodies in one card.
  *
- * @sample CardSamples.multipleBodies
+ * @sample org.patternfly.CardSample.multipleBodies
  */
 public class CardBody<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore, Div(id = id, baseClass = classes("card".component("body"), baseClass), job)

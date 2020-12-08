@@ -132,7 +132,7 @@ public fun RenderContext.pageSection(
  *
  * A typical page setup with a header, brand, tools, sidebar and navigation might look like this:
  *
- * @sample PageSamples.typicalSetup
+ * @sample org.patternfly.PageSample.typicalSetup
  */
 public class Page internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, baseClass), job) {

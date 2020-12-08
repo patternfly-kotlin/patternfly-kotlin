@@ -35,7 +35,7 @@ public fun RenderContext.icon(
  *
  * Use one of the string extension methods [String.far], [String.fas] or [String.pfIcon] to create a valid CSS class.
  *
- * @sample IconSamples.icons
+ * @sample org.patternfly.IconSample.icons
  */
 public class Icon internal constructor(iconClass: String, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,

@@ -1,3 +1,5 @@
+import java.net.URL
+
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
@@ -47,7 +49,20 @@ val sourcesJar by tasks.registering(Jar::class) {
 tasks.dokkaHtml.configure {
     dokkaSourceSets {
         named("main") {
-            samples.from(listOf("src/main/resources/Sample.kt"))
+            includeNonPublic.set(false)
+            skipEmptyPackages.set(true)
+            platform.set(org.jetbrains.dokka.Platform.js)
+            samples.from("src/main/resources/")
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(URL("https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/" +
+                        "src/main/kotlin/"
+                ))
+                remoteLineSuffix.set("#L")
+            }
+            externalDocumentationLink {
+                this.url.set(URL("https://api.fritz2.dev/core/core/"))
+            }
         }
     }
 }
