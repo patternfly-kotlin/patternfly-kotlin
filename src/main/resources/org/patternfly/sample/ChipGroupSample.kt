@@ -5,7 +5,7 @@ import org.patternfly.ChipGroupStore
 import org.patternfly.Notification
 import org.patternfly.chipGroup
 import org.patternfly.chips
-import org.patternfly.dom.chip
+import org.patternfly.chip
 
 internal interface ChipGroupSample {
 

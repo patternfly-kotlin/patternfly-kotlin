@@ -18,6 +18,9 @@ private const val COMPONENT_TYPE: String = "pfct"
 
 /**
  * Generic display function for components.
+ *
+ * @param C the component type such as [Button][dev.fritz2.dom.html.Button], [Div][dev.fritz2.dom.html.Div] or [Td][dev.fritz2.dom.html.Td]
+ * @param T the payload type which should be rendered inside the component type
  */
 public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
@@ -73,7 +76,7 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
 // ------------------------------------------------------ enums
 
-public enum class ComponentType(public val id: String, internal val baseClass: String? = null) {
+internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
     Badge("bdg", "badge".component()),
@@ -106,6 +109,9 @@ public enum class ComponentType(public val id: String, internal val baseClass: S
     TreeView("tv", "tree-view".component());
 }
 
+/**
+ * Alignment modifier for [Dropdown]s and [OptionsMenu]s.
+ */
 public enum class Align(public val modifier: String) {
     LEFT("align-left".modifier()), RIGHT("align-right".modifier())
 }
@@ -131,6 +137,10 @@ public enum class DataTableSelection {
     SINGLE
 }
 
+/**
+ * Visual modifiers for [PushButton]s and [LinkButton]s.
+ */
+@Suppress("EnumEntryName")
 public enum class ButtonVariation(internal val modifier: String) {
     control("control".modifier()),
     danger("danger".modifier()),
@@ -143,14 +153,16 @@ public enum class ButtonVariation(internal val modifier: String) {
     warning("warning".modifier()),
 }
 
+/**
+ * Visual modifier for [divider]s.
+ */
 public enum class DividerVariant {
     HR, DIV, LI
 }
 
-public enum class ExpansionMode {
-    SINGLE, MULTI
-}
-
+/**
+ * Flag used for [Navigation] component.
+ */
 public enum class Orientation {
     HORIZONTAL, VERTICAL
 }
@@ -164,6 +176,9 @@ public enum class SelectionMode {
     NONE, SINGLE, MULTIPLE
 }
 
+/**
+ * Enum for the level in [Alert]s and [Notification]s.
+ */
 public enum class Severity(
     public val modifier: String?,
     public val iconClass: String,
@@ -175,6 +190,9 @@ public enum class Severity(
     DANGER("danger".modifier(), "exclamation-circle".fas());
 }
 
+/**
+ * Size modifier used in various components.
+ */
 public enum class Size(public val modifier: String) {
     XL_4("4xl".modifier()),
     XL_3("3xl".modifier()),
@@ -184,6 +202,9 @@ public enum class Size(public val modifier: String) {
     MD("md".modifier())
 }
 
+/**
+ * Enum for the checkbox state including the [ideterminate](http://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox#indeterminate) state.
+ */
 public enum class TriState(internal val checked: Boolean, internal val indeterminate: Boolean) {
     OFF(false, false),
     INDETERMINATE(false, true),

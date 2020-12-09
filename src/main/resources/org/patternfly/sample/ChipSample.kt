@@ -2,12 +2,12 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Notification
-import org.patternfly.dom.badge
-import org.patternfly.dom.chip
+import org.patternfly.badge
+import org.patternfly.chip
 
 internal interface ChipSample {
 
-    fun chip() {
+    fun basicChips() {
         render {
             chip { +"Chip" }
             chip(readOnly = true) { +"Read-only chip" }

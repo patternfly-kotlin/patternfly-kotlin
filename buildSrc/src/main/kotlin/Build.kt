@@ -9,6 +9,7 @@ object Constants {
 object PluginVersions {
     const val js = "1.4.20"
     const val dokka = "1.4.20"
+    const val orchid = "0.21.1"
 }
 
 object Versions {
@@ -25,6 +26,13 @@ fun DependencyHandler.kotest() {
     add("testImplementation", "io.kotest:kotest-assertions-core:${Versions.kotest}")
     add("testImplementation", "io.kotest:kotest-property:${Versions.kotest}")
     add("testImplementation", "io.kotest:kotest-framework-engine:${Versions.kotest}")
+}
+
+fun DependencyHandler.orchid() {
+    add("orchidCompile", "io.github.javaeden.orchid:OrchidCore:${PluginVersions.orchid}")
+    add("orchidCompile", "io.github.javaeden.orchid:OrchidBsDoc:${PluginVersions.orchid}")
+    add("orchidCompile", "io.github.javaeden.orchid:OrchidPages:${PluginVersions.orchid}")
+    add("orchidCompile", "io.github.javaeden.orchid:OrchidAsciidoc:${PluginVersions.orchid}")
 }
 
 fun MavenPom.defaultPom() {

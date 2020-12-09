@@ -26,8 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.Chip
-import org.patternfly.dom.chip
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement

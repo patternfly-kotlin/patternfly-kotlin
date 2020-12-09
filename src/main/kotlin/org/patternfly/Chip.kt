@@ -1,4 +1,4 @@
-package org.patternfly.dom
+package org.patternfly
 
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.Div
@@ -6,19 +6,11 @@ import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
-import org.patternfly.Badge
-import org.patternfly.ButtonVariation
-import org.patternfly.ComponentType
-import org.patternfly.PatternFlyComponent
-import org.patternfly.PushButton
-import org.patternfly.WithTextDelegate
-import org.patternfly.classes
-import org.patternfly.component
-import org.patternfly.fas
-import org.patternfly.icon
-import org.patternfly.markAs
-import org.patternfly.modifier
-import org.patternfly.pushButton
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
@@ -75,7 +67,7 @@ public fun Chip.badge(
  *
  * If the chip is not created as read-only, the chip is closeable.
  *
- * @sample org.patternfly.sample.ChipSample.chip
+ * @sample org.patternfly.sample.ChipSample.basicChips
  */
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>,
@@ -95,7 +87,7 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
      * @sample org.patternfly.sample.ChipSample.closes
      */
     public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
-        org.patternfly.subscribe(
+        subscribe(
             closeButton,
             Events.click
         )
