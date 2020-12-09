@@ -1,8 +1,21 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
+import org.patternfly.brand
+import org.patternfly.headerTools
+import org.patternfly.horizontalNavigation
+import org.patternfly.navigationItem
+import org.patternfly.navigationItems
+import org.patternfly.notificationBadge
+import org.patternfly.page
+import org.patternfly.pageHeader
+import org.patternfly.pageMain
+import org.patternfly.pageSection
+import org.patternfly.pageSidebar
+import org.patternfly.sidebarBody
+import org.patternfly.verticalNavigation
 
 internal interface PageSample {
 

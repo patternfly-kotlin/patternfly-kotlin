@@ -69,7 +69,7 @@ public val Element.aria: ElementAria
  * Class that simplifies the handling of ARIA attributes on [Tag]s in a way that you don't have to specify the `aria-` prefix.
  *
  * @see ElementAria
- * @sample org.patternfly.dom.AriaSample.tagAria
+ * @sample org.patternfly.sample.AriaSample.tagAria
  */
 public class TagAria<E : Element>(private val tag: Tag<E>) : ElementAria(tag.domNode) {
 
@@ -84,7 +84,7 @@ public class TagAria<E : Element>(private val tag: Tag<E>) : ElementAria(tag.dom
 /**
  * Class that simplifies the handling of ARIA attributes on [Element]s in a way that you don't have to specify the `aria-` prefix.
  *
- * @sample org.patternfly.dom.AriaSample.elementAria
+ * @sample org.patternfly.sample.AriaSample.elementAria
  */
 public open class ElementAria(private val element: Element) {
 
@@ -210,7 +210,7 @@ public fun ParentNode.querySelectorAll(selector: By): NodeList = this.querySelec
  * - w/o children: `<element/>`
  * - w/ children: `<element></element>`
  *
- * @sample org.patternfly.dom.DebugSample.debug
+ * @sample org.patternfly.sample.DebugSample.debug
  */
 public fun Element.debug(): String = buildString {
     append("<${tagName.toLowerCase()}")

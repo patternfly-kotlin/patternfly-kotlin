@@ -1,4 +1,6 @@
-package org.patternfly.dom
+package org.patternfly.sample
+
+import org.patternfly.dom.Id
 
 internal interface IdSamples {
 

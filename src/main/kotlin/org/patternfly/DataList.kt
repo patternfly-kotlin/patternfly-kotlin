@@ -173,7 +173,7 @@ public fun <T> DataListControl<T>.dataListToggle(
  *
  * @param T the type which is used for the [DataListItem]s in this data list.
  *
- * @sample org.patternfly.DataListSample.dataList
+ * @sample org.patternfly.sample.DataListSample.dataList
  */
 public class DataList<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -221,7 +221,7 @@ public class DataListCell<T> internal constructor(itemStore: ItemStore<T>, id: S
  *
  * You can use the [ItemStore] to track the selection of an item.
  *
- * @sample org.patternfly.DataListSample.selects
+ * @sample org.patternfly.sample.DataListSample.selects
  */
 public class DataListCheck<T> internal constructor(
     private val itemStore: ItemStore<T>,
@@ -322,7 +322,7 @@ public class DataListItem<T> internal constructor(
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.DataListSample.ces
+     * @sample org.patternfly.sample.DataListSample.ces
      */
     public val ces: CollapseExpandStore = CollapseExpandStore()
 

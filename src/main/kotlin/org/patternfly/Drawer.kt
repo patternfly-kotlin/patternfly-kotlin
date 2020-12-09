@@ -166,7 +166,7 @@ public fun DrawerActions.drawerClose(
  * 1. [DrawerContent]: The normal content which is overlayed or pushed aside by the panel.
  * 1. [DrawerPanel]: The actual content of the drawer which slides in from the right edge.
  *
- * @sample org.patternfly.DrawerSample.drawerSetup
+ * @sample org.patternfly.sample.DrawerSample.drawerSetup
  */
 public class Drawer internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Drawer, baseClass), job) {
@@ -176,7 +176,7 @@ public class Drawer internal constructor(id: String?, baseClass: String?, job: J
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [Drawer]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.DrawerSample.ces
+     * @sample org.patternfly.sample.DrawerSample.ces
      */
     public val ces: CollapseExpandStore = CollapseExpandStore()
 
@@ -203,7 +203,7 @@ public class DrawerActions internal constructor(
  *
  * Use this class to add content to [DrawerContent]s and [DrawerPanel]s. If used for the [DrawerPanel] you normally add a [DrawerHead], [DrawerActions] and a [DrawerClose] to the [DrawerBody]. You can use [drawerBodyWithClose] as a shortcut. If you want to have full control you can put the components together on your own though.
  *
- * @sample org.patternfly.DrawerSample.drawerPanels
+ * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
 public class DrawerBody internal constructor(internal val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("drawer".component("body"), baseClass), job)
@@ -226,7 +226,7 @@ public class DrawerClose internal constructor(private val drawer: Drawer, id: St
 /**
  * Container for the normal content which is overlayed or pushed aside by the [DrawerPanel]. Use any number of nested [DrawerBody] components to add the actual content.
  *
- * @sample org.patternfly.DrawerSample.drawerContents
+ * @sample org.patternfly.sample.DrawerSample.drawerContents
  */
 public class DrawerContent internal constructor(
     internal val drawer: Drawer,
@@ -244,7 +244,7 @@ public class DrawerHead internal constructor(internal val drawer: Drawer, id: St
 /**
  * Container for the actual content of the drawer which slides in from the right edge. Use any number of nested [DrawerBody] components to add the actual content. The first [DrawerBody] should contain a [DrawerHead] with nested
  *
- * @sample org.patternfly.DrawerSample.drawerPanels
+ * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
 public class DrawerPanel internal constructor(
     internal val drawer: Drawer,

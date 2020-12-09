@@ -1,9 +1,22 @@
 @file:Suppress("DuplicatedCode")
 
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
+import org.patternfly.card
+import org.patternfly.cardActions
+import org.patternfly.cardBody
+import org.patternfly.cardCheckbox
+import org.patternfly.cardFooter
+import org.patternfly.cardHeader
+import org.patternfly.cardHeaderMain
+import org.patternfly.cardTitle
+import org.patternfly.dropdown
+import org.patternfly.item
+import org.patternfly.items
+import org.patternfly.kebabToggle
+import org.patternfly.separator
 
 internal interface CardSample {
 

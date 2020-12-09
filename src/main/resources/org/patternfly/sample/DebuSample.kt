@@ -1,9 +1,8 @@
-package org.patternfly.dom
+package org.patternfly.sample
 
-import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.render
-import dev.fritz2.elemento.debug
 import kotlinx.browser.document
+import org.patternfly.dom.debug
 
 internal interface DebugSample {
 

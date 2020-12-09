@@ -40,7 +40,7 @@ internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E>
  *
  * This interface is implemented by most of the components which are part of [CardView], [DataList] and [DataTable]. These implementations use the ID provider of the [ItemStore]: [ItemStore.idProvider].
  *
- * @sample org.patternfly.WithIdProviderSample.useItemId
+ * @sample org.patternfly.sample.WithIdProviderSample.useItemId
  */
 public interface WithIdProvider<T> {
 

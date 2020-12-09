@@ -1,7 +1,10 @@
 @file:Suppress("UNUSED_VARIABLE")
 
-package org.patternfly
+package org.patternfly.sample
 
+import org.patternfly.classes
+import org.patternfly.component
+import org.patternfly.modifier
 import kotlin.random.Random
 
 internal interface CssSample {

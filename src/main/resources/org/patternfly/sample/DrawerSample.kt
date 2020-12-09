@@ -1,7 +1,21 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.map
+import org.patternfly.ItemStore
+import org.patternfly.Notification
+import org.patternfly.dataList
+import org.patternfly.dataListItem
+import org.patternfly.dataListRow
+import org.patternfly.drawer
+import org.patternfly.drawerActions
+import org.patternfly.drawerBody
+import org.patternfly.drawerBodyWithClose
+import org.patternfly.drawerClose
+import org.patternfly.drawerContent
+import org.patternfly.drawerHead
+import org.patternfly.drawerPanel
+import org.patternfly.drawerSection
 
 internal interface DrawerSample {
 

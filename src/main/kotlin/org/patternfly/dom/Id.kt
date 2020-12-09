@@ -5,7 +5,7 @@ import kotlinx.browser.document
 /**
  * Generates unique and safe identifiers.
  *
- * @sample org.patternfly.dom.IdSamples.build
+ * @sample org.patternfly.sample.IdSamples.build
  */
 public object Id {
 
@@ -32,7 +32,7 @@ public object Id {
     /**
      * Creates a safe ID separated by '-' by removing white space and anything which is not `[a-zA-Z0-9-_]`. Multiple consecutive '-' are reduced to one '-'
      *
-     * @sample org.patternfly.dom.IdSamples.build
+     * @sample org.patternfly.sample.IdSamples.build
      */
     public fun build(id: String, vararg additionalIds: String): String {
         val segments = listOf(id, *additionalIds)

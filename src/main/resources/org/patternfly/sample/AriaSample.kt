@@ -1,8 +1,10 @@
-package org.patternfly.dom
+@file:Suppress("UNUSED_VARIABLE")
+
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import dev.fritz2.elemento.aria
 import kotlinx.browser.document
+import org.patternfly.dom.aria
 
 internal interface AriaSample {
 

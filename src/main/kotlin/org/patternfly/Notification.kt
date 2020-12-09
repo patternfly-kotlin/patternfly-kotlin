@@ -129,8 +129,8 @@ public data class Notification(
      * 1. Functions [default], [error], [info], [success] and [warning]: Use these functions, if you want to add static notifications and don't need the payload from the source flow.
      * 1. Function [add]: Use this function, if you want to use the payload from the source flow to create the notification.
      *
-     * @sample org.patternfly.ButtonSample.clickButton
-     * @sample org.patternfly.ChipGroupSample.remove
+     * @sample org.patternfly.sample.ButtonSample.clickButton
+     * @sample org.patternfly.sample.ChipGroupSample.remove
      */
     public companion object {
 
@@ -172,7 +172,7 @@ public data class Notification(
          * @param T the type of the source [Flow]
          * @param block the function to create the [Notification]
          *
-         * @sample org.patternfly.NotificationSample.add
+         * @sample org.patternfly.sample.NotificationSample.add
          */
         public fun <T> add(block: NotificationScope.(T) -> Notification): Handler<T> =
             addInternal(block)

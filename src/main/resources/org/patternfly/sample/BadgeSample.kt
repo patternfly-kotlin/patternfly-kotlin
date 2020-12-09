@@ -1,7 +1,8 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.flowOf
+import org.patternfly.badge
 
 internal interface BadgeSample {
 

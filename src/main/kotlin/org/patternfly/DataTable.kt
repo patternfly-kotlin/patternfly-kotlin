@@ -151,7 +151,7 @@ private val RADIO_GROUP_NAME = Id.unique(ComponentType.DataTable.id, "radio")
  * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the data columns should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
  * 1. [ActionColumn]: Use this column *any number of times* to add buttons, dropdowns or other action-like elements. The column uses a display function for the cells. This column should be placed after the data columns.
  *
- * @sample org.patternfly.DataTableSample.dataTable
+ * @sample org.patternfly.sample.DataTableSample.dataTable
  */
 public class DataTable<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -472,7 +472,7 @@ public sealed class Column<T>(
  *
  * If you want to make the column sortable, use one of the `sortInfo()` function to specify a [Comparator].
  *
- * @sample org.patternfly.DataTableSample.dataColumns
+ * @sample org.patternfly.sample.DataTableSample.dataColumns
  */
 public class DataColumn<T>(
     columns: Columns<T>,
@@ -529,7 +529,7 @@ public class DataColumn<T>(
  *
  * You can use the [ItemStore] to track the selection of an item.
  *
- * @sample org.patternfly.DataTableSample.selects
+ * @sample org.patternfly.sample.DataTableSample.selects
  */
 public class SelectColumn<T>(
     columns: Columns<T>,

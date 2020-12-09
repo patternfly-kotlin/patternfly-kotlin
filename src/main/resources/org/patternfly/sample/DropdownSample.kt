@@ -1,6 +1,25 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
+import org.patternfly.DropdownStore
+import org.patternfly.Notification
+import org.patternfly.actionToggle
+import org.patternfly.checkboxToggle
+import org.patternfly.customToggle
+import org.patternfly.dropdown
+import org.patternfly.fas
+import org.patternfly.group
+import org.patternfly.groups
+import org.patternfly.icon
+import org.patternfly.iconToggle
+import org.patternfly.item
+import org.patternfly.items
+import org.patternfly.kebabToggle
+import org.patternfly.separator
+import org.patternfly.textToggle
+import org.patternfly.toggleIcon
+import org.patternfly.toggleImage
+import org.patternfly.toggleText
 
 internal interface DropdownSample {
 

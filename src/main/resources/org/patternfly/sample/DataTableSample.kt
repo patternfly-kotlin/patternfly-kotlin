@@ -1,10 +1,27 @@
 @file:Suppress("DuplicatedCode")
 
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.ItemStore
+import org.patternfly.Notification
+import org.patternfly.SortInfo
+import org.patternfly.dataTable
+import org.patternfly.dataTableActionColumn
+import org.patternfly.dataTableCaption
+import org.patternfly.dataTableColumn
+import org.patternfly.dataTableColumns
+import org.patternfly.dataTableSelectColumn
+import org.patternfly.dataTableToggleColumn
+import org.patternfly.dropdown
+import org.patternfly.fas
+import org.patternfly.icon
+import org.patternfly.item
+import org.patternfly.items
+import org.patternfly.kebabToggle
+import org.patternfly.pushButton
 
 internal interface DataTableSample {
 

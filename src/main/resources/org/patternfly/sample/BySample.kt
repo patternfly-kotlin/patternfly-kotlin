@@ -1,7 +1,7 @@
-package org.patternfly.dom
+package org.patternfly.sample
 
-import dev.fritz2.elemento.AttributeOperator
-import dev.fritz2.elemento.By
+import org.patternfly.dom.AttributeOperator
+import org.patternfly.dom.By
 
 internal interface BySample {
 

@@ -3,7 +3,7 @@ package org.patternfly
 /**
  * Creates a PatternFly component CSS class starting with `pf-c-`. Additional elements are appended to the component class using a modified version of [BEM](http://getbem.com/introduction/).
  *
- * @sample org.patternfly.CssSample.component
+ * @sample org.patternfly.sample.CssSample.component
  */
 public fun String.component(vararg elements: String): String = combine("pf-c", this, elements)
 
@@ -45,7 +45,7 @@ private fun combine(prefix: String, main: String, elements: Array<out String>): 
 /**
  * Combines the specified classes using " " as the separator.
  *
- * @sample org.patternfly.CssSample.classesDsl
+ * @sample org.patternfly.sample.CssSample.classesDsl
  */
 public fun classes(builderAction: ClassBuilder.() -> Unit): String? =
     ClassBuilder().apply { builderAction() }.build()
@@ -53,7 +53,7 @@ public fun classes(builderAction: ClassBuilder.() -> Unit): String? =
 /**
  * Combines the specified classes using " " as the separator.
  *
- * @sample org.patternfly.CssSample.classesVararg
+ * @sample org.patternfly.sample.CssSample.classesVararg
  */
 public fun classes(vararg classes: String): String? = classes.joinToString(" ").ifEmpty { null }
 
@@ -68,7 +68,7 @@ internal fun classes(baseClass: String?, optionalClass: String? = null): String?
 /**
  * DSL for combining CSS classes.
  *
- * @sample org.patternfly.CssSample.classesDsl
+ * @sample org.patternfly.sample.CssSample.classesDsl
  */
 public class ClassBuilder {
 
@@ -86,7 +86,7 @@ public class ClassBuilder {
     /**
      * Adds the specified CSS class if the `condition == true`.
      *
-     * @sample org.patternfly.CssSample.classesDsl
+     * @sample org.patternfly.sample.CssSample.classesDsl
      */
     public infix fun String.`when`(condition: Boolean): String? = if (condition) this else null
 

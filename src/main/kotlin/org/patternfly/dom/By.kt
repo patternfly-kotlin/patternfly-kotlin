@@ -9,7 +9,7 @@ package org.patternfly.dom
  * #main [data-list-item=foo] a[href^="http://"] > .fas.fa-check, .external[hidden]
  * ```
  *
- * @sample org.patternfly.dom.BySample.complex
+ * @sample org.patternfly.sample.BySample.complex
  */
 public interface By {
 
@@ -19,7 +19,7 @@ public interface By {
      * Combines this selector with the given selector. Use this method to express selectors like `button.primary` or
      * `input[type=checkbox]`
      *
-     * @sample org.patternfly.dom.BySample.and
+     * @sample org.patternfly.sample.BySample.and
      */
     public fun and(selector: By): By = combinator(Combinator.AND, selector)
 

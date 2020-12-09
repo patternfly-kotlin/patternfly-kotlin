@@ -1,6 +1,11 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
+import org.patternfly.Notification
+import org.patternfly.dropdown
+import org.patternfly.item
+import org.patternfly.items
+import org.patternfly.textToggle
 
 internal interface NotificationSample {
 

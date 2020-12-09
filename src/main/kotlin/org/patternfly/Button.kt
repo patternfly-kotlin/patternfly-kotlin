@@ -36,7 +36,7 @@ public fun RenderContext.pushButton(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.ButtonSample.clickButton
+ * @sample org.patternfly.sample.ButtonSample.clickButton
  */
 public fun RenderContext.clickButton(
     vararg variations: ButtonVariation,
@@ -77,8 +77,8 @@ public fun RenderContext.linkButton(
  * @param baseClass optional CSS class that should be applied to the icon element
  * @param content a lambda expression for setting up the icon component
  *
- * @sample org.patternfly.ButtonSample.buttonIcon
- * @sample org.patternfly.ButtonSample.justIcon
+ * @sample org.patternfly.sample.ButtonSample.buttonIcon
+ * @sample org.patternfly.sample.ButtonSample.justIcon
  */
 public fun ButtonLike.buttonIcon(
     iconPosition: IconPosition,
@@ -98,7 +98,7 @@ public interface ButtonLike : RenderContext
  *
  * A button is a box area or text that communicates and triggers user actions when clicked or selected.
  *
- * @sample org.patternfly.ButtonSample.pushButton
+ * @sample org.patternfly.sample.ButtonSample.pushButton
  */
 public class PushButton internal constructor(
     variations: Array<out ButtonVariation>,
@@ -121,7 +121,7 @@ public class PushButton internal constructor(
  *
  * Links buttons are labeled buttons with no background or border.
  *
- * @sample org.patternfly.ButtonSample.linkButton
+ * @sample org.patternfly.sample.ButtonSample.linkButton
  */
 public class LinkButton internal constructor(
     variations: Array<out ButtonVariation>,
@@ -142,7 +142,7 @@ public class LinkButton internal constructor(
 /**
  * Container for an icon inside a [PushButton] or [LinkButton]. The container controls a margin between the icon and the button text depending on the value of [IconPosition].
  *
- * @sample org.patternfly.ButtonSample.buttonIcon
+ * @sample org.patternfly.sample.ButtonSample.buttonIcon
  */
 public class ButtonIcon internal constructor(
     iconPosition: IconPosition,

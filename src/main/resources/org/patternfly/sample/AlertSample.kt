@@ -1,16 +1,22 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation.inline
 import org.patternfly.ButtonVariation.link
+import org.patternfly.Notification
 import org.patternfly.Severity.DANGER
 import org.patternfly.Severity.INFO
 import org.patternfly.Severity.SUCCESS
 import org.patternfly.Severity.WARNING
+import org.patternfly.alert
+import org.patternfly.alertActions
+import org.patternfly.alertDescription
+import org.patternfly.alertGroup
+import org.patternfly.pushButton
 
 internal interface AlertSample {
 
-    fun alert() {
+    fun standaloneAlert() {
         render {
             alert(INFO, "Alert title") {
                 alertDescription { +"Lorem ipsum dolor sit amet." }
@@ -22,7 +28,7 @@ internal interface AlertSample {
         }
     }
 
-    fun alertGroup() {
+    fun inlineAlertGroup() {
         render {
             alertGroup {
                 alert(INFO, "Just saying.", inline = true)

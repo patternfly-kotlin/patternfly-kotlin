@@ -38,7 +38,7 @@ public fun RenderContext.badge(
  *
  * If the badge value is numeric, the value is adjusted so that it is within the bounds of [min] and [max].
  *
- * @sample org.patternfly.BadgeSample.badge
+ * @sample org.patternfly.sample.BadgeSample.badge
  */
 public class Badge internal constructor(
     private val min: Int,

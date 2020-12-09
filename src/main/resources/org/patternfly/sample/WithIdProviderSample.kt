@@ -1,8 +1,12 @@
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.dom.Id
 import dev.fritz2.lenses.IdProvider
+import org.patternfly.ItemStore
+import org.patternfly.dataList
+import org.patternfly.dataListItem
+import org.patternfly.dataListRow
 
 internal interface WithIdProviderSample {
 

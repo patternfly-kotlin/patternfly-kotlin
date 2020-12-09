@@ -1,10 +1,23 @@
 @file:Suppress("DuplicatedCode")
 
-package org.patternfly
+package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
+import org.patternfly.ItemStore
+import org.patternfly.Notification
+import org.patternfly.dataList
+import org.patternfly.dataListAction
+import org.patternfly.dataListCell
+import org.patternfly.dataListCheck
+import org.patternfly.dataListContent
+import org.patternfly.dataListControl
+import org.patternfly.dataListExpandableContent
+import org.patternfly.dataListItem
+import org.patternfly.dataListRow
+import org.patternfly.dataListToggle
+import org.patternfly.pushButton
 
 internal interface DataListSample {
 
