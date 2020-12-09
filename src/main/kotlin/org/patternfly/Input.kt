@@ -2,7 +2,6 @@ package org.patternfly
 
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.Input
-import dev.fritz2.elemento.debug
 import kotlinx.coroutines.flow.Flow
 
 public fun Input.triState(value: TriState) {

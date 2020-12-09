@@ -3,7 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import dev.fritz2.elemento.aria
+import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.HTMLElement

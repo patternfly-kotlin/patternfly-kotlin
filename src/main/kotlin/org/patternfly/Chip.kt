@@ -5,12 +5,11 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
-import dev.fritz2.elemento.By
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.querySelector
-import dev.fritz2.elemento.removeFromParent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
@@ -70,7 +69,6 @@ public fun Chip.badge(
  *
  * @sample org.patternfly.ChipSample.chip
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,

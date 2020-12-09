@@ -9,10 +9,10 @@ import dev.fritz2.dom.html.Td
 import dev.fritz2.dom.html.Th
 import dev.fritz2.dom.html.Tr
 import dev.fritz2.dom.states
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.debug
-import dev.fritz2.elemento.plusAssign
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.debug
+import org.patternfly.dom.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map

@@ -9,12 +9,11 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.isInView
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.isInView
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -62,7 +61,6 @@ public fun <T> TabItemsBuilder<T>.tabItem(
 
 // ------------------------------------------------------ tag
 
-@OptIn(ExperimentalCoroutinesApi::class)
 public class Tabs<T> internal constructor(
     public val store: TabStore<T>,
     public val box: Boolean,

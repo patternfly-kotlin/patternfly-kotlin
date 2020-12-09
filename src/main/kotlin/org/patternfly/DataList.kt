@@ -6,10 +6,10 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
-import dev.fritz2.elemento.By
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.closest
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.closest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map

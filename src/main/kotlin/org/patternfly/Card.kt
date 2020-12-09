@@ -6,7 +6,7 @@ import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
-import dev.fritz2.elemento.aria
+import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLDivElement

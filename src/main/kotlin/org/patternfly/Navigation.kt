@@ -4,10 +4,10 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import dev.fritz2.elemento.By
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.querySelector
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.querySelector
 import dev.fritz2.routing.Router
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope

@@ -1,7 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.render
-import dev.fritz2.elemento.Id
+import org.patternfly.dom.Id
 import dev.fritz2.lenses.IdProvider
 
 internal interface WithIdProviderSample {

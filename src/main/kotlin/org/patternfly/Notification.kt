@@ -4,7 +4,7 @@ import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.elemento.aria
+import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

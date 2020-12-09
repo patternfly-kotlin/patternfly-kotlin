@@ -3,8 +3,8 @@ package org.patternfly
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
-import dev.fritz2.elemento.minusAssign
-import dev.fritz2.elemento.plusAssign
+import org.patternfly.dom.minusAssign
+import org.patternfly.dom.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

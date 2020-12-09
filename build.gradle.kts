@@ -3,6 +3,7 @@ import java.net.URL
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
+    id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
 }
 
@@ -19,16 +20,17 @@ repositories {
 
 dependencies {
     fritz2()
-    implementation(Dependencies.elemento)
     kotest()
 }
 
 kotlin {
     js {
         explicitApi()
-        compilations.named("main") {
-            kotlinOptions {
-                freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+        sourceSets {
+            named("main") {
+                languageSettings.apply {
+                    useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                }
             }
         }
         browser {

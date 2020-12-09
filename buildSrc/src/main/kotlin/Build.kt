@@ -3,7 +3,7 @@ import org.gradle.api.publish.maven.MavenPom
 
 object Constants {
     const val group = "org.patternfly"
-    const val version = "0.0.5"
+    const val version = "0.1.0"
 }
 
 object PluginVersions {
@@ -12,13 +12,8 @@ object PluginVersions {
 }
 
 object Versions {
-    const val fritz2 = "0.9-SNAPSHOT"
-    const val elemento = "0.0.5"
-    const val kotest = "4.3.0"
-}
-
-object Dependencies {
-    const val elemento = "dev.fritz2:elemento:${Versions.elemento}"
+    const val fritz2 = "0.8"
+    const val kotest = "4.3.1"
 }
 
 fun DependencyHandler.fritz2() {
@@ -47,7 +42,7 @@ fun MavenPom.defaultPom() {
             id.set("hpehl")
             name.set("Harald Pehl")
             organization.set("Red Hat")
-            organizationUrl.set("http://www.redhat.com")
+            organizationUrl.set("https://developers.redhat.com/")
         }
     }
     scm {

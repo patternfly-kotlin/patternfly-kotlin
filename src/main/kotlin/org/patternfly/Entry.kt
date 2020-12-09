@@ -1,7 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Span
-import dev.fritz2.elemento.Id
+import org.patternfly.dom.Id
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -7,14 +7,13 @@ import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.renderElement
-import dev.fritz2.elemento.By
-import dev.fritz2.elemento.Id
-import dev.fritz2.elemento.aria
-import dev.fritz2.elemento.matches
-import dev.fritz2.elemento.querySelector
-import dev.fritz2.elemento.removeFromParent
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.matches
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
 import kotlinx.browser.window
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
@@ -195,7 +194,6 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
  *
  * @sample org.patternfly.AlertSample.alert
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 public class Alert internal constructor(
     private val severity: Severity,
     private val text: String,
