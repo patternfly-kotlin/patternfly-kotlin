@@ -1,5 +1,6 @@
 import org.jetbrains.dokka.Platform
 import java.net.URL
+import java.util.Date
 
 plugins {
     kotlin("js") version PluginVersions.js
@@ -90,12 +91,42 @@ tasks.dokkaHtml.configure {
 
 publishing {
     publications {
-        create<MavenPublication>("kotlin") {
+        create<MavenPublication>("maven") {
+            groupId = Constants.group
+            artifactId = Constants.name
+            version = Constants.version
             from(components["kotlin"])
             artifact(tasks["sourcesJar"])
             pom {
                 defaultPom()
             }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
+    publish = true
+    setPublications("maven")
+
+    pkg.apply {
+        repo = Constants.name
+        name = Constants.name
+        desc = Constants.description
+        userOrg = System.getenv("BINTRAY_ORG")
+        githubRepo = Constants.githubRepo
+        vcsUrl = "https://github.com/${Constants.githubRepo}.git"
+        websiteUrl = "https://github.com/${Constants.githubRepo}"
+        issueTrackerUrl = "https://github.com/${Constants.githubRepo}/issues"
+        setLabels("kotlin", "kotlin-js", "patternfly", "reactive", "fritz2")
+        setLicenses(Constants.license)
+
+        version.apply {
+            name = Constants.version
+            released = Date().toString()
+            vcsTag = Constants.version
+            vcsUrl = "https://github.com/${Constants.githubRepo}/releases/tag/${Constants.version}"
         }
     }
 }

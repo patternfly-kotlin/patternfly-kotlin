@@ -3,7 +3,11 @@ import org.gradle.api.publish.maven.MavenPom
 
 object Constants {
     const val group = "org.patternfly"
+    const val name = "patternfly-fritz2"
     const val version = "0.1.0"
+    const val description = "Kotlin implementation of PatternFly 4 based on fritz2"
+    const val license = "Apache-2.0"
+    const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
 }
 
 object PluginVersions {
@@ -37,11 +41,11 @@ fun DependencyHandler.orchid() {
 
 fun MavenPom.defaultPom() {
     name.set("patternfly-fritz2")
-    description.set("Kotlin implementation of PatternFly 4 based on fritz2")
-    url.set("https://github.com/patternfly-kotlin/patternfly-fritz2")
+    description.set(Constants.description)
+    url.set("https://github.com/${Constants.githubRepo}")
     licenses {
         license {
-            name.set("Apache-2.0")
+            name.set(Constants.license)
             url.set("https://opensource.org/licenses/Apache-2.0")
         }
     }
@@ -54,8 +58,11 @@ fun MavenPom.defaultPom() {
         }
     }
     scm {
-        url.set("https://github.com/patternfly-kotlin/patternfly-fritz2.git")
-        connection.set("scm:git:git://github.com/patternfly-kotlin/patternfly-fritz2.git")
-        developerConnection.set("scm:git:git://github.com/patternfly-kotlin/patternfly-fritz2.git")
+        url.set("https://github.com/${Constants.githubRepo}.git")
+        connection.set("scm:git:git://github.com/${Constants.githubRepo}.git")
+        developerConnection.set("scm:git:git://github.com/#${Constants.githubRepo}.git")
+    }
+    issueManagement {
+        url.set("https://github.com/${Constants.githubRepo}/issues")
     }
 }
