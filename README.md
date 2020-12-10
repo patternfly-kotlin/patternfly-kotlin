@@ -4,7 +4,7 @@ PatternFly Fritz2 is a [Kotlin/JS](https://kotl.in/js) implementation of [Patter
 
 The goal of this project is to provide all components of PatternFly in Kotlin. This is done in a way so that it matches the reactive nature of fritz2. In particular, the components build on stores, handlers, and other elements from the fritz2 API.
 
-To get a quick overview what this is all about head over to the PatternFly Fritz2 [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/).
+To get a quick overview what this is all about head over to the PatternFly Fritz2 [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). To get all details about how to use PatternFly Fritz2 take a look to the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/).
 
 ## Get Started
 
@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.130-kotlin-1.4.21")
     implementation("org.patternfly:patternfly-fritz2:0.1.0")
     implementation(npm("@patternfly/patternfly", "4"))
 }
@@ -30,11 +31,12 @@ fun main() {
 }
 ```
 
-## API
+## Usage
 
-The API documentation for PatternFly Fritz2 is available at 
+Most components are created using functions that takes parameters and return the component class. The functions act as a factory which integrates in the fritz2 DSL. The parameters passed to the factory functions follow a common pattern:
 
-### Factory Functions
-
-### Stores
+1. Parameter(s) specific to the component
+2. ID: ID attribute assigned to the component
+3. base class: CSS class(es) assigned to the component
+4. code block: Code to customize the component
 
