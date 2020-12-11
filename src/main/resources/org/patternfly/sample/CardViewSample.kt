@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ItemStore
 import org.patternfly.card
-import org.patternfly.cardActions
+import org.patternfly.actions
 import org.patternfly.cardBody
 import org.patternfly.cardCheckbox
 import org.patternfly.cardHeader
@@ -27,7 +27,7 @@ internal interface CardViewSample {
                     card(demo) {
                         cardHeader {
                             cardTitle { +"Demo" }
-                            cardActions {
+                            actions {
                                 dropdown<String>(align = RIGHT) {
                                     kebabToggle()
                                     items {

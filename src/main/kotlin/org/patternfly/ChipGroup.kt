@@ -8,24 +8,23 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
-import org.patternfly.dom.By
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.plusAssign
-import org.patternfly.dom.querySelector
-import org.patternfly.dom.removeFromParent
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.plusAssign
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
@@ -180,12 +179,6 @@ public class ChipGroup<T> internal constructor(
                         this@ChipGroup.expanded.collapse(Unit)
                     }
                 }.launchIn(MainScope() + job)
-
-            (MainScope() + job).launch {
-                this@ChipGroup.store.data.filter { it.isEmpty() }.collect {
-                    domNode.removeFromParent()
-                }
-            }
         }
 
         if (closable) {
@@ -194,6 +187,15 @@ public class ChipGroup<T> internal constructor(
                     icon("times-circle".fas())
                     aria["label"] = "Close chip group"
                     domNode.addEventListener(Events.click.name, this@ChipGroup::close)
+                }
+            }
+        }
+
+        (MainScope() + job).launch {
+            this@ChipGroup.store.remove.collect {
+                // The item is emitted before it is removed, so check for size == 1
+                if (this@ChipGroup.store.current.size == 1) {
+                    domNode.removeFromParent()
                 }
             }
         }
@@ -214,7 +216,7 @@ public class ChipGroup<T> internal constructor(
 
     override fun delegate(): HTMLSpanElement {
         if (textElement == null) {
-            val textId = Id.unique("cgl")
+            val textId = Id.unique("cgt")
             textElement = Span(id = textId, baseClass = "chip-group".component("label"), job).apply {
                 aria["hidden"] = true
             }

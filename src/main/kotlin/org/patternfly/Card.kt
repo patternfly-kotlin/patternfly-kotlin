@@ -78,28 +78,13 @@ public fun <T> Card<T>.cardHeader(
 ): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [CardHeaderMain] container inside the [CardHeader]. Use this function if you want to add images or other none-text like elements to the header.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.CardSample.cardHeaderMain
- */
-public fun <T> CardHeader<T>.cardHeaderMain(
-    id: String? = null,
-    baseClass: String? = null,
-    content: CardHeaderMain<T>.() -> Unit = {}
-): CardHeaderMain<T> = register(CardHeaderMain(this.itemStore, id = id, baseClass = baseClass, job), content)
-
-/**
  * Creates the [CardActions] container inside the [CardHeader]. Use this function to group actions in the header.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun <T> CardHeader<T>.cardActions(
+public fun <T> CardHeader<T>.actions(
     id: String? = null,
     baseClass: String? = null,
     content: CardActions<T>.() -> Unit = {}
@@ -270,19 +255,6 @@ public class CardHeader<T> internal constructor(
     job: Job
 ) : WithIdProvider<T> by itemStore,
     Div(id = id, baseClass = classes("card".component("header"), baseClass), job)
-
-/**
- * A container in the [CardHeader] used to to add images or other none-text like elements to the header.
- *
- * @sample org.patternfly.sample.CardSample.cardHeaderMain
- */
-public class CardHeaderMain<T> internal constructor(
-    itemStore: ItemStore<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : WithIdProvider<T> by itemStore,
-    Div(id = id, baseClass = classes("card".component("header", "main"), baseClass), job)
 
 /**
  * A container to group actions in the [CardHeader].

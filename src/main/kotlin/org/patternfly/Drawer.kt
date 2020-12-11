@@ -83,7 +83,7 @@ public fun DrawerPanel.drawerBodyWithClose(
 ): DrawerBody = register(DrawerBody(this.drawer, id = id, baseClass = baseClass, job), {
     it.drawerHead {
         content(this)
-        drawerActions {
+        actions {
             drawerClose()
         }
     }
@@ -135,7 +135,7 @@ public fun DrawerBody.drawerHead(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun DrawerHead.drawerActions(
+public fun DrawerHead.actions(
     id: String? = null,
     baseClass: String? = null,
     content: DrawerActions.() -> Unit = {}

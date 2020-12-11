@@ -5,12 +5,11 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.card
-import org.patternfly.cardActions
+import org.patternfly.actions
 import org.patternfly.cardBody
 import org.patternfly.cardCheckbox
 import org.patternfly.cardFooter
 import org.patternfly.cardHeader
-import org.patternfly.cardHeaderMain
 import org.patternfly.cardTitle
 import org.patternfly.dropdown
 import org.patternfly.item
@@ -24,10 +23,8 @@ internal interface CardSample {
         render {
             card {
                 cardHeader {
-                    cardHeaderMain {
-                        img { src("./logo.svg") }
-                    }
-                    cardActions {
+                    img { src("./logo.svg") }
+                    actions {
                         dropdown<String>(align = RIGHT) {
                             kebabToggle()
                             items {
@@ -53,9 +50,7 @@ internal interface CardSample {
         render {
             card {
                 cardHeader {
-                    cardHeaderMain {
-                        img { src("./logo.svg") }
-                    }
+                    img { src("./logo.svg") }
                 }
                 cardTitle { +"Title" }
                 cardBody { +"Body" }
@@ -68,7 +63,7 @@ internal interface CardSample {
         render {
             card {
                 cardHeader {
-                    cardActions {
+                    actions {
                         dropdown<String>(align = RIGHT) {
                             kebabToggle()
                             items {

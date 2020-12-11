@@ -51,11 +51,10 @@ public fun Chip.badge(
     baseClass: String? = null,
     content: Badge.() -> Unit = {}
 ) {
-    domNode.querySelector(By.classname("chip".component("text")))?.let {
-        it.parentElement?.insertBefore(
-            register(Badge(min, max, id = id, baseClass = baseClass, job), content).domNode, it.nextElementSibling
-        )
-    }
+    domNode.querySelector(By.classname("chip".component("text")))
+        ?.appendChild(register(Badge(min, max, id = id, baseClass = baseClass, job).also {
+            it.read(true)
+        }, content).domNode)
 }
 
 // ------------------------------------------------------ tag
