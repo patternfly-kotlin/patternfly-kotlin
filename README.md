@@ -117,3 +117,7 @@ fun main() {
 ```
 
 To see more components in action, take a look at the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). Read the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) to learn how to use the various components.
+
+## Feedback
+
+PatternFly Fritz2 is heavily under development. So the API might change and things might not work as expected. Please give feedback and report any [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) you come across.

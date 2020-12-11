@@ -56,7 +56,8 @@ public fun <T> OptionsMenu<T>.optionsMenuItems(
     block: ItemsBuilder<T>.() -> Unit = {}
 ): OptionsMenuEntries<HTMLUListElement, T> {
     val element = this.register(
-        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass, job), {})
+        OptionsMenuEntries<HTMLUListElement, T>(this, "ul", id = id, baseClass = baseClass, job), {}
+    )
     this.store.update(ItemsBuilder<T>().apply(block).build())
     return element
 }
