@@ -44,7 +44,7 @@ Most PatternFly components are implemented by Kotlin classes and provide factory
 1. base class: CSS class(es) assigned to the component
 1. code block: Code to customize the component
 
-Most of the parameters are optional or have reasonable defaults. 
+Most of the parameters are optional or have reasonable defaults.
 
 Let's take the [card](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-card/index.html) component as an example. The following code snippet creates a card component with an image and a dropdown in the header, a title, body and footer. See also the card section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=card). 
 
