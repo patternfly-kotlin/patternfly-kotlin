@@ -40,11 +40,11 @@ fun main() {
 Most PatternFly components are implemented by Kotlin classes and provide factory functions to create them. These functions integrate in the fritz2 DSL and follow a common signature:
 
 1. Parameter(s) specific to the component
-1. ID: ID attribute assigned to the component
-1. base class: CSS class(es) assigned to the component
-1. code block: Code to customize the component
+1. `id: String? = null` ID attribute assigned to the component
+1. `baseClass: String? = null` CSS class(es) added to the list of classes of the component
+1. `content` code block to customize the component
 
-Most of the parameters are optional or have reasonable defaults.
+Most of the parameters are optional and have reasonable defaults.
 
 Let's take the [card](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-card/index.html) component as an example. The following code snippet creates a card component with an image and a dropdown in the header, a title, body and footer. See also the card section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=card). 
 
