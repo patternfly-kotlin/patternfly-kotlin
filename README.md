@@ -80,16 +80,20 @@ Whenever possible, the components make use of reactive concepts and classes such
 fun main() {
     data class Word(val text: String, val letters: Int = text.length)
 
-    val store = ChipGroupStore<Word>()
-    store.addAll(
-        listOf(
-            Word("Chip one"),
-            Word("Really long chip that goes on and on"),
-            Word("Chip three"),
-            Word("Chip four"),
-            Word("Chip five")
+    val store = ChipGroupStore<Word> { Id.build(it.text) }.apply {
+        addAll(
+            listOf(
+                Word("Chip one"),
+                Word("Really long chip that goes on and on"),
+                Word("Chip three"),
+                Word("Chip four"),
+                Word("Chip five")
+            )
         )
-    )
+        remove handledBy Notification.add { word ->
+            info("You removed ${word?.text}.")
+        }
+    }
 
     render {
         chipGroup(store) {
