@@ -1,5 +1,5 @@
 ---
-name: Build and Publish API Documentation
+name: api-doc
 
 on:
   push:
