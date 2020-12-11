@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>chips</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+<script src="https://unpkg.com/kotlin-playground@1" data-selector="code.runnablesample"></script>    <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+    <link href="../../styles/style.css" rel="Stylesheet">
+    <link href="../../styles/logo-styles.css" rel="Stylesheet">
+    <link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
+    <link href="../../styles/main.css" rel="Stylesheet">
+    <script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/main.js" async="async"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="logo"></div>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+        <script type="text/javascript" src="../../scripts/pages.js"></script>
+        <script type="text/javascript" src="../../scripts/main.js"></script>
+        <div class="main-content" id="content" pageIds="org.patternfly//chips/org.patternfly.ChipGroup[TypeParam(bounds=[kotlin.Any?])]#kotlin.Array[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//-761621740">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../index.html">patternfly-fritz2</a>/<a href="index.html">org.patternfly</a>/<a href="chips.html">chips</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>chips</span></h1>
+          </div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="chips.html">T</a>&gt; <a href="-chip-group/index.html">ChipGroup</a>&lt;<a href="chips.html">T</a>&gt;.<a href="chips.html">chips</a>(vararg chips: <a href="chips.html">T</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Adds the specified items to the <a href="-chip-group-store/index.html">ChipGroupStore</a>. The items are displayed according to the <a href="-chip-group/display.html">ChipGroup.display</a> function.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
+import org.patternfly.ChipGroupStore
+import org.patternfly.Notification
+import org.patternfly.chipGroup
+import org.patternfly.chips
+import org.patternfly.chip
+fun main() { 
+   //sampleStart 
+   render {
+    chipGroup&lt;String&gt; {
+        +&quot;Vararg demo&quot;
+        chips(&quot;Foo&quot;, &quot;Bar&quot;)
+    }
+} 
+   //sampleEnd
+}</pre></code></div></div></div></div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="chips.html">T</a>&gt; <a href="-chip-group/index.html">ChipGroup</a>&lt;<a href="chips.html">T</a>&gt;.<a href="chips.html">chips</a>(chips: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="chips.html">T</a>&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Adds the specified items to the <a href="-chip-group-store/index.html">ChipGroupStore</a>. The items are displayed according to the <a href="-chip-group/display.html">ChipGroup.display</a> function.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
+import org.patternfly.ChipGroupStore
+import org.patternfly.Notification
+import org.patternfly.chipGroup
+import org.patternfly.chips
+import org.patternfly.chip
+fun main() { 
+   //sampleStart 
+   render {
+    chipGroup&lt;String&gt; {
+        +&quot;List demo&quot;
+        chips(listOf(&quot;Foo&quot;, &quot;Bar&quot;))
+    }
+} 
+   //sampleEnd
+}</pre></code></div></div></div></div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="chips.html">T</a>&gt; <a href="-chip-group/index.html">ChipGroup</a>&lt;<a href="chips.html">T</a>&gt;.<a href="chips.html">chips</a>(block: <a href="-chips-builder/index.html">ChipsBuilder</a>&lt;<a href="chips.html">T</a>&gt;.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Adds the specified items to the <a href="-chip-group-store/index.html">ChipGroupStore</a>. The items are displayed according to the <a href="-chip-group/display.html">ChipGroup.display</a> function.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
+import org.patternfly.ChipGroupStore
+import org.patternfly.Notification
+import org.patternfly.chipGroup
+import org.patternfly.chips
+import org.patternfly.chip
+fun main() { 
+   //sampleStart 
+   render {
+    chipGroup&lt;String&gt; {
+        +&quot;Builder demo&quot;
+        chips {
+            +&quot;Foo&quot;
+            add(&quot;Bar&quot;)
+        }
+    }
+} 
+   //sampleEnd
+}</pre></code></div></div></div></div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2020 Copyright</span><span class="pull-right"><span>Sponsored and developed by dokka</span><a href="https://github.com/Kotlin/dokka"><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
