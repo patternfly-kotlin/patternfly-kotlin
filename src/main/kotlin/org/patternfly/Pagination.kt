@@ -71,9 +71,7 @@ public class Pagination internal constructor(
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
         optionsMenu = optionsMenu {
-            display = {
-                { +"${it.item} per page" }
-            }
+            display = { +"${it.item} per page" }
             optionsMenuTogglePlain {
                 content = { this@Pagination.pageInfoFlow.showRange().invoke(this) }
             }

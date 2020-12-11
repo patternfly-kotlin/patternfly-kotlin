@@ -9,9 +9,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.isInView
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
 import kotlinx.coroutines.Job
@@ -19,6 +16,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.isInView
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLUListElement
@@ -73,8 +73,8 @@ public class Tabs<T> internal constructor(
 
     private val scrollStore = ScrollButtonStore()
     private lateinit var tabs: Ul
-    internal lateinit var tabDisplay: OldComponentDisplay<Span, T>
-    internal var contentDisplay: OldComponentDisplay<TabContent<T>, T>? = null
+    internal lateinit var tabDisplay: ComponentDisplay<Span, T>
+    internal var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
 
     init {
         markAs(ComponentType.Tabs)
@@ -118,8 +118,7 @@ public class Tabs<T> internal constructor(
                                 }
                             }
                             span(baseClass = "tabs".component("item", "text")) {
-                                val content = this@Tabs.tabDisplay(tab.item)
-                                content(this)
+                                this@Tabs.tabDisplay(this, tab.item)
                             }
                         }
                     }
@@ -143,10 +142,7 @@ public class Tabs<T> internal constructor(
                     if (!tab.selected) {
                         it.attr("hidden", "")
                     }
-                    contentDisplay?.let { display ->
-                        val content = display.invoke(it.item)
-                        content.invoke(it)
-                    }
+                    contentDisplay?.invoke(it, it.item)
                     tab.content(it)
                 })
             }
@@ -280,11 +276,9 @@ public class TabItem<T>(
 public class TabItemsBuilder<T> internal constructor(private val tabs: Tabs<T>) {
     internal val tabItems: MutableList<TabItem<T>> = mutableListOf()
 
-    public var itemDisplay: OldComponentDisplay<Span, T> = {
-        { +it.toString() }
-    }
+    public var itemDisplay: ComponentDisplay<Span, T> = { +it.toString() }
 
-    public var contentDisplay: OldComponentDisplay<TabContent<T>, T>? = null
+    public var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
 
     internal fun build(): List<TabItem<T>> {
         tabs.tabDisplay = itemDisplay

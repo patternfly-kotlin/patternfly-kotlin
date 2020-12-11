@@ -8,6 +8,11 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.render
 import dev.fritz2.dom.html.renderElement
+import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.dom.clear
 import org.patternfly.dom.By
 import org.patternfly.dom.aria
 import org.patternfly.dom.displayNone
@@ -16,11 +21,6 @@ import org.patternfly.dom.plusAssign
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.querySelectorAll
 import org.patternfly.dom.removeFromParent
-import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.dom.clear
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -37,7 +37,8 @@ public fun <T> RenderContext.treeView(
     baseClass: String? = null,
     content: TreeView<T>.() -> Unit = {}
 ): TreeView<T> = register(
-    TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job), content
+    TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job),
+    content
 )
 
 public fun <T> tree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
@@ -104,9 +105,7 @@ public class TreeView<T> internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
     private val ul: Ul
-    public var display: OldComponentDisplay<Span, T> = {
-        { +it.toString() }
-    }
+    public var display: ComponentDisplay<Span, T> = { +it.toString() }
     public var icons: TreeIconProvider<T>? = null
     public var fetchItems: (suspend (TreeItem<T>) -> List<TreeItem<T>>)? = null
 
@@ -173,8 +172,7 @@ public class TreeView<T> internal constructor(
                             }
                         }
                         span(baseClass = "tree-view".component("node", "text")) {
-                            val content = this@TreeView.display(treeItem.item)
-                            content(this)
+                            this@TreeView.display(this, treeItem.item)
                         }
                         if (this@TreeView.badges && treeItem.hasChildren) {
                             span(baseClass = "tree-view".component("node", "count")) {

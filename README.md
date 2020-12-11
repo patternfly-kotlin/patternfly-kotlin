@@ -46,7 +46,9 @@ Most PatternFly components are implemented by Kotlin classes and provide factory
 
 Most of the parameters are optional and have reasonable defaults.
 
-Let's take the [card](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-card/index.html) component as an example. The following code snippet creates a card component with an image and a dropdown in the header, a title, body and footer. See also the card section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=card). 
+Let's take the [card](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-card/index.html) component as an example. The following code snippet creates a card component with an image and a dropdown in the header, a title, body and footer. 
+
+See also the card section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=card). 
 
 ```kotlin
 fun main() {
@@ -74,7 +76,9 @@ fun main() {
 }
 ```
 
-Whenever possible, the components make use of reactive concepts and classes such as stores, handlers and flows. The following example creates a [chip group](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group/index.html) component whose [chips](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip/index.html) are backed by a [store](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group-store/index.html). The chips are rendered by a [display](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group/display.html) function which uses the number of letters to add a [badge](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-badge/index.html) component. See also the chip group section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=chip-group).
+Whenever possible, the components make use of reactive concepts and classes such as stores, handlers and flows. The following example creates a [chip group](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group/index.html) component whose [chips](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip/index.html) are backed by a [store](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group-store/index.html) and rendered by a [display](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-chip-group/display.html) function. The function uses the number of letters to add a [badge](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-badge/index.html) component to the chip. When a chip is removed from the group a info [notification](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-notification/index.html) is [added](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-notification/-companion/add.html) to the [notification store](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-notification-store/index.html) which in turn is fetched by the [toast alert group](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/add-toast-alert-group.html). 
+
+See also the chip group section in the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/#component;id=chip-group).
 
 ```kotlin
 fun main() {
@@ -95,6 +99,7 @@ fun main() {
         }
     }
 
+    document.addToastAlertGroup()
     render {
         chipGroup(store) {
             +"Letters"
@@ -111,4 +116,4 @@ fun main() {
 }
 ```
 
-See the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/) and the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) for more examples and how to use the various components.
+To see more components in action, take a look at the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). Read the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) to learn how to use the various components.

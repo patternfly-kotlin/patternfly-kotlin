@@ -9,6 +9,11 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.dom.clear
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -16,11 +21,6 @@ import org.patternfly.dom.debug
 import org.patternfly.dom.matches
 import org.patternfly.dom.minusAssign
 import org.patternfly.dom.plusAssign
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
-import kotlinx.dom.clear
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -93,10 +93,8 @@ public open class OptionsMenu<T> internal constructor(
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
 
-    public var display: OldComponentDisplay<Button, Item<T>> = {
-        {
-            +it.item.toString()
-        }
+    public var display: ComponentDisplay<Button, Item<T>> = {
+        +it.item.toString()
     }
 
     init {
@@ -294,7 +292,7 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                 domNode.classList += "disabled".modifier()
             }
             clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.select
-            this@OptionsMenuEntries.optionsMenu.display(item).invoke(this)
+            this@OptionsMenuEntries.optionsMenu.display(this, item)
             if (item.selected) {
                 span(baseClass = "options-menu".component("menu-item", "icon")) {
                     icon("check".fas())

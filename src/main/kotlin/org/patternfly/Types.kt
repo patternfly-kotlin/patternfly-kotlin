@@ -24,9 +24,6 @@ private const val COMPONENT_TYPE: String = "pfct"
  */
 public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
-@Deprecated("Please use ComponentDisplay", replaceWith = ReplaceWith("ComponentDisplay"))
-public typealias OldComponentDisplay<C, T> = (T) -> C.() -> Unit
-
 // ------------------------------------------------------ types
 
 internal fun <E : HTMLElement> PatternFlyComponent<E>.markAs(componentType: ComponentType) {

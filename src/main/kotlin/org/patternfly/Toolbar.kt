@@ -3,11 +3,11 @@ package org.patternfly
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.states
-import org.patternfly.dom.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -158,9 +158,7 @@ public class SortOptions<T> internal constructor(
 ) : OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, id = id, baseClass = baseClass, job) {
 
     init {
-        display = {
-            { +it.item.text }
-        }
+        display = { +it.item.text }
         optionsMenuToggle { icon = { icon("sort-amount-down".fas()) } }
         optionsMenuGroups {
             group {
