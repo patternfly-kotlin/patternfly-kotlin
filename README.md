@@ -1,10 +1,14 @@
+![Bintray](https://img.shields.io/bintray/v/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/)
+
 # PatternFly Fritz2
 
 PatternFly Fritz2 is a [Kotlin/JS](https://kotl.in/js) implementation of [PatternFly](https://www.org.patternfly.org/) based on [fritz2](https://www.fritz2.dev/). 
 
-The goal of this project is to provide all components of PatternFly in Kotlin. This is done in a way so that it matches the reactive nature of fritz2. In particular, the components build on stores, handlers, and other elements from the fritz2 API.
+The goal of this project is to provide all components of PatternFly in Kotlin. This is done in a way that matches the reactive nature of fritz2. In particular, the components use stores, handlers, and other elements from the fritz2 API.
 
-To get a quick overview what this is all about head over to the PatternFly Fritz2 [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). To get all details about how to use PatternFly Fritz2 take a look to the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/).
+To get a quick overview what this is all about head over to the PatternFly Fritz2 [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). It demonstrates the usage of all supported components and also includes more complex demos of data driven components such as card view, data list and data tables. 
+
+To get all details about how to use PatternFly Fritz2 take a look at the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/).
 
 ## Get Started
 
