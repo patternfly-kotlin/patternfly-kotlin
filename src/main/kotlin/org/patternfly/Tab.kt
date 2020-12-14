@@ -104,7 +104,7 @@ public class Tabs<T> internal constructor(
                     .filterNotNull()
                     .handledBy(this@Tabs.scrollStore.update)
 
-                this@Tabs.store.data.renderEach({ this@Tabs.selectId(it) }, { tab ->
+                this@Tabs.store.data.renderEach({ this@Tabs.selectId(it) }) { tab ->
                     li(baseClass = classes {
                         +"tabs".component("item")
                         +("current".modifier() `when` tab.selected)
@@ -122,7 +122,7 @@ public class Tabs<T> internal constructor(
                             }
                         }
                     }
-                })
+                }
             }
             button(baseClass = "tabs".component("scroll", "button")) {
                 aria["label"] = "Scroll right"

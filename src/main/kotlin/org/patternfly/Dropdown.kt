@@ -55,7 +55,7 @@ public fun <T> RenderContext.dropdown(
 ): Dropdown<T> = register(Dropdown(store, grouped, align, up, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a text toggle.
+ * Creates a text toggle. Specify the text using the [content] function.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the text toggle
@@ -71,7 +71,7 @@ public fun <T> Dropdown<T>.textToggle(
 }
 
 /**
- * Creates an icon toggle.
+ * Creates an icon toggle. Use the [content] function to setup the icon.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the icon toggle
@@ -96,7 +96,7 @@ public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
 }
 
 /**
- * Creates a [CheckboxToggle].
+ * Creates a [CheckboxToggle]. A checkbox toggle can contain optional text.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the checkbox toggle
@@ -104,11 +104,11 @@ public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
  * @sample org.patternfly.sample.DropdownSample.checkboxToggle
  */
 public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: CheckboxToggle.() -> Unit = {}) {
-    assignToggle(CheckboxToggleContainer(this, baseClass, job, content))
+    assignToggle(InternalCheckboxToggle(this, baseClass, job, content))
 }
 
 /**
- * Creates an action toggle and returns a [Listener] (basically a [Flow]) in order to combine the button declaration directly to a fitting _handler_.
+ * Creates an action toggle and returns a [Listener] (basically a [Flow]) in order to combine the button of the action toggle declaration directly to a fitting handler.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the action toggle
@@ -125,7 +125,7 @@ public fun <T> Dropdown<T>.actionToggle(
 }
 
 /**
- * Creates a [CustomToggle]. Use this function if you want to have full control over the layout of the toggle.
+ * Creates a [CustomToggle]. Use this function if you want to have full control over the layout of the toggle. You can use one of the `toggleXyz()` functions to add specific content.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the custom toggle
@@ -142,7 +142,7 @@ public fun <T> Dropdown<T>.customToggle(
 }
 
 /**
- * Creates an image container inside a [CustomToggle].
+ * Creates an container for the image inside a [CustomToggle] component.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the image container
@@ -151,7 +151,7 @@ public fun <T> CustomToggle<T>.toggleImage(baseClass: String? = null, content: S
     span(baseClass = classes("dropdown".component("toggle", "image"), baseClass), content = content)
 
 /**
- * Creates a text container inside a [CustomToggle].
+ * Creates a container for the text inside a [CustomToggle] component.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the text container
@@ -160,7 +160,7 @@ public fun <T> CustomToggle<T>.toggleText(baseClass: String? = null, content: Sp
     span(baseClass = classes("dropdown".component("toggle", "text"), baseClass), content = content)
 
 /**
- * Creates an container inside a [CustomToggle] containing an `icon("caret-down".fas())` icon.
+ * Creates a container inside a [CustomToggle] containing an `icon("caret-down".fas())` icon.
  *
  * @param baseClass optional CSS class that should be applied to the element
  */
@@ -171,6 +171,8 @@ public fun <T> CustomToggle<T>.toggleIcon(baseClass: String? = null): Span =
 
 /**
  * Starts a block to add flat dropdown items using the DSL.
+ *
+ * @sample org.patternfly.sample.DropdownSample.items
  */
 public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
     store.update(ItemsBuilder<T>().apply(block).build())
@@ -178,6 +180,8 @@ public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
 
 /**
  * Starts a block to add dropdown groups using the DSL.
+ *
+ * @sample org.patternfly.sample.DropdownSample.groups
  */
 public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
@@ -191,14 +195,14 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
 /**
  * PatternFly [dropdown](https://www.patternfly.org/v4/components/dropdown/design-guidelines) component.
  *
- * A dropdown presents a menu of actions or links in a constrained space that will trigger a process or navigate to a new location. A dropdown consists of a toggle control to open and close a menu of entries.
+ * A dropdown presents a menu of actions in a constrained space that will trigger a process or navigate to a new location. A dropdown consists of a toggle control to open and close a menu of [entries][Entry].
  *
  * You can choose between different toggle variations:
- * - text toggle
- * - icon toggle
- * - checkbox toggle
- * - action toggle
- * - custom toggle
+ * - [text toggle][TextToggle]
+ * - [icon toggle][IconToggle]
+ * - [checkbox toggle][CheckboxToggle]
+ * - [action toggle][ActionToggle]
+ * - [custom toggle][CustomToggle]
  *
  * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
  *
@@ -210,7 +214,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * By default the dropdown uses a builtin function to render the [Item]s in the [DropdownStore]. This function takes the [Item.icon] and the [Item.description] into account (if specified). It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
  *
- * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the wrapped items.
+ * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data inside the dropdown entries.
  *
  * @sample org.patternfly.sample.DropdownSample.dropdownDsl
  * @sample org.patternfly.sample.DropdownSample.dropdownStore
@@ -368,9 +372,8 @@ public class Dropdown<T> internal constructor(
             this.toggle = toggle
 
         } else {
-            console.warn("Reassignment of dropdown toggle not supported. Toggle for dropdown ${domNode.debug()} has already assigned been to ${this.toggle::class.simpleName}.")
+            console.warn("Reassignment of dropdown toggle in ${domNode.debug()} not supported. Toggle has already been assigned to ${this.toggle::class.simpleName}.")
         }
-
     }
 
     /**
@@ -381,7 +384,7 @@ public class Dropdown<T> internal constructor(
     }
 
     /**
-     * Sets a custom display function to render the dropdown entries.
+     * Sets a custom display function to render the data inside the dropdown entries.
      */
     public fun display(display: ComponentDisplay<Button, T>) {
         this.customDisplay = display
@@ -507,7 +510,7 @@ internal class IconToggle<T>(
     }
 }
 
-internal class CheckboxToggleContainer<T>(
+internal class InternalCheckboxToggle<T>(
     dropdown: Dropdown<T>,
     baseClass: String?,
     job: Job,
@@ -527,7 +530,7 @@ internal class CheckboxToggleContainer<T>(
         val inputId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
         label = label(baseClass = "dropdown".component("toggle", "check")) {
             `for`(inputId)
-            this@CheckboxToggleContainer.checkbox = input(id = inputId) {
+            this@InternalCheckboxToggle.checkbox = input(id = inputId) {
                 type("checkbox")
             }
         }
@@ -629,7 +632,7 @@ internal class ActionToggle<T>(
 }
 
 /**
- * Custom toggle of a [Dropdown] component. Allows full control over the content of the toggle. You can use one of the `toggle` function to add specific content.
+ * Custom toggle of a [Dropdown] component. Allows full control over the content of the toggle. You can use one of the `toggleXyz()` functions to add specific content.
  *
  * @sample org.patternfly.sample.DropdownSample.customToggle
  */

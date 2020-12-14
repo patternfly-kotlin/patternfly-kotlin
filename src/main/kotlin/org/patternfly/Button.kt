@@ -20,6 +20,8 @@ import org.w3c.dom.events.MouseEvent
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.ButtonSample.pushButton
  */
 public fun RenderContext.pushButton(
     vararg variations: ButtonVariation,
@@ -29,12 +31,13 @@ public fun RenderContext.pushButton(
 ): PushButton = register(PushButton(variations, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [PushButton] component and returns a [Listener] (basically a [Flow]) in order to combine the button declaration directly to a fitting _handler_.
+ * Creates a [PushButton] component and returns a [Listener] (basically a [Flow]) in order to combine the button declaration directly to a fitting handler.
  *
  * @param variations variations to control the visual representation of the button
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ * @return a listener for the click events to be consumed by a fitting handler
  *
  * @sample org.patternfly.sample.ButtonSample.clickButton
  */
@@ -59,6 +62,8 @@ public fun RenderContext.clickButton(
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.ButtonSample.linkButton
  */
 public fun RenderContext.linkButton(
     vararg variations: ButtonVariation,

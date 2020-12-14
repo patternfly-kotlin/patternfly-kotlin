@@ -9,10 +9,6 @@ import dev.fritz2.dom.html.Td
 import dev.fritz2.dom.html.Th
 import dev.fritz2.dom.html.Tr
 import dev.fritz2.dom.states
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.debug
-import org.patternfly.dom.plusAssign
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -20,6 +16,10 @@ import org.patternfly.ButtonVariation.plain
 import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.debug
+import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.set
 
@@ -60,7 +60,7 @@ public fun <T> DataTable<T>.dataTableCaption(
 ): DataTableCaption = register(DataTableCaption(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the builder for the columns. Please note that this does *not* create a visual container, but a builder for the DSL to add the columns.
+ * Creates the builder for the columns. Please note that this does **not** create visual components, but a builder for the DSL to add the columns.
  */
 public fun <T> DataTable<T>.dataTableColumns(block: Columns<T>.() -> Unit) {
     columns.apply(block)
@@ -121,7 +121,7 @@ public fun <T> Columns<T>.dataTableToggleColumn(
 }
 
 /**
- * Creates an [ActionColumn] to show buttons, dropdowns or other buttons or other action-like elements. Use this function multiple times for each action you want to add.
+ * Creates an [ActionColumn] to show buttons, dropdowns or other action-like elements. Use this function multiple times for each action you want to add.
  *
  * @param id the ID of the cell element
  * @param baseClass optional CSS class that should be applied to the cell element
@@ -148,7 +148,7 @@ private val RADIO_GROUP_NAME = Id.unique(ComponentType.DataTable.id, "radio")
  *
  * 1. [ToggleColumn]: Use this column *exactly once* to add an expandable row below each normal row. The column uses a display function to render the expandable content. If used this column should be the first column.
  * 1. [SelectColumn]: Use this column *exactly once* to add a checkbox or a radio button which you can use to select rows. If used this column should be should be placed after the toggle column and before the data columns.
- * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the data columns should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
  * 1. [ActionColumn]: Use this column *any number of times* to add buttons, dropdowns or other action-like elements. The column uses a display function for the cells. This column should be placed after the data columns.
  *
  * @sample org.patternfly.sample.DataTableSample.dataTable
@@ -222,7 +222,7 @@ public class DataTable<T> internal constructor(
                                         button(baseClass = "table".component("button")) {
                                             clicks.map { column.sortInfo!! } handledBy this@DataTable.itemStore.sortOrToggle
                                             span(baseClass = "table".component("text")) {
-                                                +column.text
+                                                +column.caption
                                             }
                                             span(baseClass = "table".component("sort", "indicator")) {
                                                 icon("arrows-alt-v".fas()) {
@@ -238,7 +238,7 @@ public class DataTable<T> internal constructor(
                                             }
                                         }
                                     } else {
-                                        +column.text
+                                        +column.caption
                                     }
                                 }
                             }
@@ -261,21 +261,18 @@ public class DataTable<T> internal constructor(
         } else {
             tbody {
                 attr("role", "rowgroup")
-                this@DataTable.itemStore.visible.renderEach(
-                    { this@DataTable.itemStore.idProvider(it) },
-                    { item ->
-                        tr {
-                            renderCells(this@DataTable, item, "", null)
-                        }
+                this@DataTable.itemStore.visible.renderEach({ this@DataTable.itemStore.idProvider(it) }) { item ->
+                    tr {
+                        renderCells(this@DataTable, item, "", null)
                     }
-                )
+                }
             }
         }
     }
 }
 
 /**
- * A container to add a caption above the data table.
+ * Component to add a caption above the [DataTable].
  */
 public class DataTableCaption internal constructor(id: String?, baseClass: String?, job: Job) :
     Caption(id = id, baseClass = baseClass, job)
@@ -389,7 +386,7 @@ internal fun <T> Tr.renderCells(
             is DataColumn<T> -> {
                 td {
                     attr("role", "cell")
-                    domNode.dataset["label"] = column.text
+                    domNode.dataset["label"] = column.caption
                     column.cellDisplay(this, item)
                 }
             }
@@ -426,9 +423,9 @@ internal fun <T> Td.renderExpandableContent(
 /**
  * Builder to add [Column]s when creating a [DataTable].
  *
- * This class is not related to a DOM element, but is used as a container in the DSL to add columns.
+ * This class is not related to a DOM element, but is used as a builder in the DSL to add columns.
  */
-public class Columns<T>(internal val dataTable: DataTable<T>) : Iterable<Column<T>> {
+public class Columns<T> internal constructor(internal val dataTable: DataTable<T>) : Iterable<Column<T>> {
     private val columns: MutableList<Column<T>> = mutableListOf()
 
     internal val hasToggle: Boolean
@@ -468,9 +465,11 @@ public sealed class Column<T>(
 /**
  * Column to show the actual data of an item in the [ItemStore]. Use this column any number of times to render the properties of the items.
  *
- * The column uses display functions for the header and cells. One of the data columns should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ * The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
  *
  * If you want to make the column sortable, use one of the `sortInfo()` function to specify a [Comparator].
+ *
+ * If you use a custom [headerDisplay], you have full control how the header should look like. However you have to render the controls & icons to sort the column by yourself. If you want to use the built in header display (which takes care of the sort controls & icons), but just need additional CSS classes use the [headerClass] function instead.
  *
  * @sample org.patternfly.sample.DataTableSample.dataColumns
  */
@@ -478,7 +477,7 @@ public class DataColumn<T>(
     columns: Columns<T>,
     id: String?,
     baseClass: String?,
-    internal val text: String
+    internal val caption: String
 ) : Column<T>(columns, id, baseClass), WithIdProvider<T> by columns.dataTable.itemStore {
 
     internal var cellDisplay: ComponentDisplay<Td, T> = { +it.toString() }

@@ -63,7 +63,7 @@ public fun RenderContext.alertGroup(
 ): AlertGroup = register(AlertGroup(false, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates an [Alert] component.
+ * Creates a standalone [Alert] component.
  *
  * @param severity the severity level
  * @param text the text of the alert
@@ -72,6 +72,8 @@ public fun RenderContext.alertGroup(
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.AlertSample.standaloneAlert
  */
 public fun RenderContext.alert(
     severity: Severity,
@@ -93,6 +95,8 @@ public fun RenderContext.alert(
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.AlertSample.inlineAlertGroup
  */
 public fun AlertGroup.alert(
     severity: Severity,

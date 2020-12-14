@@ -18,7 +18,7 @@ internal typealias CollapsePredicate = (Element) -> Boolean
 /**
  * Store to manage the collapsed and expanded state of various components like [Dropdown], [Drawer] or [OptionsMenu].
  *
- * A state of `false` means collapsed and `true` means expanded. The initial state is `false`.
+ * A state of `false` means collapsed and `true` means expanded. The initial state is `false` (collapsed).
  */
 public class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = null) :
     RootStore<Boolean>(false) {

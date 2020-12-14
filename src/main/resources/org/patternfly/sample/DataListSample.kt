@@ -10,7 +10,7 @@ import org.patternfly.Notification
 import org.patternfly.dataList
 import org.patternfly.dataListAction
 import org.patternfly.dataListCell
-import org.patternfly.dataListCheck
+import org.patternfly.dataListCheckbox
 import org.patternfly.dataListContent
 import org.patternfly.dataListControl
 import org.patternfly.dataListExpandableContent
@@ -32,7 +32,7 @@ internal interface DataListSample {
                         dataListRow {
                             dataListControl {
                                 dataListToggle()
-                                dataListCheck()
+                                dataListCheckbox()
                             }
                             dataListContent {
                                 dataListCell(id = itemId(demo)) {
@@ -72,7 +72,9 @@ internal interface DataListSample {
                             dataListControl { dataListToggle() }
                             dataListContent { dataListCell { +item } }
                         }
-                        dataListExpandableContent { +"More details about $item" }
+                        dataListExpandableContent {
+                            +"More details about $item"
+                        }
                     }
                 }
             }
@@ -92,7 +94,7 @@ internal interface DataListSample {
                 display { demo ->
                     dataListItem(demo) {
                         dataListRow {
-                            dataListControl { dataListCheck() }
+                            dataListControl { dataListCheckbox() }
                             dataListContent { dataListCell { +demo.name } }
                         }
                     }

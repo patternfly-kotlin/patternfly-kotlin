@@ -22,6 +22,8 @@ import org.w3c.dom.HTMLElement
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public fun <T> RenderContext.cardView(
     store: ItemStore<T> = ItemStore(),
@@ -38,6 +40,8 @@ public fun <T> RenderContext.cardView(
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public fun <T> CardView<T>.card(
     item: T,
@@ -56,6 +60,8 @@ public fun <T> CardView<T>.card(
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.CardSample.card
  */
 public fun RenderContext.card(
     selectable: Boolean = false,
@@ -65,7 +71,7 @@ public fun RenderContext.card(
 ): Card<Unit> = register(Card(ItemStore.NOOP, Unit, selectable, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [CardHeader] container inside a [Card] component. Use a header if you want to add images, actions or a checkbox to the card.
+ * Creates the [CardHeader] component inside a [Card] component. Use a header if you want to add images, actions or a checkbox to the card.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -78,27 +84,27 @@ public fun <T> Card<T>.cardHeader(
 ): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [CardActions] container inside the [CardHeader]. Use this function to group actions in the header.
+ * Creates the [CardAction] component inside the [CardHeader] component. Use this function to group actions in the header.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun <T> CardHeader<T>.actions(
+public fun <T> CardHeader<T>.cardAction(
     id: String? = null,
     baseClass: String? = null,
-    content: CardActions<T>.() -> Unit = {}
-): CardActions<T> =
-    register(CardActions(this.itemStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
+    content: CardAction<T>.() -> Unit = {}
+): CardAction<T> =
+    register(CardAction(this.itemStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [CardCheckbox] inside the [CardActions]. If the card is selectable, the checkbox is bound to the [Card.selected] store (when used standalone) or the [ItemStore] (when used as part of a [CardView]).
+ * Creates a [CardCheckbox] inside the [CardAction]. If the card is selectable, the checkbox is bound to the [Card.selected] store (when used standalone) or the [ItemStore] (when used as part of a [CardView]).
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun <T> CardActions<T>.cardCheckbox(
+public fun <T> CardAction<T>.cardCheckbox(
     id: String? = null,
     baseClass: String? = null,
     content: CardCheckbox<T>.() -> Unit = {}
@@ -136,7 +142,7 @@ public fun <T> Card<T>.cardTitle(
 ): CardTitle<T> = register(CardTitle(this.itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [CardBody] container inside a [Card] component. You can have multiple bodies in one card.
+ * Creates a [CardBody] component inside a [Card] component. You can have multiple bodies in one card.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -151,7 +157,7 @@ public fun <T> Card<T>.cardBody(
 ): CardBody<T> = register(CardBody(this.itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [CardFooter] container inside a [Card] component.
+ * Creates the [CardFooter] component inside a [Card] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -168,7 +174,9 @@ public fun <T> Card<T>.cardFooter(
 /**
  * PatternFly [card view](https://www.patternfly.org/v4/components/card/design-guidelines/#card-view-usage) component.
  *
- * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemStore] as [Card]s. One of the elements in the [display] should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemStore] as [Card]s.
+ *
+ * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the card components implement [WithIdProvider], this can be easily done using [WithIdProvider.itemId]. See the samples for more details.
  *
  * @param T the type which is used for the [Card]s in this card view.
  *
@@ -190,19 +198,47 @@ public class CardView<T> internal constructor(
     }
 
     /**
-     * Defines how to display the items in the [ItemStore] as [Card]s. Call this function *before* populating the store.
+     * Defines how to display the items in the [ItemStore] as [Card]s.
      */
     public fun display(display: (T) -> Card<T>) {
-        itemStore.visible.renderEach({ itemStore.idProvider(it) }, { item ->
-            display(item)
-        })
+        itemStore.visible.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
     }
 }
 
 /**
  * PatternFly [card](https://www.patternfly.org/v4/components/card/design-guidelines) component.
  *
- * A card can be used standalone or as part of a [CardView]. If used standalone and the card is [selectable], the card stores its selection state using the [selected] property. If the card is part of a [CardView], the selection is stored in the [ItemStore].
+ * A card can be used standalone or as part of a [CardView]. If used standalone and the card is created as [selectable], the card stores its selection state using the [selected] property. If the card is part of a [CardView], the selection is stored in the [ItemStore].
+ *
+ * A card contains nested components which make up the card itself. The [CardTitle] can be placed either in the [CardHeader] or in the [Card] itself. If used in the [CardHeader], make sure to add it **after** the [CardAction]. Besides the [CardCheckbox] the [CardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
+ *
+ * Most components should be used exactly once, except the [CardBody], which can be used multiple times.
+ *
+ * ```
+ * ┏━━━━━━━━━━━━━━ card: Card ━━━━━━━━━━━━━━┓
+ * ┃                                        ┃
+ * ┃ ┌────── cardHeader: CardHeader ──────┐ ┃
+ * ┃ │                                    │ ┃
+ * ┃ │ ┌──── cardAction: CardAction ────┐ │ ┃
+ * ┃ │ │ ┌────────────────────────────┐ │ │ ┃
+ * ┃ │ │ │ cardCheckbox: CardCheckbox │ │ │ ┃
+ * ┃ │ │ └────────────────────────────┘ │ │ ┃
+ * ┃ │ └────────────────────────────────┘ │ ┃
+ * ┃ │ ┌────────────────────────────────┐ │ ┃
+ * ┃ │ │      cardTitle: CardTitle      │ │ ┃
+ * ┃ │ └────────────────────────────────┘ │ ┃
+ * ┃ └────────────────────────────────────┘ ┃
+ * ┃ ┌────────────────────────────────────┐ ┃
+ * ┃ │        cardTitle: CardTitle        │ ┃
+ * ┃ └────────────────────────────────────┘ ┃
+ * ┃ ┌────────────────────────────────────┐ ┃
+ * ┃ │         cardBody: CardBody         │ ┃
+ * ┃ └────────────────────────────────────┘ ┃
+ * ┃ ┌────────────────────────────────────┐ ┃
+ * ┃ │       cardFooter: CardFooter       │ ┃
+ * ┃ └────────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ```
  *
  * @sample org.patternfly.sample.CardSample.card
  */
@@ -244,7 +280,7 @@ public class Card<T> internal constructor(
 }
 
 /**
- * The header container of a [Card].
+ * The header component of a [Card].
  */
 public class CardHeader<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -257,9 +293,9 @@ public class CardHeader<T> internal constructor(
     Div(id = id, baseClass = classes("card".component("header"), baseClass), job)
 
 /**
- * A container to group actions in the [CardHeader].
+ * A component to group actions in the [CardHeader]. Besides the [CardCheckbox] the [CardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
  */
-public class CardActions<T> internal constructor(
+public class CardAction<T> internal constructor(
     internal val itemStore: ItemStore<T>,
     internal val item: T,
     internal val card: Card<T>,
@@ -276,7 +312,7 @@ public class CardActions<T> internal constructor(
 }
 
 /**
- * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to the [Card.selected] store. If the card is part of a [CardView], the checkbox is bound to the selection state of the [ItemStore].
+ * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to a [CardStore]. If the card is part of a [CardView], the checkbox is bound to the selection state of the [ItemStore].
  */
 public class CardCheckbox<T> internal constructor(
     itemStore: ItemStore<T>,
@@ -301,7 +337,10 @@ public class CardCheckbox<T> internal constructor(
 }
 
 /**
- * The title of a [Card].
+ * The title of a [Card]. The title can be placed either in the [CardHeader] or in the [Card] itself. If used in the [CardHeader], make sure to add it **after** the [CardAction].
+ *
+ * @sample org.patternfly.sample.CardSample.cardTitleInHeader
+ * @sample org.patternfly.sample.CardSample.cardTitleInCard
  */
 public class CardTitle<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore, Div(id = id, baseClass = classes("card".component("title"), baseClass), job)
@@ -316,7 +355,7 @@ public class CardBody<T> internal constructor(itemStore: ItemStore<T>, id: Strin
 
 
 /**
- * The title of a [Card].
+ * The footer of a [Card].
  */
 public class CardFooter<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore, Div(id = id, baseClass = classes("card".component("footer"), baseClass), job)

@@ -1,3 +1,0 @@
-# Package org.patternfly
-
-Package documentation for `org.patternfly` pending...

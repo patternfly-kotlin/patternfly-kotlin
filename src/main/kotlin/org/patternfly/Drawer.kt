@@ -23,7 +23,7 @@ public fun RenderContext.drawer(
 ): Drawer = register(Drawer(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerSection] component.
+ * Creates a [DrawerSection] component inside a [Drawer] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -42,7 +42,7 @@ public fun Drawer.drawerSection(
 }
 
 /**
- * Creates a [DrawerContent] component.
+ * Creates a [DrawerContent] component inside a [Drawer] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -56,7 +56,7 @@ public fun Drawer.drawerContent(
     main.register(DrawerContent(this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerPanel] component.
+ * Creates a [DrawerPanel] component inside a [Drawer] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -70,11 +70,13 @@ public fun Drawer.drawerPanel(
     main.register(DrawerPanel(this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerBody] component for the [DrawerPanel] component which contains a [DrawerHead], [DrawerActions] and [DrawerClose] component.
+ * Creates a [DrawerBody] component inside the [DrawerPanel] component which contains a [DrawerHead], [DrawerAction] and [DrawerClose] component. Use this as a shortcut if you don't need any customization of the built components.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the [DrawerHead]
+ *
+ * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
 public fun DrawerPanel.drawerBodyWithClose(
     id: String? = null,
@@ -83,14 +85,14 @@ public fun DrawerPanel.drawerBodyWithClose(
 ): DrawerBody = register(DrawerBody(this.drawer, id = id, baseClass = baseClass, job), {
     it.drawerHead {
         content(this)
-        actions {
+        drawerAction {
             drawerClose()
         }
     }
 })
 
 /**
- * Creates a [DrawerBody] component for the [DrawerPanel] component.
+ * Creates a [DrawerBody] component inside the [DrawerPanel] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -103,7 +105,7 @@ public fun DrawerPanel.drawerBody(
 ): DrawerBody = register(DrawerBody(this.drawer, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerBody] component for the [DrawerContent] component.
+ * Creates a [DrawerBody] component inside the [DrawerContent] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -116,7 +118,7 @@ public fun DrawerContent.drawerBody(
 ): DrawerBody = register(DrawerBody(this.drawer, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerHead] component.
+ * Creates a [DrawerHead] component iside the [DrawerBody] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -129,25 +131,25 @@ public fun DrawerBody.drawerHead(
 ): DrawerHead = register(DrawerHead(this.drawer, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerActions] component.
+ * Creates a [DrawerAction] component inside the [DrawerHead] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun DrawerHead.actions(
+public fun DrawerHead.drawerAction(
     id: String? = null,
     baseClass: String? = null,
-    content: DrawerActions.() -> Unit = {}
-): DrawerActions = register(DrawerActions(this.drawer, id = id, baseClass = baseClass, job), content)
+    content: DrawerAction.() -> Unit = {}
+): DrawerAction = register(DrawerAction(this.drawer, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerClose] component.
+ * Creates a [DrawerClose] component inside the [DrawerAction] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  */
-public fun DrawerActions.drawerClose(
+public fun DrawerAction.drawerClose(
     id: String? = null,
     baseClass: String? = null
 ): DrawerClose {
@@ -161,10 +163,42 @@ public fun DrawerActions.drawerClose(
  *
  * A drawer is a sliding panel that enters from the right edge of the viewport. It can be configured to either overlay content on a page or create a sidebar by pushing that content to the left.
  *
- * A drawer consists of these main containers:
- * 1. [DrawerSection]: An optional container above [DrawerContent] and [DrawerPanel].
- * 1. [DrawerContent]: The normal content which is overlayed or pushed aside by the panel.
+ * A drawer contains three main components:
+ *
+ * 1. [DrawerSection]: An optional component above [DrawerContent] and [DrawerPanel].
+ * 1. [DrawerContent]: The normal content which is overlayed or pushed aside by the [DrawerPanel].
  * 1. [DrawerPanel]: The actual content of the drawer which slides in from the right edge.
+ *
+ * The [DrawerContent] and [DrawerPanel] components contain [DrawerBody] components to add the actual content. The first [DrawerBody] component inside the [DrawerPanel] component normally contains a [DrawerHead] component with a nested [DrawerAction] and [DrawerClose] component. You can use [drawerBodyWithClose] as a shortcut. If you want to have full control you can put the components together on your own though.
+ *
+ * ```
+ * ┏━━━━━━━━━━━━━━━ drawer: Drawer ━━━━━━━━━━━━━━━┓
+ * ┃ ┌──────────────────────────────────────────┐ ┃
+ * ┃ │       drawerSection: DrawerSection       │ ┃
+ * ┃ └──────────────────────────────────────────┘ ┃
+ * ┃                                              ┃
+ * ┃ ┌────── drawerContent: DrawerContent ──────┐ ┃
+ * ┃ │ ┌──────────────────────────────────────┐ │ ┃
+ * ┃ │ │        drawerBody: DrawerBody        │ │ ┃
+ * ┃ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ └──────────────────────────────────────────┘ ┃
+ * ┃                                              ┃
+ * ┃ ┌──────── drawerPanel: DrawerPanel ────────┐ ┃
+ * ┃ │                                          │ ┃
+ * ┃ │ ┌─────── drawerBody: DrawerBody ───────┐ │ ┃
+ * ┃ │ │                                      │ │ ┃
+ * ┃ │ │ ┌───── drawerHead: DrawerHead ─────┐ │ │ ┃
+ * ┃ │ │ │                                  │ │ │ ┃
+ * ┃ │ │ │ ┌─ drawerAction: DrawerAction ─┐ │ │ │ ┃
+ * ┃ │ │ │ │ ┌──────────────────────────┐ │ │ │ │ ┃
+ * ┃ │ │ │ │ │ drawerClose: DrawerClose │ │ │ │ │ ┃
+ * ┃ │ │ │ │ └──────────────────────────┘ │ │ │ │ ┃
+ * ┃ │ │ │ └──────────────────────────────┘ │ │ │ ┃
+ * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ └──────────────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ```
  *
  * @sample org.patternfly.sample.DrawerSample.drawerSetup
  */
@@ -188,9 +222,9 @@ public class Drawer internal constructor(id: String?, baseClass: String?, job: J
 }
 
 /**
- * Container for the actions in the [DrawerHead] component.
+ * Component for the actions inside the [DrawerHead] component.
  */
-public class DrawerActions internal constructor(
+public class DrawerAction internal constructor(
     internal val drawer: Drawer,
     id: String?,
     baseClass: String?,
@@ -199,9 +233,9 @@ public class DrawerActions internal constructor(
     Div(id = id, baseClass = classes("drawer".component("actions"), baseClass), job)
 
 /**
- * Container for the content inside [DrawerContent] and [DrawerPanel].
+ * Component for the content inside the [DrawerContent] and [DrawerPanel] components.
  *
- * Use this class to add content to [DrawerContent]s and [DrawerPanel]s. If used for the [DrawerPanel] you normally add a [DrawerHead], [DrawerActions] and a [DrawerClose] to the [DrawerBody]. You can use [drawerBodyWithClose] as a shortcut. If you want to have full control you can put the components together on your own though.
+ * Use this class to add content to [DrawerContent]s and [DrawerPanel]s. If used for the [DrawerPanel] you normally add a [DrawerHead], [DrawerAction] and a [DrawerClose] to the [DrawerBody]. You can use [drawerBodyWithClose] as a shortcut. If you want to have full control you can put the components together on your own though.
  *
  * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
@@ -209,7 +243,7 @@ public class DrawerBody internal constructor(internal val drawer: Drawer, id: St
     Div(id = id, baseClass = classes("drawer".component("body"), baseClass), job)
 
 /**
- * Container with a close button inside the [DrawerActions] component.
+ * Component for the close button inside the [DrawerAction] component.
  */
 public class DrawerClose internal constructor(private val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("drawer".component("close"), baseClass), job) {
@@ -224,7 +258,7 @@ public class DrawerClose internal constructor(private val drawer: Drawer, id: St
 }
 
 /**
- * Container for the normal content which is overlayed or pushed aside by the [DrawerPanel]. Use any number of nested [DrawerBody] components to add the actual content.
+ * Component for the normal content which is overlayed or pushed aside by the [DrawerPanel] component. Use any number of nested [DrawerBody] components to add the actual content.
  *
  * @sample org.patternfly.sample.DrawerSample.drawerContents
  */
@@ -236,13 +270,13 @@ public class DrawerContent internal constructor(
 ) : Div(id = id, baseClass = classes("drawer".component("content"), baseClass), job)
 
 /**
- * Container for the content left from the [DrawerActions] in the [DrawerBody].
+ * Component for the content left from the [DrawerAction] component in the [DrawerBody] component.
  */
 public class DrawerHead internal constructor(internal val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("drawer".component("head"), baseClass), job)
 
 /**
- * Container for the actual content of the drawer which slides in from the right edge. Use any number of nested [DrawerBody] components to add the actual content. The first [DrawerBody] should contain a [DrawerHead] with nested
+ * Component for the actual content of the drawer which slides in from the right edge. Use any number of nested [DrawerBody] components to add the actual content. The first [DrawerBody] should contain a [DrawerHead] with a nested [DrawerAction] and [DrawerClose] component.
  *
  * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
@@ -261,7 +295,7 @@ public class DrawerPanel internal constructor(
 }
 
 /**
- * Container for content above [DrawerContent] and [DrawerPanel].
+ * Component for content above [DrawerContent] and [DrawerPanel].
  */
 public class DrawerSection internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("drawer".component("section"), baseClass), job)

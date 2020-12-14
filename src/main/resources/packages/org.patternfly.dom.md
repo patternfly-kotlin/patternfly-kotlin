@@ -1,3 +1,0 @@
-# Package org.patternfly.dom
-
-Package documentation for `org.patternfly.dom` pending...

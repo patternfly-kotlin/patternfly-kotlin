@@ -5,7 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.card
-import org.patternfly.actions
+import org.patternfly.cardAction
 import org.patternfly.cardBody
 import org.patternfly.cardCheckbox
 import org.patternfly.cardFooter
@@ -24,7 +24,7 @@ internal interface CardSample {
             card {
                 cardHeader {
                     img { src("./logo.svg") }
-                    actions {
+                    cardAction {
                         dropdown<String>(align = RIGHT) {
                             kebabToggle()
                             items {
@@ -63,7 +63,7 @@ internal interface CardSample {
         render {
             card {
                 cardHeader {
-                    actions {
+                    cardAction {
                         dropdown<String>(align = RIGHT) {
                             kebabToggle()
                             items {

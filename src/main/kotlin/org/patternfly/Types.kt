@@ -33,7 +33,10 @@ internal fun <E : HTMLElement> PatternFlyComponent<E>.markAs(componentType: Comp
     }
 }
 
-internal interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E>
+/**
+ * Marker interface implemented by all PatternFly components.
+ */
+public interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E>
 
 /**
  * Interface meant to be implemented by components which want to have an easy access to an item ID based on [IdProvider]. These components can for example use [itemId] to set the ID attribute on their DOM element.

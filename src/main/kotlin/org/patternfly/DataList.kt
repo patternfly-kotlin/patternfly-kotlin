@@ -6,14 +6,14 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
-import org.patternfly.dom.By
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.closest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.closest
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
@@ -29,6 +29,8 @@ import org.w3c.dom.HTMLUListElement
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.DataListSample.dataList
  */
 public fun <T> RenderContext.dataList(
     store: ItemStore<T> = ItemStore(),
@@ -39,7 +41,7 @@ public fun <T> RenderContext.dataList(
 ): DataList<T> = register(DataList(store, selectableRows, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [DataListAction] container in the [DataListRow].
+ * Creates the [DataListAction] component inside the [DataListRow] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -52,7 +54,7 @@ public fun <T> DataListRow<T>.dataListAction(
 ): DataListAction = register(DataListAction(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DataListCell] inside the [DataListContent] container.
+ * Creates a [DataListCell] component inside the [DataListContent] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -65,20 +67,21 @@ public fun <T> DataListContent<T>.dataListCell(
 ): DataListCell<T> = register(DataListCell(itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DataListCheck] inside the [DataListControl] container.
+ * Creates the [DataListCheckbox] component inside the [DataListControl] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun <T> DataListControl<T>.dataListCheck(
+public fun <T> DataListControl<T>.dataListCheckbox(
     id: String? = null,
     baseClass: String? = null,
-    content: DataListCheck<T>.() -> Unit = {}
-): DataListCheck<T> = register(DataListCheck(this.itemStore, this.item, id = id, baseClass = baseClass, job), content)
+    content: DataListCheckbox<T>.() -> Unit = {}
+): DataListCheckbox<T> =
+    register(DataListCheckbox(this.itemStore, this.item, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [DataListContent] container inside the [DataListRow].
+ * Creates the [DataListContent] component inside the [DataListRow] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -91,7 +94,7 @@ public fun <T> DataListRow<T>.dataListContent(
 ): DataListContent<T> = register(DataListContent(itemStore, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [DataListControl] container inside the [DataListRow].
+ * Creates the [DataListControl] component inside the [DataListRow] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -101,18 +104,17 @@ public fun <T> DataListRow<T>.dataListControl(
     id: String? = null,
     baseClass: String? = null,
     content: DataListControl<T>.() -> Unit = {}
-): DataListControl<T> =
-    register(
-        DataListControl(this.itemStore, this.item, this.dataListItem, id = id, baseClass = baseClass, job),
-        content
-    )
+): DataListControl<T> = register(
+    DataListControl(this.itemStore, this.item, this.dataListItem, id = id, baseClass = baseClass, job),
+    content
+)
 
 /**
- * Creates the [DataListExpandableContent] container inside the [DataListItem].
+ * Creates the [DataListExpandableContent] component inside the [DataListItem] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the expandable content container
+ * @param content a lambda expression for setting up the expandable content
  */
 public fun <T> DataListItem<T>.dataListExpandableContent(
     id: String? = Id.unique(ComponentType.DataList.id, "ec"),
@@ -122,7 +124,7 @@ public fun <T> DataListItem<T>.dataListExpandableContent(
     register(DataListExpandableContent(this, id = id, baseClass = baseClass, job, content), {})
 
 /**
- * Creates the [DataListItem] container. All other elements are nested inside this container.
+ * Creates the [DataListItem] component. All other components are nested inside this component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -136,7 +138,7 @@ public fun <T> DataList<T>.dataListItem(
 ): DataListItem<T> = register(DataListItem(this.itemStore, item, this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [DataListRow] inside the [DataListItem] container.
+ * Creates the [DataListRow] component inside the [DataListItem] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -149,7 +151,9 @@ public fun <T> DataListItem<T>.dataListRow(
 ): DataListRow<T> = register(DataListRow(this.itemStore, this.item, this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [DataListToggle] to to expand / collapse the [DataListExpandableContent].
+ * Creates the [DataListToggle] component inside the [DataListControl] component.
+ *
+ * If you use this component, don't forget to also use [dataListExpandableContent] to add a [DataListExpandableContent] component to the [DataListItem] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -169,7 +173,7 @@ public fun <T> DataListControl<T>.dataListToggle(
  *
  * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in an [ItemStore] as [DataListItem]s.
  *
- * One of the elements in the [display] should use the [ItemStore.idProvider] to assign an element ID. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes.
+ * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the data list components implement [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
  *
  * @param T the type which is used for the [DataListItem]s in this data list.
  *
@@ -189,32 +193,25 @@ public class DataList<T> internal constructor(
     }
 
     /**
-     * Defines how to display the items in the [ItemStore] as [DataListItem]s. Call this function *before* populating the store.
+     * Defines how to display the items in the [ItemStore] as [DataListItem]s.
      */
     public fun display(display: (T) -> DataListItem<T>) {
-        itemStore.visible.renderEach({ itemStore.idProvider(it) }, { item -> display(item) })
+        itemStore.visible.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
     }
 }
 
 /**
- * A container to group the actions in a [DataListRow].
+ * A component to group the actions in a [DataListRow] component.
  */
 public class DataListAction internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("data-list".component("item-action"), baseClass), job)
 
 /**
- * A cell in a [DataListContent] container. Cells are usually used to display properties of the items.
+ * A cell in a [DataListContent] component. Cells are usually used to display properties of the items.
  */
 public class DataListCell<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore,
-    Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job) {
-
-    init {
-        domNode.closest(By.classname("data-list".component("item")))?.let {
-            attr("rowId", it.id)
-        }
-    }
-}
+    Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job)
 
 /**
  * Checkbox to (de)select a data item. The checkbox is bound to the selection state of the [ItemStore].
@@ -223,7 +220,7 @@ public class DataListCell<T> internal constructor(itemStore: ItemStore<T>, id: S
  *
  * @sample org.patternfly.sample.DataListSample.selects
  */
-public class DataListCheck<T> internal constructor(
+public class DataListCheckbox<T> internal constructor(
     private val itemStore: ItemStore<T>,
     private val item: T,
     id: String?,
@@ -236,16 +233,16 @@ public class DataListCheck<T> internal constructor(
             val inputId = Id.unique(ComponentType.DataList.id, "chk")
             name(inputId)
             type("checkbox")
-            checked(this@DataListCheck.itemStore.data.map { it.isSelected(this@DataListCheck.item) })
+            checked(this@DataListCheckbox.itemStore.data.map { it.isSelected(this@DataListCheckbox.item) })
             aria["invalid"] = false
-            aria["labelledby"] = this@DataListCheck.itemStore.idProvider(this@DataListCheck.item)
-            changes.states().map { (this@DataListCheck.item to it) } handledBy this@DataListCheck.itemStore.select
+            aria["labelledby"] = this@DataListCheckbox.itemStore.idProvider(this@DataListCheckbox.item)
+            changes.states().map { (this@DataListCheckbox.item to it) } handledBy this@DataListCheckbox.itemStore.select
         }
     }
 }
 
 /**
- * Container for [DataListCell]s in a [DataListRow].
+ * Component to group [DataListCell]s components inside a [DataListRow] component.
  */
 public class DataListContent<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -253,17 +250,10 @@ public class DataListContent<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemStore,
-    Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job) {
-
-    init {
-        domNode.closest(By.classname("data-list".component("item")))?.let {
-            attr("rowId", it.id)
-        }
-    }
-}
+    Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job)
 
 /**
- * Container for controls of a [DataListRow]. Use this class to add a [DataListToggle] or a [DataListCheck].
+ * Component for controls of a [DataListRow] component. Use this class to add a [DataListToggle] or a [DataListCheckbox] component.
  */
 public class DataListControl<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -275,7 +265,7 @@ public class DataListControl<T> internal constructor(
 ) : Div(id = id, baseClass = classes("data-list".component("item-control"), baseClass), job)
 
 /**
- * Container for expandable content inside a [DataListItem].
+ * Component for the expandable content inside a [DataListItem] component.
  */
 public class DataListExpandableContent<T> internal constructor(
     dataListItem: DataListItem<T>,
@@ -303,7 +293,43 @@ public class DataListExpandableContent<T> internal constructor(
 }
 
 /**
- * Container for an item in a [DataList]. All other elements are nested inside this container.
+ * Component for an item in a [DataList]. All other components are nested inside this component.
+ *
+ * The data list is very flexible when it comes to displaying the items in the [ItemStore]. You should at least add a [DataListRow] for each item you want to render. If you want to use controls like a checkbox and / or a toggle, add them inside a [DataListControl] component. The actual content should be added inside multiple [DataListCell]s inside a [DataListContent] component. If you want to add actions like [PushButton]s or [Dropdown]s, add them inside a [DataListAction] component. Finally the expandable content goes inside a [DataListExpandableContent] component.
+ *
+ * ```
+ * ┏━━━━━━━━━━━ dataList: DataListItem ━━━━━━━━━━━┓
+ * ┃                                              ┃
+ * ┃ ┌──────── dataListRow: DataListRow ────────┐ ┃
+ * ┃ │                                          │ ┃
+ * ┃ │ ┌── dataListControl: DataListControl ──┐ │ ┃
+ * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │ │  dataListToggle: DataListToggle  │ │ │ ┃
+ * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │ │dataListCheckbox: DataListCheckbox│ │ │ ┃
+ * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ │                                          │ ┃
+ * ┃ │ ┌── dataListContent: DataListContent ──┐ │ ┃
+ * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │ │    dataListCell: DataListCell    │ │ │ ┃
+ * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ │                                          │ ┃
+ * ┃ │ ┌─── dataListAction: DataListAction ───┐ │ ┃
+ * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │ │  control components like buttons │ │ │ ┃
+ * ┃ │ │ │           or dropdowns           │ │ │ ┃
+ * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ └──────────────────────────────────────────┘ ┃
+ * ┃ ┌──────────────────────────────────────────┐ ┃
+ * ┃ │        dataListExpandableContent:        │ ┃
+ * ┃ │        DataListExpandableContent         │ ┃
+ * ┃ └──────────────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ```
  */
 public class DataListItem<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -350,7 +376,7 @@ public class DataListItem<T> internal constructor(
 }
 
 /**
- * Container for the main data of an [DataListItem] (except content for [DataListExpandableContent]).
+ * Component for the main data of a [DataListItem] component (except content for [DataListExpandableContent]).
  */
 public class DataListRow<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -360,17 +386,12 @@ public class DataListRow<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemStore,
-    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job) {
-
-    init {
-        domNode.closest(By.classname("data-list".component("item")))?.let {
-            attr("rowId", it.id)
-        }
-    }
-}
+    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job)
 
 /**
  * Toggle to expand / collapse the [DataListExpandableContent].
+ *
+ * If you use this component, don't forget to also add a [DataListExpandableContent] component to the [DataListItem] component.
  */
 public class DataListToggle<T> internal constructor(
     private val itemStore: ItemStore<T>,

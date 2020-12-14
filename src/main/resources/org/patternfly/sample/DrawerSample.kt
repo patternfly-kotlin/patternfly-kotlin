@@ -8,7 +8,7 @@ import org.patternfly.dataList
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
 import org.patternfly.drawer
-import org.patternfly.actions
+import org.patternfly.drawerAction
 import org.patternfly.drawerBody
 import org.patternfly.drawerBodyWithClose
 import org.patternfly.drawerClose
@@ -98,7 +98,7 @@ internal interface DrawerSample {
                     drawerBody {
                         drawerHead {
                             +"Title"
-                            actions {
+                            drawerAction {
                                 drawerClose()
                             }
                         }

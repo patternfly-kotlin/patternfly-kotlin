@@ -87,18 +87,30 @@ public fun <T> ChipGroup<T>.chips(block: ChipsBuilder<T>.() -> Unit) {
 public class ChipsBuilder<T> {
     internal val chips: MutableList<T> = mutableListOf()
 
+    /**
+     * Adds one item to this builder using the unary plus operator.
+     */
     public operator fun T.unaryPlus() {
         chips.add(this)
     }
 
+    /**
+     * Adds all items in the specified list to this builder using the unary plus operator.
+     */
     public operator fun List<T>.unaryPlus() {
         chips.addAll(this)
     }
 
+    /**
+     * Adds one item to this builder.
+     */
     public fun add(chip: T) {
         chips.add(chip)
     }
 
+    /**
+     * Adds all items in the specified list to this builder.
+     */
     public fun addAll(chips: List<T>) {
         this.chips.addAll(chips)
     }
@@ -115,7 +127,7 @@ public class ChipsBuilder<T> {
  *
  * The items can be added to the [ChipGroupStore] using different ways (see samples).
  *
- * @param T the type which is used for the single [Chip]s (matters only if a store is used)
+ * @param T the type which is used for the single [Chip]s
  *
  * @sample org.patternfly.sample.ChipGroupSample.vararg
  * @sample org.patternfly.sample.ChipGroupSample.list
@@ -205,8 +217,6 @@ public class ChipGroup<T> internal constructor(
      * Defines how to display the items in the [ChipGroupStore].
      *
      * Defaults to `{ chip { +it.toString() } }`.
-     *
-     * Please call this function *before* populating the store.
      *
      * @sample org.patternfly.sample.ChipGroupSample.display
      */

@@ -61,13 +61,7 @@ tasks.dokkaHtml.configure {
             includeNonPublic.set(false)
             skipEmptyPackages.set(true)
             platform.set(Platform.js)
-            includes.from(
-                files(
-                    "src/main/resources/module.md",
-                    "src/main/resources/packages/org.patternfly.md",
-                    "src/main/resources/packages/org.patternfly.dom.md"
-                )
-            )
+            includes.from("src/main/resources/module.md")
             samples.from("src/main/resources/")
             sourceLink {
                 localDirectory.set(file("src/main/kotlin"))

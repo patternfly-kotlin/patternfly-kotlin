@@ -20,6 +20,8 @@ import org.w3c.dom.HTMLSpanElement
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.BadgeSample.badge
  */
 public fun RenderContext.badge(
     min: Int = 0,

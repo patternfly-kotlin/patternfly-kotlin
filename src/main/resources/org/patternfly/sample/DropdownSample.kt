@@ -28,7 +28,7 @@ internal interface DropdownSample {
             dropdown<String> {
                 textToggle { +"Choose one" }
                 groups {
-                    group { // w/o title
+                    group { // group w/o title
                         item("Item 1")
                         item("Item 2") {
                             description = "Item description"
@@ -178,6 +178,36 @@ internal interface DropdownSample {
                 items {
                     item("Foo")
                     item("Bar")
+                }
+            }
+        }
+    }
+
+    fun items() {
+        render {
+            dropdown<String> {
+                kebabToggle()
+                items {
+                    item("Item 1")
+                    item("Item 2")
+                }
+            }
+        }
+    }
+
+    fun groups() {
+        render {
+            dropdown<String> {
+                kebabToggle()
+                groups {
+                    group { // group w/o title
+                        item("Item 1")
+                        item("Item 2")
+                    }
+                    group("Group 1") {
+                        item("Item 1")
+                        item("Item 2")
+                    }
                 }
             }
         }
