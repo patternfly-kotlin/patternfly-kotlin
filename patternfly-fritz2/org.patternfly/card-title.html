@@ -25,7 +25,7 @@
         <div id="leftToggler"><span class="icon-toggler"></span></div>
         <script type="text/javascript" src="../../scripts/pages.js"></script>
         <script type="text/javascript" src="../../scripts/main.js"></script>
-        <div class="main-content" id="content" pageIds="org.patternfly//cardTitle/org.patternfly.CardHeader[TypeParam(bounds=[kotlin.Any?])]#kotlin.String?#kotlin.String?#kotlin.Function1[org.patternfly.CardTitle[TypeParam(bounds=[kotlin.Any?])],kotlin.Unit]/PointingToDeclaration//-450478109">
+        <div class="main-content" id="content" pageIds="org.patternfly//cardTitle/org.patternfly.CardHeader[TypeParam(bounds=[kotlin.Any?])]#kotlin.String?#kotlin.String?#kotlin.Function1[org.patternfly.CardTitle[TypeParam(bounds=[kotlin.Any?])],kotlin.Unit]/PointingToDeclaration//2142085003">
           <div class="navigation-wrapper" id="navigation-wrapper">
             <div class="breadcrumbs"><a href="../index.html">patternfly-fritz2</a>/<a href="index.html">org.patternfly</a>/<a href="card-title.html">cardTitle</a></div>
             <div class="pull-right d-flex">
@@ -43,7 +43,7 @@
 <p class="paragraph">Creates the <a href="-card-title/index.html">CardTitle</a> as part of the <a href="-card-header/index.html">CardHeader</a>. Use this function if you want to place the title in the header together with the actions and / or checkbox.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.card
-import org.patternfly.actions
+import org.patternfly.cardAction
 import org.patternfly.cardBody
 import org.patternfly.cardCheckbox
 import org.patternfly.cardFooter
@@ -59,7 +59,7 @@ fun main() {
    render {
     card {
         cardHeader {
-            actions {
+            cardAction {
                 dropdown&lt;String&gt;(align = RIGHT) {
                     kebabToggle()
                     items {
@@ -86,7 +86,7 @@ fun main() {
 <p class="paragraph">Creates the <a href="-card-title/index.html">CardTitle</a> as part of the <a href="-card/index.html">Card</a>. Use this function if you don't need a header.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.card
-import org.patternfly.actions
+import org.patternfly.cardAction
 import org.patternfly.cardBody
 import org.patternfly.cardCheckbox
 import org.patternfly.cardFooter

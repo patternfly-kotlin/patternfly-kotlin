@@ -4,7 +4,7 @@
     <title>badge</title>
     <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../";</script>
-    <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<script src="https://unpkg.com/kotlin-playground@1" data-selector="code.runnablesample"></script>    <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
     <link href="../../styles/style.css" rel="Stylesheet">
     <link href="../../styles/logo-styles.css" rel="Stylesheet">
     <link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
@@ -25,7 +25,7 @@
         <div id="leftToggler"><span class="icon-toggler"></span></div>
         <script type="text/javascript" src="../../scripts/pages.js"></script>
         <script type="text/javascript" src="../../scripts/main.js"></script>
-        <div class="main-content" id="content" pageIds="org.patternfly//badge/dev.fritz2.dom.html.RenderContext#kotlin.Int#kotlin.Int#kotlin.String?#kotlin.String?#kotlin.Function1[org.patternfly.Badge,kotlin.Unit]/PointingToDeclaration//-450478109">
+        <div class="main-content" id="content" pageIds="org.patternfly//badge/dev.fritz2.dom.html.RenderContext#kotlin.Int#kotlin.Int#kotlin.String?#kotlin.String?#kotlin.Function1[org.patternfly.Badge,kotlin.Unit]/PointingToDeclaration//2142085003">
           <div class="navigation-wrapper" id="navigation-wrapper">
             <div class="breadcrumbs"><a href="../index.html">patternfly-fritz2</a>/<a href="index.html">org.patternfly</a>/<a href="badge.html">badge</a></div>
             <div class="pull-right d-flex">
@@ -40,7 +40,26 @@
   <div>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun <a href="https://api.fritz2.dev/core/core/dev.fritz2.dom.html/-render-context/index.html">RenderContext</a>.<a href="badge.html">badge</a>(min: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a> = 0, max: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a> = 999, id: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>? = null, baseClass: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>? = null, content: <a href="-badge/index.html">Badge</a>.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> = {}): <a href="-badge/index.html">Badge</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<p class="paragraph">Creates a <a href="-badge/index.html">Badge</a> component.</p><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">min</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the minimum number to show in the badge</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">max</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the maximum number to show in the badge</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">id</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the ID of the element</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">baseClass</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">optional CSS class that should be applied to the element</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">content</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">a lambda expression for setting up the component itself</p></div></div></div></div></div></div></div></div></div></div></div>
+<p class="paragraph">Creates a <a href="-badge/index.html">Badge</a> component.</p><h2 class="">Samples</h2><div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Samples"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="sample-container"><code class="runnablesample monospace" theme="idea"><pre>import dev.fritz2.dom.html.render
+import kotlinx.coroutines.flow.flowOf
+import org.patternfly.badge
+fun main() { 
+   //sampleStart 
+   render {
+    val values = flowOf(1, 2, 3)
+    badge { +&quot;Label&quot; }
+    badge {
+        value(&quot;Label&quot;)
+    }
+    badge {
+        value(23)
+    }
+    badge {
+        value(values)
+    }
+} 
+   //sampleEnd
+}</pre></code></div></div></div><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">min</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the minimum number to show in the badge</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">max</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the maximum number to show in the badge</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">id</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the ID of the element</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">baseClass</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">optional CSS class that should be applied to the element</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">content</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">a lambda expression for setting up the component itself</p></div></div></div></div></div></div></div></div></div></div></div>
 <div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
