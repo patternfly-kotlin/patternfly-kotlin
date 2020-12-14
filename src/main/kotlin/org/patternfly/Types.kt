@@ -167,13 +167,12 @@ public enum class Orientation {
     HORIZONTAL, VERTICAL
 }
 
+/**
+ * Enum used in [buttonIcon] to specify the position of the icon in buttons when used together with text.
+ */
 public enum class IconPosition(public val modifier: String) {
     ICON_FIRST("start".modifier()),
     ICON_LAST("end".modifier())
-}
-
-public enum class SelectionMode {
-    NONE, SINGLE, MULTIPLE
 }
 
 /**

@@ -201,7 +201,7 @@ public class CardView<T> internal constructor(
      * Defines how to display the items in the [ItemStore] as [Card]s.
      */
     public fun display(display: (T) -> Card<T>) {
-        itemStore.visible.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
+        itemStore.page.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
     }
 }
 

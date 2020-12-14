@@ -16,6 +16,7 @@ import org.patternfly.ButtonVariation.plain
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
+// Document me
 // ------------------------------------------------------ dsl
 
 /**
@@ -32,7 +33,7 @@ public fun RenderContext.page(
 ): Page = register(Page(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [Header] component inside the [Page].
+ * Creates the [Header] component inside the [Page] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -45,7 +46,7 @@ public fun Page.pageHeader(
 ): Header = register(Header(this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [Brand] component inside the [Header].
+ * Creates the [Brand] component inside the [Header] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -58,7 +59,7 @@ public fun Header.brand(
 ): Brand = register(Brand(this.page.sidebarStore, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a container for the tools inside the [Header].
+ * Creates a container for the tools inside the [Header] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -131,6 +132,35 @@ public fun RenderContext.pageSection(
  * document body.
  *
  * A typical page setup with a header, brand, tools, sidebar and navigation might look like this:
+ *
+ * ```
+ * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ page: Page ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ * ┃                                                                           ┃
+ * ┃ ┌──────────────────────── pageHeader: PageHeader ───────────────────────┐ ┃
+ * ┃ │ ┌──────────────┐ ┌─────────────────────────────┐ ┌──────────────────┐ │ ┃
+ * ┃ │ │              │ │    horizontalNavigation:    │ │                  │ │ ┃
+ * ┃ │ │ brand: Brand │ │         Navigation          │ │ headerTools: Div │ │ ┃
+ * ┃ │ │              │ │                             │ │                  │ │ ┃
+ * ┃ │ └──────────────┘ └─────────────────────────────┘ └──────────────────┘ │ ┃
+ * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
+ * ┃                                                                           ┃
+ * ┃ ┌─── pageSidebar: PageSidebar ───┐ ┌──────── pageMain: PageMain ────────┐ ┃
+ * ┃ │                                │ │                                    │ ┃
+ * ┃ │ ┌───── sidebarBody: Div ─────┐ │ │ ┌────────────────────────────────┐ │ ┃
+ * ┃ │ │ ┌────────────────────────┐ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │  verticalNavigation:   │ │ │ │ │    pageSection: PageSection    │ │ ┃
+ * ┃ │ │ │       Navigation       │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
+ * ┃ │ │ └────────────────────────┘ │ │ │ │                                │ │ ┃
+ * ┃ │ └────────────────────────────┘ │ │ └────────────────────────────────┘ │ ┃
+ * ┃ └────────────────────────────────┘ └────────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ```
  *
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */

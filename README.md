@@ -118,6 +118,8 @@ fun main() {
 
 To see more components in action, take a look at the [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). To learn how to use the components, read the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/).
 
-## Feedback
+## Get Involved
 
-PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and share your feedback, thoughts and comments. Use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to file bugs or open feature requests.
+PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and let us know what you think about it. Use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to file bugs or open feature requests. 
+
+Of course, you're very welcome to [contribute][CONTRIBUTE.md] to PatternFly Fritz2.  

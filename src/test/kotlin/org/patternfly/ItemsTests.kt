@@ -112,7 +112,7 @@ open class ItemsTests : FunSpec({
         forAll(Arb.positiveInts(100), Arb.positiveInts(100)) { size, pageSize ->
             val numbers = (0 until size).toList()
             with(
-                Items<Int>(identifier = { it.toString() }, pageInfo = PageInfo(pageSize = pageSize))
+                Items<Int>(idProvider = { it.toString() }, pageInfo = PageInfo(pageSize = pageSize))
                     .addAll(numbers)
                     .selectPage()
             ) {

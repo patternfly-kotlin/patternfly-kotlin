@@ -43,13 +43,13 @@ internal interface DrawerSample {
                         h2 { +"Details of selected item" }
                     }
                     drawerBody {
-                        store.selectItem.asText()
+                        store.selectOnly.asText()
                     }
                 }
             }
 
             store.addAll(listOf("One", "Two", "Three"))
-            store.selectItem.map { } handledBy drawer.ces.expand
+            store.selectOnly.map { } handledBy drawer.ces.expand
         }
     }
 

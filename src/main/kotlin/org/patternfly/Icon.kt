@@ -10,7 +10,6 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
 
-
 /**
  * Creates an [Icon] component.
  *
@@ -50,13 +49,19 @@ public class Icon internal constructor(iconClass: String, id: String?, baseClass
         aria["hidden"] = true
     }
 
+    /**
+     * Changes the icon class.
+     */
     public fun iconClass(iconClass: Flow<String>) {
         mountSingle(job, iconClass) { v, _ ->
             iconClass(v)
         }
     }
 
-    private fun iconClass(iconClass: String) {
+    /**
+     * Changes the icon class.
+     */
+    public fun iconClass(iconClass: String) {
         attr("class", classes {
             +ComponentType.Icon
             +iconClass

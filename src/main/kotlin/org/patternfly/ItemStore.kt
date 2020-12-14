@@ -7,34 +7,96 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Store used in data-driven components like [CardView], [DataList] and [DataTable]. The store uses an instance of [Items] as its data. It provides flows to get the properties of [Items] and handlers to modify it.
+ *
+ * @param idProvider used to uniquely identify each item
+ * @param T the type of the payload
+ */
 public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
     WithIdProvider<T>,
     RootStore<Items<T>>(Items(idProvider)), PageInfoHandler {
 
-    public val visible: Flow<List<T>> = data.map { it.page }
-    public val selected: Flow<Int> = data.map { it.selected.size }
-    public val selection: Flow<List<T>> = data.map { it.selection() }
+    /**
+     * Flow containing the current page.
+     */
+    public val page: Flow<List<T>> = data.map { it.page }
 
+    /**
+     * Flow containing the number of selected items.
+     */
+    public val selected: Flow<Int> = data.map { it.selected.size }
+
+    /**
+     * Flow containing the selected items.
+     */
+    public val selection: Flow<List<T>> = data.map { it.selection }
+
+    /**
+     * Handler to add all specified items.
+     */
     public val addAll: Handler<List<T>> = handle { items, newItems -> items.addAll(newItems) }
 
-    public val addFilter: Handler<Pair<String, ItemFilter<T>>> = handle { items, (name, filter) ->
-        items.addFilter(name, filter)
-    }
+    /**
+     * Handler to add the specified filter.
+     */
+    public val addFilter: Handler<Pair<String, ItemFilter<T>>> =
+        handle { items, (name, filter) ->
+            items.addFilter(name, filter)
+        }
+
+    /**
+     * Handler to remove the specified filter.
+     */
     public val removeFilter: Handler<String> = handle { items, name -> items.removeFilter(name) }
 
+    /**
+     * Handler to go to the first page.
+     */
     override val gotoFirstPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoFirstPage()) }
+
+    /**
+     * Handler to go to the previous (if any) page.
+     */
     override val gotoPreviousPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoPreviousPage()) }
+
+    /**
+     * Handler to go to the next (if any) page.
+     */
     override val gotoNextPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoNextPage()) }
+
+    /**
+     * Handler to go to the last page.
+     */
     override val gotoLastPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoLastPage()) }
+
+    /**
+     * Handler to go to the specified page.
+     */
     override val gotoPage: Handler<Int> = handle { items, page ->
         items.copy(pageInfo = items.pageInfo.gotoPage(page))
     }
+
+    /**
+     * Handler to set a new page size.
+     */
     override val pageSize: Handler<Int> = handle { items, pageSize ->
         items.copy(pageInfo = items.pageInfo.pageSize(pageSize))
     }
+
+    /**
+     * Handler to set a new number of total items.
+     */
     override val total: Handler<Int> = handle { items, _ -> items } // not implemented!
+
+    /**
+     * Does nothing!
+     */
     override val refresh: Handler<Unit> = handle { it } // not implemented!
 
+    /**
+     * Handler to select items depending on the value of [PreSelection].
+     */
     public val preSelect: Handler<PreSelection> = handle { items, preSelection ->
         when (preSelection) {
             PreSelection.NONE -> items.selectNone()
@@ -42,26 +104,57 @@ public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.
             PreSelection.ALL -> items.selectAll()
         }
     }
+
+    /**
+     * Handler to deselect all items.
+     */
     public val selectNone: Handler<Unit> = handle { it.selectNone() }
+
+    /**
+     * Handler to select the items of the current page.
+     */
     public val selectPage: Handler<Unit> = handle { it.selectPage() }
+
+    /**
+     * Handler to select all items.
+     */
     public val selectAll: Handler<Unit> = handle { it.selectAll() }
+
+    /**
+     * Handler to (de)select the specified item. The handler emits a [Pair] with the item and a boolean (`true` == selected, `false` otherwise).
+     */
     public val select: EmittingHandler<Pair<T, Boolean>, Pair<T, Boolean>> =
         handleAndEmit { items, (item, select) ->
             val updatedItems = items.select(item, select)
             emit(item to updatedItems.isSelected(item))
             updatedItems
         }
-    public val selectItem: EmittingHandler<T, T> =
+
+    /**
+     * Handler to only select the specified item and deselect all other items. The handler emits the newly selected item.
+     */
+    public val selectOnly: EmittingHandler<T, T> =
         handleAndEmit { items, item ->
             val updatedItems = items.selectOnly(item)
             emit(item)
             updatedItems
         }
+
+    /**
+     * Handler to toggle the selection of the specified item.
+     */
     public val toggleSelection: Handler<T> = handle { items, item -> items.toggleSelection(item) }
 
+    /**
+     * Handler to sort the items using the specified [SortInfo].
+     */
     public val sortWith: Handler<SortInfo<T>> = handle { items, sortInfo ->
         items.sortWith(sortInfo)
     }
+
+    /**
+     * Handler to sort the items using the specified [SortInfo], if the specified sort info is already used, the sort direction is reversed.
+     */
     public val sortOrToggle: Handler<SortInfo<T>> = handle { items, sortInfo ->
         val newSortInfo = if (items.sortInfo == null) {
             sortInfo

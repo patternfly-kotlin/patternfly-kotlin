@@ -10,10 +10,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
-import org.patternfly.dom.closest
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 
@@ -196,7 +194,7 @@ public class DataList<T> internal constructor(
      * Defines how to display the items in the [ItemStore] as [DataListItem]s.
      */
     public fun display(display: (T) -> DataListItem<T>) {
-        itemStore.visible.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
+        itemStore.page.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
     }
 }
 
@@ -368,7 +366,7 @@ public class DataListItem<T> internal constructor(
                     )
                 }
             )
-            clicks.map { item } handledBy itemStore.selectItem
+            clicks.map { item } handledBy itemStore.selectOnly
         } else {
             classMap(ces.data.map { mapOf("expanded".modifier() to it) })
         }

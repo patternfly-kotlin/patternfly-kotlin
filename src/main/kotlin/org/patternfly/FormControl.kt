@@ -5,6 +5,7 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Select
 import dev.fritz2.dom.html.TextArea
 
+// TODO Document me
 // ------------------------------------------------------ dsl
 
 public fun RenderContext.inputFormControl(
@@ -19,7 +20,7 @@ public fun RenderContext.selectFormControl(
     content: Select.() -> Unit = {}
 ): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass), job), content)
 
-public fun RenderContext.pfTextareaFormControl(
+public fun RenderContext.textareaFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: TextArea.() -> Unit = {}

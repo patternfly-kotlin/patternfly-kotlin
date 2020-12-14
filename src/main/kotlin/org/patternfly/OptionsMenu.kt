@@ -26,6 +26,7 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLUListElement
 
+// TODO Refactor and document me
 // ------------------------------------------------------ dsl
 
 public fun <T> RenderContext.optionsMenu(
@@ -252,7 +253,7 @@ public class OptionsMenuEntries<E : HTMLElement, T> internal constructor(
                 }
                 is Group<T> -> {
                     section(baseClass = "options-menu".component("group")) {
-                        entry.title?.let {
+                        entry.text?.let {
                             h1(baseClass = "options-menu".component("group", "title")) { +it }
                         }
                         ul {

@@ -204,7 +204,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [action toggle][ActionToggle]
  * - [custom toggle][CustomToggle]
  *
- * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item], a [Group] or a [Separator]. An [Item] can have additional properties such as an icon, a description or a disabled state.
  *
  * **Adding entries**
  *
@@ -300,7 +300,7 @@ public class Dropdown<T> internal constructor(
                     }
                     is Group<T> -> {
                         section(baseClass = "dropdown".component("group")) {
-                            entry.title?.let {
+                            entry.text?.let {
                                 h1(baseClass = "dropdown".component("group", "title")) { +it }
                             }
                             ul {

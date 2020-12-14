@@ -22,6 +22,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
 
+// TODO Document me
 // ------------------------------------------------------ dsl
 
 public fun <T> RenderContext.horizontalNavigation(
@@ -144,6 +145,7 @@ public class NavigationGroup<T> internal constructor(
     job: Job,
     content: NavigationItems<T>.() -> Unit
 ) : Tag<HTMLElement>("section", id = id, baseClass = classes("nav".component("section"), baseClass), job) {
+
     init {
         h2("nav".component("section", "title"), id) { +text }
         navigationItems {
@@ -164,13 +166,14 @@ public class NavigationExpandableGroup<T> internal constructor(
     +"expandable".modifier()
     +baseClass
 }, job) {
-    private val expanded = CollapseExpandStore()
+
+    private val ces = CollapseExpandStore()
 
     init {
         // don't use classMap for expanded flow
         // classMap = expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
-        MainScope().launch {
-            expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
+        (MainScope() + job).launch {
+            ces.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
         }
         // it might interfere with router flow, which also modifies the class list
         (MainScope() + job).launch {
@@ -184,8 +187,8 @@ public class NavigationExpandableGroup<T> internal constructor(
         val linkId = Id.unique(ComponentType.Navigation.id, "eg")
         a("nav".component("link"), linkId) {
             +text
-            clicks handledBy this@NavigationExpandableGroup.expanded.toggle
-            aria["expanded"] = this@NavigationExpandableGroup.expanded.data.map { it.toString() }
+            clicks handledBy this@NavigationExpandableGroup.ces.toggle
+            aria["expanded"] = this@NavigationExpandableGroup.ces.data.map { it.toString() }
 
             span("nav".component("toggle")) {
                 span("nav".component("toggle", "icon")) {
@@ -195,7 +198,7 @@ public class NavigationExpandableGroup<T> internal constructor(
         }
         section("nav".component("subnav")) {
             aria["labelledby"] = linkId
-            attr("hidden", this@NavigationExpandableGroup.expanded.data.map { !it })
+            attr("hidden", this@NavigationExpandableGroup.ces.data.map { !it })
             navigationItems(this@NavigationExpandableGroup.navigation) {
                 content(this)
             }
@@ -219,6 +222,7 @@ public class NavigationItem<T> internal constructor(
     job: Job,
     content: A.() -> Unit
 ) : Tag<HTMLLIElement>("li", id = id, baseClass = classes("nav".component("item"), baseClass), job) {
+
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo

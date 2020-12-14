@@ -250,7 +250,7 @@ public class DataTable<T> internal constructor(
         }
 
         if (columns.hasToggle) {
-            this@DataTable.itemStore.visible.renderShifted(
+            this@DataTable.itemStore.page.renderShifted(
                 1,
                 this,
                 { itemStore.idProvider(it) },
@@ -261,7 +261,7 @@ public class DataTable<T> internal constructor(
         } else {
             tbody {
                 attr("role", "rowgroup")
-                this@DataTable.itemStore.visible.renderEach({ this@DataTable.itemStore.idProvider(it) }) { item ->
+                this@DataTable.itemStore.page.renderEach({ this@DataTable.itemStore.idProvider(it) }) { item ->
                     tr {
                         renderCells(this@DataTable, item, "", null)
                     }
@@ -378,7 +378,7 @@ internal fun <T> Tr.renderCells(
                             name(RADIO_GROUP_NAME) // same name for all radios == radio group
                             aria["labelledby"] = itemId
                             checked(dataTable.itemStore.data.map { it.isSelected(item) })
-                            changes.states().map { item } handledBy dataTable.itemStore.selectItem
+                            changes.states().map { item } handledBy dataTable.itemStore.selectOnly
                         }
                     }
                 }

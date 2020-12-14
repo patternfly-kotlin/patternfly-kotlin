@@ -111,7 +111,7 @@ public class NotificationScope {
 }
 
 /**
- * Data class for a notification. Normally you don't need to create notifications yourself. Use one of the helper function in the [companion object][Notification.Companion] instead.
+ * Data class for a notification. Normally you don't need to create notifications yourself. Use one of the helper function defined in the [companion object][Notification.Companion] instead.
  */
 public data class Notification(
     val severity: Severity,

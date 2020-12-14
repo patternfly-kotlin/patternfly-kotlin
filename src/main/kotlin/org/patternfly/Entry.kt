@@ -56,16 +56,22 @@ public fun <T> Flow<List<Entry<T>>>.flatItems(): Flow<List<Item<T>>> = this.map 
 /**
  * Entry used in components like [Dropdown], [OptionsMenu] or [Select].
  *
- * Each entry is either an [Item] or a [Group] of [Item]s.
+ * Each [Entry] is either an [Item], a [Group] or a [Separator].
  */
 public sealed class Entry<T>
 
+/**
+ * Group containing a list of nested [Entry] instances and an optional text.
+ */
 public data class Group<T> internal constructor(
     internal val id: String = Id.unique("grp"),
-    val title: String?,
+    val text: String?,
     val items: List<Entry<T>>
 ) : Entry<T>()
 
+/**
+ * Item containing the actual data and an optional description and icon.
+ */
 public data class Item<T> internal constructor(
     override val item: T,
     val disabled: Boolean,
@@ -75,25 +81,40 @@ public data class Item<T> internal constructor(
     internal var group: Group<T>?
 ) : Entry<T>(), HasItem<T>
 
+/**
+ * Separator used for visual purposes only.
+ */
 public class Separator<T> : Entry<T>()
 
+/**
+ * Builder for a list of [Item]s.
+ */
 public class ItemsBuilder<T> internal constructor() {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
+/**
+ * Builder for a list of [Group]s.
+ */
 public class GroupsBuilder<T> internal constructor() {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): List<Entry<T>> = entries
 }
 
-public class GroupBuilder<T> internal constructor(private val title: String?) {
+/**
+ * Builder for a [Group].
+ */
+public class GroupBuilder<T> internal constructor(private val text: String?) {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
-    internal fun build(): Group<T> = Group(title = title, items = entries).apply {
+    internal fun build(): Group<T> = Group(text = text, items = entries).apply {
         items.filterIsInstance<Item<T>>().forEach { it.group = this }
     }
 }
 
+/**
+ * Builder for an [Item].
+ */
 public class ItemBuilder<T> internal constructor(private val item: T) {
     public var disabled: Boolean = false
     public var selected: Boolean = false
