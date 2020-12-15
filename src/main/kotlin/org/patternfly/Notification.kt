@@ -48,20 +48,24 @@ public class NotificationBadge internal constructor(withCount: Boolean, id: Stri
             if (unread) "Unread notifications" else "Notifications"
         }
         span(baseClass = "notification-badge".component()) {
-            className(NotificationStore.data.map { notifications ->
-                when {
-                    notifications.isEmpty() -> "read".modifier()
-                    notifications.any { it.severity == Severity.DANGER } -> "attention".modifier()
-                    else -> "unread".modifier()
+            className(
+                NotificationStore.data.map { notifications ->
+                    when {
+                        notifications.isEmpty() -> "read".modifier()
+                        notifications.any { it.severity == Severity.DANGER } -> "attention".modifier()
+                        else -> "unread".modifier()
+                    }
                 }
-            })
+            )
             icon("bell".pfIcon()) {
-                iconClass(NotificationStore.data.map { notifications ->
-                    if (notifications.any { it.severity == Severity.DANGER })
-                        "attention-bell".pfIcon()
-                    else
-                        "bell".pfIcon()
-                })
+                iconClass(
+                    NotificationStore.data.map { notifications ->
+                        if (notifications.any { it.severity == Severity.DANGER })
+                            "attention-bell".pfIcon()
+                        else
+                            "bell".pfIcon()
+                    }
+                )
             }
             if (withCount) {
                 span(baseClass = "notification-badge".component("count")) {

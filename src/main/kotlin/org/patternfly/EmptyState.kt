@@ -45,11 +45,15 @@ public class EmptyState internal constructor(
     baseClass: String?,
     job: Job,
     content: EmptyStateContent.() -> Unit
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
-    +ComponentType.EmptyState
-    +size?.modifier
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLDivElement>, Div(
+    id = id,
+    baseClass = classes {
+        +ComponentType.EmptyState
+        +size?.modifier
+        +baseClass
+    },
+    job
+) {
 
     init {
         markAs(ComponentType.EmptyState)

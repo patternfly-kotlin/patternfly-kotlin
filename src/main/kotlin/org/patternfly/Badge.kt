@@ -101,8 +101,8 @@ public class Badge internal constructor(
     }
 
     private fun applyBounds(value: Int): String = when {
-        value < min -> "<${min}"
-        value > max -> "${max}+"
+        value < min -> "<$min"
+        value > max -> "$max+"
         else -> value.toString()
     }
 }

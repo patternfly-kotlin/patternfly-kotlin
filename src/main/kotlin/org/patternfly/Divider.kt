@@ -22,16 +22,19 @@ public fun RenderContext.divider(
 ): Tag<HTMLElement> =
     when (variant) {
         DividerVariant.HR -> register(
-            Hr(id = id, baseClass = classes("divider".component(), baseClass), job), {}
+            Hr(id = id, baseClass = classes("divider".component(), baseClass), job),
+            {}
         )
         DividerVariant.DIV -> register(
             Div(id = id, baseClass = classes("divider".component(), baseClass), job).apply {
                 attr("role", "separator")
-            }, {}
+            },
+            {}
         )
         DividerVariant.LI -> register(
             Li(id = id, baseClass = classes("divider".component(), baseClass), job).apply {
                 attr("role", "separator")
-            }, {}
+            },
+            {}
         )
     }

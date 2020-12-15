@@ -6,9 +6,9 @@ import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -187,11 +187,16 @@ public class CardView<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
-    +"gallery".layout()
-    +"gutter".modifier()
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLDivElement>,
+    Div(
+        id = id,
+        baseClass = classes {
+            +"gallery".layout()
+            +"gutter".modifier()
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.CardView)
@@ -251,11 +256,16 @@ public class Card<T> internal constructor(
     job: Job
 ) : PatternFlyComponent<HTMLElement>,
     WithIdProvider<T> by itemStore,
-    TextElement("article", id = id, baseClass = classes {
-        +ComponentType.Card
-        +("selectable".modifier() `when` selectable)
-        +baseClass
-    }, job) {
+    TextElement(
+        "article",
+        id = id,
+        baseClass = classes {
+            +ComponentType.Card
+            +("selectable".modifier() `when` selectable)
+            +baseClass
+        },
+        job
+    ) {
 
     /**
      * Stores the selection of this card if this card is used standalone (i.e. not as part of a [CardView])
@@ -267,9 +277,7 @@ public class Card<T> internal constructor(
         if (selectable) {
             domNode.tabIndex = 0
             if (itemStore != ItemStore.NOOP) {
-                classMap(itemStore.data
-                    .map { it.isSelected(item) }
-                    .map { mapOf("selected".modifier() to it) })
+                classMap(itemStore.data.map { it.isSelected(item) }.map { mapOf("selected".modifier() to it) })
                 clicks.map { item } handledBy itemStore.toggleSelection
             } else {
                 classMap(selected.data.map { mapOf("selected".modifier() to it) })
@@ -352,7 +360,6 @@ public class CardTitle<T> internal constructor(itemStore: ItemStore<T>, id: Stri
  */
 public class CardBody<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore, Div(id = id, baseClass = classes("card".component("body"), baseClass), job)
-
 
 /**
  * The footer of a [Card].

@@ -145,10 +145,14 @@ public class ChipGroup<T> internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     WithIdProvider<T> by store,
-    Div(id = id, baseClass = classes {
-        +ComponentType.ChipGroup
-        +baseClass
-    }, job) {
+    Div(
+        id = id,
+        baseClass = classes {
+            +ComponentType.ChipGroup
+            +baseClass
+        },
+        job
+    ) {
 
     private val expanded = CollapseExpandStore()
     private var display: (T) -> Chip = { chip { +it.toString() } }

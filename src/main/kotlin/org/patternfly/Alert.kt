@@ -7,12 +7,6 @@ import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.renderElement
-import org.patternfly.dom.By
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.matches
-import org.patternfly.dom.querySelector
-import org.patternfly.dom.removeFromParent
 import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -20,6 +14,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.matches
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
@@ -106,11 +106,14 @@ public fun AlertGroup.alert(
     id: String? = null,
     baseClass: String? = null,
     content: Alert.() -> Unit = {}
-): Li = register(li("alert-group".component("item")) {
-    alert(severity, text, closable, inline, id = id, baseClass = baseClass) {
-        content(this)
-    }
-}, {})
+): Li = register(
+    li("alert-group".component("item")) {
+        alert(severity, text, closable, inline, id = id, baseClass = baseClass) {
+            content(this)
+        }
+    },
+    {}
+)
 
 /**
  * Adds a description to an [Alert] component.
@@ -125,9 +128,12 @@ public fun Alert.alertDescription(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(div(id = id, baseClass = classes("alert".component("description"), baseClass)) {
-    content()
-}, {})
+): Div = register(
+    div(id = id, baseClass = classes("alert".component("description"), baseClass)) {
+        content()
+    },
+    {}
+)
 
 /**
  * Adds a container for actions to an [Alert] component.
@@ -142,9 +148,12 @@ public fun Alert.alertActions(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(div(id = id, baseClass = classes("alert".component("action-group"), baseClass)) {
-    content()
-}, {})
+): Div = register(
+    div(id = id, baseClass = classes("alert".component("action-group"), baseClass)) {
+        content()
+    },
+    {}
+)
 
 // ------------------------------------------------------ tag
 
@@ -158,11 +167,15 @@ public fun Alert.alertActions(
  */
 public class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLUListElement>,
-    Ul(id = id, baseClass = classes {
-        +ComponentType.AlertGroup
-        +("toast".modifier() `when` toast)
-        +baseClass
-    }, job) {
+    Ul(
+        id = id,
+        baseClass = classes {
+            +ComponentType.AlertGroup
+            +("toast".modifier() `when` toast)
+            +baseClass
+        },
+        job
+    ) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
 
@@ -172,15 +185,17 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
             (MainScope() + job).launch {
                 NotificationStore.latest.collect {
                     val alertId = Id.unique("alert")
-                    domNode.prepend(renderElement {
-                        alert(it.severity, it.text, true, id = alertId) {
-                            with(domNode) {
-                                onmouseover = { this@AlertGroup.stopTimeout(alertId) }
-                                onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
-                                this@AlertGroup.startTimeout(alertId, this)
+                    domNode.prepend(
+                        renderElement {
+                            alert(it.severity, it.text, true, id = alertId) {
+                                with(domNode) {
+                                    onmouseover = { this@AlertGroup.stopTimeout(alertId) }
+                                    onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
+                                    this@AlertGroup.startTimeout(alertId, this)
+                                }
                             }
-                        }
-                    }.domNode)
+                        }.domNode
+                    )
                 }
             }
         }
@@ -211,12 +226,17 @@ public class Alert internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
-    +ComponentType.Alert
-    +severity.modifier
-    +("inline".modifier() `when` inline)
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLDivElement>,
+    Div(
+        id = id,
+        baseClass = classes {
+            +ComponentType.Alert
+            +severity.modifier
+            +("inline".modifier() `when` inline)
+            +baseClass
+        },
+        job
+    ) {
 
     private var closeButton: PushButton? = null
     private val ariaLabels: Pair<String, String> = when (severity) {

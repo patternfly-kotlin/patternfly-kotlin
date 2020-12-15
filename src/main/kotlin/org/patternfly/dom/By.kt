@@ -148,14 +148,18 @@ private open class ByAttribute(
         if (value == "" || value == "-") {
             return false
         }
-        val r0 = """\\([0-9A-Fa-f]{1,6})[ \t\n\f\r]?""".toRegex()
-        val r1 = """\\.""".toRegex()
+        val r0 =
+            """\\([0-9A-Fa-f]{1,6})[ \t\n\f\r]?""".toRegex()
+        val r1 =
+            """\\.""".toRegex()
         val replaced = value
             .replace(r0, "a")
             .replace(r1, "a")
 
-        val m0 = """[\u0000-\u002c\u002e\u002f\u003A-\u0040\u005B-\u005E\u0060\u007B-\u009f]""".toRegex()
-        val m1 = """^(?:-?\d|--)""".toRegex()
+        val m0 =
+            """[\u0000-\u002c\u002e\u002f\u003A-\u0040\u005B-\u005E\u0060\u007B-\u009f]""".toRegex()
+        val m1 =
+            """^(?:-?\d|--)""".toRegex()
         return !(m0.containsMatchIn(replaced) || m1.containsMatchIn(replaced))
     }
 }

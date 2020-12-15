@@ -25,11 +25,16 @@ public class Title internal constructor(
     baseClass: String?,
     job: Job
 ) : PatternFlyComponent<HTMLHeadingElement>,
-    H(level, id = id, baseClass = classes {
-        +ComponentType.Title
-        +size.modifier
-        +baseClass
-    }, job) {
+    H(
+        level,
+        id = id,
+        baseClass = classes {
+            +ComponentType.Title
+            +size.modifier
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.Title)

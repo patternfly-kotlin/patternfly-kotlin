@@ -2,9 +2,9 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -82,14 +82,22 @@ public fun DrawerPanel.drawerBodyWithClose(
     id: String? = null,
     baseClass: String? = null,
     content: DrawerHead.() -> Unit = {}
-): DrawerBody = register(DrawerBody(this.drawer, id = id, baseClass = baseClass, job), {
-    it.drawerHead {
-        content(this)
-        drawerAction {
-            drawerClose()
+): DrawerBody = register(
+    DrawerBody(
+        this.drawer,
+        id = id,
+        baseClass = baseClass,
+        job
+    ),
+    {
+        it.drawerHead {
+            content(this)
+            drawerAction {
+                drawerClose()
+            }
         }
     }
-})
+)
 
 /**
  * Creates a [DrawerBody] component inside the [DrawerPanel] component.

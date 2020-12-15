@@ -4,10 +4,6 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import org.patternfly.dom.By
-import org.patternfly.dom.Id
-import org.patternfly.dom.aria
-import org.patternfly.dom.querySelector
 import dev.fritz2.routing.Router
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -18,6 +14,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.Orientation.HORIZONTAL
 import org.patternfly.Orientation.VERTICAL
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.aria
+import org.patternfly.dom.querySelector
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
@@ -42,7 +42,18 @@ public fun <T> RenderContext.verticalNavigation(
     baseClass: String? = null,
     content: Navigation<T>.() -> Unit = {}
 ): Navigation<T> = register(
-    Navigation(router, selected, VERTICAL, false, id = id, baseClass = baseClass, job, content), {})
+    Navigation(
+        router,
+        selected,
+        VERTICAL,
+        false,
+        id = id,
+        baseClass = baseClass,
+        job,
+        content
+    ),
+    {}
+)
 
 public fun <T> Navigation<T>.navigationGroup(
     text: String,
@@ -107,11 +118,16 @@ public class Navigation<T> internal constructor(
     job: Job,
     content: Navigation<T>.() -> Unit
 ) : PatternFlyComponent<HTMLElement>,
-    TextElement("nav", id = id, baseClass = classes {
-        +ComponentType.Navigation
-        +("horizontal".modifier() `when` (orientation == HORIZONTAL))
-        +baseClass
-    }, job) {
+    TextElement(
+        "nav",
+        id = id,
+        baseClass = classes {
+            +ComponentType.Navigation
+            +("horizontal".modifier() `when` (orientation == HORIZONTAL))
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.Navigation)
@@ -144,7 +160,12 @@ public class NavigationGroup<T> internal constructor(
     baseClass: String?,
     job: Job,
     content: NavigationItems<T>.() -> Unit
-) : Tag<HTMLElement>("section", id = id, baseClass = classes("nav".component("section"), baseClass), job) {
+) : Tag<HTMLElement>(
+    "section",
+    id = id,
+    baseClass = classes("nav".component("section"), baseClass),
+    job
+) {
 
     init {
         h2("nav".component("section", "title"), id) { +text }
@@ -161,11 +182,16 @@ public class NavigationExpandableGroup<T> internal constructor(
     baseClass: String?,
     job: Job,
     content: NavigationItems<T>.() -> Unit
-) : Tag<HTMLLIElement>("li", id = id, baseClass = classes {
-    +"nav".component("item")
-    +"expandable".modifier()
-    +baseClass
-}, job) {
+) : Tag<HTMLLIElement>(
+    "li",
+    id = id,
+    baseClass = classes {
+        +"nav".component("item")
+        +"expandable".modifier()
+        +baseClass
+    },
+    job
+) {
 
     private val ces = CollapseExpandStore()
 
@@ -211,7 +237,12 @@ public class NavigationItems<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Tag<HTMLUListElement>("ul", id = id, baseClass = classes("nav".component("list"), baseClass), job)
+) : Tag<HTMLUListElement>(
+    "ul",
+    id = id,
+    baseClass = classes("nav".component("list"), baseClass),
+    job
+)
 
 public class NavigationItem<T> internal constructor(
     private val navigation: Navigation<T>,
@@ -221,14 +252,21 @@ public class NavigationItem<T> internal constructor(
     baseClass: String?,
     job: Job,
     content: A.() -> Unit
-) : Tag<HTMLLIElement>("li", id = id, baseClass = classes("nav".component("item"), baseClass), job) {
+) : Tag<HTMLLIElement>(
+    "li",
+    id = id,
+    baseClass = classes("nav".component("item"), baseClass),
+    job
+) {
 
     init {
         a("nav".component("link")) {
             clicks.map { this@NavigationItem.item } handledBy this@NavigationItem.navigation.router.navTo
-            classMap(this@NavigationItem.navigation.router.data.map { route ->
-                mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
-            })
+            classMap(
+                this@NavigationItem.navigation.router.data.map { route ->
+                    mapOf("current".modifier() to (this@NavigationItem.calculateSelection(route)))
+                }
+            )
             aria["current"] = this@NavigationItem.navigation.router.data
                 .map { route -> if (this@NavigationItem.calculateSelection(route)) "page" else "" }
             content(this)

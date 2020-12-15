@@ -27,10 +27,13 @@ internal fun <V, I> Flow<List<V>>.renderShifted(
     content: RenderContext.(V) -> Tag<HTMLElement>
 ) {
     val jobs = mutableMapOf<Node, Job>()
-    mountDomNodePatch(tag.job, tag.domNode,
-        scan(Pair(emptyList<V>(), emptyList<V>()), { accumulator, newValue ->
-            Pair(accumulator.second, newValue)
-        }).flatMapConcat { (old, new) ->
+    mountDomNodePatch(
+        tag.job,
+        tag.domNode,
+        scan(
+            Pair(emptyList<V>(), emptyList<V>()),
+            { accumulator, newValue -> Pair(accumulator.second, newValue) }
+        ).flatMapConcat { (old, new) ->
             Myer.diff(old, new, idProvider)
         }.map { patch ->
             when (patch) {
@@ -47,10 +50,10 @@ internal fun <V, I> Flow<List<V>>.renderShifted(
                     jobs[it.domNode] = newJob
                 }
             }
-        }) { node ->
+        }
+    ) { node ->
         val job = jobs.remove(node)
         if (job != null) job.cancelChildren()
         else console.error("could not cancel renderEach-jobs!")
     }
 }
-

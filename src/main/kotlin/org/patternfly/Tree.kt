@@ -127,10 +127,12 @@ public class TreeView<T> internal constructor(
     private fun render(ul: Ul, treeItem: TreeItem<T>): Li {
         val li: Li
         with(ul) {
-            li = li(baseClass = classes {
-                +"tree-view".component("list-item")
-                +("expandable".modifier() `when` treeItem.hasChildren)
-            }) {
+            li = li(
+                baseClass = classes {
+                    +"tree-view".component("list-item")
+                    +("expandable".modifier() `when` treeItem.hasChildren)
+                }
+            ) {
                 attr("role", "treeitem")
                 attr("tabindex", "0")
                 domNode.dataset[TREE_ITEM] = this@TreeView.idProvider(treeItem.item)
@@ -218,14 +220,16 @@ public class TreeView<T> internal constructor(
 
     private fun expand(li: Element, treeItems: List<TreeItem<T>>) {
         flipIcons(li, true)
-        li.appendChild(renderElement {
-            ul {
-                attr("role", "group")
-                for (childItem in treeItems) {
-                    this@TreeView.render(this, childItem)
+        li.appendChild(
+            renderElement {
+                ul {
+                    attr("role", "group")
+                    for (childItem in treeItems) {
+                        this@TreeView.render(this, childItem)
+                    }
                 }
-            }
-        }.domNode)
+            }.domNode
+        )
         li.aria["expanded"] = true
         li.classList += "expanded".modifier()
 

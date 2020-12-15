@@ -76,13 +76,15 @@ public fun <T> ToolbarItem.bulkSelect(
                 }.asText()
             }
             checkbox {
-                triState(itemStore.data.map {
-                    when {
-                        it.selected.isEmpty() -> TriState.OFF
-                        it.selected.size == it.items.size -> TriState.ON
-                        else -> TriState.INDETERMINATE
+                triState(
+                    itemStore.data.map {
+                        when {
+                            it.selected.isEmpty() -> TriState.OFF
+                            it.selected.size == it.items.size -> TriState.ON
+                            else -> TriState.INDETERMINATE
+                        }
                     }
-                })
+                )
                 changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
                 changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
             }
@@ -155,7 +157,8 @@ public fun <T> ToolbarItem.pagination(
             id = id,
             baseClass = baseClass,
             job
-        ), content
+        ),
+        content
     )
 }
 
@@ -208,8 +211,6 @@ public class SortProperty<T>(public val id: String, text: String, public val com
     override fun toString(): String {
         return "SortProperty(id=$id)"
     }
-
-
 }
 
 public class SortOrder(public val ascending: Boolean) : SortOption(if (ascending) "Ascending" else "Descending") {

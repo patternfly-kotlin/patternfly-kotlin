@@ -86,9 +86,15 @@ public fun <T> Dropdown<T>.iconToggle(baseClass: String? = null, content: Button
  * @sample org.patternfly.sample.DropdownSample.kebabToggle
  */
 public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
-    assignToggle(DropdownIconToggle(this, baseClass, job) {
-        icon("ellipsis-v".fas())
-    })
+    assignToggle(
+        DropdownIconToggle(
+            this,
+            baseClass,
+            job
+        ) {
+            icon("ellipsis-v".fas())
+        }
+    )
 }
 
 /**
@@ -223,12 +229,16 @@ public class Dropdown<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
-    +ComponentType.Dropdown
-    +dropdownAlign?.modifier
-    +("top".modifier() `when` up)
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLDivElement>, Div(
+    id = id,
+    baseClass = classes {
+        +ComponentType.Dropdown
+        +dropdownAlign?.modifier
+        +("top".modifier() `when` up)
+        +baseClass
+    },
+    job
+) {
 
     private var selector: (T) -> String = { it.toString() }
     private var customDisplay: ComponentDisplay<Button, T>? = null
@@ -330,12 +340,14 @@ public class Dropdown<T> internal constructor(
 
     private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
-        button(baseClass = classes {
-            +"dropdown".component("menu-item")
-            +("icon".modifier() `when` (item.icon != null))
-            +("description".modifier() `when` item.description.isNotEmpty())
-            +("disabled".modifier() `when` item.disabled)
-        }) {
+        button(
+            baseClass = classes {
+                +"dropdown".component("menu-item")
+                +("icon".modifier() `when` (item.icon != null))
+                +("description".modifier() `when` item.description.isNotEmpty())
+                +("disabled".modifier() `when` item.disabled)
+            }
+        ) {
             attr("tabindex", "-1")
             if (item.disabled) {
                 aria["disabled"] = true
@@ -361,7 +373,6 @@ public class Dropdown<T> internal constructor(
             domNode.prepend(toggle.domNode)
             (this.toggle as RecordingToggle<T>).playback(toggle)
             this.toggle = toggle
-
         } else {
             console.warn("Reassignment of dropdown toggle in ${domNode.debug()} not supported. Toggle has already been assigned to ${this.toggle::class.simpleName}.")
         }
@@ -414,11 +425,14 @@ internal class DropdownTextToggle<T>(
     job: Job,
     content: Span.() -> Unit
 ) : Toggle<T, HTMLButtonElement>,
-    Button(baseClass = classes {
-        +"dropdown".component("toggle")
-        +variations.joinToString(" ") { it.modifier }
-        +baseClass
-    }, job = job) {
+    Button(
+        baseClass = classes {
+            +"dropdown".component("toggle")
+            +variations.joinToString(" ") { it.modifier }
+            +baseClass
+        },
+        job = job
+    ) {
 
     init {
         initToggle(dropdown, this)
@@ -445,11 +459,14 @@ internal class DropdownIconToggle<T>(
     job: Job,
     content: Button.() -> Unit
 ) : Toggle<T, HTMLButtonElement>,
-    Button(baseClass = classes {
-        +"dropdown".component("toggle")
-        +"plain".modifier()
-        +baseClass
-    }, job = job) {
+    Button(
+        baseClass = classes {
+            +"dropdown".component("toggle")
+            +"plain".modifier()
+            +baseClass
+        },
+        job = job
+    ) {
 
     init {
         initToggle(dropdown, this)
@@ -471,11 +488,14 @@ internal class DropdownInternalCheckboxToggle<T>(
     job: Job,
     content: DropdownCheckboxToggle.() -> Unit,
 ) : Toggle<T, HTMLDivElement>,
-    Div(baseClass = classes {
-        +"dropdown".component("toggle")
-        +"split-button".modifier()
-        +baseClass
-    }, job = job) {
+    Div(
+        baseClass = classes {
+            +"dropdown".component("toggle")
+            +"split-button".modifier()
+            +baseClass
+        },
+        job = job
+    ) {
 
     private val label: Label
     private val button: Button
@@ -500,7 +520,6 @@ internal class DropdownInternalCheckboxToggle<T>(
         domNode.classList.toggle("disabled".modifier(), value)
         checkbox.disabled(value)
         button.disabled(value)
-
     }
 
     override fun disabled(value: Flow<Boolean>) {
@@ -531,9 +550,11 @@ public class DropdownCheckboxToggle internal constructor(
                     id = Id.unique(ComponentType.Dropdown.id, "tgl", "txt"),
                     baseClass = "dropdown".component("toggle", "text"),
                     job
-                ), {
+                ),
+                {
                     it.aria["hidden"] = true
-                })
+                }
+            )
             checkbox.aria["labelledby"] = text!!.domNode.id
         }
         content.invoke(text!!)
@@ -553,12 +574,15 @@ internal class DropdownActionToggle<T>(
     job: Job,
     content: Button.() -> Unit
 ) : Toggle<T, HTMLDivElement>,
-    Div(baseClass = classes {
-        +"dropdown".component("toggle")
-        +"split-button".modifier()
-        +"action".modifier()
-        +baseClass
-    }, job = job) {
+    Div(
+        baseClass = classes {
+            +"dropdown".component("toggle")
+            +"split-button".modifier()
+            +"action".modifier()
+            +baseClass
+        },
+        job = job
+    ) {
 
     private val actionButton: Button
     private val toggleButton: Button

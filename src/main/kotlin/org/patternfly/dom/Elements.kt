@@ -166,13 +166,15 @@ public fun Element?.isInView(container: Element?, partial: Boolean = false): Boo
         val elementBoundsRight = floor(elementBounds.right)
 
         // Check if in view
-        val totallyInView = elementBoundsLeft >= containerBoundsLeft && elementBoundsRight <= containerBoundsRight;
+        val totallyInView = elementBoundsLeft >= containerBoundsLeft && elementBoundsRight <= containerBoundsRight
         val partiallyInView = partial &&
-                ((elementBoundsLeft < containerBoundsLeft && elementBoundsRight > containerBoundsLeft) ||
-                        (elementBoundsRight > containerBoundsRight && elementBoundsLeft < containerBoundsRight))
+            (
+                (elementBoundsLeft < containerBoundsLeft && elementBoundsRight > containerBoundsLeft) ||
+                    (elementBoundsRight > containerBoundsRight && elementBoundsLeft < containerBoundsRight)
+                )
 
         // Return outcome
-        return totallyInView || partiallyInView;
+        return totallyInView || partiallyInView
     } else {
         return false
     }

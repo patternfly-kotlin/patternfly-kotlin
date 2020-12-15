@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.map
  */
 public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
     WithIdProvider<T>,
-    RootStore<Items<T>>(Items(idProvider)), PageInfoHandler {
+    RootStore<Items<T>>(Items(idProvider)),
+    PageInfoHandler {
 
     /**
      * Flow containing the current page.

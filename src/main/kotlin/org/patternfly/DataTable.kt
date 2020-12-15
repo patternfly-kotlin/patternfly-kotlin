@@ -158,11 +158,15 @@ public class DataTable<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLTableElement>, Table(id = id, baseClass = classes {
-    +ComponentType.DataTable
-    +"grid-md".modifier()
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLTableElement>, Table(
+    id = id,
+    baseClass = classes {
+        +ComponentType.DataTable
+        +"grid-md".modifier()
+        +baseClass
+    },
+    job
+) {
 
     internal val columns: Columns<T> = Columns(this)
 
@@ -199,10 +203,12 @@ public class DataTable<T> internal constructor(
                             }
                         }
                         is DataColumn<T> -> {
-                            th(baseClass = classes {
-                                +("table".component("sort") `when` (column.sortInfo != null))
-                                +column.headerClass
-                            }) {
+                            th(
+                                baseClass = classes {
+                                    +("table".component("sort") `when` (column.sortInfo != null))
+                                    +column.headerClass
+                                }
+                            ) {
                                 attr("scope", "col")
                                 attr("role", "columnheader")
                                 if (column.sortInfo != null) {
@@ -211,9 +217,11 @@ public class DataTable<T> internal constructor(
                                             if (it.sortInfo.ascending) "ascending" else "descending"
                                         } else "none"
                                     }
-                                    classMap(this@DataTable.itemStore.data.map {
-                                        mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
-                                    })
+                                    classMap(
+                                        this@DataTable.itemStore.data.map {
+                                            mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
+                                        }
+                                    )
                                 }
                                 if (column.headerDisplay != null) {
                                     column.headerDisplay!!.invoke(this)
@@ -226,14 +234,17 @@ public class DataTable<T> internal constructor(
                                             }
                                             span(baseClass = "table".component("sort", "indicator")) {
                                                 icon("arrows-alt-v".fas()) {
-                                                    iconClass(this@DataTable.itemStore.data.map {
-                                                        if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
-                                                            if (it.sortInfo.ascending)
-                                                                "long-arrow-alt-up".fas()
-                                                            else
-                                                                "long-arrow-alt-down".fas()
-                                                        } else "arrows-alt-v".fas()
-                                                    })
+                                                    iconClass(
+                                                        this@DataTable.itemStore.data.map {
+                                                            if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
+                                                                if (it.sortInfo.ascending)
+                                                                    "long-arrow-alt-up".fas()
+                                                                else
+                                                                    "long-arrow-alt-down".fas()
+                                                            } else
+                                                                "arrows-alt-v".fas()
+                                                        }
+                                                    )
                                                 }
                                             }
                                         }

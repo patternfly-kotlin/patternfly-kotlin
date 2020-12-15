@@ -1,9 +1,9 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Span
-import org.patternfly.dom.Id
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.dom.Id
 
 // ------------------------------------------------------ dsl
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.Comment
 import org.w3c.dom.Node
 
-
 /**
  * Common interface for [Dropdown] and [OptionsMenu] toggle variants.
  */
@@ -42,4 +41,3 @@ internal class RecordingToggle<T> : Toggle<T, Comment> {
         recordedFlow?.let { toggle.disabled(it) }
     }
 }
-

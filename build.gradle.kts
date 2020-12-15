@@ -5,9 +5,9 @@ import java.util.Date
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
-    id("com.jfrog.bintray") version "1.8.5"
-    // Incompatible with Kotlin/JS at the moment
-//    id("com.eden.orchidPlugin") version PluginVersions.orchid
+    id("com.jfrog.bintray") version PluginVersions.bintray
+    id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlint
+    id("org.jlleitschuh.gradle.ktlint-idea") version PluginVersions.ktlint
     `maven-publish`
 }
 
@@ -25,7 +25,6 @@ repositories {
 dependencies {
     fritz2()
     kotest()
-//    orchid()
 }
 
 kotlin {
@@ -68,7 +67,7 @@ tasks.dokkaHtml.configure {
                 remoteUrl.set(
                     URL(
                         "https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/" +
-                                "src/main/kotlin/"
+                            "src/main/kotlin/"
                     )
                 )
                 remoteLineSuffix.set("#L")

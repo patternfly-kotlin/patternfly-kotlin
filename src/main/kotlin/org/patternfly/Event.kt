@@ -12,14 +12,16 @@ import org.w3c.dom.events.Event
 // Taken from dev.fritz2.dom.WithEvents.subscribe()
 internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: EventType<E>): Listener<E, T> =
     if (wdn != null) {
-        Listener(callbackFlow {
-            val listener: (Event) -> Unit = {
-                offer(it.unsafeCast<E>())
-            }
-            wdn.domNode.addEventListener(type.name, listener)
+        Listener(
+            callbackFlow {
+                val listener: (Event) -> Unit = {
+                    offer(it.unsafeCast<E>())
+                }
+                wdn.domNode.addEventListener(type.name, listener)
 
-            awaitClose { wdn.domNode.removeEventListener(type.name, listener) }
-        })
+                awaitClose { wdn.domNode.removeEventListener(type.name, listener) }
+            }
+        )
     } else {
         Listener(emptyFlow())
     }

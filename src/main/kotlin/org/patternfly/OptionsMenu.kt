@@ -57,7 +57,6 @@ public fun <T> RenderContext.optionsMenu(
         content
     )
 
-
 /**
  * Creates a text toggle. Specify the text using the [content] function.
  *
@@ -150,12 +149,16 @@ public class OptionsMenu<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes {
-    +ComponentType.OptionsMenu
-    +optionsMenuAlign?.modifier
-    +("top".modifier() `when` up)
-    +baseClass
-}, job) {
+) : PatternFlyComponent<HTMLDivElement>, Div(
+    id = id,
+    baseClass = classes {
+        +ComponentType.OptionsMenu
+        +optionsMenuAlign?.modifier
+        +("top".modifier() `when` up)
+        +baseClass
+    },
+    job
+) {
 
     private var selector: (T) -> String = { it.toString() }
     private var customDisplay: ComponentDisplay<Button, T>? = null
@@ -239,10 +242,12 @@ public class OptionsMenu<T> internal constructor(
 
     private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
-        button(baseClass = classes {
-            +"options-menu".component("menu-item")
-            +("disabled".modifier() `when` item.disabled)
-        }) {
+        button(
+            baseClass = classes {
+                +"options-menu".component("menu-item")
+                +("disabled".modifier() `when` item.disabled)
+            }
+        ) {
             attr("tabindex", "-1")
             if (item.disabled) {
                 aria["disabled"] = true
@@ -272,7 +277,6 @@ public class OptionsMenu<T> internal constructor(
             domNode.prepend(toggle.domNode)
             (this.toggle as RecordingToggle<T>).playback(toggle)
             this.toggle = toggle
-
         } else {
             console.warn("Reassignment of options menu toggle in ${domNode.debug()} not supported. Toggle has already been assigned to ${this.toggle::class.simpleName}.")
         }
@@ -351,12 +355,15 @@ internal class OptionsMenuPlainTextToggle<T>(
     job: Job,
     content: Span.() -> Unit
 ) : Toggle<T, HTMLDivElement>,
-    Div(baseClass = classes {
-        +"options-menu".component("toggle")
-        +"text".modifier()
-        +"plain".modifier()
-        +baseClass
-    }, job = job) {
+    Div(
+        baseClass = classes {
+            +"options-menu".component("toggle")
+            +"text".modifier()
+            +"plain".modifier()
+            +baseClass
+        },
+        job = job
+    ) {
 
     private val toggleButton: Button
 
@@ -388,11 +395,14 @@ internal class OptionsMenuIconToggle<T>(
     job: Job,
     content: Button.() -> Unit
 ) : Toggle<T, HTMLButtonElement>,
-    Button(baseClass = classes {
-        +"options-menu".component("toggle")
-        +"plain".modifier()
-        +baseClass
-    }, job = job) {
+    Button(
+        baseClass = classes {
+            +"options-menu".component("toggle")
+            +"plain".modifier()
+            +baseClass
+        },
+        job = job
+    ) {
 
     init {
         initToggle(optionsMenu, this)
@@ -494,4 +504,3 @@ public class OptionsMenuStore<T>(override val idProvider: IdProvider<T, String> 
         }
     }
 }
-

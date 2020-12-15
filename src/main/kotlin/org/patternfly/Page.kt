@@ -8,11 +8,11 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -246,13 +246,15 @@ public class Sidebar internal constructor(
     init {
         markAs(ComponentType.PageSidebar)
         attr("hidden", sidebarStore.data.map { !it.visible })
-        classMap(sidebarStore.data.map {
-            mapOf(
-                "display-none".util() to !it.visible,
-                "collapsed".modifier() to !it.expanded,
-                "expanded".modifier() to it.expanded
-            )
-        })
+        classMap(
+            sidebarStore.data.map {
+                mapOf(
+                    "display-none".util() to !it.visible,
+                    "collapsed".modifier() to !it.expanded,
+                    "expanded".modifier() to it.expanded
+                )
+            }
+        )
     }
 
     /**

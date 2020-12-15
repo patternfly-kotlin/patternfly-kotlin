@@ -337,11 +337,15 @@ public class DataListItem<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemStore,
-    Li(id = id, baseClass = classes {
-        +"data-list".component("item")
-        +("selectable".modifier() `when` dataList.selectableRows)
-        +baseClass
-    }, job) {
+    Li(
+        id = id,
+        baseClass = classes {
+            +"data-list".component("item")
+            +("selectable".modifier() `when` dataList.selectableRows)
+            +baseClass
+        },
+        job
+    ) {
 
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
@@ -355,11 +359,10 @@ public class DataListItem<T> internal constructor(
     init {
         aria["labelledby"] = itemStore.idProvider(item)
         if (dataList.selectableRows) {
-            classMap(ces.data
-                .combine(itemStore.data.map { it.isSelected(item) }) { expanded, selected ->
+            classMap(
+                ces.data.combine(itemStore.data.map { it.isSelected(item) }) { expanded, selected ->
                     expanded to selected
-                }
-                .map { (expanded, selected) ->
+                }.map { (expanded, selected) ->
                     mapOf(
                         "expanded".modifier() to expanded,
                         "selected".modifier() to selected
@@ -412,4 +415,3 @@ public class DataListToggle<T> internal constructor(
         } handledBy this@DataListToggle.dataListItem.ces.toggle
     }
 }
-

@@ -38,15 +38,18 @@ public fun <T> RenderContext.tabs(
     baseClass: String? = null,
     block: TabItemsBuilder<T>.() -> Unit = {}
 ): Tabs<T> {
-    val tabs = register(Tabs(
-        store,
-        box = box,
-        filled = filled,
-        vertical = vertical,
-        id = id,
-        baseClass = baseClass,
-        job
-    ), {})
+    val tabs = register(
+        Tabs(
+            store,
+            box = box,
+            filled = filled,
+            vertical = vertical,
+            id = id,
+            baseClass = baseClass,
+            job
+        ),
+        {}
+    )
     val tabItems = TabItemsBuilder(tabs).apply(block).build()
     store.update(tabItems)
     return tabs
@@ -81,16 +84,20 @@ public class Tabs<T> internal constructor(
     init {
         markAs(ComponentType.Tabs)
 
-        div(baseClass = classes {
-            +"tabs".component()
-            +("box".modifier() `when` box)
-            +("fill".modifier() `when` filled)
-            +("vertical".modifier() `when` vertical)
-            +baseClass
-        }) {
-            classMap(this@Tabs.scrollStore.data.map {
-                mapOf("scrollable".modifier() to (!this@Tabs.vertical && it.showButtons))
-            })
+        div(
+            baseClass = classes {
+                +"tabs".component()
+                +("box".modifier() `when` box)
+                +("fill".modifier() `when` filled)
+                +("vertical".modifier() `when` vertical)
+                +baseClass
+            }
+        ) {
+            classMap(
+                this@Tabs.scrollStore.data.map {
+                    mapOf("scrollable".modifier() to (!this@Tabs.vertical && it.showButtons))
+                }
+            )
             button(baseClass = "tabs".component("scroll", "button")) {
                 aria["label"] = "Scroll left"
                 disabled(this@Tabs.scrollStore.data.map { it.disableLeft })
@@ -101,16 +108,17 @@ public class Tabs<T> internal constructor(
             this@Tabs.tabs = ul(baseClass = "tabs".component("list")) {
                 // update scroll buttons, when scroll event has been fired
                 // e.g. by scrollLeft() or scrollRight()
-                scrolls
-                    .map { this@Tabs.updateScrollButtons(domNode) }
+                scrolls.map { this@Tabs.updateScrollButtons(domNode) }
                     .filterNotNull()
                     .handledBy(this@Tabs.scrollStore.update)
 
                 this@Tabs.store.data.renderEach({ this@Tabs.selectId(it) }) { tab ->
-                    li(baseClass = classes {
-                        +"tabs".component("item")
-                        +("current".modifier() `when` tab.selected)
-                    }) {
+                    li(
+                        baseClass = classes {
+                            +"tabs".component("item")
+                            +("current".modifier() `when` tab.selected)
+                        }
+                    ) {
                         button(id = this@Tabs.tabId(tab.item), baseClass = "tabs".component("link")) {
                             aria["controls"] = this@Tabs.contentId(tab.item)
                             clicks.map { tab } handledBy this@Tabs.store.selectHandler
@@ -140,13 +148,21 @@ public class Tabs<T> internal constructor(
             this,
             { selectId(it) },
             { tab ->
-                register(TabContent(tab.item, tabId(tab.item), contentId(tab.item), job), {
-                    if (!tab.selected) {
-                        it.attr("hidden", "")
-                    }
-                    contentDisplay?.invoke(it, it.item)
-                    tab.content(it)
-                })
+                register(
+                    TabContent(
+                        tab.item,
+                        tabId(tab.item),
+                        contentId(tab.item),
+                        job
+                    ),
+                    {
+                        if (!tab.selected) {
+                            it.attr("hidden", "")
+                        }
+                        contentDisplay?.invoke(it, it.item)
+                        tab.content(it)
+                    },
+                )
             }
         )
 

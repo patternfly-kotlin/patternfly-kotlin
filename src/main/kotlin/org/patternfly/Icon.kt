@@ -3,9 +3,9 @@ package org.patternfly
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
@@ -38,11 +38,16 @@ public fun RenderContext.icon(
  */
 public class Icon internal constructor(iconClass: String, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("i", id = id, baseClass = classes {
-        +ComponentType.Icon
-        +iconClass
-        +baseClass
-    }, job) {
+    TextElement(
+        "i",
+        id = id,
+        baseClass = classes {
+            +ComponentType.Icon
+            +iconClass
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.Icon)
@@ -62,10 +67,13 @@ public class Icon internal constructor(iconClass: String, id: String?, baseClass
      * Changes the icon class.
      */
     public fun iconClass(iconClass: String) {
-        attr("class", classes {
-            +ComponentType.Icon
-            +iconClass
-            +baseClass
-        })
+        attr(
+            "class",
+            classes {
+                +ComponentType.Icon
+                +iconClass
+                +baseClass
+            }
+        )
     }
 }

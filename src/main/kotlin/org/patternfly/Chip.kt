@@ -51,10 +51,14 @@ public fun Chip.badge(
     baseClass: String? = null,
     content: Badge.() -> Unit = {}
 ) {
-    domNode.querySelector(By.classname("chip".component("text")))
-        ?.appendChild(register(Badge(min, max, id = id, baseClass = baseClass, job).also {
-            it.read(true)
-        }, content).domNode)
+    domNode.querySelector(By.classname("chip".component("text")))?.appendChild(
+        register(
+            Badge(min, max, id = id, baseClass = baseClass, job).also {
+                it.read(true)
+            },
+            content
+        ).domNode
+    )
 }
 
 // ------------------------------------------------------ tag
@@ -71,11 +75,15 @@ public fun Chip.badge(
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
-    Div(id = id, baseClass = classes {
-        +ComponentType.Chip
-        +("read-only".modifier() `when` readOnly)
-        +baseClass
-    }, job) {
+    Div(
+        id = id,
+        baseClass = classes {
+            +ComponentType.Chip
+            +("read-only".modifier() `when` readOnly)
+            +baseClass
+        },
+        job
+    ) {
 
     private var textElement: Span
     private var closeButton: PushButton? = null

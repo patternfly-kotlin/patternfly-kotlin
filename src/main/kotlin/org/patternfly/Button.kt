@@ -110,11 +110,17 @@ public class PushButton internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Button(id, classes {
-    +ComponentType.Button
-    +variations.joinToString(" ") { it.modifier }
-    +baseClass
-}, job), ButtonLike, PatternFlyComponent<HTMLButtonElement> {
+) : PatternFlyComponent<HTMLButtonElement>,
+    ButtonLike,
+    Button(
+        id,
+        classes {
+            +ComponentType.Button
+            +variations.joinToString(" ") { it.modifier }
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.Button)
@@ -133,11 +139,17 @@ public class LinkButton internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : A(id, classes {
-    +ComponentType.Button
-    +variations.joinToString(" ") { it.modifier }
-    +baseClass
-}, job), ButtonLike, PatternFlyComponent<HTMLAnchorElement> {
+) : PatternFlyComponent<HTMLAnchorElement>,
+    ButtonLike,
+    A(
+        id,
+        classes {
+            +ComponentType.Button
+            +variations.joinToString(" ") { it.modifier }
+            +baseClass
+        },
+        job
+    ) {
 
     init {
         markAs(ComponentType.Button)
@@ -156,10 +168,13 @@ public class ButtonIcon internal constructor(
     baseClass: String?,
     job: Job,
     content: Icon.() -> Unit
-) : Span(baseClass = classes {
-    +"button".component("icon")
-    +iconPosition.modifier
-}, job = job) {
+) : Span(
+    baseClass = classes {
+        +"button".component("icon")
+        +iconPosition.modifier
+    },
+    job = job
+) {
 
     init {
         icon(iconClass, id = id, baseClass = baseClass) {
