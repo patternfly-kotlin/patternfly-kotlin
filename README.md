@@ -94,8 +94,8 @@ fun main() {
                 Word("Chip five")
             )
         )
-        remove handledBy Notification.add { word ->
-            info("You removed ${word?.text}.")
+        removes handledBy Notification.add { word ->
+            info("You removed ${word.text}.")
         }
     }
 
