@@ -8,11 +8,11 @@ import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.valuesAsNumber
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -71,11 +71,11 @@ public class Pagination internal constructor(
         div(baseClass = "pagination".component("total-items")) {
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
-        optionsMenu = optionsMenu {
-            display { +"$it per page" }
-            optionsMenuTogglePlain {
-                content = { this@Pagination.pageInfoFlow.showRange().invoke(this) }
+        optionsMenu = optionsMenu(closeOnSelect = true) {
+            textToggle(plain = true) {
+                this@Pagination.pageInfoFlow.showRange().invoke(this)
             }
+            display { +"$it per page" }
             items {
                 pageSizes.forEachIndexed { index, pageSize ->
                     item(pageSize) {
@@ -83,8 +83,7 @@ public class Pagination internal constructor(
                     }
                 }
             }
-            store.selection.map { Unit } handledBy ces.collapse
-            store.selection.unwrap().map { it.first() } handledBy this@Pagination.pageInfoHandler.pageSize
+            store.selects.unwrap() handledBy this@Pagination.pageInfoHandler.pageSize
         }
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {

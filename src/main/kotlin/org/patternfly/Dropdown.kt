@@ -1,8 +1,8 @@
 package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
@@ -13,15 +13,14 @@ import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.matches
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -187,7 +186,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     store.update(GroupsBuilder<T>().apply(block).build())
 }
 
-// ------------------------------------------------------ dropdown tag
+// ------------------------------------------------------ tag
 
 /**
  * PatternFly [dropdown](https://www.patternfly.org/v4/components/dropdown/design-guidelines) component.
@@ -211,7 +210,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * By default the dropdown uses a builtin function to render the [Item]s in the [DropdownStore]. This function takes the [Item.icon] and the [Item.description] into account (if specified). It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
  *
- * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data inside the dropdown entries.
+ * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the dropdown entries.
  *
  * @sample org.patternfly.sample.DropdownSample.dropdownDsl
  * @sample org.patternfly.sample.DropdownSample.dropdownStore
@@ -285,7 +284,7 @@ public class Dropdown<T> internal constructor(
                 attr("hidden", true)
             }
         }
-        with (tag) {
+        with(tag) {
             attr("role", "menu")
             attr("hidden", this@Dropdown.ces.data.map { !it })
             aria["labelledby"] = this@Dropdown.toggleId
@@ -351,8 +350,7 @@ public class Dropdown<T> internal constructor(
                 this@Dropdown.defaultDisplay.invoke(this, item)
             }
             clicks handledBy this@Dropdown.ces.collapse
-            clicks.map { item } handledBy this@Dropdown.store.selectItemHandler
-            clicks.map { item.item } handledBy this@Dropdown.store.selectHandler
+            clicks.map { item } handledBy this@Dropdown.store.selectHandler
         }
     }
 
@@ -398,9 +396,9 @@ public class Dropdown<T> internal constructor(
     }
 }
 
-// ------------------------------------------------------ dropdown toggle
+// ------------------------------------------------------ toggle
 
-internal fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
+private fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
     with(tag) {
         domNode.id = dropdown.toggleId
         aria["haspopup"] = true
@@ -408,6 +406,7 @@ internal fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
         clicks handledBy dropdown.ces.toggle
     }
 }
+
 internal class DropdownTextToggle<T>(
     dropdown: Dropdown<T>,
     variations: Array<out ButtonVariation>,
@@ -613,50 +612,29 @@ public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, 
 
 /**
  * Store containing the data shown in a dropdown. The data is wrapped inside instances of [Entry]. An entry is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ *
+ * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the `unwrap()` functions to get the actual payload.
+ *
+ * @sample org.patternfly.sample.DropdownSample.unwrap
  */
 public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
 
-    internal val selectHandler: EmittingHandler<T, T> = handleAndEmit { items, item ->
-        emit(item)
-        items
-    }
-
-    internal val selectItemHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
+    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
         emit(item)
         items
     }
 
     /**
-     * Flow with the last selected item data. Use this flow if you just want to handle the payload of [Item] and don't need the [Item] instance itself.
+     * Flow with the last selected items.
      */
-    public val select: Flow<T> = selectHandler
-
-    /**
-     * Flow with the last selected item. Use this flow if you need the [Item] instance.
-     */
-    public val selectItem: Flow<Item<T>> = selectItemHandler
-
-    /**
-     * Flow containing a list of all items in all groups (if any).
-     */
-    public val items: Flow<List<Item<T>>> = data.flatItems()
-
-    /**
-     * Flow containing a list of all groups.
-     */
-    public val groups: Flow<List<Group<T>>> = data.groups()
+    public val selects: Flow<Item<T>> = selectHandler
 
     /**
      * Wraps the specified data inside instances of [Item] and adds them to the list of existing entries.
      */
-    public val addAll: SimpleHandler<List<T>> = handle { items, newItems ->
+    public val addAll: Handler<List<T>> = handle { items, newItems ->
         items + newItems.map {
             Item(it, disabled = false, selected = false, description = "", icon = null, group = null)
         }
     }
-
-    /**
-     * Adds all specified items to the list of entries.
-     */
-    public val addAllItems: SimpleHandler<List<Entry<T>>> = handle { items, newItems -> items + newItems }
 }

@@ -1,3 +1,5 @@
+@file:Suppress("DuplicatedCode")
+
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
@@ -20,6 +22,7 @@ import org.patternfly.textToggle
 import org.patternfly.toggleIcon
 import org.patternfly.toggleImage
 import org.patternfly.toggleText
+import org.patternfly.unwrap
 
 internal interface DropdownSample {
 
@@ -56,7 +59,7 @@ internal interface DropdownSample {
             data class Demo(val id: String, val name: String)
 
             val store = DropdownStore<Demo>().apply {
-                select handledBy Notification.add { demo ->
+                selects.unwrap() handledBy Notification.add { demo ->
                     info("You selected ${demo.name}")
                 }
             }
@@ -208,6 +211,21 @@ internal interface DropdownSample {
                         item("Item 1")
                         item("Item 2")
                     }
+                }
+            }
+        }
+    }
+
+    fun unwrap() {
+        render {
+            dropdown<String> {
+                store.selects.unwrap() handledBy Notification.add {
+                    info("You selected $it")
+                }
+                textToggle { +"Text" }
+                items {
+                    item("Foo")
+                    item("Bar")
                 }
             }
         }

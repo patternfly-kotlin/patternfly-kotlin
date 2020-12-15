@@ -4,13 +4,13 @@ import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
-import org.patternfly.dom.aria
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.NotificationStore.addInternal
+import org.patternfly.dom.aria
 import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
 

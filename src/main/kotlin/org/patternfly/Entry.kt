@@ -7,40 +7,82 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ dsl
 
+/**
+ * Entrypoint for building items.
+ */
 public fun <T> items(block: ItemsBuilder<T>.() -> Unit = {}): List<Entry<T>> =
     ItemsBuilder<T>().apply(block).build()
 
+/**
+ * Entrypoint for building groups.
+ */
 public fun <T> groups(block: GroupsBuilder<T>.() -> Unit = {}): List<Entry<T>> =
     GroupsBuilder<T>().apply(block).build()
 
+/**
+ * Adds an item to the enclosing [ItemsBuilder].
+ *
+ * @receiver an items builder this item is added to
+ */
 public fun <T> ItemsBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
+/**
+ * Adds a separator to the enclosing [ItemsBuilder].
+ *
+ * @receiver an items builder this separator is added to
+ */
 public fun <T> ItemsBuilder<T>.separator() {
     entries.add(Separator())
 }
 
+/**
+ * Add a group to the enclosing [GroupsBuilder].
+ *
+ * @receiver a groups builder this group is added to
+ */
 public fun <T> GroupsBuilder<T>.group(title: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(title).apply(block).build())
 }
 
+/**
+ * Add a separator to the enclosing [GroupsBuilder].
+ *
+ * @receiver a groups builder this separator is added to
+ */
 public fun <T> GroupsBuilder<T>.separator() {
     entries.add(Separator())
 }
 
+/**
+ * Adds an item to the enclosing [GroupBuilder].
+ *
+ * @receiver a group builder this item is added to
+ */
 public fun <T> GroupBuilder<T>.item(item: T, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item).apply(block).build())
 }
 
+/**
+ * Adds a separator to the enclosing [GroupBuilder].
+ *
+ * @receiver a group builder this separator is added to
+ */
 public fun <T> GroupBuilder<T>.separator() {
     entries.add(Separator())
 }
 
 // ------------------------------------------------------ flow extensions
 
+/**
+ * Maps the specified flow into a flow with groups only.
+ */
 public fun <T> Flow<List<Entry<T>>>.groups(): Flow<List<Group<T>>> = this.map { it.filterIsInstance<Group<T>>() }
 
+/**
+ * Maps the specified flow into a flow with all items across all groups (if any).
+ */
 public fun <T> Flow<List<Entry<T>>>.flatItems(): Flow<List<Item<T>>> = this.map {
     it.flatMap { entry ->
         when (entry) {

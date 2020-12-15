@@ -1,6 +1,6 @@
 # PatternFly Fritz2
 
-[![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) ![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) ![Bintray](https://img.shields.io/bintray/v/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2)
+[![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) ![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2) ![Bintray](https://img.shields.io/bintray/v/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2)
 
 PatternFly Fritz2 is a [Kotlin/JS](https://kotl.in/js) implementation of [PatternFly](https://www.org.patternfly.org/) based on [fritz2](https://www.fritz2.dev/).
 

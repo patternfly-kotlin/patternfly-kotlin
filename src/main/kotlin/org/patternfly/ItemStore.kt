@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
@@ -31,6 +30,11 @@ public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.
      * Flow containing the selected items.
      */
     public val selection: Flow<List<T>> = data.map { it.selection }
+
+    /**
+     * Flow containing the single selected item.
+     */
+    public val singleSelection: Flow<T?> = data.map { it.selection.firstOrNull() }
 
     /**
      * Handler to add all specified items.
@@ -121,24 +125,16 @@ public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.
     public val selectAll: Handler<Unit> = handle { it.selectAll() }
 
     /**
-     * Handler to (de)select the specified item. The handler emits a [Pair] with the item and a boolean (`true` == selected, `false` otherwise).
+     * Handler to (de)select the specified item.
      */
-    public val select: EmittingHandler<Pair<T, Boolean>, Pair<T, Boolean>> =
-        handleAndEmit { items, (item, select) ->
-            val updatedItems = items.select(item, select)
-            emit(item to updatedItems.isSelected(item))
-            updatedItems
-        }
+    public val select: Handler<Pair<T, Boolean>> = handle { items, (item, select) ->
+        items.select(item, select)
+    }
 
     /**
-     * Handler to only select the specified item and deselect all other items. The handler emits the newly selected item.
+     * Handler to only select the specified item and deselect all other items.
      */
-    public val selectOnly: EmittingHandler<T, T> =
-        handleAndEmit { items, item ->
-            val updatedItems = items.selectOnly(item)
-            emit(item)
-            updatedItems
-        }
+    public val selectOnly: Handler<T> = handle { items, item -> items.selectOnly(item) }
 
     /**
      * Handler to toggle the selection of the specified item.

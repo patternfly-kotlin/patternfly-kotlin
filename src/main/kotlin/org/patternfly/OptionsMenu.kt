@@ -2,25 +2,24 @@ package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.SimpleHandler
+import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
-import kotlinx.dom.clear
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.matches
-import org.patternfly.dom.minusAssign
-import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -35,6 +34,7 @@ import org.w3c.dom.Node
  * @param store the store for the options menu
  * @param grouped whether the options menu contains groups or just flat items
  * @param multiSelect whether multiple entries can be selected
+ * @param closeOnSelect whether to close the menu after selecting an item
  * @param align the alignment of the options menu
  * @param up controls the direction of the options menu
  * @param id the ID of the element
@@ -45,30 +45,67 @@ public fun <T> RenderContext.optionsMenu(
     store: OptionsMenuStore<T> = OptionsMenuStore(),
     grouped: Boolean = false,
     multiSelect: Boolean = false,
+    closeOnSelect: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> = register(OptionsMenu(store, grouped, multiSelect, align, up, id = id, baseClass = baseClass, job), content)
+): OptionsMenu<T> =
+    register(
+        OptionsMenu(store, grouped, multiSelect, closeOnSelect, align, up, id = id, baseClass = baseClass, job),
+        content
+    )
 
-public fun <T> OptionsMenu<T>.optionsMenuToggle(
-    id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "btn"),
+
+/**
+ * Creates a text toggle. Specify the text using the [content] function.
+ *
+ * @param plain whether to use plain text in the toggle
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda for setting up the text toggle
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.textToggle
+ * @sample org.patternfly.sample.OptionsMenuSample.plainTextToggle
+ */
+public fun <T> OptionsMenu<T>.textToggle(
+    plain: Boolean = false,
     baseClass: String? = null,
-    content: OptionsMenuToggle<T>.() -> Unit = {}
-): OptionsMenuToggle<T> = register(OptionsMenuToggle(this, id = id, baseClass = baseClass, job), content)
+    content: Span.() -> Unit
+) {
+    if (plain) {
+        assignToggle(OptionsMenuPlainTextToggle(this, baseClass, job, content))
+    } else {
+        assignToggle(OptionsMenuTextToggle(this, baseClass, job, content))
+    }
+}
 
-public fun <T> OptionsMenu<T>.optionsMenuTogglePlain(
-    id: String? = Id.unique(ComponentType.OptionsMenu.id, "tgl", "pln"),
-    baseClass: String? = null,
-    content: OptionsMenuTogglePlain<T>.() -> Unit = {}
-): OptionsMenuTogglePlain<T> =
-    register(OptionsMenuTogglePlain(this, id = id, baseClass = baseClass, job), content)
+/**
+ * Creates an icon toggle. Use the [content] function to setup the icon.
+ *
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda for setting up the icon toggle
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.iconToggle
+ */
+public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: Button.() -> Unit) {
+    assignToggle(OptionsMenuIconToggle(this, baseClass, job, content))
+}
 
+/**
+ * Starts a block to add flat option menu items using the DSL.
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.items
+ */
 public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
     store.update(ItemsBuilder<T>().apply(block).build())
 }
 
+/**
+ * Starts a block to add dropdown groups using the DSL.
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.groups
+ */
 public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Options menu ${domNode.debug()} has not been created using `grouped = true`")
@@ -78,10 +115,36 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
 
 // ------------------------------------------------------ tag
 
+/**
+ * PatternFly [options menu](https://www.patternfly.org/v4/components/options-menu/design-guidelines) component.
+ *
+ * An options menu is similar to a dropdown, but provides a way to select among a set of optional settings rather than trigger an action. A options menu consists of a toggle control to open and close a menu of [entries][Entry].
+ *
+ * You can choose between different toggle variations:
+ * - [text toggle][OptionsMenuTextToggle]
+ * - [plain text toggle][OptionsMenuPlainTextToggle]
+ * - [icon toggle][DropdownIconToggle]
+ *
+ * The data in the menu is wrapped inside instances of [Entry] and managed by a [OptionsMenuStore]. Each [Entry] is either an [Item], a [Group] or a [Separator]. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ *
+ * **Adding entries**
+ *
+ * Entries can be added by using the [OptionsMenuStore] or by using the DSL. Items can be grouped. Nested groups are not supported. See the samples below.
+ *
+ * **Rendering entries**
+ *
+ * By default the options menu uses a builtin function to render the [Item]s in the [OptionsMenuStore]. It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
+ *
+ * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the option menu entries.
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.dropdownDsl
+ * @sample org.patternfly.sample.OptionsMenuSample.dropdownStore
+ */
 public class OptionsMenu<T> internal constructor(
     public val store: OptionsMenuStore<T>,
     internal val grouped: Boolean,
     multiSelect: Boolean,
+    private val closeOnSelect: Boolean,
     optionsMenuAlign: Align?,
     up: Boolean,
     id: String?,
@@ -109,7 +172,8 @@ public class OptionsMenu<T> internal constructor(
      * @sample org.patternfly.sample.OptionsMenuSample.ces
      */
     public val ces: CollapseExpandStore = CollapseExpandStore { target ->
-        !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))    }
+        !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
+    }
 
     init {
         store.multiSelect = multiSelect
@@ -129,7 +193,7 @@ public class OptionsMenu<T> internal constructor(
                 attr("hidden", true)
             }
         }
-        with (tag) {
+        with(tag) {
             attr("role", "menu")
             attr("hidden", this@OptionsMenu.ces.data.map { !it })
             aria["labelledby"] = this@OptionsMenu.toggleId
@@ -194,11 +258,10 @@ public class OptionsMenu<T> internal constructor(
                     icon("check".fas())
                 }
             }
-
-            clicks handledBy this@OptionsMenu.ces.collapse
-//            clicks.map { item } handledBy this@OptionsMenu.store.selectItemHandler
-//            clicks.map { item } handledBy this@OptionsMenuEntries.optionsMenu.store.select
-//            clicks.map { item.item } handledBy this@OptionsMenu.store.selectHandler
+            if (this@OptionsMenu.closeOnSelect) {
+                clicks handledBy this@OptionsMenu.ces.collapse
+            }
+            clicks.map { item } handledBy this@OptionsMenu.store.selectHandler
         }
     }
 
@@ -244,187 +307,191 @@ public class OptionsMenu<T> internal constructor(
     }
 }
 
-public sealed class OptionsMenuToggleBase<E : HTMLElement, T>(
-    private val optionsMenu: OptionsMenu<T>,
-    tagName: String,
-    id: String? = null,
-    baseClass: String? = null,
-    job: Job
-) : Tag<E>(tagName = tagName, id = id, baseClass = baseClass, job), WithText<E> {
+// ------------------------------------------------------ toggle
 
-    internal lateinit var toggleId: String
-
-    public abstract fun disabled(value: Boolean)
-    public abstract fun disabled(value: Flow<Boolean>)
-
-    internal fun initToggle(toggleTag: Tag<HTMLElement>) {
-        with(toggleTag) {
-            aria["haspopup"] = "listbox"
-            aria["expanded"] = this@OptionsMenuToggleBase.optionsMenu.ces.data.map { it.toString() }
-            clicks handledBy this@OptionsMenuToggleBase.optionsMenu.ces.toggle
-            this@OptionsMenuToggleBase.toggleId = id ?: Id.unique()
-        }
-//        optionsMenu.toggle = this
+private fun <T> initToggle(optionsMenu: OptionsMenu<T>, tag: Tag<HTMLElement>) {
+    with(tag) {
+        domNode.id = optionsMenu.toggleId
+        aria["haspopup"] = "listbox"
+        aria["expanded"] = optionsMenu.ces.data.map { it.toString() }
+        clicks handledBy optionsMenu.ces.toggle
     }
 }
 
-public class OptionsMenuToggle<T> internal constructor(
+internal class OptionsMenuTextToggle<T>(
     optionsMenu: OptionsMenu<T>,
-    id: String?,
     baseClass: String?,
-    job: Job
-) : OptionsMenuToggleBase<HTMLButtonElement, T>(
-    optionsMenu = optionsMenu,
-    tagName = "button",
-    id = id,
-    baseClass = classes {
-        +"options-menu".component("toggle")
-        +baseClass
-    }, job
-) {
+    job: Job,
+    content: Span.() -> Unit
+) : Toggle<T, HTMLButtonElement>,
+    Button(baseClass = classes("options-menu".component("toggle"), baseClass), job = job) {
 
     init {
-        initToggle(this)
-    }
-
-    public var content: (Span.() -> Unit)? = null
-        set(value) {
-            domNode.clear()
-            domNode.classList -= "plain".modifier()
-            register(span(baseClass = "options-menu".component("toggle", "text")) {
-                value?.invoke(this)
-            }, {})
-            register(span(baseClass = "options-menu".component("toggle", "icon")) {
-                icon("caret-down".fas())
-            }, {})
-            field = value
+        initToggle(optionsMenu, this)
+        span(baseClass = "options-menu".component("toggle", "text")) {
+            content(this)
         }
-
-    public override fun disabled(value: Boolean) {
-        attr("disabled", value)
-    }
-
-    public override fun disabled(value: Flow<Boolean>) {
-        attr("disabled", value)
-    }
-
-    public var icon: (Tag<HTMLButtonElement>.() -> Unit)? = null
-        set(value) {
-            domNode.clear()
-            domNode.classList += "plain".modifier()
-            value?.invoke(this)
-            field = value
+        span(baseClass = "options-menu".component("toggle", "icon")) {
+            icon("caret-down".fas())
         }
+    }
+
+    override fun disabled(value: Boolean) {
+        disabled(value, trueValue = "")
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        disabled(value, trueValue = "")
+    }
 }
 
-public class OptionsMenuTogglePlain<T> internal constructor(
+internal class OptionsMenuPlainTextToggle<T>(
     optionsMenu: OptionsMenu<T>,
-    id: String?,
     baseClass: String?,
-    job: Job
-) : OptionsMenuToggleBase<HTMLDivElement, T>(
-    optionsMenu = optionsMenu,
-    tagName = "div",
-    id = id,
-    baseClass = classes {
+    job: Job,
+    content: Span.() -> Unit
+) : Toggle<T, HTMLDivElement>,
+    Div(baseClass = classes {
+        +"options-menu".component("toggle")
+        +"text".modifier()
+        +"plain".modifier()
+        +baseClass
+    }, job = job) {
+
+    private val toggleButton: Button
+
+    init {
+        span(baseClass = "options-menu".component("toggle", "text")) {
+            content(this)
+        }
+        toggleButton = button(baseClass = "options-menu".component("button")) {
+            span(baseClass = "options-menu".component("toggle", "icon")) {
+                icon("caret-down".fas())
+            }
+        }
+        initToggle(optionsMenu, toggleButton)
+    }
+
+    override fun disabled(value: Boolean) {
+        domNode.classList.toggle("disabled".modifier(), value)
+        toggleButton.disabled(value)
+    }
+
+    override fun disabled(value: Flow<Boolean>) {
+        mountSingle(job, value) { v, _ -> disabled(v) }
+    }
+}
+
+internal class OptionsMenuIconToggle<T>(
+    optionsMenu: OptionsMenu<T>,
+    baseClass: String?,
+    job: Job,
+    content: Button.() -> Unit
+) : Toggle<T, HTMLButtonElement>,
+    Button(baseClass = classes {
         +"options-menu".component("toggle")
         +"plain".modifier()
-        +"text".modifier()
         +baseClass
-    }, job
-) {
-
-    private var toggleButton: Button
+    }, job = job) {
 
     init {
-        toggleButton = button(
-            id = Id.unique(ComponentType.Dropdown.id, "tgl", "btn"),
-            baseClass = "options-menu".component("toggle", "button")
-        ) {
-            this@OptionsMenuTogglePlain.initToggle(this)
-            span(baseClass = "options-menu".component("toggle", "button", "icon")) {
-                icon("caret-down".fas())
-            }
-        }
+        initToggle(optionsMenu, this)
+        content(this)
     }
 
-    public var content: (Span.() -> Unit)? = null
-        set(value) {
-            val span = Span(baseClass = "options-menu".component("toggle-text"), job = job).apply {
-                value?.invoke(this)
-            }
-            domNode.prepend(span.domNode)
-            field = value
-        }
-
-    public override fun disabled(value: Boolean) {
-        domNode.classList.toggle("disabled".modifier(), value)
-        toggleButton.attr("disabled", value)
+    override fun disabled(value: Boolean) {
+        disabled(value, trueValue = "")
     }
 
-    public override fun disabled(value: Flow<Boolean>) {
-        classMap(value.map { mapOf("disabled".modifier() to it) })
-        toggleButton.attr("disabled", value)
+    override fun disabled(value: Flow<Boolean>) {
+        disabled(value, trueValue = "")
     }
 }
 
 // ------------------------------------------------------ store
-
-public class OptionsMenuStore<T> : RootStore<List<Entry<T>>>(listOf()) {
+/**
+ * Store containing the data shown in a options menu. The data is wrapped inside instances of [Entry]. An entry is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ *
+ * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the `unwrap()` functions to get the actual payload.
+ *
+ * @sample org.patternfly.sample.OptionsMenuSample.unwrap
+ */
+public class OptionsMenuStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    WithIdProvider<T>,
+    RootStore<List<Entry<T>>>(listOf()) {
 
     internal var multiSelect: Boolean = false
-    public val items: Flow<List<Item<T>>> = data.flatItems()
-    public val groups: Flow<List<Group<T>>> = data.groups()
-    public val selection: Flow<List<Item<T>>> = items.drop(1).map { items ->
-        items.filter { it.selected }
-    }
-    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
 
-
-    /**
-     * Selects and emits the specified item. Use this handler if you just want to handle the payload of [Item] and don't need the [Item] instance itself.
-     */
-    public val select: EmittingHandler<Item<T>, T> = handleAndEmit { items, item ->
-        emit(item.item)
-        handleEntries(items, item)
-    }
-
-    /**
-     * Selects and emits the specified item. Use this handler if you need the [Item] instance.
-     */
-    public val selectItem: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
+    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
         emit(item)
-        handleEntries(items, item)
-    }
-
-    private fun handleEntries(entries: List<Entry<T>>, item: Item<T>): List<Entry<T>> = entries.map { entry ->
-        when (entry) {
-            is Item<T> -> handleSelection(entry, item)
-            is Group<T> -> {
-                if (entry.id == item.group?.id) {
-                    val groupItems = entry.items.map { groupEntry ->
-                        when (groupEntry) {
-                            is Item<T> -> handleSelection(groupEntry, item)
-                            else -> groupEntry
+        items.map { currentEntry ->
+            when (currentEntry) {
+                is Item<T> -> select(item, currentEntry)
+                is Group<T> -> {
+                    if (currentEntry.id == item.group?.id) {
+                        val groupItems = currentEntry.items.map { groupEntry ->
+                            when (groupEntry) {
+                                is Item<T> -> select(item, groupEntry)
+                                else -> groupEntry
+                            }
                         }
+                        currentEntry.copy(items = groupItems)
+                    } else {
+                        currentEntry
                     }
-                    entry.copy(items = groupItems)
-                } else {
-                    entry
                 }
+                else -> currentEntry
             }
-            else -> entry
         }
     }
 
-    private fun handleSelection(entry: Item<T>, current: Item<T>): Entry<T> =
-        if (entry.item == current.item) {
-            if (entry.selected) {
-                entry
+    private fun select(item: Item<T>, current: Item<T>): Entry<T> =
+        if (multiSelect) {
+            if (sameId(item, current)) {
+                current.copy(selected = !current.selected)
             } else {
-                entry.copy(selected = true)
+                current
             }
         } else {
-            entry.copy(selected = false)
+            if (sameId(item, current)) {
+                if (current.selected) {
+                    current
+                } else {
+                    current.copy(selected = true)
+                }
+            } else {
+                current.copy(selected = false)
+            }
         }
+
+    private fun sameId(item: Item<T>, current: Item<T>) = itemId(item.item) == itemId(current.item)
+
+    /**
+     * Flow with the last selected items.
+     */
+    public val selects: Flow<Item<T>> = selectHandler
+
+    /**
+     * Flow containing all selected items.
+     */
+    public val selection: Flow<List<Item<T>>> = data.flatItems()
+        .drop(1) // drop initial (empty) data
+        .map { items ->
+            items.filter { it.selected }
+        }
+
+    /**
+     * Flow containing the first selected item.
+     */
+    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
+
+    /**
+     * Wraps the specified data inside instances of [Item] and adds them to the list of existing entries.
+     */
+    public val addAll: SimpleHandler<List<T>> = handle { items, newItems ->
+        items + newItems.map {
+            Item(it, disabled = false, selected = false, description = "", icon = null, group = null)
+        }
+    }
 }
+

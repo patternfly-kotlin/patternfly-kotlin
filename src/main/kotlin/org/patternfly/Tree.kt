@@ -31,14 +31,14 @@ import org.w3c.dom.set
 // ------------------------------------------------------ dsl
 
 public fun <T> RenderContext.treeView(
-    identifier: IdProvider<T, String>,
+    idProvider: IdProvider<T, String>,
     checkboxes: Boolean = false,
     badges: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: TreeView<T>.() -> Unit = {}
 ): TreeView<T> = register(
-    TreeView(identifier = identifier, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job),
+    TreeView(idProvider, checkboxes = checkboxes, badges = badges, id = id, baseClass = baseClass, job),
     content
 )
 
@@ -97,13 +97,15 @@ private const val EXPANDED_ICON = TREE_ITEM + "ei"
 private const val COLLAPSED_ICON = TREE_ITEM + "ci"
 
 public class TreeView<T> internal constructor(
-    private val identifier: IdProvider<T, String>,
+    override val idProvider: IdProvider<T, String>,
     private val checkboxes: Boolean,
     private val badges: Boolean,
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
+) : PatternFlyComponent<HTMLDivElement>,
+    WithIdProvider<T>,
+    Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
     private val ul: Ul
     public var display: ComponentDisplay<Span, T> = { +it.toString() }
@@ -131,7 +133,7 @@ public class TreeView<T> internal constructor(
             }) {
                 attr("role", "treeitem")
                 attr("tabindex", "0")
-                domNode.dataset[TREE_ITEM] = this@TreeView.identifier(treeItem.item)
+                domNode.dataset[TREE_ITEM] = this@TreeView.idProvider(treeItem.item)
                 div(baseClass = "tree-view".component("content")) {
                     button(baseClass = "tree-view".component("node")) {
                         domNode.onclick = {

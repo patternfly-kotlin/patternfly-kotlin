@@ -68,11 +68,7 @@ public fun <T> ToolbarItem.bulkSelect(
     content: Dropdown<PreSelection>.() -> Unit = {}
 ): Dropdown<PreSelection> {
     domNode.classList += "bulk-select".modifier()
-    val dropdownStore = DropdownStore<PreSelection>().apply {
-        select handledBy itemStore.preSelect
-        addAll(PreSelection.values().asList())
-    }
-    return dropdown(dropdownStore, id = id, baseClass = baseClass) {
+    return dropdown(id = id, baseClass = baseClass) {
         checkboxToggle {
             text {
                 itemStore.selected.map {
@@ -92,6 +88,10 @@ public fun <T> ToolbarItem.bulkSelect(
             }
         }
         display { +it.text }
+        items {
+            PreSelection.values().map { item(it) }
+        }
+        store.selects.unwrap() handledBy itemStore.preSelect
         content(this)
     }
 }
@@ -102,9 +102,11 @@ public fun <T> ToolbarItem.sortOptions(
     id: String? = null,
     baseClass: String? = null,
     content: OptionsMenu<SortOption>.() -> Unit = {}
-): OptionsMenu<SortOption> = optionsMenu(id = id, baseClass = baseClass) {
+): OptionsMenu<SortOption> = optionsMenu(grouped = true, multiSelect = true, id = id, baseClass = baseClass) {
+    iconToggle {
+        icon("sort-amount-down".fas())
+    }
     display { +it.text }
-    optionsMenuToggle { icon = { icon("sort-amount-down".fas()) } }
     groups {
         group {
             options.forEach {

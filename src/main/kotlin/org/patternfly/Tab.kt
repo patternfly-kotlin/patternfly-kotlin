@@ -13,6 +13,7 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -112,7 +113,7 @@ public class Tabs<T> internal constructor(
                     }) {
                         button(id = this@Tabs.tabId(tab.item), baseClass = "tabs".component("link")) {
                             aria["controls"] = this@Tabs.contentId(tab.item)
-                            clicks.map { tab } handledBy this@Tabs.store.select
+                            clicks.map { tab } handledBy this@Tabs.store.selectHandler
                             if (tab.icon != null) {
                                 span(baseClass = "tabs".component("item", "icon")) {
                                     tab.icon.invoke(this)
@@ -250,10 +251,15 @@ internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton()) {
 public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
-    public val select: EmittingHandler<TabItem<T>, TabItem<T>> = handleAndEmit { items, tab ->
+    internal val selectHandler: EmittingHandler<TabItem<T>, TabItem<T>> = handleAndEmit { items, tab ->
         emit(tab)
         items.map { if (identifier(it.item) == identifier(tab.item)) it.select() else it.unselect() }
     }
+
+    /**
+     * Flow with the last selected tab item.
+     */
+    public val selects: Flow<TabItem<T>> = selectHandler
 }
 
 // ------------------------------------------------------ types

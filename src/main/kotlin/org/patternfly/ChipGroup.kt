@@ -11,6 +11,7 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -143,6 +144,7 @@ public class ChipGroup<T> internal constructor(
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
+    WithIdProvider<T> by store,
     Div(id = id, baseClass = classes {
         +ComponentType.ChipGroup
         +baseClass
@@ -172,8 +174,8 @@ public class ChipGroup<T> internal constructor(
                         li(baseClass = "chip-group".component("list-item")) {
                             val chip = this@ChipGroup.display.invoke(item)
                             register(chip) {
-                                val chipId = this@ChipGroup.store.identifier(item)
-                                it.closes.map { chipId } handledBy this@ChipGroup.store.remove
+                                val chipId = this@ChipGroup.itemId(item)
+                                it.closes.map { chipId } handledBy this@ChipGroup.store.removeHandler
                             }
                         }
                     }
@@ -204,7 +206,7 @@ public class ChipGroup<T> internal constructor(
         }
 
         (MainScope() + job).launch {
-            this@ChipGroup.store.remove.collect {
+            this@ChipGroup.store.removes.collect {
                 // The item is emitted before it is removed, so check for size == 1
                 if (this@ChipGroup.store.current.size == 1) {
                     domNode.removeFromParent()
@@ -262,8 +264,21 @@ public class ChipGroup<T> internal constructor(
  *
  * @sample org.patternfly.sample.ChipGroupSample.store
  */
-public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
+public class ChipGroupStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    WithIdProvider<T>,
     RootStore<List<T>>(listOf()) {
+
+    internal val removeHandler: EmittingHandler<String, T> = handleAndEmit { items, id ->
+        items.find { idProvider(it) == id }?.let { emit(it) }
+        items.filterNot { idProvider(it) == id }
+    }
+
+    /**
+     * Flow containing the removed items.
+     *
+     * @sample org.patternfly.sample.ChipGroupSample.remove
+     */
+    public val removes: Flow<T> = removeHandler
 
     /**
      * Adds the specified item to the list of items.
@@ -274,14 +289,4 @@ public class ChipGroupStore<T>(internal val identifier: IdProvider<T, String> = 
      * Adds all specified items to the list of items.
      */
     public val addAll: Handler<List<T>> = handle { items, newItems -> items + newItems }
-
-    /**
-     * Removes the specified item from the list of items and emits it (if found).
-     *
-     * @sample org.patternfly.sample.ChipGroupSample.remove
-     */
-    public val remove: EmittingHandler<String, T?> = handleAndEmit { items, id ->
-        emit(items.find { identifier(it) == id })
-        items.filterNot { identifier(it) == id }
-    }
 }

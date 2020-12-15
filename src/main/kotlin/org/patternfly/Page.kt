@@ -16,7 +16,6 @@ import org.patternfly.ButtonVariation.plain
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
-// Document me
 // ------------------------------------------------------ dsl
 
 /**
@@ -131,7 +130,7 @@ public fun RenderContext.pageSection(
  * A page component is used to create the basic structure of an application. It should be added directly to the
  * document body.
  *
- * A typical page setup with a header, brand, tools, sidebar and navigation might look like this:
+ * Typically a page contains some but not necessarily all of the following components.
  *
  * ```
  * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ page: Page ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -162,6 +161,8 @@ public fun RenderContext.pageSection(
  * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
  * ```
  *
+ * A page setup with a header, brand, tools, sidebar and navigation might look like this:
+ *
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
 public class Page internal constructor(id: String?, baseClass: String?, job: Job) :
@@ -175,7 +176,7 @@ public class Page internal constructor(id: String?, baseClass: String?, job: Job
 }
 
 /**
- * [PatternFly header](https://www.patternfly.org/v4/components/page/design-guidelines) component.
+ * Header component.
  */
 public class Header internal constructor(internal val page: Page, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
@@ -189,6 +190,8 @@ public class Header internal constructor(internal val page: Page, id: String?, b
 
 /**
  * [PatternFly brand](https://www.patternfly.org/v4/components/page/design-guidelines) component.
+ *
+ * A brand is used to place a product logotype on a screen.
  */
 public class Brand internal constructor(sidebarStore: SidebarStore, id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("page".component("header", "brand"), baseClass), job) {
@@ -227,7 +230,7 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
 }
 
 /**
- * [PatternFly sidebar](https://www.patternfly.org/v4/components/page/design-guidelines) component.
+ * Sidebar component.
  *
  * If a sidebar is added to the page, a toggle button is displayed in the [Header] to toggle and expand the sidebar.
  *
@@ -270,7 +273,7 @@ public class Sidebar internal constructor(
 }
 
 /**
- * Main container of the [Page].
+ * Main component inside the [Page] component.
  */
 public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
@@ -284,7 +287,7 @@ public class PageMain internal constructor(id: String?, baseClass: String?, job:
 }
 
 /**
- * Page section container inside the [PageMain] container.
+ * Page section component inside the [PageMain] component.
  */
 public class PageSection internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,

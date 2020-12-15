@@ -87,7 +87,7 @@ internal interface ChipGroupSample {
             chipGroup<String> {
                 +"Remove one"
                 chips("Foo", "Bar")
-                store.remove handledBy Notification.add { chip ->
+                store.removes handledBy Notification.add { chip ->
                     info("You removed $chip.")
                 }
             }
