@@ -6,7 +6,6 @@ import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Input
@@ -19,12 +18,10 @@ import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.matches
-import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import org.w3c.dom.Comment
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -67,7 +64,7 @@ public fun <T> Dropdown<T>.textToggle(
     baseClass: String? = null,
     content: Span.() -> Unit
 ) {
-    assignToggle(TextToggle(this, variation, baseClass, job, content))
+    assignToggle(DropdownTextToggle(this, variation, baseClass, job, content))
 }
 
 /**
@@ -79,7 +76,7 @@ public fun <T> Dropdown<T>.textToggle(
  * @sample org.patternfly.sample.DropdownSample.iconToggle
  */
 public fun <T> Dropdown<T>.iconToggle(baseClass: String? = null, content: Button.() -> Unit) {
-    assignToggle(IconToggle(this, baseClass, job, content))
+    assignToggle(DropdownIconToggle(this, baseClass, job, content))
 }
 
 /**
@@ -90,21 +87,21 @@ public fun <T> Dropdown<T>.iconToggle(baseClass: String? = null, content: Button
  * @sample org.patternfly.sample.DropdownSample.kebabToggle
  */
 public fun <T> Dropdown<T>.kebabToggle(baseClass: String? = null) {
-    assignToggle(IconToggle(this, baseClass, job) {
+    assignToggle(DropdownIconToggle(this, baseClass, job) {
         icon("ellipsis-v".fas())
     })
 }
 
 /**
- * Creates a [CheckboxToggle]. A checkbox toggle can contain optional text.
+ * Creates a [DropdownCheckboxToggle]. A checkbox toggle can contain optional text.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the checkbox toggle
  *
  * @sample org.patternfly.sample.DropdownSample.checkboxToggle
  */
-public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: CheckboxToggle.() -> Unit = {}) {
-    assignToggle(InternalCheckboxToggle(this, baseClass, job, content))
+public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: DropdownCheckboxToggle.() -> Unit = {}) {
+    assignToggle(DropdownInternalCheckboxToggle(this, baseClass, job, content))
 }
 
 /**
@@ -119,13 +116,13 @@ public fun <T> Dropdown<T>.actionToggle(
     baseClass: String? = null,
     content: Button.() -> Unit
 ): Listener<MouseEvent, HTMLButtonElement> {
-    val actionToggle = ActionToggle(this, baseClass, job, content)
+    val actionToggle = DropdownActionToggle(this, baseClass, job, content)
     assignToggle(actionToggle)
     return actionToggle.clickEvents!!
 }
 
 /**
- * Creates a [CustomToggle]. Use this function if you want to have full control over the layout of the toggle. You can use one of the `toggleXyz()` functions to add specific content.
+ * Creates a [DropdownCustomToggle]. Use this function if you want to have full control over the layout of the toggle. You can use one of the `toggleXyz()` functions to add specific content.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the custom toggle
@@ -134,37 +131,37 @@ public fun <T> Dropdown<T>.actionToggle(
  */
 public fun <T> Dropdown<T>.customToggle(
     baseClass: String? = null,
-    content: CustomToggle<T>.() -> Unit
-): CustomToggle<T> {
-    val toggle = CustomToggle(this, baseClass, job).apply(content)
+    content: DropdownCustomToggle<T>.() -> Unit
+): DropdownCustomToggle<T> {
+    val toggle = DropdownCustomToggle(this, baseClass, job).apply(content)
     assignToggle(toggle)
     return toggle
 }
 
 /**
- * Creates an container for the image inside a [CustomToggle] component.
+ * Creates an container for the image inside a [DropdownCustomToggle] component.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the image container
  */
-public fun <T> CustomToggle<T>.toggleImage(baseClass: String? = null, content: Span.() -> Unit): Span =
+public fun <T> DropdownCustomToggle<T>.toggleImage(baseClass: String? = null, content: Span.() -> Unit): Span =
     span(baseClass = classes("dropdown".component("toggle", "image"), baseClass), content = content)
 
 /**
- * Creates a container for the text inside a [CustomToggle] component.
+ * Creates a container for the text inside a [DropdownCustomToggle] component.
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda for setting up the text container
  */
-public fun <T> CustomToggle<T>.toggleText(baseClass: String? = null, content: Span.() -> Unit): Span =
+public fun <T> DropdownCustomToggle<T>.toggleText(baseClass: String? = null, content: Span.() -> Unit): Span =
     span(baseClass = classes("dropdown".component("toggle", "text"), baseClass), content = content)
 
 /**
- * Creates a container inside a [CustomToggle] containing an `icon("caret-down".fas())` icon.
+ * Creates a container inside a [DropdownCustomToggle] containing an `icon("caret-down".fas())` icon.
  *
  * @param baseClass optional CSS class that should be applied to the element
  */
-public fun <T> CustomToggle<T>.toggleIcon(baseClass: String? = null): Span =
+public fun <T> DropdownCustomToggle<T>.toggleIcon(baseClass: String? = null): Span =
     span(baseClass = classes("dropdown".component("toggle", "text"), baseClass)) {
         icon("caret-down".fas())
     }
@@ -198,11 +195,11 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * A dropdown presents a menu of actions in a constrained space that will trigger a process or navigate to a new location. A dropdown consists of a toggle control to open and close a menu of [entries][Entry].
  *
  * You can choose between different toggle variations:
- * - [text toggle][TextToggle]
- * - [icon toggle][IconToggle]
- * - [checkbox toggle][CheckboxToggle]
- * - [action toggle][ActionToggle]
- * - [custom toggle][CustomToggle]
+ * - [text toggle][DropdownTextToggle]
+ * - [icon toggle][DropdownIconToggle]
+ * - [checkbox toggle][DropdownCheckboxToggle]
+ * - [action toggle][DropdownActionToggle]
+ * - [custom toggle][DropdownCustomToggle]
  *
  * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item], a [Group] or a [Separator]. An [Item] can have additional properties such as an icon, a description or a disabled state.
  *
@@ -259,7 +256,7 @@ public class Dropdown<T> internal constructor(
         }
     }
 
-    private var toggle: DropdownToggle<T, Node> = RecordingToggle()
+    private var toggle: Toggle<T, Node> = RecordingToggle()
     internal val toggleId: String = Id.unique(ComponentType.Dropdown.id, "tgl")
 
     /**
@@ -356,14 +353,10 @@ public class Dropdown<T> internal constructor(
             clicks handledBy this@Dropdown.ces.collapse
             clicks.map { item } handledBy this@Dropdown.store.selectItemHandler
             clicks.map { item.item } handledBy this@Dropdown.store.selectHandler
-
-            val sf: MutableStateFlow<T> = MutableStateFlow(item.item)
-            sf.value = item.item
-
         }
     }
 
-    internal fun <N : Node> assignToggle(toggle: DropdownToggle<T, N>) {
+    internal fun <N : Node> assignToggle(toggle: Toggle<T, N>) {
         // when switching from the recording to a valid toggle
         // replay the recorded values (if any)
         if (this.toggle is RecordingToggle<T> && toggle !is RecordingToggle<T>) {
@@ -415,50 +408,13 @@ internal fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
         clicks handledBy dropdown.ces.toggle
     }
 }
-
-/**
- * Common interface for all dropdown toggle variants.
- */
-public interface DropdownToggle<T, out N : Node> : WithDomNode<N> {
-
-    /**
-     * Disables or enables the dropdown toggle.
-     */
-    public fun disabled(value: Boolean)
-
-    /**
-     * Disables or enables the dropdown toggle based on the values from the flow.
-     */
-    public fun disabled(value: Flow<Boolean>)
-}
-
-internal class RecordingToggle<T> : DropdownToggle<T, Comment> {
-
-    private var recordedBoolean: Boolean? = null
-    private var recordedFlow: Flow<Boolean>? = null
-    override val domNode: Comment = document.createComment("noop toggle")
-
-    override fun disabled(value: Boolean) {
-        recordedBoolean = value
-    }
-
-    override fun disabled(value: Flow<Boolean>) {
-        recordedFlow = value
-    }
-
-    internal fun <N : Node> playback(toggle: DropdownToggle<T, N>) {
-        recordedBoolean?.let { toggle.disabled(it) }
-        recordedFlow?.let { toggle.disabled(it) }
-    }
-}
-
-internal class TextToggle<T>(
+internal class DropdownTextToggle<T>(
     dropdown: Dropdown<T>,
     variations: Array<out ButtonVariation>,
     baseClass: String?,
     job: Job,
     content: Span.() -> Unit
-) : DropdownToggle<T, HTMLButtonElement>,
+) : Toggle<T, HTMLButtonElement>,
     Button(baseClass = classes {
         +"dropdown".component("toggle")
         +variations.joinToString(" ") { it.modifier }
@@ -484,12 +440,12 @@ internal class TextToggle<T>(
     }
 }
 
-internal class IconToggle<T>(
+internal class DropdownIconToggle<T>(
     dropdown: Dropdown<T>,
     baseClass: String?,
     job: Job,
     content: Button.() -> Unit
-) : DropdownToggle<T, HTMLButtonElement>,
+) : Toggle<T, HTMLButtonElement>,
     Button(baseClass = classes {
         +"dropdown".component("toggle")
         +"plain".modifier()
@@ -510,12 +466,12 @@ internal class IconToggle<T>(
     }
 }
 
-internal class InternalCheckboxToggle<T>(
+internal class DropdownInternalCheckboxToggle<T>(
     dropdown: Dropdown<T>,
     baseClass: String?,
     job: Job,
-    content: CheckboxToggle.() -> Unit,
-) : DropdownToggle<T, HTMLDivElement>,
+    content: DropdownCheckboxToggle.() -> Unit,
+) : Toggle<T, HTMLDivElement>,
     Div(baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
@@ -530,7 +486,7 @@ internal class InternalCheckboxToggle<T>(
         val inputId = Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
         label = label(baseClass = "dropdown".component("toggle", "check")) {
             `for`(inputId)
-            this@InternalCheckboxToggle.checkbox = input(id = inputId) {
+            this@DropdownInternalCheckboxToggle.checkbox = input(id = inputId) {
                 type("checkbox")
             }
         }
@@ -538,7 +494,7 @@ internal class InternalCheckboxToggle<T>(
             icon("caret-down".fas())
         }
         initToggle(dropdown, button)
-        CheckboxToggle(label, checkbox, job).apply(content)
+        DropdownCheckboxToggle(label, checkbox, job).apply(content)
     }
 
     override fun disabled(value: Boolean) {
@@ -558,7 +514,7 @@ internal class InternalCheckboxToggle<T>(
  *
  * @sample org.patternfly.sample.DropdownSample.checkboxToggle
  */
-public class CheckboxToggle internal constructor(
+public class DropdownCheckboxToggle internal constructor(
     private val label: Label,
     private val checkbox: Input,
     private val job: Job
@@ -592,12 +548,12 @@ public class CheckboxToggle internal constructor(
     }
 }
 
-internal class ActionToggle<T>(
+internal class DropdownActionToggle<T>(
     dropdown: Dropdown<T>,
     baseClass: String?,
     job: Job,
     content: Button.() -> Unit
-) : DropdownToggle<T, HTMLDivElement>,
+) : Toggle<T, HTMLDivElement>,
     Div(baseClass = classes {
         +"dropdown".component("toggle")
         +"split-button".modifier()
@@ -611,7 +567,7 @@ internal class ActionToggle<T>(
 
     init {
         actionButton = button(baseClass = "dropdown".component("toggle", "button")) {
-            this@ActionToggle.clickEvents = clicks
+            this@DropdownActionToggle.clickEvents = clicks
             content(this)
         }
         toggleButton = button(baseClass = "dropdown".component("toggle", "button")) {
@@ -636,8 +592,8 @@ internal class ActionToggle<T>(
  *
  * @sample org.patternfly.sample.DropdownSample.customToggle
  */
-public class CustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, job: Job) :
-    DropdownToggle<T, HTMLButtonElement>,
+public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, job: Job) :
+    Toggle<T, HTMLButtonElement>,
     Button(baseClass = classes("dropdown".component("toggle"), baseClass), job = job) {
 
     init {

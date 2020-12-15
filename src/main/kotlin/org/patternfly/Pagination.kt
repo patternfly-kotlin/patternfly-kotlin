@@ -72,11 +72,11 @@ public class Pagination internal constructor(
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
         optionsMenu = optionsMenu {
-            display = { +"${it.item} per page" }
+            display { +"$it per page" }
             optionsMenuTogglePlain {
                 content = { this@Pagination.pageInfoFlow.showRange().invoke(this) }
             }
-            optionsMenuItems {
+            items {
                 pageSizes.forEachIndexed { index, pageSize ->
                     item(pageSize) {
                         selected = index == 0
@@ -148,13 +148,13 @@ public class Pagination internal constructor(
     }
 
     public fun disabled(value: Boolean) {
-        optionsMenu.toggle.disabled(value)
+        optionsMenu.disabled(value)
         controlElements.forEach { it.disabled = value }
         inputElement?.let { it.disabled = value }
     }
 
     public fun disabled(value: Flow<Boolean>) {
-        optionsMenu.toggle.disabled(value)
+        optionsMenu.disabled(value)
         mountSingle(job, value) { v, _ ->
             if (v) {
                 controlElements.forEach { it.disabled = true }

@@ -101,8 +101,39 @@ public fun <T> ToolbarItem.sortOptions(
     options: List<SortInfo<T>>,
     id: String? = null,
     baseClass: String? = null,
-    content: SortOptions<T>.() -> Unit = {}
-): SortOptions<T> = register(SortOptions(itemStore, options, id = id, baseClass = baseClass, job), content)
+    content: OptionsMenu<SortOption>.() -> Unit = {}
+): OptionsMenu<SortOption> = optionsMenu(id = id, baseClass = baseClass) {
+    display { +it.text }
+    optionsMenuToggle { icon = { icon("sort-amount-down".fas()) } }
+    groups {
+        group {
+            options.forEach {
+                item(SortProperty(it.id, it.text, it.comparator))
+            }
+        }
+        separator()
+        group {
+            item(SortOrder(true)) {
+                selected = true
+            }
+            item(SortOrder(false))
+        }
+    }
+
+    // TODO Update selection when ItemStore.sortWith has changed
+    store.selection.unwrap()
+        .map { items ->
+            val property = items.filterIsInstance<SortProperty<T>>().firstOrNull()
+            val order = items.filterIsInstance<SortOrder>().firstOrNull()
+            if (property != null && order != null) {
+                SortInfo(property.id, property.text, property.comparator, order.ascending)
+            } else {
+                null
+            }
+        }.filterNotNull() handledBy itemStore.sortWith
+
+    content(this)
+}
 
 public fun <T> ToolbarItem.pagination(
     itemStore: ItemStore<T>,
@@ -149,47 +180,6 @@ public class ToolbarItem internal constructor(id: String?, baseClass: String?, j
 
 public class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass), job)
-
-public class SortOptions<T> internal constructor(
-    itemStore: ItemStore<T>,
-    options: List<SortInfo<T>>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : OptionsMenu<SortOption>(OptionStore(), optionsMenuAlign = null, up = false, id = id, baseClass = baseClass, job) {
-
-    init {
-        display = { +it.item.text }
-        optionsMenuToggle { icon = { icon("sort-amount-down".fas()) } }
-        optionsMenuGroups {
-            group {
-                options.forEach {
-                    item(SortProperty(it.id, it.text, it.comparator))
-                }
-            }
-            separator()
-            group {
-                item(SortOrder(true)) {
-                    selected = true
-                }
-                item(SortOrder(false))
-            }
-        }
-
-        // TODO Update selection when ItemStore.sortWith has changed
-
-        store.selection.unwrap()
-            .map { items ->
-                val property = items.filterIsInstance<SortProperty<T>>().firstOrNull()
-                val order = items.filterIsInstance<SortOrder>().firstOrNull()
-                if (property != null && order != null) {
-                    SortInfo(property.id, property.text, property.comparator, order.ascending)
-                } else {
-                    null
-                }
-            }.filterNotNull() handledBy itemStore.sortWith
-    }
-}
 
 // ------------------------------------------------------ types
 
