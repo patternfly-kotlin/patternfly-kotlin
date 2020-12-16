@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
 ## [0.0.2] - 2020-12-16
 
 First public release
+
+[0.0.2]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.0.2
