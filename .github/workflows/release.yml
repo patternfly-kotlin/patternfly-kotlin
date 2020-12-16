@@ -25,13 +25,9 @@ jobs:
           FOLDER: build/dokka/html
           CLEAN: true
       - run: ./gradlew build
-      - uses: anton-yurchenko/git-release@v3.4.2
+      - uses: docker://antonyurchenko/git-release:latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRAFT_RELEASE: "false"
-          PRE_RELEASE: "false"
-          CHANGELOG_FILE: "CHANGELOG.md"
-          ALLOW_EMPTY_CHANGELOG: "false"
           ALLOW_TAG_PREFIX: "true"
         with:
           args: |
