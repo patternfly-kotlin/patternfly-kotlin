@@ -4,14 +4,13 @@ import org.gradle.api.publish.maven.MavenPom
 object Constants {
     const val group = "org.patternfly"
     const val name = "patternfly-fritz2"
-    const val version = "0.0.5"
+    const val version = "0.0.6"
     const val description = "Kotlin implementation of PatternFly 4 based on fritz2"
     const val license = "Apache-2.0"
     const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
 }
 
 object PluginVersions {
-    const val bintray = "1.8.5"
     const val dokka = "1.4.20"
     const val js = "1.4.20"
     const val ktlint = "9.4.1"

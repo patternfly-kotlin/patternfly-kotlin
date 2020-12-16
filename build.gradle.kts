@@ -1,11 +1,9 @@
 import org.jetbrains.dokka.Platform
 import java.net.URL
-import java.util.Date
 
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
-    id("com.jfrog.bintray") version PluginVersions.bintray
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlint
     id("org.jlleitschuh.gradle.ktlint-idea") version PluginVersions.ktlint
     `maven-publish`
@@ -97,31 +95,14 @@ publishing {
             }
         }
     }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_API_KEY")
-    publish = true
-    setPublications("maven")
-
-    pkg.apply {
-        repo = Constants.name
-        name = Constants.name
-        desc = Constants.description
-        userOrg = System.getenv("BINTRAY_ORG")
-        githubRepo = Constants.githubRepo
-        vcsUrl = "https://github.com/${Constants.githubRepo}.git"
-        websiteUrl = "https://github.com/${Constants.githubRepo}"
-        issueTrackerUrl = "https://github.com/${Constants.githubRepo}/issues"
-        setLabels("kotlin", "kotlin-js", "patternfly", "reactive", "fritz2")
-        setLicenses(Constants.license)
-
-        version.apply {
-            name = Constants.version
-            released = Date().toString()
-            vcsTag = Constants.version
-            vcsUrl = "https://github.com/${Constants.githubRepo}/releases/tag/${Constants.version}"
+    repositories {
+        maven {
+            name = "bintray"
+            url = uri("https://api.bintray.com/maven/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/;publish=1")
+            credentials {
+                username = System.getenv("BINTRAY_USER")
+                password = System.getenv("BINTRAY_API_KEY")
+            }
         }
     }
 }
