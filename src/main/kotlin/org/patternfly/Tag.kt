@@ -7,8 +7,6 @@ import dev.fritz2.dom.html.renderElement
 import dev.fritz2.dom.mountDomNodePatch
 import dev.fritz2.lenses.IdProvider
 import dev.fritz2.utils.Myer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +17,6 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 
-@OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
 internal fun <V, I> Flow<List<V>>.renderShifted(
     amount: Int,
     tag: Tag<Element>,

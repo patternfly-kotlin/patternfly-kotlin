@@ -40,7 +40,9 @@ kotlin {
         sourceSets {
             named("main") {
                 languageSettings.apply {
+                    useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
                     useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                    useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
                 }
             }
         }
