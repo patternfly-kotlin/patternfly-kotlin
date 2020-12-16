@@ -39,7 +39,7 @@ if git rev-parse -q --verify "refs/tags/$VERSION_TAG" >/dev/null; then
     exit 1
 fi
 
-printf "\n\n\n# Check clean status\n\n"
+printf "\n# Check clean status\n\n"
 git checkout master
 if ! git diff --no-ext-diff --quiet --exit-code; then
     echo "Unable to release. You have uncommitted changes in the branch 'master'."
