@@ -4,7 +4,7 @@ import org.gradle.api.publish.maven.MavenPom
 object Constants {
     const val group = "org.patternfly"
     const val name = "patternfly-fritz2"
-    const val version = "0.1.2"
+    const val version = "0.0.1"
     const val description = "Kotlin implementation of PatternFly 4 based on fritz2"
     const val license = "Apache-2.0"
     const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
