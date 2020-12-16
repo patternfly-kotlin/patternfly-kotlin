@@ -12,7 +12,7 @@ To get all details about how to use PatternFly Fritz2 take a look at the [API do
 
 ## Get Started
 
-PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 does **not** come with stylesheets, fonts or any other PatternFly assets. You need to add them by yourself using an `npm` dependency and a call to `kotlinext.js.require.require()`.
+PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. 
 
 ```kotlin
 repositories {
@@ -20,11 +20,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.130-kotlin-1.4.21")
+    implementation("org.jetbrains:kotlin-extensions:<version>")
     implementation("org.patternfly:patternfly-fritz2:0.0.5")
     implementation(npm("@patternfly/patternfly", "4"))
 }
 ```
+
+PatternFly Fritz2 does **not** come with stylesheets, fonts or any other PatternFly assets. You need to add them by yourself using an `npm` dependency and a call to `kotlinext.js.require.require()`.
 
 ```kotlin
 import kotlinext.js.require
