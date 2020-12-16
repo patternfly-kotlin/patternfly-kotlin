@@ -19,7 +19,7 @@
 
 
 VERSION=$1
-
+VERSION_TAG=v$1
 
 
 # Prerequisites
@@ -35,8 +35,8 @@ if ! [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1
     exit 1
 fi
 
-if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
-    echo "A tag for '$VERSION' already exists."
+if git rev-parse -q --verify "refs/tags/$VERSION_TAG" >/dev/null; then
+    echo "A tag for '$VERSION_TAG' already exists."
     exit 1
 fi
 
@@ -49,19 +49,19 @@ fi
 
 
 # Build, tag and push
-box "Build 'master'"
+printf "\n\n\nBuild master\n"
 git pull origin master
 ./gradlew build || { echo "Build failed" ; exit 1; }
 
-box "Bump to '$VERSION'"
+printf "\n\n\nBump to %s\n" "$VERSION"
 ./versionBump.sh "$VERSION"
 git commit -am "Bump to $VERSION"
 
-box "Tag and push '$VERSION'"
-git tag "$VERSION"
+printf "\n\n\nTag and push %s\n" "$VERSION_TAG"
+git tag "$VERSION_TAG"
 git push --tags origin
 
 
 
 # Done
-box "  <<--==  PatternFly Fritz2 successfully released  ==-->>  "
+printf "\n\n\n  <<--==  PatternFly Fritz2 successfully released  ==-->>  \n"
