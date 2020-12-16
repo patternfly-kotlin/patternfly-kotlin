@@ -21,7 +21,6 @@ import org.patternfly.dom.aria
 import org.patternfly.dom.matches
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
-import org.w3c.dom.Document
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -32,21 +31,6 @@ import org.w3c.dom.events.MouseEvent
 // ------------------------------------------------------ dsl
 
 internal val TOAST_ALERT_GROUP = Id.unique("toast", ComponentType.AlertGroup.id)
-
-/**
- * Creates the singleton toast [AlertGroup] component and [prepends][org.w3c.dom.ParentNode.prepend] it to the body of this document. If the toast alert group is already present in the DOM, this function does nothing.
- *
- * @receiver the document
- *
- * @param baseClass optional CSS class that should be applied to the element
- *
- * @sample org.patternfly.sample.AlertSample.toastAlertGroup
- */
-public fun Document.addToastAlertGroup(baseClass: String? = null) {
-    if (querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
-        body?.prepend(renderElement { AlertGroup(true, TOAST_ALERT_GROUP, baseClass, job) }.domNode)
-    }
-}
 
 /**
  * Creates an [AlertGroup] component. Alert groups are used to stack and position [Alert]s. Besides the singleton toast alert group, alert groups are most often used to group inline alerts.

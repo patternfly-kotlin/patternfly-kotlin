@@ -120,8 +120,7 @@ bintray {
         version.apply {
             name = Constants.version
             released = Date().toString()
-            vcsTag = Constants.version
-            vcsUrl = "https://github.com/${Constants.githubRepo}/releases/tag/${Constants.version}"
+            vcsTag = "v${Constants.version}"
         }
     }
 }

@@ -1,7 +1,6 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import kotlinx.browser.document
 import org.patternfly.AlertGroup
 import org.patternfly.ButtonVariation.inline
 import org.patternfly.ButtonVariation.link
@@ -10,7 +9,6 @@ import org.patternfly.Severity.DANGER
 import org.patternfly.Severity.INFO
 import org.patternfly.Severity.SUCCESS
 import org.patternfly.Severity.WARNING
-import org.patternfly.addToastAlertGroup
 import org.patternfly.alert
 import org.patternfly.alertActions
 import org.patternfly.alertDescription
