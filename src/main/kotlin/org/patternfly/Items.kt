@@ -98,7 +98,7 @@ public data class Items<T>(
      */
     public fun addFilter(name: String, filter: ItemFilter<T>): Items<T> {
         val newFilters = filters + (name to filter)
-        val newItems = items(newFilters, sortInfo)
+        val newItems = applyFiltersAndSorting(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
@@ -108,7 +108,7 @@ public data class Items<T>(
      */
     public fun removeFilter(name: String): Items<T> {
         val newFilters = filters - name
-        val newItems = items(newFilters, sortInfo)
+        val newItems = applyFiltersAndSorting(newFilters, sortInfo)
         val newPageInfo = pageInfo.total(newItems.size)
         return copy(items = newItems, pageInfo = newPageInfo, filters = newFilters)
     }
@@ -117,7 +117,7 @@ public data class Items<T>(
      * Applies the specified sort info and returns a new instance.
      */
     public fun sortWith(sortInfo: SortInfo<T>): Items<T> {
-        val newItems = items(filters, sortInfo)
+        val newItems = applyFiltersAndSorting(filters, sortInfo)
         return copy(items = newItems, sortInfo = sortInfo)
     }
 
@@ -177,7 +177,7 @@ public data class Items<T>(
         append(")")
     }
 
-    private fun items(filters: Map<String, ItemFilter<T>>, sortInfo: SortInfo<T>?): List<T> =
+    private fun applyFiltersAndSorting(filters: Map<String, ItemFilter<T>>, sortInfo: SortInfo<T>?): List<T> =
         if (filters.isEmpty()) {
             if (sortInfo != null) {
                 all.sortedWith(sortInfo.effectiveComparator())
