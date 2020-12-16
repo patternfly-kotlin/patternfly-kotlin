@@ -22,7 +22,6 @@ VERSION=$1
 VERSION_TAG=v$1
 
 
-# Prerequisites
 if [[ "$#" -ne 1 ]]; then
     echo "Illegal number of parameters. Please use $0 <version>"
     exit 1
@@ -40,15 +39,13 @@ if git rev-parse -q --verify "refs/tags/$VERSION_TAG" >/dev/null; then
     exit 1
 fi
 
+printf "\n\n\n# Check clean status\n\n"
 git checkout master
 if ! git diff --no-ext-diff --quiet --exit-code; then
     echo "Unable to release. You have uncommitted changes in the branch 'master'."
     exit 1
 fi
 
-
-
-# Build, tag and push
 printf "\n\n\n# Build master\n\n"
 git pull origin master
 ./gradlew build || { echo "Build failed" ; exit 1; }
@@ -62,7 +59,4 @@ printf "\n\n\n# Tag and push %s\n\n" "$VERSION_TAG"
 git tag "$VERSION_TAG"
 git push --tags origin
 
-
-
-# Done
 printf "\n\n\n<<--==  PatternFly Fritz2 successfully released  ==-->>\n\n"
