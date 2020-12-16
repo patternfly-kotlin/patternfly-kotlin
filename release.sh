@@ -49,19 +49,20 @@ fi
 
 
 # Build, tag and push
-printf "\n\n\nBuild master\n"
+printf "\n\n\n# Build master\n\n"
 git pull origin master
 ./gradlew build || { echo "Build failed" ; exit 1; }
 
-printf "\n\n\nBump to %s\n" "$VERSION"
+printf "\n\n\n# Bump to %s\n\n" "$VERSION"
 ./versionBump.sh "$VERSION"
 git commit -am "Bump to $VERSION"
+git push origin master
 
-printf "\n\n\nTag and push %s\n" "$VERSION_TAG"
+printf "\n\n\n# Tag and push %s\n\n" "$VERSION_TAG"
 git tag "$VERSION_TAG"
 git push --tags origin
 
 
 
 # Done
-printf "\n\n\n  <<--==  PatternFly Fritz2 successfully released  ==-->>  \n"
+printf "\n\n\n<<--==  PatternFly Fritz2 successfully released  ==-->>\n\n"
