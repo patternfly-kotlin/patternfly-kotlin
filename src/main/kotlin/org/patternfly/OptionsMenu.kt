@@ -371,8 +371,8 @@ internal class OptionsMenuPlainTextToggle<T>(
         span(baseClass = "options-menu".component("toggle", "text")) {
             content(this)
         }
-        toggleButton = button(baseClass = "options-menu".component("button")) {
-            span(baseClass = "options-menu".component("toggle", "icon")) {
+        toggleButton = button(baseClass = "options-menu".component("toggle", "button")) {
+            span(baseClass = "options-menu".component("toggle", "button", "icon")) {
                 icon("caret-down".fas())
             }
         }

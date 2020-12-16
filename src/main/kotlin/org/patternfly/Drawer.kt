@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 
@@ -257,7 +258,7 @@ public class DrawerClose internal constructor(private val drawer: Drawer, id: St
     Div(id = id, baseClass = classes("drawer".component("close"), baseClass), job) {
 
     init {
-        button("plain".modifier()) {
+        pushButton(plain) {
             icon("times".fas())
             aria["label"] = "Close drawer panel"
             clicks.map { false } handledBy this@DrawerClose.drawer.ces.update
