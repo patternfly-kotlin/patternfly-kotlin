@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains:kotlin-extensions:<version>")
-    implementation("org.patternfly:patternfly-fritz2:0.0.9")
+    implementation("org.patternfly:patternfly-fritz2:0.1.0")
     implementation(npm("@patternfly/patternfly", "4"))
 }
 ```
