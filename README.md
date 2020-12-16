@@ -34,6 +34,41 @@ import kotlinext.js.require
 fun main() {
     require("@patternfly/patternfly/patternfly.css")
     require("@patternfly/patternfly/patternfly-addons.css")
+
+    document.body?.appendChild(
+        renderElement {
+            page {
+                pageHeader {
+                    brand {
+                        home("#home")
+                        img("/assets/logo.svg")
+                    }
+                    headerTools {
+                        notificationBadge()
+                    }
+                }
+                pageSidebar {
+                    sidebarBody {
+                        verticalNavigation(router) {
+                            navigationItems {
+                                navigationItem("#item1", "Item 1")
+                                navigationItem("#item2", "Item 2")
+                            }
+                        }
+                    }
+                }
+                pageMain {
+                    pageSection {
+                        h1 { +"Welcome" }
+                        p { +"Lorem ipsum" }
+                    }
+                    pageSection {
+                        +"Another section"
+                    }
+                }
+            }
+        }.domNode
+    )
 }
 ```
 

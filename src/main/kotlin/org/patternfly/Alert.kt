@@ -7,6 +7,7 @@ import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.renderElement
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -208,6 +209,25 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
 
     private fun stopTimeout(id: String) {
         timeoutHandles[id]?.let { window.clearTimeout(it) }
+    }
+
+    public companion object {
+
+        /**
+         * Creates the singleton toast [AlertGroup] component and [prepends][org.w3c.dom.ParentNode.prepend] it to the body of this document. If the toast alert group is already present in the DOM, this function does nothing.
+         *
+         * @param baseClass optional CSS class that should be applied to the element
+         *
+         * @sample org.patternfly.sample.AlertSample.toastAlertGroup
+         */
+        public fun addToastAlertGroup(baseClass: String? = null) {
+            if (document.querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
+                val toastAlertGroup = renderElement {
+                    AlertGroup(true, TOAST_ALERT_GROUP, baseClass, job)
+                }
+                document.body?.prepend(toastAlertGroup.domNode)
+            }
+        }
     }
 }
 

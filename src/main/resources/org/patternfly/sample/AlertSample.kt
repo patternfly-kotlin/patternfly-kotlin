@@ -2,6 +2,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import kotlinx.browser.document
+import org.patternfly.AlertGroup
 import org.patternfly.ButtonVariation.inline
 import org.patternfly.ButtonVariation.link
 import org.patternfly.Notification
@@ -19,7 +20,7 @@ import org.patternfly.pushButton
 internal interface AlertSample {
 
     fun toastAlertGroup() {
-        document.addToastAlertGroup()
+        AlertGroup.addToastAlertGroup()
     }
 
     fun standaloneAlert() {

@@ -8,6 +8,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
+import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,13 @@ public fun RenderContext.page(
     baseClass: String? = null,
     content: Page.() -> Unit = {}
 ): Page = register(Page(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Appends the page component to the body element.
+ */
+public fun Page.appendToBody() {
+    document.body?.appendChild(this.domNode)
+}
 
 /**
  * Creates the [Header] component inside the [Page] component.
