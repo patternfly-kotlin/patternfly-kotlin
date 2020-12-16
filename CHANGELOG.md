@@ -24,9 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - in case of vulnerabilities
 
+## [0.0.4] - 2020-12-16
+
+- Setup contributing guidelines
+- Setup [Gitter](https://gitter.im/patternfly-kotlin/fritz2) chat room
+
 ## [0.0.3] - 2020-12-16
 
-Fixed documentation
+Fix documentation
 
 ## [0.0.2] - 2020-12-16
 
@@ -36,6 +41,7 @@ First public release
 
 Pre release
 
-[0.0.3]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.0.1...v0.0.2
+[0.0.4]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.0.1
