@@ -124,4 +124,4 @@ To see more components in action, take a look at the [showcase](https://patternf
 
 PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and share your feedback. Join the chat at [Gitter](https://gitter.im/patternfly-kotlin/patternfly-fritz2) or use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to file bugs or open feature requests. 
 
-Of course, you're very welcome to [contribute](CONTRIBUTE.md) to PatternFly Fritz2.  
+Of course, you're very welcome to [contribute](CONTRIBUTING.md) to PatternFly Fritz2.  
