@@ -1,6 +1,6 @@
 # PatternFly Fritz2
 
-[![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) [![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2?sort=semver)](https://github.com/patternfly-kotlin/patternfly-fritz2/releases/latest) [ ![Download](https://api.bintray.com/packages/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/images/download.svg) ](https://bintray.com/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/_latestVersion)
+[![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) [![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2?sort=semver)](https://github.com/patternfly-kotlin/patternfly-fritz2/releases/latest) [ ![Download](https://api.bintray.com/packages/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/images/download.svg) ](https://bintray.com/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/_latestVersion) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/patternfly-kotlin/patternfly-fritz2)
 
 PatternFly Fritz2 is a [Kotlin/JS](https://kotl.in/js) implementation of [PatternFly](https://www.org.patternfly.org/) based on [fritz2](https://www.fritz2.dev/).
 
@@ -120,6 +120,6 @@ To see more components in action, take a look at the [showcase](https://patternf
 
 ## Get Involved
 
-PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and let us know what you think about it. Use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to file bugs or open feature requests. 
+PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and share your feedback. Join the chat at [Gitter](https://gitter.im/patternfly-kotlin/patternfly-fritz2) or use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to file bugs or open feature requests. 
 
 Of course, you're very welcome to [contribute](CONTRIBUTE.md) to PatternFly Fritz2.  
