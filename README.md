@@ -93,7 +93,7 @@ fun main() {
         card {
             cardHeader {
                 img { src("./logo.svg") }
-                actions {
+                cardAction {
                     dropdown<String>(align = RIGHT) {
                         kebabToggle()
                         items {
