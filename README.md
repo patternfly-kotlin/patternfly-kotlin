@@ -14,7 +14,7 @@ To get all details about how to use PatternFly Fritz2 take a look at the [API do
 
 ### Dependencies
 
-PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 is 100% Kotlin. All PatternFly components are implemented in Kotlin. The only dependency is `fritz2-core`. You won't need any additional external JS libraries. 
+PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 is 💯 Kotlin. All PatternFly components are implemented in Kotlin. The only dependency is `fritz2-core`. You won't need any additional external JS libraries. 
 
 ```kotlin
 repositories {
