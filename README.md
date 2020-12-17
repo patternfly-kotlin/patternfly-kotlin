@@ -2,7 +2,7 @@
 
 [![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) [![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions) [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2?sort=semver)](https://github.com/patternfly-kotlin/patternfly-fritz2/releases/latest) [ ![Download](https://api.bintray.com/packages/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/images/download.svg) ](https://bintray.com/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/_latestVersion) [![Gitter](https://img.shields.io/gitter/room/patternfly-kotlin/patternfly-fritz2)](https://gitter.im/patternfly-kotlin/patternfly-fritz2)
 
-PatternFly Fritz2 is a [Kotlin/JS](https://kotl.in/js) implementation of [PatternFly](https://www.patternfly.org/) based on [fritz2](https://www.fritz2.dev/).
+PatternFly Fritz2 is a pure [Kotlin/JS](https://kotl.in/js) implementation of [PatternFly](https://www.patternfly.org/) based on [fritz2](https://www.fritz2.dev/).
 
 The goal of this project is to provide all PatternFly components in Kotlin/JS. This is done in a way that matches the reactive nature of fritz2. In particular, the components use [stores](https://api.fritz2.dev/core/core/dev.fritz2.binding/-store/index.html), [handlers](https://api.fritz2.dev/core/core/dev.fritz2.binding/-handler/index.html), and other elements from the fritz2 API.
 
@@ -11,6 +11,8 @@ To get a quick overview what this is all about head over to the PatternFly Fritz
 To get all details about how to use PatternFly Fritz2 take a look at the [API documentation](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/).
 
 ## Get Started
+
+### Dependencies
 
 PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 is 100% Kotlin. All PatternFly components are implemented in Kotlin. The only dependency is `fritz2-core`. You won't need any additional external JS libraries. 
 
@@ -23,6 +25,8 @@ dependencies {
     implementation("org.patternfly:patternfly-fritz2:0.1.0")
 }
 ```
+
+### PatternFly Assets
 
 However, PatternFly Fritz2 does not come with stylesheets, fonts or other static PatternFly assets. One way to include them is to add a `npm` dependency to PatternFly 
 
@@ -42,48 +46,74 @@ import kotlinext.js.require
 fun main() {
     require("@patternfly/patternfly/patternfly.css")
     require("@patternfly/patternfly/patternfly-addons.css")
+```
 
-    // a typical page setup might look something like this
-    document.body?.appendChild(
-        renderElement {
-            page {
-                pageHeader {
-                    brand {
-                        home("#home")
-                        img("/assets/logo.svg")
-                    }
-                    headerTools {
-                        notificationBadge()
-                    }
+Another option is to get PatternFly using an CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) or to download PatternFly and include the stylesheets directly in your HTML page:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My App</title>
+    <link rel="stylesheet" href="patternfly.css">
+    <link rel="stylesheet" href="patternfly-addons.css">
+</head>
+<body id="entrypoint">
+</body>
+</html>
+```
+
+See also the [getting started](https://www.patternfly.org/v4/get-started/develop#htmlcss) section on the PatternFly website for more details. 
+
+### Page
+
+The typical setup in PatternFly starts with adding an instance of the [Page](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-page/index.html) component to the document body. The page contains the header, an optional sidebar and the main content container. 
+
+A typical setup might look something like this:
+
+```kotlin
+
+fun main() {
+    
+    render {
+        page {
+            pageHeader {
+                brand {
+                    home("#home")
+                    img("/assets/logo.svg")
                 }
-                pageSidebar {
-                    sidebarBody {
-                        verticalNavigation(router) {
-                            navigationItems {
-                                navigationItem("#item1", "Item 1")
-                                navigationItem("#item2", "Item 2")
-                            }
+                headerTools {
+                    notificationBadge()
+                }
+            }
+            pageSidebar {
+                sidebarBody {
+                    verticalNavigation(router) {
+                        navigationItems {
+                            navigationItem("#item1", "Item 1")
+                            navigationItem("#item2", "Item 2")
                         }
                     }
                 }
-                pageMain {
-                    pageSection {
-                        h1 { +"Welcome" }
-                        p { +"Lorem ipsum" }
-                    }
-                    pageSection {
-                        +"Another section"
-                    }
+            }
+            pageMain {
+                pageSection {
+                    h1 { +"Welcome" }
+                    p { +"Lorem ipsum" }
+                }
+                pageSection {
+                    +"Another section"
                 }
             }
-        }.domNode
-    )
+        }
+    }.mount("entrypoint") // given the index.html from above
 }
 ```
 
-## Usage
+## API
 
-Most PatternFly components are implemented by Kotlin classes and created by factory functions. These functions integrate in the fritz2 DSL and follow a common pattern:
+All components in PatternFly Fritz2 are completely implemented in Kotlin and are created by factory functions. These functions integrate in the fritz2 DSL and follow a common pattern:
 
 1. Parameter(s) specific to the component
 1. `id: String? = null` ID attribute assigned to the component
