@@ -4,7 +4,7 @@
 
 PatternFly Fritz2 is a 💯 Kotlin implementation of [PatternFly](https://www.patternfly.org/) based on [fritz2](https://www.fritz2.dev/) targeting [Kotlin/JS](https://kotl.in/js).
 
-The goal of this project is to provide all PatternFly components in Kotlin. This is done in a way that matches the reactive nature of fritz2. In particular, the components use [stores](https://api.fritz2.dev/core/core/dev.fritz2.binding/-store/index.html), [handlers](https://api.fritz2.dev/core/core/dev.fritz2.binding/-handler/index.html), and other elements from the fritz2 API.
+The goal of this project is to provide all PatternFly components in Kotlin. This is done in a way that matches the reactive nature of fritz2. In particular, the components use [stores](https://api.fritz2.dev/core/core/dev.fritz2.binding/-store/index.html), [handlers](https://api.fritz2.dev/core/core/dev.fritz2.binding/-handler/index.html), and other elements from the [fritz2 API](https://api.fritz2.dev/core/core/index.html).
 
 To get a quick overview what this is all about head over to the PatternFly Fritz2 [showcase](https://patternfly-kotlin.github.io/patternfly-fritz2-showcase/). It demonstrates the usage of all supported components and also includes more complex demos of data driven components such as [card view](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-card-view/index.html), [data list](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-data-list/index.html) and [data tables](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-data-table/index.html).
 
