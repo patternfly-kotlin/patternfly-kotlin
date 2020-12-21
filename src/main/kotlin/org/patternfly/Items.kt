@@ -10,14 +10,14 @@ import kotlin.math.min
 public typealias ItemFilter<T> = (T) -> Boolean
 
 /**
- * Immutable container for items used in [ItemStore]. Items can be paged, filtered, selected and sorted. Every modification to an instance of this class leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
+ * Immutable collection of items used in [ItemStore]. Items can be paged, filtered, selected and sorted. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
  *
- * The wrapped data can be obtained using different collections:
+ * Items can be obtained using different properties:
  *
- * - [all]: All items given when this instance was created.
- * - [items]: Sorted items after all filters have been applied.
+ * - [all]: All items given when this instance was created. This collection never changes.
+ * - [items]: List after [sortInfo] and [filters] have been applied to [all].
  * - [page]: Paged version of [items].
- * - [selection]: Selected items.
+ * - [selection]: Selected items based on [all].
  *
  * **Paging**
  *
@@ -25,18 +25,18 @@ public typealias ItemFilter<T> = (T) -> Boolean
  *
  * **Filter**
  *
- * Each filter is identified by an unique name. They are applied to all items. Filters can be added and removed using a call to `copy(filters = mapOf(...))`.
+ * Each filter is identified by an unique name. They are applied to [all] items. Filters can be added and removed using [addFilter] and [removeFilter].
  *
  * **Select**
  *
  * Items can be selected using of of the following methods
  *
- * - [select]
- * - [selectOnly]
- * - [selectNone]
- * - [selectPage]
- * - [selectAll]
- * - [toggleSelection]
+ * - [select]: (de)select single items
+ * - [selectOnly]: select one item and deselect all other items
+ * - [selectNone]: select no items
+ * - [selectPage]: select all items of the current [page]
+ * - [selectAll]: select all items
+ * - [toggleSelection]: toggle the selection of an item
  *
  * Selected items are stored in the [selection] property.
  *
@@ -46,7 +46,7 @@ public typealias ItemFilter<T> = (T) -> Boolean
  *
  * @param idProvider used to uniquely identify each item
  * @param all all items managed by this instance
- * @param items sorted items after all filters have been applied
+ * @param items list after [sortInfo] and [filters] have been applied to [all]
  * @param pageInfo used to divide [items] into pages
  * @param filters predicates applied to [all] items
  * @param selected contains the selected **IDs**
@@ -72,7 +72,7 @@ public data class Items<T>(
     /**
      * The items of the current page. Filters and sorting (in that order) are applied to this list.
      */
-    val page: List<T>
+    public val page: List<T>
         get() = if (items.isEmpty()) listOf() else {
             val from = inBounds(pageInfo.range.first - 1, 0, items.size - 1)
             val to = inBounds(pageInfo.range.last, 1, items.size)
