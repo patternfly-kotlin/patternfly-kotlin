@@ -1,9 +1,9 @@
 package org.patternfly.sample
 
-import dev.fritz2.dom.html.renderElement
+import dev.fritz2.dom.html.render
+import dev.fritz2.dom.mount
 import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
-import kotlinx.browser.document
 import org.patternfly.brand
 import org.patternfly.headerTools
 import org.patternfly.horizontalNavigation
@@ -22,45 +22,43 @@ internal interface PageSample {
 
     fun typicalSetup() {
         val router = Router(StringRoute("#home"))
-        document.body?.appendChild(
-            renderElement {
-                page {
-                    pageHeader {
-                        brand {
-                            home("#home")
-                            img("/assets/logo.svg")
+        render {
+            page {
+                pageHeader {
+                    brand {
+                        home("#home")
+                        img("/assets/logo.svg")
+                    }
+                    horizontalNavigation(router) {
+                        navigationItems {
+                            navigationItem("#item1", "Item 1")
+                            navigationItem("#item2", "Item 2")
                         }
-                        horizontalNavigation(router) {
+                    }
+                    headerTools {
+                        notificationBadge()
+                    }
+                }
+                pageSidebar {
+                    sidebarBody {
+                        verticalNavigation(router) {
                             navigationItems {
                                 navigationItem("#item1", "Item 1")
                                 navigationItem("#item2", "Item 2")
                             }
                         }
-                        headerTools {
-                            notificationBadge()
-                        }
-                    }
-                    pageSidebar {
-                        sidebarBody {
-                            verticalNavigation(router) {
-                                navigationItems {
-                                    navigationItem("#item1", "Item 1")
-                                    navigationItem("#item2", "Item 2")
-                                }
-                            }
-                        }
-                    }
-                    pageMain {
-                        pageSection {
-                            h1 { +"Welcome" }
-                            p { +"Lorem ipsum" }
-                        }
-                        pageSection {
-                            +"Another section"
-                        }
                     }
                 }
-            }.domNode
-        )
+                pageMain {
+                    pageSection {
+                        h1 { +"Welcome" }
+                        p { +"Lorem ipsum" }
+                    }
+                    pageSection {
+                        +"Another section"
+                    }
+                }
+            }
+        }.mount("entrypoint")
     }
 }
