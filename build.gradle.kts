@@ -54,31 +54,33 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(kotlin.sourceSets.main.get().kotlin)
 }
 
-tasks.dokkaHtml.configure {
-    dokkaSourceSets {
-        named("main") {
-            noJdkLink.set(false)
-            noStdlibLink.set(false)
-            includeNonPublic.set(false)
-            skipEmptyPackages.set(true)
-            platform.set(Platform.js)
-            includes.from("src/main/resources/module.md")
-            samples.from("src/main/resources/")
-            sourceLink {
-                localDirectory.set(file("src/main/kotlin"))
-                remoteUrl.set(
-                    URL(
-                        "https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/" +
-                            "src/main/kotlin/"
+tasks {
+    dokkaHtml.configure {
+        dokkaSourceSets {
+            named("main") {
+                noJdkLink.set(false)
+                noStdlibLink.set(false)
+                includeNonPublic.set(false)
+                skipEmptyPackages.set(true)
+                platform.set(Platform.js)
+                includes.from("src/main/resources/module.md")
+                samples.from("src/main/resources/")
+                sourceLink {
+                    localDirectory.set(file("src/main/kotlin"))
+                    remoteUrl.set(
+                        URL(
+                            "https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/" +
+                                "src/main/kotlin/"
+                        )
                     )
-                )
-                remoteLineSuffix.set("#L")
-            }
-            externalDocumentationLink {
-                this.url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
-            }
-            externalDocumentationLink {
-                this.url.set(URL("https://api.fritz2.dev/core/core/"))
+                    remoteLineSuffix.set("#L")
+                }
+                externalDocumentationLink {
+                    this.url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
+                }
+                externalDocumentationLink {
+                    this.url.set(URL("https://api.fritz2.dev/core/core/"))
+                }
             }
         }
     }
