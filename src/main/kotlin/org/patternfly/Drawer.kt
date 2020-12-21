@@ -238,8 +238,7 @@ public class DrawerAction internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) :
-    Div(id = id, baseClass = classes("drawer".component("actions"), baseClass), job)
+) : Div(id = id, baseClass = classes("drawer".component("actions"), baseClass), job)
 
 /**
  * Component for the content inside the [DrawerContent] and [DrawerPanel] components.
