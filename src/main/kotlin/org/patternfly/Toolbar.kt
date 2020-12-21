@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLDivElement
 
@@ -85,8 +86,8 @@ public fun <T> ToolbarItem.bulkSelect(
                         }
                     }
                 )
-                changes.states().filter { !it }.map { Unit } handledBy itemStore.selectNone
-                changes.states().filter { it }.map { Unit } handledBy itemStore.selectAll
+                changes.states().filter { !it }.map { } handledBy itemStore.selectNone
+                changes.states().filter { it }.map { } handledBy itemStore.selectAll
             }
         }
         display { +it.text }
@@ -104,7 +105,12 @@ public fun <T> ToolbarItem.sortOptions(
     id: String? = null,
     baseClass: String? = null,
     content: OptionsMenu<SortOption>.() -> Unit = {}
-): OptionsMenu<SortOption> = optionsMenu(grouped = true, multiSelect = true, id = id, baseClass = baseClass) {
+): OptionsMenu<SortOption> = optionsMenu(
+    selectionMode = SINGLE_PER_GROUP,
+    grouped = true,
+    id = id,
+    baseClass = baseClass
+) {
     iconToggle {
         icon("sort-amount-down".fas())
     }
@@ -124,7 +130,17 @@ public fun <T> ToolbarItem.sortOptions(
         }
     }
 
-    // TODO Update selection when ItemStore.sortWith has changed
+    // Two-way data binding (1): update selection according to Items.sortInfo
+    select(
+        itemStore.data.map { it.sortInfo }.filterNotNull().map {
+            listOf(
+                SortProperty(it.id, it.text, it.comparator),
+                SortOrder(it.ascending)
+            )
+        }
+    )
+
+    // Two-way data binding (2): sort items according to selection
     store.selection.unwrap()
         .map { items ->
             val property = items.filterIsInstance<SortProperty<T>>().firstOrNull()

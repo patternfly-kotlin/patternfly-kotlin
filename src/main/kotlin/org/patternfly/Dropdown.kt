@@ -1,8 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
-import dev.fritz2.binding.Handler
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
@@ -13,6 +11,7 @@ import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -177,7 +176,8 @@ public fun <T> DropdownCustomToggle<T>.toggleIcon(baseClass: String? = null): Sp
  * @sample org.patternfly.sample.DropdownSample.items
  */
 public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
-    store.update(ItemsBuilder<T>().apply(block).build())
+    val entries = ItemsBuilder(store).apply(block).build()
+    store.update(entries)
 }
 
 /**
@@ -189,7 +189,8 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Dropdown ${domNode.debug()} has not been created using `grouped = true`")
     }
-    store.update(GroupsBuilder<T>().apply(block).build())
+    val entries = GroupsBuilder(store).apply(block).build()
+    store.update(entries)
 }
 
 // ------------------------------------------------------ tag
@@ -206,7 +207,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [action toggle][DropdownActionToggle]
  * - [custom toggle][DropdownCustomToggle]
  *
- * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore]. Each [Entry] is either an [Item], a [Group] or a [Separator]. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore].
  *
  * **Adding entries**
  *
@@ -243,7 +244,7 @@ public class Dropdown<T> internal constructor(
     private var selector: (T) -> String = { it.toString() }
     private var customDisplay: ComponentDisplay<Button, T>? = null
     private var defaultDisplay: ComponentDisplay<Button, Item<T>> = { item ->
-        if (item.description.isNotEmpty()) {
+        if (item.description != null) {
             div(baseClass = "dropdown".component("menu-item", "main")) {
                 item.icon?.let { iconDisplay ->
                     span(baseClass = "dropdown".component("menu-item", "icon")) {
@@ -299,7 +300,7 @@ public class Dropdown<T> internal constructor(
             attr("hidden", this@Dropdown.ces.data.map { !it })
             aria["labelledby"] = this@Dropdown.toggleId
 
-            this@Dropdown.store.data.renderEach { entry ->
+            this@Dropdown.store.entries.renderEach { entry ->
                 when (entry) {
                     is Item<T> -> {
                         li(content = this@Dropdown.itemContent(entry))
@@ -310,7 +311,7 @@ public class Dropdown<T> internal constructor(
                                 h1(baseClass = "dropdown".component("group", "title")) { +it }
                             }
                             ul {
-                                entry.items.forEach { groupEntry ->
+                                entry.entries.forEach { groupEntry ->
                                     when (groupEntry) {
                                         is Item<T> -> {
                                             li(content = this@Dropdown.itemContent(groupEntry))
@@ -338,13 +339,14 @@ public class Dropdown<T> internal constructor(
         }
     }
 
+    // TODO Support links if item.href != null
     private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
         button(
             baseClass = classes {
                 +"dropdown".component("menu-item")
                 +("icon".modifier() `when` (item.icon != null))
-                +("description".modifier() `when` item.description.isNotEmpty())
+                +("description".modifier() `when` (item.description != null))
                 +("disabled".modifier() `when` item.disabled)
             }
         ) {
@@ -635,30 +637,22 @@ public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, 
 // ------------------------------------------------------ store
 
 /**
- * Store containing the data shown in a dropdown. The data is wrapped inside instances of [Entry]. An entry is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * An [EntriesStore] with [ItemSelection.SINGLE] selection mode.
  *
- * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the `unwrap()` functions to get the actual payload.
+ * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
  *
  * @sample org.patternfly.sample.DropdownSample.unwrap
  */
-public class DropdownStore<T> : RootStore<List<Entry<T>>>(listOf()) {
+public class DropdownStore<T>(idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    EntriesStore<T>(idProvider, ItemSelection.SINGLE) {
 
-    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
+    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, item ->
         emit(item)
-        items
+        entries.select(item.item)
     }
 
     /**
-     * Flow with the last selected items.
+     * Flow for selected items. Shortcut for `singleSelection.filterNotNull()`
      */
     public val selects: Flow<Item<T>> = selectHandler
-
-    /**
-     * Wraps the specified data inside instances of [Item] and adds them to the list of existing entries.
-     */
-    public val addAll: Handler<List<T>> = handle { items, newItems ->
-        items + newItems.map {
-            Item(it, disabled = false, selected = false, description = "", icon = null, group = null)
-        }
-    }
 }

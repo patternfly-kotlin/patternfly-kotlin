@@ -1,8 +1,11 @@
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
+import org.patternfly.dom.Id
 import org.w3c.dom.HTMLDivElement
 
 // TODO Implement and document me
@@ -24,3 +27,9 @@ public class Select internal constructor(id: String?, baseClass: String?, job: J
         markAs(ComponentType.Select)
     }
 }
+
+// ------------------------------------------------------ store
+
+public class SelectStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    RootStore<List<Entry<T>>>(listOf()),
+    WithIdProvider<T>

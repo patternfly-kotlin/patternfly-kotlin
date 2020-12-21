@@ -93,6 +93,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
     Main("mn", "page".component("main")),
+    Menu("mu", "menu".component()),
     Navigation("nav", "nav".component()),
     NotificationBadge("nb", "button".component()),
     OptionsMenu("opt", "options-menu".component()),
@@ -117,27 +118,6 @@ public enum class Align(public val modifier: String) {
 }
 
 /**
- * Enum for the [DataTable] selection mode.
- */
-public enum class DataTableSelection {
-
-    /**
-     * Multiple rows can be selected using checkboxes. The table header contains an additional checkbox to select all rows.
-     */
-    MULTIPLE_ALL,
-
-    /**
-     * Multiple rows can be selected using checkboxes.
-     */
-    MULTIPLE,
-
-    /**
-     * Only one row can be selected at a time using radio buttons.
-     */
-    SINGLE
-}
-
-/**
  * Visual modifiers for [PushButton]s and [LinkButton]s.
  */
 @Suppress("EnumEntryName")
@@ -151,6 +131,27 @@ public enum class ButtonVariation(internal val modifier: String) {
     secondary("secondary".modifier()),
     tertiary("tertiary".modifier()),
     warning("warning".modifier()),
+}
+
+/**
+ * Enum for the [DataTable] selection mode.
+ */
+public enum class DataTableSelection {
+
+    /**
+     * Only one row can be selected at a time using radio buttons.
+     */
+    SINGLE,
+
+    /**
+     * Multiple rows can be selected using checkboxes.
+     */
+    MULTIPLE,
+
+    /**
+     * Multiple rows can be selected using checkboxes. The table header contains an additional checkbox to select all rows.
+     */
+    MULTIPLE_ALL
 }
 
 /**

@@ -1,8 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
-import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.SimpleHandler
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
@@ -13,7 +11,6 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
@@ -25,15 +22,14 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 
-// TODO Refactor and document me
 // ------------------------------------------------------ dsl
 
 /**
  * Creates a [OptionsMenu] component.
  *
+ * @param selectionMode controls how items can be selected
  * @param store the store for the options menu
  * @param grouped whether the options menu contains groups or just flat items
- * @param multiSelect whether multiple entries can be selected
  * @param closeOnSelect whether to close the menu after selecting an item
  * @param align the alignment of the options menu
  * @param up controls the direction of the options menu
@@ -42,20 +38,31 @@ import org.w3c.dom.Node
  * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.optionsMenu(
-    store: OptionsMenuStore<T> = OptionsMenuStore(),
+    selectionMode: ItemSelection = ItemSelection.SINGLE_PER_GROUP,
+    store: OptionsMenuStore<T> = OptionsMenuStore(selectionMode = selectionMode),
     grouped: Boolean = false,
-    multiSelect: Boolean = false,
     closeOnSelect: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: OptionsMenu<T>.() -> Unit = {}
-): OptionsMenu<T> =
-    register(
-        OptionsMenu(store, grouped, multiSelect, closeOnSelect, align, up, id = id, baseClass = baseClass, job),
-        content
+): OptionsMenu<T> {
+    val optionsMenu = OptionsMenu(
+        store = store,
+        grouped = grouped,
+        closeOnSelect = closeOnSelect,
+        optionsMenuAlign = align,
+        up = up,
+        id = id,
+        baseClass = baseClass,
+        job = job
     )
+    if (selectionMode != store.selectionMode) {
+        console.warn("Different selection modes for options menu ${optionsMenu.domNode.debug()}: param($selectionMode) != store(${store.selectionMode}). ${store.selectionMode} will be used.")
+    }
+    return register(optionsMenu, content)
+}
 
 /**
  * Creates a text toggle. Specify the text using the [content] function.
@@ -97,7 +104,8 @@ public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: But
  * @sample org.patternfly.sample.OptionsMenuSample.items
  */
 public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
-    store.update(ItemsBuilder<T>().apply(block).build())
+    val entries = ItemsBuilder(store).apply(block).build()
+    store.update(entries)
 }
 
 /**
@@ -109,7 +117,8 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Options menu ${domNode.debug()} has not been created using `grouped = true`")
     }
-    store.update(GroupsBuilder<T>().apply(block).build())
+    val entries = GroupsBuilder(store).apply(block).build()
+    store.update(entries)
 }
 
 // ------------------------------------------------------ tag
@@ -142,7 +151,6 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
 public class OptionsMenu<T> internal constructor(
     public val store: OptionsMenuStore<T>,
     internal val grouped: Boolean,
-    multiSelect: Boolean,
     private val closeOnSelect: Boolean,
     optionsMenuAlign: Align?,
     up: Boolean,
@@ -179,7 +187,6 @@ public class OptionsMenu<T> internal constructor(
     }
 
     init {
-        store.multiSelect = multiSelect
         markAs(ComponentType.OptionsMenu)
         classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
 
@@ -201,7 +208,7 @@ public class OptionsMenu<T> internal constructor(
             attr("hidden", this@OptionsMenu.ces.data.map { !it })
             aria["labelledby"] = this@OptionsMenu.toggleId
 
-            this@OptionsMenu.store.data.renderEach { entry ->
+            this@OptionsMenu.store.entries.renderEach { entry ->
                 when (entry) {
                     is Item<T> -> {
                         li(content = this@OptionsMenu.itemContent(entry))
@@ -212,7 +219,7 @@ public class OptionsMenu<T> internal constructor(
                                 h1(baseClass = "options-menu".component("group", "title")) { +it }
                             }
                             ul {
-                                entry.items.forEach { groupEntry ->
+                                entry.entries.forEach { groupEntry ->
                                     when (groupEntry) {
                                         is Item<T> -> {
                                             li(content = this@OptionsMenu.itemContent(groupEntry))
@@ -240,6 +247,7 @@ public class OptionsMenu<T> internal constructor(
         }
     }
 
+    // TODO Support links if item.href != null
     private fun itemContent(item: Item<T>): Li.() -> Unit = {
         attr("role", "menuitem")
         button(
@@ -266,7 +274,7 @@ public class OptionsMenu<T> internal constructor(
             if (this@OptionsMenu.closeOnSelect) {
                 clicks handledBy this@OptionsMenu.ces.collapse
             }
-            clicks.map { item } handledBy this@OptionsMenu.store.selectHandler
+            clicks.map { item.item } handledBy this@OptionsMenu.store.select
         }
     }
 
@@ -308,6 +316,34 @@ public class OptionsMenu<T> internal constructor(
      */
     public fun disabled(value: Flow<Boolean>) {
         toggle.disabled(value)
+    }
+
+    /**
+     * Updates the selection of the specified values.
+     */
+    public fun select(values: Flow<List<T>>) {
+        mountSingle(job, values) { v, _ -> select(v) }
+    }
+
+    /**
+     * Updates the selection of the specified values.
+     */
+    public fun select(values: List<T>) {
+        values.forEach { select(it) }
+    }
+
+    /**
+     * Updates the selection of the specified value.
+     */
+    public fun select(value: Flow<T>) {
+        mountSingle(job, value) { v, _ -> select(v) }
+    }
+
+    /**
+     * Updates the selection of the specified value.
+     */
+    public fun select(value: T) {
+        store.select(value)
     }
 }
 
@@ -420,87 +456,18 @@ internal class OptionsMenuIconToggle<T>(
 
 // ------------------------------------------------------ store
 /**
- * Store containing the data shown in a options menu. The data is wrapped inside instances of [Entry]. An entry is either an [Item] or a [Group] of [Item]s. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * An [EntriesStore] with the specified selection mode.
  *
- * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the `unwrap()` functions to get the actual payload.
+ * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
  *
  * @sample org.patternfly.sample.OptionsMenuSample.unwrap
  */
-public class OptionsMenuStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
-    WithIdProvider<T>,
-    RootStore<List<Entry<T>>>(listOf()) {
+public class OptionsMenuStore<T>(
+    idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+    selectionMode: ItemSelection = ItemSelection.SINGLE_PER_GROUP
+) : EntriesStore<T>(idProvider, selectionMode) {
 
-    internal var multiSelect: Boolean = false
-
-    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { items, item ->
-        emit(item)
-        items.map { currentEntry ->
-            when (currentEntry) {
-                is Item<T> -> select(item, currentEntry)
-                is Group<T> -> {
-                    if (currentEntry.id == item.group?.id) {
-                        val groupItems = currentEntry.items.map { groupEntry ->
-                            when (groupEntry) {
-                                is Item<T> -> select(item, groupEntry)
-                                else -> groupEntry
-                            }
-                        }
-                        currentEntry.copy(items = groupItems)
-                    } else {
-                        currentEntry
-                    }
-                }
-                else -> currentEntry
-            }
-        }
-    }
-
-    private fun select(item: Item<T>, current: Item<T>): Entry<T> =
-        if (multiSelect) {
-            if (sameId(item, current)) {
-                current.copy(selected = !current.selected)
-            } else {
-                current
-            }
-        } else {
-            if (sameId(item, current)) {
-                if (current.selected) {
-                    current
-                } else {
-                    current.copy(selected = true)
-                }
-            } else {
-                current.copy(selected = false)
-            }
-        }
-
-    private fun sameId(item: Item<T>, current: Item<T>) = itemId(item.item) == itemId(current.item)
-
-    /**
-     * Flow with the last selected items.
-     */
-    public val selects: Flow<Item<T>> = selectHandler
-
-    /**
-     * Flow containing all selected items.
-     */
-    public val selection: Flow<List<Item<T>>> = data.flatItems()
-        .drop(1) // drop initial (empty) data
-        .map { items ->
-            items.filter { it.selected }
-        }
-
-    /**
-     * Flow containing the first selected item.
-     */
-    public val singleSelection: Flow<Item<T>?> = selection.map { it.firstOrNull() }
-
-    /**
-     * Wraps the specified data inside instances of [Item] and adds them to the list of existing entries.
-     */
-    public val addAll: SimpleHandler<List<T>> = handle { items, newItems ->
-        items + newItems.map {
-            Item(it, disabled = false, selected = false, description = "", icon = null, group = null)
-        }
+    internal val select: Handler<T> = handle { entries, data ->
+        entries.select(data)
     }
 }

@@ -3,8 +3,10 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
+import kotlinx.coroutines.flow.filterNotNull
 import org.patternfly.Notification
 import org.patternfly.OptionsMenuStore
+import org.patternfly.addTo
 import org.patternfly.fas
 import org.patternfly.group
 import org.patternfly.groups
@@ -56,18 +58,16 @@ internal interface OptionsMenuSample {
                 singleSelection.unwrapOrNull() handledBy Notification.add { demo ->
                     info("You selected ${demo?.name}")
                 }
+                items {
+                    item(Demo("foo", "Foo"))
+                    item(Demo("bar", "Bar"))
+                }
             }
-            optionsMenu(store) {
+
+            optionsMenu(store = store) {
                 textToggle { +"Choose one" }
                 display { demo -> +demo.name }
             }
-
-            store.addAll(
-                listOf(
-                    Demo("foo", "Foo"),
-                    Demo("bar", "Bar")
-                )
-            )
         }
     }
 
@@ -154,14 +154,11 @@ internal interface OptionsMenuSample {
 
     fun unwrap() {
         render {
-            optionsMenu<String> {
-                store.selection.unwrap() handledBy Notification.add { strings ->
-                    info("You selected $strings")
-                }
-                textToggle { +"Text" }
-                items {
-                    item("Foo")
-                    item("Bar")
+            optionsMenu<Int> {
+                textToggle { +"Favorite numbers" }
+                (1..10).toList().addTo(store)
+                store.singleSelection.filterNotNull().unwrap() handledBy Notification.add { number ->
+                    info("You favorite number is $number")
                 }
             }
         }

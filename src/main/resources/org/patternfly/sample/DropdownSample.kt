@@ -59,21 +59,16 @@ internal interface DropdownSample {
             data class Demo(val id: String, val name: String)
 
             val store = DropdownStore<Demo>().apply {
-                selects.unwrap() handledBy Notification.add { demo ->
-                    info("You selected ${demo.name}")
+                items {
+                    item(Demo("foo", "Foo"))
+                    item(Demo("bar", "Bar"))
                 }
             }
+
             dropdown(store) {
                 textToggle { +"Choose one" }
                 display { demo -> +demo.name }
             }
-
-            store.addAll(
-                listOf(
-                    Demo("foo", "Foo"),
-                    Demo("bar", "Bar")
-                )
-            )
         }
     }
 
@@ -220,7 +215,7 @@ internal interface DropdownSample {
         render {
             dropdown<String> {
                 store.selects.unwrap() handledBy Notification.add {
-                    info("You selected $it")
+                    info("You clicked on $it")
                 }
                 textToggle { +"Text" }
                 items {
