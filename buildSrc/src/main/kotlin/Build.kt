@@ -19,7 +19,7 @@ object PluginVersions {
 
 object Versions {
     const val fritz2 = "0.8"
-    const val kotest = "4.3.1"
+    const val kotest = "4.3.2"
 }
 
 fun DependencyHandler.fritz2() {

@@ -22,7 +22,7 @@ import org.patternfly.unwrapOrNull
 
 internal interface OptionsMenuSample {
 
-    fun dropdownDsl() {
+    fun optionsMenuDsl() {
         render {
             optionsMenu<String> {
                 textToggle { +"Choose one" }
@@ -50,7 +50,7 @@ internal interface OptionsMenuSample {
         }
     }
 
-    fun dropdownStore() {
+    fun optionsMenuStore() {
         render {
             data class Demo(val id: String, val name: String)
 
@@ -147,18 +147,6 @@ internal interface OptionsMenuSample {
                         item("Item 1")
                         item("Item 2")
                     }
-                }
-            }
-        }
-    }
-
-    fun unwrap() {
-        render {
-            optionsMenu<Int> {
-                textToggle { +"Favorite numbers" }
-                (1..10).toList().addTo(store)
-                store.singleSelection.filterNotNull().unwrap() handledBy Notification.add { number ->
-                    info("You favorite number is $number")
                 }
             }
         }

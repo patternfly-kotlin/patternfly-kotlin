@@ -176,7 +176,7 @@ public fun <T> DropdownCustomToggle<T>.toggleIcon(baseClass: String? = null): Sp
  * @sample org.patternfly.sample.DropdownSample.items
  */
 public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
-    val entries = ItemsBuilder(store).apply(block).build()
+    val entries = ItemsBuilder(store.idProvider, store.itemSelection).apply(block).build()
     store.update(entries)
 }
 
@@ -189,7 +189,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Dropdown ${domNode.debug()} has not been created using `grouped = true`")
     }
-    val entries = GroupsBuilder(store).apply(block).build()
+    val entries = GroupsBuilder(store.idProvider, store.itemSelection).apply(block).build()
     store.update(entries)
 }
 
@@ -207,7 +207,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [action toggle][DropdownActionToggle]
  * - [custom toggle][DropdownCustomToggle]
  *
- * The data in the menu is wrapped inside instances of [Entry] and managed by a [DropdownStore].
+ * The data in the menu is managed by a [DropdownStore].
  *
  * **Adding entries**
  *
@@ -638,10 +638,6 @@ public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, 
 
 /**
  * An [EntriesStore] with [ItemSelection.SINGLE] selection mode.
- *
- * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
- *
- * @sample org.patternfly.sample.DropdownSample.unwrap
  */
 public class DropdownStore<T>(idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
     EntriesStore<T>(idProvider, ItemSelection.SINGLE) {

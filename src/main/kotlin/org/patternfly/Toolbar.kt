@@ -106,7 +106,7 @@ public fun <T> ToolbarItem.sortOptions(
     baseClass: String? = null,
     content: OptionsMenu<SortOption>.() -> Unit = {}
 ): OptionsMenu<SortOption> = optionsMenu(
-    selectionMode = SINGLE_PER_GROUP,
+    itemSelection = SINGLE_PER_GROUP,
     grouped = true,
     id = id,
     baseClass = baseClass

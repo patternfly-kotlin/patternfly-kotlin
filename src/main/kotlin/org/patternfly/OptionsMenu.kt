@@ -27,7 +27,7 @@ import org.w3c.dom.Node
 /**
  * Creates a [OptionsMenu] component.
  *
- * @param selectionMode controls how items can be selected
+ * @param itemSelection controls how items can be selected
  * @param store the store for the options menu
  * @param grouped whether the options menu contains groups or just flat items
  * @param closeOnSelect whether to close the menu after selecting an item
@@ -38,8 +38,8 @@ import org.w3c.dom.Node
  * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.optionsMenu(
-    selectionMode: ItemSelection = ItemSelection.SINGLE_PER_GROUP,
-    store: OptionsMenuStore<T> = OptionsMenuStore(selectionMode = selectionMode),
+    itemSelection: ItemSelection = ItemSelection.SINGLE_PER_GROUP,
+    store: OptionsMenuStore<T> = OptionsMenuStore(itemSelection = itemSelection),
     grouped: Boolean = false,
     closeOnSelect: Boolean = false,
     align: Align? = null,
@@ -58,8 +58,10 @@ public fun <T> RenderContext.optionsMenu(
         baseClass = baseClass,
         job = job
     )
-    if (selectionMode != store.selectionMode) {
-        console.warn("Different selection modes for options menu ${optionsMenu.domNode.debug()}: param($selectionMode) != store(${store.selectionMode}). ${store.selectionMode} will be used.")
+    if (itemSelection != store.itemSelection) {
+        console.warn("Different selection modes for options menu ${optionsMenu.domNode.debug()}.")
+        console.warn("  Parameter: $itemSelection != Store: ${store.itemSelection}.")
+        console.warn("  ${store.itemSelection} will be used.")
     }
     return register(optionsMenu, content)
 }
@@ -104,7 +106,7 @@ public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: But
  * @sample org.patternfly.sample.OptionsMenuSample.items
  */
 public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
-    val entries = ItemsBuilder(store).apply(block).build()
+    val entries = ItemsBuilder(store.idProvider, store.itemSelection).apply(block).build()
     store.update(entries)
 }
 
@@ -117,7 +119,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Options menu ${domNode.debug()} has not been created using `grouped = true`")
     }
-    val entries = GroupsBuilder(store).apply(block).build()
+    val entries = GroupsBuilder(store.idProvider, store.itemSelection).apply(block).build()
     store.update(entries)
 }
 
@@ -133,11 +135,15 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [plain text toggle][OptionsMenuPlainTextToggle]
  * - [icon toggle][DropdownIconToggle]
  *
- * The data in the menu is wrapped inside instances of [Entry] and managed by a [OptionsMenuStore]. Each [Entry] is either an [Item], a [Group] or a [Separator]. An [Item] can have additional properties such as an icon, a description or a disabled state.
+ * The data in the menu is managed by a [OptionsMenuStore].
  *
  * **Adding entries**
  *
  * Entries can be added by using the [OptionsMenuStore] or by using the DSL. Items can be grouped. Nested groups are not supported. See the samples below.
+ *
+ * **Selecting entries**
+ *
+ * Options menus support different selection modes based on the value of [ItemSelection].
  *
  * **Rendering entries**
  *
@@ -145,8 +151,8 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the option menu entries.
  *
- * @sample org.patternfly.sample.OptionsMenuSample.dropdownDsl
- * @sample org.patternfly.sample.OptionsMenuSample.dropdownStore
+ * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuDsl
+ * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuStore
  */
 public class OptionsMenu<T> internal constructor(
     public val store: OptionsMenuStore<T>,
@@ -319,28 +325,28 @@ public class OptionsMenu<T> internal constructor(
     }
 
     /**
-     * Updates the selection of the specified values.
+     * Updates the selection based on the specified values.
      */
     public fun select(values: Flow<List<T>>) {
         mountSingle(job, values) { v, _ -> select(v) }
     }
 
     /**
-     * Updates the selection of the specified values.
+     * Updates the selection based on the specified values.
      */
     public fun select(values: List<T>) {
         values.forEach { select(it) }
     }
 
     /**
-     * Updates the selection of the specified value.
+     * Updates the selection based on the specified value.
      */
     public fun select(value: Flow<T>) {
         mountSingle(job, value) { v, _ -> select(v) }
     }
 
     /**
-     * Updates the selection of the specified value.
+     * Updates the selection based on the specified value.
      */
     public fun select(value: T) {
         store.select(value)
@@ -455,17 +461,14 @@ internal class OptionsMenuIconToggle<T>(
 }
 
 // ------------------------------------------------------ store
+
 /**
  * An [EntriesStore] with the specified selection mode.
- *
- * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
- *
- * @sample org.patternfly.sample.OptionsMenuSample.unwrap
  */
 public class OptionsMenuStore<T>(
     idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-    selectionMode: ItemSelection = ItemSelection.SINGLE_PER_GROUP
-) : EntriesStore<T>(idProvider, selectionMode) {
+    itemSelection: ItemSelection = ItemSelection.SINGLE_PER_GROUP
+) : EntriesStore<T>(idProvider, itemSelection) {
 
     internal val select: Handler<T> = handle { entries, data ->
         entries.select(data)

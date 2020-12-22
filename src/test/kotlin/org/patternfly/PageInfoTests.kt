@@ -13,8 +13,8 @@ import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
 import kotlin.math.min
 
-@Suppress("EmptyRange")
-open class PageInfoTests : FunSpec({
+@Suppress("EmptyRange", "unused")
+class PageInfoTests : FunSpec({
 
     test("New page info") {
         with(PageInfo()) {

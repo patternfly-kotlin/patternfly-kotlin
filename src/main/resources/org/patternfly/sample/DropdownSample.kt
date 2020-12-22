@@ -210,19 +210,4 @@ internal interface DropdownSample {
             }
         }
     }
-
-    fun unwrap() {
-        render {
-            dropdown<String> {
-                store.selects.unwrap() handledBy Notification.add {
-                    info("You clicked on $it")
-                }
-                textToggle { +"Text" }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
 }

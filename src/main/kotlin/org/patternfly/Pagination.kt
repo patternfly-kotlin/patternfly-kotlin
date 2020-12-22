@@ -77,7 +77,7 @@ public class Pagination internal constructor(
         div(baseClass = "pagination".component("total-items")) {
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
-        optionsMenu = optionsMenu(selectionMode = SINGLE, closeOnSelect = true) {
+        optionsMenu = optionsMenu(itemSelection = SINGLE, closeOnSelect = true) {
             textToggle(plain = true) {
                 this@Pagination.pageInfoFlow.showRange().invoke(this)
             }

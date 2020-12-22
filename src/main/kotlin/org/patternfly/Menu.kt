@@ -10,7 +10,7 @@ import org.w3c.dom.HTMLDivElement
 // ------------------------------------------------------ dsl
 
 public fun <T> RenderContext.actionMenu(
-    store: MenuStore<T> = MenuStore(selectionMode = ItemSelection.SINGLE),
+    store: MenuStore<T> = MenuStore(itemSelection = ItemSelection.SINGLE),
     id: String? = null,
     baseClass: String? = null,
     content: Menu<T>.() -> Unit = {}
@@ -40,12 +40,8 @@ public class Menu<T> internal constructor(
 
 /**
  * An [EntriesStore] with the specified selection mode.
- *
- * Most of the flows and handlers in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
- *
- * @sample org.patternfly.sample.DropdownSample.unwrap
  */
 public class MenuStore<T>(
     idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-    selectionMode: ItemSelection
-) : EntriesStore<T>(idProvider, selectionMode)
+    itemSelection: ItemSelection
+) : EntriesStore<T>(idProvider, itemSelection)

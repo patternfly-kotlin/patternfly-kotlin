@@ -32,6 +32,13 @@ public fun <T> Flow<HasItem<T>>.unwrap(): Flow<T> = this.map { it.item }
 public fun <T> Flow<HasItem<T>?>.unwrapOrNull(): Flow<T?> = this.map { it?.item }
 
 /**
+ * Unwraps the payload from the specified [List].
+ *
+ * @receiver a list of [HasItem] instances
+ */
+public fun <T> List<HasItem<T>>.unwrap(): List<T> = this.map { it.item }
+
+/**
  * Unwraps the payload from the specified [HasItem] instance.
  *
  * @receiver a [HasItem] instance
