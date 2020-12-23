@@ -154,6 +154,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuDsl
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuStore
  */
+@Suppress("LongParameterList")
 public class OptionsMenu<T> internal constructor(
     public val store: OptionsMenuStore<T>,
     internal val grouped: Boolean,
@@ -292,7 +293,10 @@ public class OptionsMenu<T> internal constructor(
             (this.toggle as RecordingToggle<T>).playback(toggle)
             this.toggle = toggle
         } else {
-            console.warn("Reassignment of options menu toggle in ${domNode.debug()} not supported. Toggle has already been assigned to ${this.toggle::class.simpleName}.")
+            console.warn(
+                "Reassignment of options menu toggle in ${domNode.debug()} not supported. " +
+                    "Toggle has already been assigned to ${this.toggle::class.simpleName}."
+            )
         }
     }
 

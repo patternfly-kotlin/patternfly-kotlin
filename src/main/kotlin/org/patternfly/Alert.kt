@@ -187,7 +187,7 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
     }
 
     private fun startTimeout(id: String, element: HTMLElement) {
-        val handle = window.setTimeout({ element.removeFromParent() }, Settings.notificationTimeout)
+        val handle = window.setTimeout({ element.removeFromParent() }, Settings.NOTIFICATION_TIMEOUT)
         timeoutHandles[id] = handle
     }
 

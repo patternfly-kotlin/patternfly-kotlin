@@ -1,13 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.lenses.IdProvider
-import kotlin.math.max
-import kotlin.math.min
-
-/**
- * Type alias for a [filter](https://www.patternfly.org/v4/guidelines/filters) used in [Items].
- */
-public typealias ItemFilter<T> = (T) -> Boolean
 
 /**
  * Immutable collection of items used in [ItemStore]. Items can be paged, filtered, selected and sorted. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
@@ -59,6 +52,7 @@ public typealias ItemFilter<T> = (T) -> Boolean
  * @sample org.patternfly.sample.ItemsSample.select
  * @sample org.patternfly.sample.ItemsSample.sort
  */
+@Suppress("TooManyFunctions")
 public data class Items<T>(
     val idProvider: IdProvider<T, String>,
     val all: List<T> = emptyList(),
@@ -191,149 +185,3 @@ public data class Items<T>(
             sequence.toList()
         }
 }
-
-/**
- * Immutable class for paging over [Items]. Every modification to an instance of this class leads to a new instance with changed properties.
- *
- * @param pageSize the size of one page
- * @param page the current page
- * @param total total number of items
- */
-public data class PageInfo(
-    val pageSize: Int = DEFAULT_PAGE_SIZE,
-    val page: Int = 0,
-    val total: Int = 0,
-    private val signalUpdate: Int = 0
-) {
-    init {
-        require(pageSize > 0) { "Page size must be greater than 0" }
-        require(page >= 0) { "Page must be greater than or equal 0" }
-        require(total >= 0) { "Total must be greater than or equal 0" }
-    }
-
-    /**
-     * Range for the current page
-     */
-    val range: IntRange
-        get() {
-            val from = if (total == 0) 1 else page * pageSize + 1
-            val to = min(total, from + pageSize - 1)
-            return from..to
-        }
-
-    /**
-     * Number of pages
-     */
-    val pages: Int = safePages(pageSize, total)
-
-    /**
-     * Whether the current [page] is the first one.
-     */
-    val firstPage: Boolean = page == 0
-
-    /**
-     * Whether the current [page] is the last one.
-     */
-    val lastPage: Boolean = page == pages - 1
-
-    /**
-     * Goes to the first page and returns a new instance.
-     */
-    public fun gotoFirstPage(): PageInfo = copy(page = 0)
-
-    /**
-     * Goes to the previous page (if any) and returns a new instance.
-     */
-    public fun gotoPreviousPage(): PageInfo = copy(page = inBounds(page - 1, 0, pages - 1))
-
-    /**
-     * Goes to the next page (if any) and returns a new instance.
-     */
-    public fun gotoNextPage(): PageInfo = copy(page = inBounds(page + 1, 0, pages - 1))
-
-    /**
-     * Goes to the last page and returns a new instance.
-     */
-    public fun gotoLastPage(): PageInfo = copy(page = pages - 1)
-
-    /**
-     * Goes to the specified page and returns a new instance.
-     */
-    public fun gotoPage(page: Int): PageInfo = copy(page = inBounds(page, 0, pages - 1))
-
-    /**
-     * Sets a new page size and returns a new instance.
-     */
-    public fun pageSize(pageSize: Int): PageInfo {
-        val pages = safePages(pageSize, total)
-        val page = inBounds(page, 0, pages - 1)
-        return copy(pageSize = pageSize, page = page)
-    }
-
-    /**
-     * Sets a new total number of items and returns a new instance.
-     */
-    public fun total(total: Int): PageInfo {
-        val pages = safePages(pageSize, total)
-        val page = inBounds(page, 0, pages - 1)
-        return copy(page = page, total = total)
-    }
-
-    internal fun refresh(): PageInfo =
-        copy(signalUpdate = if (signalUpdate == Int.MAX_VALUE) 0 else signalUpdate + 1)
-
-    override fun toString(): String = "PageInfo(range=$range,page=($page/$pages),pageSize=$pageSize,total=$total)"
-
-    private fun safePages(pageSize: Int, total: Int): Int {
-        var pages = total / pageSize
-        if (total % pageSize != 0) {
-            pages++
-        }
-        return max(1, pages)
-    }
-
-    public companion object {
-        public const val DEFAULT_PAGE_SIZE: Int = 10
-        public val DEFAULT_PAGE_SIZES: Array<Int> = arrayOf(10, 20, 50, 100)
-    }
-}
-
-/**
- * Simple class to hold information when sorting [Items]. Please note that the comparator is never reversed! It's only reversed 'in-place' when [ascending] == `false`
- *
- * @param id unique identifier
- * @param text text used in the UI
- * @param comparator comparator for this sort info
- * @param ascending whether the comparator is ascending or descending
- */
-public class SortInfo<T>(
-    public val id: String,
-    public val text: String,
-    internal val comparator: Comparator<T>,
-    public val ascending: Boolean = true
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-        other as SortInfo<*>
-        if (id != other.id) return false
-        if (ascending != other.ascending) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + ascending.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "SortInfo(id=$id, ascending=$ascending)"
-    }
-
-    internal fun toggle(): SortInfo<T> = SortInfo(id, text, comparator, !ascending)
-
-    internal fun effectiveComparator(): Comparator<T> = if (ascending) comparator else comparator.reversed()
-}
-
-private fun inBounds(value: Int, min: Int, max: Int): Int = min(max(min, value), max)

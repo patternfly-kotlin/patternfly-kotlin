@@ -8,6 +8,7 @@ plugins {
     id("com.jfrog.bintray") version PluginVersions.bintray
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlint
     id("org.jlleitschuh.gradle.ktlint-idea") version PluginVersions.ktlint
+    id("io.gitlab.arturbosch.detekt") version PluginVersions.detekt
     `maven-publish`
 }
 

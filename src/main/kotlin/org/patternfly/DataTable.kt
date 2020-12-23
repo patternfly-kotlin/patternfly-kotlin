@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly
 
 import dev.fritz2.dom.html.Caption
@@ -187,73 +189,12 @@ public class DataTable<T> internal constructor(
                     when (column) {
                         is SelectColumn<T> -> {
                             if (column.selectionMode == MULTIPLE_ALL) {
-                                td(baseClass = "table".component("check")) {
-                                    attr("role", "cell")
-                                    input {
-                                        type("checkbox")
-                                        aria["label"] = "Select all"
-                                        changes.states().filter { !it }
-                                            .map { } handledBy this@DataTable.itemStore.selectNone
-                                        changes.states().filter { it }
-                                            .map { } handledBy this@DataTable.itemStore.selectAll
-                                    }
-                                }
+                                this@DataTable.renderSelectHeader(this)
                             } else {
                                 td {}
                             }
                         }
-                        is DataColumn<T> -> {
-                            th(
-                                baseClass = classes {
-                                    +("table".component("sort") `when` (column.sortInfo != null))
-                                    +column.headerClass
-                                }
-                            ) {
-                                attr("scope", "col")
-                                attr("role", "columnheader")
-                                if (column.sortInfo != null) {
-                                    aria["sort"] = this@DataTable.itemStore.data.map {
-                                        if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
-                                            if (it.sortInfo.ascending) "ascending" else "descending"
-                                        } else "none"
-                                    }
-                                    classMap(
-                                        this@DataTable.itemStore.data.map {
-                                            mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
-                                        }
-                                    )
-                                }
-                                if (column.headerDisplay != null) {
-                                    column.headerDisplay!!.invoke(this)
-                                } else {
-                                    if (column.sortInfo != null) {
-                                        button(baseClass = "table".component("button")) {
-                                            clicks.map { column.sortInfo!! } handledBy this@DataTable.itemStore.sortOrToggle
-                                            span(baseClass = "table".component("text")) {
-                                                +column.caption
-                                            }
-                                            span(baseClass = "table".component("sort", "indicator")) {
-                                                icon("arrows-alt-v".fas()) {
-                                                    iconClass(
-                                                        this@DataTable.itemStore.data.map {
-                                                            if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
-                                                                if (it.sortInfo.ascending)
-                                                                    "long-arrow-alt-up".fas()
-                                                                else
-                                                                    "long-arrow-alt-down".fas()
-                                                            } else
-                                                                "arrows-alt-v".fas()
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        +column.caption
-                                    }
-                                }
-                            }
-                        }
+                        is DataColumn<T> -> this@DataTable.renderDataHeader(this, column)
                         is ToggleColumn<T>, is ActionColumn<T> -> td {}
                     }
                 }
@@ -275,6 +216,83 @@ public class DataTable<T> internal constructor(
                 this@DataTable.itemStore.page.renderEach({ this@DataTable.itemStore.idProvider(it) }) { item ->
                     tr {
                         renderCells(this@DataTable, item, "", null)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderSelectHeader(tr: Tr) {
+        with(tr) {
+            td(baseClass = "table".component("check")) {
+                attr("role", "cell")
+                input {
+                    type("checkbox")
+                    aria["label"] = "Select all"
+                    changes.states().filter { !it }
+                        .map { } handledBy this@DataTable.itemStore.selectNone
+                    changes.states().filter { it }
+                        .map { } handledBy this@DataTable.itemStore.selectAll
+                }
+            }
+        }
+    }
+
+    private fun renderDataHeader(tr: Tr, column: DataColumn<T>) {
+        with(tr) {
+            th(
+                baseClass = classes {
+                    +("table".component("sort") `when` (column.sortInfo != null))
+                    +column.headerClass
+                }
+            ) {
+                attr("scope", "col")
+                attr("role", "columnheader")
+                if (column.sortInfo != null) {
+                    aria["sort"] = this@DataTable.itemStore.data.map {
+                        if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
+                            if (it.sortInfo.ascending) "ascending" else "descending"
+                        } else "none"
+                    }
+                    classMap(
+                        this@DataTable.itemStore.data.map {
+                            mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
+                        }
+                    )
+                }
+                if (column.headerDisplay != null) {
+                    column.headerDisplay!!.invoke(this)
+                } else {
+                    if (column.sortInfo != null) {
+                        this@DataTable.renderSortButton(this, column)
+                    } else {
+                        +column.caption
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderSortButton(th: Th, column: DataColumn<T>) {
+        with(th) {
+            button(baseClass = "table".component("button")) {
+                clicks.map { column.sortInfo!! } handledBy this@DataTable.itemStore.sortOrToggle
+                span(baseClass = "table".component("text")) {
+                    +column.caption
+                }
+                span(baseClass = "table".component("sort", "indicator")) {
+                    icon("arrows-alt-v".fas()) {
+                        iconClass(
+                            this@DataTable.itemStore.data.map {
+                                if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
+                                    if (it.sortInfo.ascending)
+                                        "long-arrow-alt-up".fas()
+                                    else
+                                        "long-arrow-alt-down".fas()
+                                } else
+                                    "arrows-alt-v".fas()
+                            }
+                        )
                     }
                 }
             }
@@ -349,65 +367,91 @@ internal fun <T> Tr.renderCells(
         when (column) {
             is ToggleColumn<T> -> {
                 if (dataTable.columns.hasToggle) {
-                    td(
-                        id = column.id,
-                        baseClass = classes("table".component("toggle"), column.baseClass)
-                    ) {
-                        attr("role", "cell")
-                        pushButton(plain) {
-                            aria["labelledby"] = itemId
-                            aria["controls"] = expandableContentId
-                            aria["label"] = "Details"
-                            ces?.let { store ->
-                                aria["expancded"] = store.data.map { it.toString() }
-                                classMap(store.data.map { mapOf("expanded".modifier() to it) })
-                                clicks handledBy store.toggle
-                            }
-                            div(baseClass = "table".component("toggle", "icon")) {
-                                icon("angle-down".fas())
-                            }
-                        }
-                    }
+                    renderToggleCell(column, itemId, expandableContentId, ces)
                 } else {
                     console.error("Illegal use of dataTableToggleColumn() for ${dataTable.domNode.debug()}")
                 }
             }
-            is SelectColumn<T> -> {
-                td(id = column.id, baseClass = classes("table".component("check"), column.baseClass)) {
-                    attr("role", "cell")
-                    if (column.selectionMode == MULTIPLE_ALL || column.selectionMode == MULTIPLE) {
-                        input {
-                            type("checkbox")
-                            name("$itemId-check")
-                            aria["labelledby"] = itemId
-                            checked(dataTable.itemStore.data.map { it.isSelected(item) })
-                            changes.states().map { Pair(item, it) } handledBy dataTable.itemStore.select
-                        }
-                    } else if (column.selectionMode == SINGLE) {
-                        input {
-                            type("radio")
-                            name(RADIO_GROUP_NAME) // same name for all radios == radio group
-                            aria["labelledby"] = itemId
-                            checked(dataTable.itemStore.data.map { it.isSelected(item) })
-                            changes.states().map { item } handledBy dataTable.itemStore.selectOnly
-                        }
-                    }
-                }
+            is SelectColumn<T> -> renderSelectCell(column, itemId, dataTable, item)
+            is DataColumn<T> -> renderDataCell(column, item)
+            is ActionColumn<T> -> renderActionCell(column, item)
+        }
+    }
+}
+
+private fun <T> Tr.renderToggleCell(
+    column: Column<T>,
+    itemId: String,
+    expandableContentId: String,
+    ces: CollapseExpandStore?
+) {
+    td(
+        id = column.id,
+        baseClass = classes("table".component("toggle"), column.baseClass)
+    ) {
+        attr("role", "cell")
+        pushButton(plain) {
+            aria["labelledby"] = itemId
+            aria["controls"] = expandableContentId
+            aria["label"] = "Details"
+            ces?.let { store ->
+                aria["expancded"] = store.data.map { it.toString() }
+                classMap(store.data.map { mapOf("expanded".modifier() to it) })
+                clicks handledBy store.toggle
             }
-            is DataColumn<T> -> {
-                td {
-                    attr("role", "cell")
-                    domNode.dataset["label"] = column.caption
-                    column.cellDisplay(this, item)
-                }
-            }
-            is ActionColumn<T> -> {
-                td(baseClass = classes("table".component("action"), column.baseClass)) {
-                    attr("role", "cell")
-                    column.display(this, item)
-                }
+            div(baseClass = "table".component("toggle", "icon")) {
+                icon("angle-down".fas())
             }
         }
+    }
+}
+
+private fun <T> Tr.renderSelectCell(
+    column: SelectColumn<T>,
+    itemId: String,
+    dataTable: DataTable<T>,
+    item: T
+) {
+    td(id = column.id, baseClass = classes("table".component("check"), column.baseClass)) {
+        attr("role", "cell")
+        if (column.selectionMode == MULTIPLE_ALL || column.selectionMode == MULTIPLE) {
+            input {
+                type("checkbox")
+                name("$itemId-check")
+                aria["labelledby"] = itemId
+                checked(dataTable.itemStore.data.map { it.isSelected(item) })
+                changes.states().map { Pair(item, it) } handledBy dataTable.itemStore.select
+            }
+        } else if (column.selectionMode == SINGLE) {
+            input {
+                type("radio")
+                name(RADIO_GROUP_NAME) // same name for all radios == radio group
+                aria["labelledby"] = itemId
+                checked(dataTable.itemStore.data.map { it.isSelected(item) })
+                changes.states().map { item } handledBy dataTable.itemStore.selectOnly
+            }
+        }
+    }
+}
+
+private fun <T> Tr.renderDataCell(
+    column: DataColumn<T>,
+    item: T
+) {
+    td {
+        attr("role", "cell")
+        domNode.dataset["label"] = column.caption
+        column.cellDisplay(this, item)
+    }
+}
+
+private fun <T> Tr.renderActionCell(
+    column: ActionColumn<T>,
+    item: T
+) {
+    td(baseClass = classes("table".component("action"), column.baseClass)) {
+        attr("role", "cell")
+        column.display(this, item)
     }
 }
 
@@ -437,6 +481,8 @@ internal fun <T> Td.renderExpandableContent(
  * This class is not related to a DOM element, but is used as a builder in the DSL to add columns.
  */
 public class Columns<T> internal constructor(internal val dataTable: DataTable<T>) : Iterable<Column<T>> {
+
+    @Suppress("MemberNameEqualsClassName")
     private val columns: MutableList<Column<T>> = mutableListOf()
 
     internal val hasToggle: Boolean

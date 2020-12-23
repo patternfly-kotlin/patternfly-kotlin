@@ -76,6 +76,7 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
 // ------------------------------------------------------ enums
 
+@Suppress("EnumNaming")
 internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
@@ -120,7 +121,7 @@ public enum class Align(public val modifier: String) {
 /**
  * Visual modifiers for [PushButton]s and [LinkButton]s.
  */
-@Suppress("EnumEntryName")
+@Suppress("EnumEntryName", "EnumNaming")
 public enum class ButtonVariation(internal val modifier: String) {
     control("control".modifier()),
     danger("danger".modifier()),

@@ -169,3 +169,7 @@ public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.
         internal val NOOP: ItemStore<Unit> = ItemStore()
     }
 }
+
+public enum class PreSelection(public val text: String) {
+    NONE("Select none"), PAGE("Select visible"), ALL("Select all")
+}

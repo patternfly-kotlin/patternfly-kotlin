@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
@@ -376,7 +378,10 @@ public class Dropdown<T> internal constructor(
             (this.toggle as RecordingToggle<T>).playback(toggle)
             this.toggle = toggle
         } else {
-            console.warn("Reassignment of dropdown toggle in ${domNode.debug()} not supported. Toggle has already been assigned to ${this.toggle::class.simpleName}.")
+            console.warn(
+                "Reassignment of dropdown toggle in ${domNode.debug()} not supported. " +
+                    "Toggle has already been assigned to ${this.toggle::class.simpleName}."
+            )
         }
     }
 

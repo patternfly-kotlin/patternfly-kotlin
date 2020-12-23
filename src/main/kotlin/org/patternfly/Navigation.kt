@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.Orientation.HORIZONTAL
 import org.patternfly.Orientation.VERTICAL
+import org.patternfly.Settings.UI_TIMEOUT
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -108,6 +109,7 @@ public fun <T> NavigationItems<T>.navigationItem(
 
 // ------------------------------------------------------ tag
 
+@Suppress("LongParameterList")
 public class Navigation<T> internal constructor(
     internal val router: Router<T>,
     internal val selected: (route: T, item: T) -> Boolean,
@@ -204,7 +206,7 @@ public class NavigationExpandableGroup<T> internal constructor(
         // it might interfere with router flow, which also modifies the class list
         (MainScope() + job).launch {
             this@NavigationExpandableGroup.navigation.router.data.collect {
-                delay(333) // wait a little bit before testing for the current modifier
+                delay(UI_TIMEOUT) // wait a little bit before testing for the current modifier
                 val selector = By.classname("nav".component("link"), "current".modifier())
                 val containsCurrent = domNode.querySelector(selector) != null
                 domNode.classList.toggle("current".modifier(), containsCurrent)

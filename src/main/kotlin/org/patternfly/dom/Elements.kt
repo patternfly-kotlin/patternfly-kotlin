@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly.dom
 
 import dev.fritz2.dom.Tag

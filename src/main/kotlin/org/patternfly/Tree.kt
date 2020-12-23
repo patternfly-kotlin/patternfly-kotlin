@@ -1,12 +1,14 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly
 
 import dev.fritz2.dom.Tag
+import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.dom.html.render
 import dev.fritz2.dom.html.renderElement
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -58,36 +60,6 @@ public fun <T> TreeBuilder<T>.treeItem(item: T, block: TreeItemBuilder<T>.() -> 
 
 public fun <T> TreeItemBuilder<T>.children(block: TreeBuilder<T>.() -> Unit = {}) {
     childrenBuilder.apply(block)
-}
-
-private fun test() {
-    render {
-        treeView<String>({ it }) {
-            tree {
-                treeItem("Foo")
-                treeItem("Bar") {
-                    children {
-                        treeItem("Child 1")
-                        treeItem("Child 2")
-                    }
-                }
-            }
-        }
-    }
-
-    render {
-        treeView<String>({ it }) {
-            icons = {
-                SingleIcon {
-                    icon("user".fas())
-                }
-            }
-            fetchItems = { (1..10).map { treeItem(it.toString()) } }
-            tree {
-                treeItem("Root")
-            }
-        }
-    }
 }
 
 // ------------------------------------------------------ tag
@@ -143,58 +115,82 @@ public class TreeView<T> internal constructor(
                             this@TreeView.select(this.domNode)
                         }
                         if (treeItem.hasChildren) {
-                            div(baseClass = "tree-view".component("node", "toggle")) {
-                                span(baseClass = "tree-view".component("node", "toggle", "icon")) {
-                                    icon("angle-right".fas())
-                                }
-                            }
+                            this@TreeView.renderToggle(this)
                         }
                         if (this@TreeView.checkboxes) {
-                            span(baseClass = "tree-view".component("node", "check")) {
-                                input {
-                                    domNode.type = "checkbox"
-                                    domNode.onclick = { it.stopPropagation() }
-                                    domNode.onchange = {
-                                        // TODO trigger checked event
-                                    }
-                                }
-                            }
+                            this@TreeView.renderCheckbox(this)
                         }
-                        this@TreeView.icons?.let {
-                            span(baseClass = "tree-view".component("node", "icon")) {
-                                when (val icons = it(treeItem.item)) {
-                                    is SingleIcon -> icons.icon(this)
-                                    is ColExIcon -> {
-                                        icons.collapsed(this).domNode.apply {
-                                            dataset[COLLAPSED_ICON] = ""
-                                        }
-                                        icons.expanded(this).domNode.apply {
-                                            displayNone = true
-                                            dataset[EXPANDED_ICON] = ""
-                                        }
-                                    }
-                                }
-                            }
+                        this@TreeView.icons?.let { tip ->
+                            this@TreeView.renderIcon(this, tip, treeItem)
                         }
                         span(baseClass = "tree-view".component("node", "text")) {
                             this@TreeView.display(this, treeItem.item)
                         }
                         if (this@TreeView.badges && treeItem.hasChildren) {
-                            span(baseClass = "tree-view".component("node", "count")) {
-                                val children = if (treeItem.childCount > 0)
-                                    treeItem.childCount
-                                else
-                                    treeItem.children.size
-                                badge {
-                                    +children.toString()
-                                }
-                            }
+                            this@TreeView.renderBadge(this, treeItem)
                         }
                     }
                 }
             }
         }
         return li
+    }
+
+    private fun renderToggle(button: Button) {
+        with(button) {
+            div(baseClass = "tree-view".component("node", "toggle")) {
+                span(baseClass = "tree-view".component("node", "toggle", "icon")) {
+                    icon("angle-right".fas())
+                }
+            }
+        }
+    }
+
+    private fun renderCheckbox(button: Button) {
+        with(button) {
+            span(baseClass = "tree-view".component("node", "check")) {
+                input {
+                    domNode.type = "checkbox"
+                    domNode.onclick = { it.stopPropagation() }
+                    domNode.onchange = {
+                        // TODO trigger checked event
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderIcon(button: Button, tip: TreeIconProvider<T>, treeItem: TreeItem<T>) {
+        with(button) {
+            span(baseClass = "tree-view".component("node", "icon")) {
+                when (val icons = tip(treeItem.item)) {
+                    is SingleIcon -> icons.icon(this)
+                    is ColExIcon -> {
+                        icons.collapsed(this).domNode.apply {
+                            dataset[COLLAPSED_ICON] = ""
+                        }
+                        icons.expanded(this).domNode.apply {
+                            displayNone = true
+                            dataset[EXPANDED_ICON] = ""
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderBadge(button: Button, treeItem: TreeItem<T>) {
+        with(button) {
+            span(baseClass = "tree-view".component("node", "count")) {
+                val children = if (treeItem.childCount > 0)
+                    treeItem.childCount
+                else
+                    treeItem.children.size
+                badge {
+                    +children.toString()
+                }
+            }
+        }
     }
 
     private fun toggle(li: Element, treeItem: TreeItem<T>) {

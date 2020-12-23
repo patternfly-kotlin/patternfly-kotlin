@@ -4,6 +4,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
+ * Type alias for an item filter.
+ */
+public typealias ItemFilter<T> = (T) -> Boolean
+
+/**
  * Common interface for things with an item / payload.
  */
 public interface HasItem<T> {

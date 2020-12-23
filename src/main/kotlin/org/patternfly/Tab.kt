@@ -76,8 +76,9 @@ public class Tabs<T> internal constructor(
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job) {
 
-    private val scrollStore = ScrollButtonStore()
+    @Suppress("MemberNameEqualsClassName")
     private lateinit var tabs: Ul
+    private val scrollStore = ScrollButtonStore()
     internal lateinit var tabDisplay: ComponentDisplay<Span, T>
     internal var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
 
@@ -303,6 +304,7 @@ public class TabItemsBuilder<T> internal constructor(private val tabs: Tabs<T>) 
 
     public var contentDisplay: ComponentDisplay<TabContent<T>, T>? = null
 
+    @Suppress("NestedBlockDepth")
     internal fun build(): List<TabItem<T>> {
         tabs.tabDisplay = itemDisplay
         tabs.contentDisplay = contentDisplay

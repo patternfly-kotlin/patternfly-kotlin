@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.dom.aria
+import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -25,7 +26,7 @@ import org.w3c.dom.HTMLInputElement
 
 public fun <T> RenderContext.pagination(
     store: ItemStore<T>,
-    pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
+    pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
@@ -37,7 +38,7 @@ public fun <T> RenderContext.pagination(
 
 public fun RenderContext.pagination(
     pageInfo: PageInfo = PageInfo(),
-    pageSizes: Array<Int> = PageInfo.DEFAULT_PAGE_SIZES,
+    pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
@@ -47,12 +48,35 @@ public fun RenderContext.pagination(
     return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass, job), content)
 }
 
+public fun <T> ToolbarItem.pagination(
+    itemStore: ItemStore<T>,
+    pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
+    compact: Boolean = false,
+    id: String? = null,
+    baseClass: String? = null,
+    content: Pagination.() -> Unit = {}
+): Pagination {
+    this.domNode.classList += "pagination".modifier()
+    return register(
+        Pagination(
+            itemStore,
+            itemStore.data.map { it.pageInfo },
+            pageSizes,
+            compact,
+            id = id,
+            baseClass = baseClass,
+            job
+        ),
+        content
+    )
+}
+
 // ------------------------------------------------------ tag
 
 public class Pagination internal constructor(
     public val pageInfoHandler: PageInfoHandler,
     public val pageInfoFlow: Flow<PageInfo>,
-    pageSizes: Array<Int>,
+    pageSizes: IntArray,
     compact: Boolean,
     id: String?,
     baseClass: String?,
