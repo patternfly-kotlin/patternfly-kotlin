@@ -1,5 +1,4 @@
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.publish.maven.MavenPom
 
 object Constants {
     const val group = "org.patternfly"
@@ -32,32 +31,4 @@ fun DependencyHandler.kotest() {
     add("testImplementation", "io.kotest:kotest-assertions-core:${Versions.kotest}")
     add("testImplementation", "io.kotest:kotest-property:${Versions.kotest}")
     add("testImplementation", "io.kotest:kotest-framework-engine:${Versions.kotest}")
-}
-
-fun MavenPom.defaultPom() {
-    name.set("patternfly-fritz2")
-    description.set(Constants.description)
-    url.set("https://github.com/${Constants.githubRepo}")
-    licenses {
-        license {
-            name.set(Constants.license)
-            url.set("https://opensource.org/licenses/Apache-2.0")
-        }
-    }
-    developers {
-        developer {
-            id.set("hpehl")
-            name.set("Harald Pehl")
-            organization.set("Red Hat")
-            organizationUrl.set("https://developers.redhat.com/")
-        }
-    }
-    scm {
-        url.set("https://github.com/${Constants.githubRepo}.git")
-        connection.set("scm:git:git://github.com/${Constants.githubRepo}.git")
-        developerConnection.set("scm:git:git://github.com/#${Constants.githubRepo}.git")
-    }
-    issueManagement {
-        url.set("https://github.com/${Constants.githubRepo}/issues")
-    }
 }
