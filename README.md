@@ -14,7 +14,7 @@ To get all details about how to use PatternFly Fritz2 take a look at the [API do
 
 ### Dependencies
 
-PatternFly Fritz2 is available in Bintray. To use it in your Kotlin/JS project add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 is 💯 Kotlin. All PatternFly components are implemented in Kotlin only. You won't need any additional external JS libraries. 
+To use PatternFly Fritz2 add a dependency to your `gradle.build.kts` file. All PatternFly components are implemented in Kotlin only. You won't need any additional external JS libraries. 
 
 ```kotlin
 repositories {
@@ -28,7 +28,7 @@ dependencies {
 
 ### PatternFly Assets
 
-PatternFly Fritz2 does not come with stylesheets, fonts or other static PatternFly assets. One way to include them is to add a `npm` dependency to PatternFly 
+PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. One way to include them is to add a `npm` dependency to PatternFly 
 
 
 ```kotlin
@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-and make a call `kotlinext.js.require.require()` in your entry point:
+and add the PatternFly stylesheets using `kotlinext.js.require.require()`:
 
 ```kotlin
 import kotlinext.js.require
@@ -48,7 +48,7 @@ fun main() {
     require("@patternfly/patternfly/patternfly-addons.css")
 ```
 
-Another option is to get PatternFly using an CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) or to download PatternFly and include the stylesheets directly in your HTML page:
+Another option is to download or get PatternFly using a CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) and include the stylesheets directly in your HTML page:
 
 ```html
 <!DOCTYPE html>
