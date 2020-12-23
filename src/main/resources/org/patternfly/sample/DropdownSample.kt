@@ -22,7 +22,6 @@ import org.patternfly.textToggle
 import org.patternfly.toggleIcon
 import org.patternfly.toggleImage
 import org.patternfly.toggleText
-import org.patternfly.unwrap
 
 internal interface DropdownSample {
 

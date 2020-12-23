@@ -3,10 +3,8 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import kotlinx.coroutines.flow.filterNotNull
 import org.patternfly.Notification
 import org.patternfly.OptionsMenuStore
-import org.patternfly.addTo
 import org.patternfly.fas
 import org.patternfly.group
 import org.patternfly.groups
@@ -17,7 +15,6 @@ import org.patternfly.items
 import org.patternfly.optionsMenu
 import org.patternfly.separator
 import org.patternfly.textToggle
-import org.patternfly.unwrap
 import org.patternfly.unwrapOrNull
 
 internal interface OptionsMenuSample {

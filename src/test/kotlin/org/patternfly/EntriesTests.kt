@@ -16,6 +16,7 @@ class EntriesTests : FunSpec({
         with(Entries<Int>({ it.toString() }, emptyList(), SINGLE)) {
             all.shouldBeEmpty()
             entries.shouldBeEmpty()
+            groups.shouldBeEmpty()
             items.shouldBeEmpty()
             selection.shouldBeEmpty()
             singleSelection shouldBe null
@@ -34,6 +35,11 @@ class EntriesTests : FunSpec({
         threes.all.size shouldBe 10
         threes.entries.size shouldBe 3
         threes.items.unwrap().shouldContainAll(3, 6, 9)
+
+        val numbers = threes.clearFilter()
+        numbers.all.size shouldBe 10
+        numbers.entries.size shouldBe 10
+        numbers.items.unwrap().shouldContainAll((1..10).toList())
     }
 
     test("Select single item") {
@@ -71,14 +77,14 @@ class EntriesTests : FunSpec({
     }
 
     test("Filter items in groups") {
-        val groups = groups(1..12, 3, SINGLE).filter { it > 6 }
+        val groups = groups(1..12, 3, SINGLE).filter { it in 8..11 }
         groups.all.size shouldBe 4
         groups.entries.size shouldBe 2
         groups.groups.size shouldBe 2
-        groups.items.size shouldBe 6
+        groups.items.size shouldBe 4
 
-        groups.groups[0].items.unwrap().shouldContainAll(7, 8, 9)
-        groups.groups[1].items.unwrap().shouldContainAll(10, 11, 12)
+        groups.groups[0].items.unwrap().shouldContainAll(8, 9)
+        groups.groups[1].items.unwrap().shouldContainAll(10, 11)
     }
 
     test("Select single item across all groups") {

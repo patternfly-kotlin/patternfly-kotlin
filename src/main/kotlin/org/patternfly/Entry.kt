@@ -243,21 +243,31 @@ public data class Entries<T>(
      */
     public val entries: List<Entry<T>>
         get() = if (filter != null) {
-            all.filter { entry ->
-                when (entry) {
-                    is Group -> entry.entries.any { groupEntry ->
-                        when (groupEntry) {
-                            is Group -> {
-                                warnAboutNestedGroups(entry, groupEntry)
-                                false
+            all.map { entry -> // (1) filter items in groups
+                if (entry is Group<T>) {
+                    entry.copy(
+                        entries = entry.entries.filter { groupEntry ->
+                            when (groupEntry) {
+                                is Group<T> -> {
+                                    warnAboutNestedGroups(entry, groupEntry)
+                                    true
+                                }
+                                is Item<T> -> filter.invoke(groupEntry.item)
+                                is Separator -> true
                             }
-                            is Item -> filter.invoke(groupEntry.item)
-                            is Separator -> true
                         }
-                    }
-                    is Item -> filter.invoke(entry.item)
-                    is Separator -> true
+                    )
+                } else {
+                    entry
                 }
+            }.filter { entry -> // (2) filter top level items
+                if (entry is Item<T>) {
+                    filter.invoke(entry.item)
+                } else {
+                    true
+                }
+            }.filter { entry -> // (3) filter empty groups
+                !(entry is Group<T> && entry.items.isEmpty())
             }
         } else {
             all
@@ -295,7 +305,7 @@ public data class Entries<T>(
     /**
      * Removes any filter.
      */
-    public fun clearFilter(filter: ItemFilter<T>): Entries<T> = copy(filter = null)
+    public fun clearFilter(): Entries<T> = copy(filter = null)
 
     /**
      * Selects the specified data and returns a new instance. Selecting an item might lead to unselecting other items depending on the value of [itemSelection].
@@ -316,37 +326,35 @@ public data class Entries<T>(
                                             warnAboutNestedGroups(entry, groupEntry)
                                             groupEntry
                                         }
-                                        is Item<T> -> {
-                                            groupEntry.copy(
-                                                selected = when (itemSelection) {
-                                                    SINGLE -> {
-                                                        if (groupWithSelection) {
+                                        is Item<T> -> groupEntry.copy(
+                                            selected = when (itemSelection) {
+                                                SINGLE -> {
+                                                    if (groupWithSelection) {
+                                                        false
+                                                    } else {
+                                                        idProvider(groupEntry.item) == itemId
+                                                    }
+                                                }
+                                                SINGLE_PER_GROUP -> {
+                                                    if (idProvider(groupEntry.item) == itemId) {
+                                                        true
+                                                    } else {
+                                                        if (groupEntry.group?.id == item.group?.id) {
                                                             false
-                                                        } else {
-                                                            idProvider(groupEntry.item) == itemId
-                                                        }
-                                                    }
-                                                    SINGLE_PER_GROUP -> {
-                                                        if (idProvider(groupEntry.item) == itemId) {
-                                                            true
-                                                        } else {
-                                                            if (groupEntry.group?.id == item.group?.id) {
-                                                                false
-                                                            } else {
-                                                                groupEntry.selected
-                                                            }
-                                                        }
-                                                    }
-                                                    MULTIPLE -> {
-                                                        if (idProvider(groupEntry.item) == itemId) {
-                                                            true
                                                         } else {
                                                             groupEntry.selected
                                                         }
                                                     }
                                                 }
-                                            )
-                                        }
+                                                MULTIPLE -> {
+                                                    if (idProvider(groupEntry.item) == itemId) {
+                                                        true
+                                                    } else {
+                                                        groupEntry.selected
+                                                    }
+                                                }
+                                            }
+                                        )
                                         is Separator -> groupEntry
                                     }
                                 }
@@ -354,22 +362,20 @@ public data class Entries<T>(
                             groupWithSelection = groupCopy.hasSelection
                             groupCopy
                         }
-                        is Item<T> -> {
-                            entry.copy(
-                                selected = when (itemSelection) {
-                                    SINGLE, SINGLE_PER_GROUP -> {
-                                        idProvider(entry.item) == itemId
-                                    }
-                                    MULTIPLE -> {
-                                        if (idProvider(entry.item) == itemId) {
-                                            true
-                                        } else {
-                                            entry.selected
-                                        }
+                        is Item<T> -> entry.copy(
+                            selected = when (itemSelection) {
+                                SINGLE, SINGLE_PER_GROUP -> {
+                                    idProvider(entry.item) == itemId
+                                }
+                                MULTIPLE -> {
+                                    if (idProvider(entry.item) == itemId) {
+                                        true
+                                    } else {
+                                        entry.selected
                                     }
                                 }
-                            )
-                        }
+                            }
+                        )
                         is Separator<T> -> entry
                     }
                 }
