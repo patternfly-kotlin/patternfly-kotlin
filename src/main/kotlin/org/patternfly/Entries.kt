@@ -225,7 +225,7 @@ public data class Entries<T>(
         itemId: String,
         groupWithSelection: Boolean
     ): Group<T> = group.copy(
-        entries = entries.map { groupEntry ->
+        entries = group.entries.map { groupEntry ->
             when (groupEntry) {
                 is Group<T> -> {
                     warnAboutNestedGroups(group, groupEntry)

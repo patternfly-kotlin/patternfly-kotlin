@@ -1,6 +1,5 @@
 package org.patternfly
 
-
 /**
  * Creates a PatternFly component CSS class starting with `pf-c-`. Additional elements are appended to the component class using a modified version of [BEM](http://getbem.com/introduction/).
  *
