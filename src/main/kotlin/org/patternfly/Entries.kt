@@ -4,6 +4,8 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.ItemSelection.SINGLE
+import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 
 /**
  * Creates an instance of [Entries] containing [Item]s from the data in [Iterable] and updates the specified store.
@@ -198,12 +200,12 @@ public data class Entries<T>(
                         }
                         is Item<T> -> entry.copy(
                             selected = when (itemSelection) {
-                                ItemSelection.SINGLE, ItemSelection.SINGLE_PER_GROUP -> {
+                                SINGLE, SINGLE_PER_GROUP -> {
                                     idProvider(entry.item) == itemId
                                 }
                                 ItemSelection.MULTIPLE -> {
                                     if (idProvider(entry.item) == itemId) {
-                                        true
+                                        !entry.selected
                                     } else {
                                         entry.selected
                                     }
@@ -233,14 +235,14 @@ public data class Entries<T>(
                 }
                 is Item<T> -> groupEntry.copy(
                     selected = when (itemSelection) {
-                        ItemSelection.SINGLE -> {
+                        SINGLE -> {
                             if (groupWithSelection) {
                                 false
                             } else {
                                 idProvider(groupEntry.item) == itemId
                             }
                         }
-                        ItemSelection.SINGLE_PER_GROUP -> {
+                        SINGLE_PER_GROUP -> {
                             if (idProvider(groupEntry.item) == itemId) {
                                 true
                             } else {
@@ -253,7 +255,7 @@ public data class Entries<T>(
                         }
                         ItemSelection.MULTIPLE -> {
                             if (idProvider(groupEntry.item) == itemId) {
-                                true
+                                !groupEntry.selected
                             } else {
                                 groupEntry.selected
                             }
