@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.1]
-### Added
-- Flag to control multi select behaviour in options menus
+### Fixed
+- Flag to control item select in options menus ([#40][i40])
 
 ## [0.1.0] - 2020-12-16
 First public release
@@ -34,3 +34,4 @@ First public release
 
 [0.1.1]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.1.0
+[i40]: https://github.com/patternfly-kotlin/patternfly-fritz2/issues/40
