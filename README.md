@@ -14,7 +14,7 @@ To get all details about how to use PatternFly Fritz2 take a look at the [API do
 
 ### Dependencies
 
-To use PatternFly Fritz2 add a dependency to your `gradle.build.kts` file. All PatternFly components are implemented in Kotlin only. You won't need any additional external JS libraries. 
+To use PatternFly Fritz2 add its dependency to your `gradle.build.kts` file. All PatternFly components are implemented in Kotlin only. You won't need any additional external JS libraries. 
 
 ```kotlin
 repositories {
