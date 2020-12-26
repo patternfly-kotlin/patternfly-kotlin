@@ -28,7 +28,7 @@ dependencies {
 
 ### PatternFly Assets
 
-PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. One way to include them is to add a `npm` dependency to PatternFly 
+PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. You have to include them on your own. One way is to add a `npm` dependency to PatternFly 
 
 
 ```kotlin
@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-and add the PatternFly stylesheets using `kotlinext.js.require.require()`:
+and make a call to `require()`:
 
 ```kotlin
 import kotlinext.js.require
@@ -48,7 +48,7 @@ fun main() {
     require("@patternfly/patternfly/patternfly-addons.css")
 ```
 
-Another option is to download or get PatternFly using a CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) and include the stylesheets directly in your HTML page:
+Another option is to download or get PatternFly using a CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) and include the stylesheets in your HTML page:
 
 ```html
 <!DOCTYPE html>
