@@ -71,18 +71,6 @@ public abstract class EntriesStore<T> internal constructor(
      */
     public val entries: Flow<List<Entry<T>>>
         get() = data.map { it.entries }
-
-    /**
-     * Flow with the list of selected [Item]s.
-     */
-    public val selection: Flow<List<Item<T>>>
-        get() = data.map { it.selection }
-
-    /**
-     * Flow with the first selected [Item] (if any)
-     */
-    public val singleSelection: Flow<Item<T>?>
-        get() = data.map { it.singleSelection }
 }
 
 /**

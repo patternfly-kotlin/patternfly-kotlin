@@ -8,11 +8,15 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.dom.html.renderElement
+import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
+import org.patternfly.dom.By
 import org.patternfly.dom.aria
+import org.patternfly.dom.querySelector
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -202,7 +206,7 @@ public class Brand internal constructor(sidebarStore: SidebarStore, id: String?,
     init {
         div(baseClass = "page".component("header", "brand", "toggle")) {
             attr("hidden", sidebarStore.data.map { !it.visible })
-            classMap(sidebarStore.data.map { mapOf("display-none".util() to it.visible) })
+            classMap(sidebarStore.data.map { mapOf("display-none".util() to !it.visible) })
             clickButton(plain) {
                 aria["expanded"] = sidebarStore.data.map { it.expanded.toString() }
                 icon("bars".fas())
@@ -261,6 +265,7 @@ public class Sidebar internal constructor(
      * Manually show & hide the sidebar.
      */
     public fun visible(value: Boolean) {
+        console.log("${if (value) "Show" else "Hide"} sidebar")
         sidebarStore.visible(value)
     }
 

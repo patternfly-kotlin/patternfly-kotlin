@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.1]
 ### Fixed
 - Flag to control item select in options menus ([#40][i40])
+- Sidebar is not collapsable / expandable ([#67][i67])
 
 ## [0.1.0] - 2020-12-16
 First public release
@@ -34,4 +35,5 @@ First public release
 
 [0.1.1]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.1.0
+[i67]: https://github.com/patternfly-kotlin/patternfly-fritz2/issues/67
 [i40]: https://github.com/patternfly-kotlin/patternfly-fritz2/issues/40

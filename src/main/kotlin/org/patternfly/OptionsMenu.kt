@@ -477,4 +477,16 @@ public class OptionsMenuStore<T>(
     internal val select: Handler<T> = handle { entries, data ->
         entries.select(data)
     }
+
+    /**
+     * Flow with the list of selected [Item]s.
+     */
+    public val selection: Flow<List<Item<T>>>
+        get() = data.map { it.selection }
+
+    /**
+     * Flow with the first selected [Item] (if any)
+     */
+    public val singleSelection: Flow<Item<T>?>
+        get() = data.map { it.singleSelection }
 }
