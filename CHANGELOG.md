@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0]
+### Added
+- Title component ([#58](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/58))
+
 ### Changed
-- Provide documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
-- Implement expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
+- Documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
+- Expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
 - Refactoring: `CollapseExpandStore` → `ExpandedStore`
 
 ### Fixed

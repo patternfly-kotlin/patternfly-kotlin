@@ -9,6 +9,10 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.Size.LG
+import org.patternfly.Size.MD
+import org.patternfly.Size.XL
+import org.patternfly.Size.XL_2
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.get
@@ -106,6 +110,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Select("sel", "select".component()),
     Switch("sw", "switch".component()),
     Tabs("tbs"),
+    TextContent("tc", "content".component()),
     Title("tlt", "title".component()),
     Toolbar("tb", "toolbar".component()),
     TreeView("tv", "tree-view".component());
@@ -160,6 +165,18 @@ public enum class DataTableSelection {
  */
 public enum class DividerVariant {
     HR, DIV, LI
+}
+
+/**
+ * Heading level used for the [Title] component.
+ */
+public enum class Level(public val level: Int, public val size: Size) {
+    H1(1, XL_2),
+    H2(2, XL),
+    H3(3, LG),
+    H4(4, MD),
+    H5(5, MD),
+    H6(6, MD),
 }
 
 /**
