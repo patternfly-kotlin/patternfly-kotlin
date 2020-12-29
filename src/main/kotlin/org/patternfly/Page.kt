@@ -305,7 +305,7 @@ public class PageSection internal constructor(id: String?, baseClass: String?, j
 
 internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 
-internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
+internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = true, expanded = true)) {
 
     val visible: SimpleHandler<Boolean> = handle { status, visible ->
         status.copy(visible = visible)
