@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
@@ -7,30 +9,13 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.aria
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
-// TODO Implement expandable cards
-// ------------------------------------------------------ card view dsl
-
-/**
- * Creates a [CardView] component.
- *
- * @param store the item store
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.CardViewSample.cardView
- */
-public fun <T> RenderContext.cardView(
-    store: ItemStore<T> = ItemStore(),
-    id: String? = null,
-    baseClass: String? = null,
-    content: CardView<T>.() -> Unit = {}
-): CardView<T> = register(CardView(store, id = id, baseClass = baseClass, job), content)
+// ------------------------------------------------------ dsl
 
 /**
  * Creates a [Card] component which is part of an [CardView].
@@ -50,8 +35,6 @@ public fun <T> CardView<T>.card(
     baseClass: String? = null,
     content: Card<T>.() -> Unit = {}
 ): Card<T> = register(Card(this.itemStore, item, selectable, id = id, baseClass = baseClass, job), content)
-
-// ------------------------------------------------------ card dsl
 
 /**
  * Creates a standalone [Card] component.
@@ -82,6 +65,22 @@ public fun <T> Card<T>.cardHeader(
     baseClass: String? = null,
     content: CardHeader<T>.() -> Unit = {}
 ): CardHeader<T> = register(CardHeader(this.itemStore, this.item, this, id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [CardToggle] component inside the [CardHeader] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.CardSample.toggle
+ */
+public fun <T> CardHeader<T>.cardToggle(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardToggle<T>.() -> Unit = {}
+): CardToggle<T> =
+    register(CardToggle(this.itemStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
 
 /**
  * Creates the [CardAction] component inside the [CardHeader] component. Use this function to group actions in the header.
@@ -169,46 +168,49 @@ public fun <T> Card<T>.cardFooter(
     content: CardFooter<T>.() -> Unit = {}
 ): CardFooter<T> = register(CardFooter(this.itemStore, id = id, baseClass = baseClass, job), content)
 
-// ------------------------------------------------------ tag
+/**
+ * Creates a container for the expandable content of a expandable [Card].
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.CardSample.toggle
+ */
+public fun <T> Card<T>.cardExpandableContent(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardExpandableContent<T>.() -> Unit = {}
+): CardExpandableContent<T> =
+    register(CardExpandableContent(this.itemStore, this, id = id, baseClass = baseClass, job), content)
 
 /**
- * PatternFly [card view](https://www.patternfly.org/v4/components/card/design-guidelines/#card-view-usage) component.
+ * Creates a [CardBody] component inside a [CardExpandableContent] component. You can have multiple bodies in one card.
  *
- * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemStore] as [Card]s.
- *
- * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the card components implement [WithIdProvider], this can be easily done using [WithIdProvider.itemId]. See the samples for more details.
- *
- * @param T the type which is used for the [Card]s in this card view.
- *
- * @sample org.patternfly.sample.CardViewSample.cardView
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
  */
-public class CardView<T> internal constructor(
-    internal val itemStore: ItemStore<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyComponent<HTMLDivElement>,
-    Div(
-        id = id,
-        baseClass = classes {
-            +"gallery".layout()
-            +"gutter".modifier()
-            +baseClass
-        },
-        job
-    ) {
+public fun <T> CardExpandableContent<T>.cardBody(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardBody<T>.() -> Unit = {}
+): CardBody<T> = register(CardBody(this.itemStore, id = id, baseClass = baseClass, job), content)
 
-    init {
-        markAs(ComponentType.CardView)
-    }
+/**
+ * Creates the [CardFooter] component inside a [CardExpandableContent] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun <T> CardExpandableContent<T>.cardFooter(
+    id: String? = null,
+    baseClass: String? = null,
+    content: CardFooter<T>.() -> Unit = {}
+): CardFooter<T> = register(CardFooter(this.itemStore, id = id, baseClass = baseClass, job), content)
 
-    /**
-     * Defines how to display the items in the [ItemStore] as [Card]s.
-     */
-    public fun display(display: (T) -> Card<T>) {
-        itemStore.page.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
-    }
-}
+// ------------------------------------------------------ tag
 
 /**
  * PatternFly [card](https://www.patternfly.org/v4/components/card/design-guidelines) component.
@@ -217,13 +219,17 @@ public class CardView<T> internal constructor(
  *
  * A card contains nested components which make up the card itself. The [CardTitle] can be placed either in the [CardHeader] or in the [Card] itself. If used in the [CardHeader], make sure to add it **after** the [CardAction]. Besides the [CardCheckbox] the [CardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
  *
+ * If you want to make the card expandable, add a [CardToggle] to the [CardHeader] and wrap the [CardBody] and [CardFooter] inside a [CardExpandableContent] component. Otherwise add the [CardBody] and [CardFooter] directly to the [Card] component.
+ *
  * Most components should be used exactly once, except the [CardBody], which can be used multiple times.
  *
  * ```
  * ┏━━━━━━━━━━━━━━ card: Card ━━━━━━━━━━━━━━┓
  * ┃                                        ┃
  * ┃ ┌────── cardHeader: CardHeader ──────┐ ┃
- * ┃ │                                    │ ┃
+ * ┃ │ ┌────────────────────────────────┐ │ ┃
+ * ┃ │ │     cardToggle: CardToggle     │ │ ┃
+ * ┃ │ └────────────────────────────────┘ │ ┃
  * ┃ │ ┌──── cardAction: CardAction ────┐ │ ┃
  * ┃ │ │ ┌────────────────────────────┐ │ │ ┃
  * ┃ │ │ │ cardCheckbox: CardCheckbox │ │ │ ┃
@@ -236,11 +242,15 @@ public class CardView<T> internal constructor(
  * ┃ ┌────────────────────────────────────┐ ┃
  * ┃ │        cardTitle: CardTitle        │ ┃
  * ┃ └────────────────────────────────────┘ ┃
- * ┃ ┌────────────────────────────────────┐ ┃
- * ┃ │         cardBody: CardBody         │ ┃
- * ┃ └────────────────────────────────────┘ ┃
- * ┃ ┌────────────────────────────────────┐ ┃
- * ┃ │       cardFooter: CardFooter       │ ┃
+ * ┃                                        ┃
+ * ┃ ┌────── cardExpandableContent: ──────┐ ┃
+ * ┃ │       CardExpandableContent        │ ┃
+ * ┃ │ ┌────────────────────────────────┐ │ ┃
+ * ┃ │ │       cardBody: CardBody       │ │ ┃
+ * ┃ │ └────────────────────────────────┘ │ ┃
+ * ┃ │ ┌────────────────────────────────┐ │ ┃
+ * ┃ │ │     cardFooter: CardFooter     │ │ ┃
+ * ┃ │ └────────────────────────────────┘ │ ┃
  * ┃ └────────────────────────────────────┘ ┃
  * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
  * ```
@@ -272,17 +282,44 @@ public class Card<T> internal constructor(
      */
     public val selected: CardStore = CardStore()
 
+    /**
+     * Manages the **c**ollapse / **e**xpand **s**tate of an expandable [Card]. Use this property if you want to track the collapse / expand state.
+     *
+     * @sample org.patternfly.sample.CardSample.toggle
+     */
+    public val ces: CollapseExpandStore = CollapseExpandStore()
+
     init {
         markAs(ComponentType.Card)
         if (selectable) {
             domNode.tabIndex = 0
             if (itemStore != ItemStore.NOOP) {
-                classMap(itemStore.data.map { it.isSelected(item) }.map { mapOf("selected".modifier() to it) })
+                classMap(
+                    itemStore.data.map { it.isSelected(item) }.combine(ces.data) { selected, expanded ->
+                        selected to expanded
+                    }.map { (selected, expanded) ->
+                        mapOf(
+                            "selected".modifier() to selected,
+                            "expanded".modifier() to expanded
+                        )
+                    }
+                )
                 clicks.map { item } handledBy itemStore.toggleSelection
             } else {
-                classMap(selected.data.map { mapOf("selected".modifier() to it) })
+                classMap(
+                    selected.data.combine(ces.data) { selected, expanded ->
+                        selected to expanded
+                    }.map { (selected, expanded) ->
+                        mapOf(
+                            "selected".modifier() to selected,
+                            "expanded".modifier() to expanded
+                        )
+                    }
+                )
                 clicks handledBy selected.toggle
             }
+        } else {
+            classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
         }
     }
 }
@@ -299,6 +336,33 @@ public class CardHeader<T> internal constructor(
     job: Job
 ) : WithIdProvider<T> by itemStore,
     Div(id = id, baseClass = classes("card".component("header"), baseClass), job)
+
+/**
+ * The toggle control of a expandable card inside the [CardHeader].
+ */
+public class CardToggle<T> internal constructor(
+    itemStore: ItemStore<T>,
+    item: T,
+    card: Card<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemStore,
+    Div(id = id, baseClass = classes("card".component("header", "toggle"), baseClass), job) {
+
+    init {
+        clickButton(plain) {
+            aria["label"] = "Details"
+            if (itemStore != ItemStore.NOOP) {
+                aria["labelledby"] = this@CardToggle.itemId(item)
+            }
+            attr("aria-expanded", card.ces.data.map { it.toString() })
+            span(baseClass = "card".component("header", "toggle", "icon")) {
+                icon("angle-right".fas())
+            }
+        } handledBy card.ces.toggle
+    }
+}
 
 /**
  * A component to group actions in the [CardHeader]. Besides the [CardCheckbox] the [CardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
@@ -352,6 +416,26 @@ public class CardCheckbox<T> internal constructor(
  */
 public class CardTitle<T> internal constructor(itemStore: ItemStore<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemStore, Div(id = id, baseClass = classes("card".component("title"), baseClass), job)
+
+/**
+ * A container for the expandable content of a expandable [Card].
+ *
+ * @sample org.patternfly.sample.CardSample.toggle
+ */
+public class CardExpandableContent<T> internal constructor(
+    internal val itemStore: ItemStore<T>,
+    card: Card<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemStore,
+    Div(id = id, baseClass = classes("card".component("expandable", "content"), baseClass), job) {
+
+    init {
+        attr("hidden", card.ces.data.map { !it })
+        classMap(card.ces.data.map { expanded -> mapOf("display-none".util() to !expanded) })
+    }
+}
 
 /**
  * The body of a [Card]. You can have multiple bodies in one card.

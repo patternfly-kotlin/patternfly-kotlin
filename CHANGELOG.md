@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.1]
+## [0.2.0]
 ### Changed
-- Provide documentation for [Pagination](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/org.patternfly/-pagination/index.html) component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
+- Provide documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
+- Implement expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
 
 ### Fixed
 - Flag to control item select in options menus ([#40](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/40))
@@ -36,7 +37,5 @@ First public release
 ### Security
 - in case of vulnerabilities
 
-[0.1.1]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.1.0...v0.1.1
+[0.2.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.1.0
-[i67]: 
-[i40]: 
