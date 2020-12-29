@@ -26,6 +26,8 @@ public fun RenderContext.textContent(
  * PatternFly [text content](https://www.patternfly.org/v4/components/text/design-guidelines) component.
  *
  * A text component can wrap any static HTML content you want to place on your page to provide correct formatting when using standard HTML tags.
+ *
+ * @sample org.patternfly.sample.TextContentSample.textContent
  */
 public class TextContent internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>,
