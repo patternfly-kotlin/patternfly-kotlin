@@ -1,7 +1,101 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
+import dev.fritz2.binding.RootStore
 import kotlin.math.max
 import kotlin.math.min
+
+/**
+ * Common interface meant to be implemented by stores which have a [PageInfo] instance.
+ */
+public interface PageInfoHandler {
+
+    /**
+     * Handler to go to the first page.
+     */
+    public val gotoFirstPage: Handler<Unit>
+
+    /**
+     * Handler to go to the previous (if any) page.
+     */
+    public val gotoPreviousPage: Handler<Unit>
+
+    /**
+     * Handler to go to the next (if any) page.
+     */
+    public val gotoNextPage: Handler<Unit>
+
+    /**
+     * Handler to go to the last page.
+     */
+    public val gotoLastPage: Handler<Unit>
+
+    /**
+     * Handler to go to the specified page.
+     */
+    public val gotoPage: Handler<Int>
+
+    /**
+     * Handler to set a new page size.
+     */
+    public val pageSize: Handler<Int>
+
+    /**
+     * Handler to set a new number of total items.
+     */
+    public val total: Handler<Int>
+
+    /**
+     * Handler to refresh the [PageInfo] instance.
+     */
+    public val refresh: Handler<Unit>
+}
+
+/**
+ * Store holding a [PageInfo] instance.
+ */
+public class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInfoHandler {
+
+    /**
+     * Handler to go to the first page.
+     */
+    override val gotoFirstPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoFirstPage() }
+
+    /**
+     * Handler to go to the previous (if any) page.
+     */
+    override val gotoPreviousPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoPreviousPage() }
+
+    /**
+     * Handler to go to the next (if any) page.
+     */
+    override val gotoNextPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoNextPage() }
+
+    /**
+     * Handler to go to the last page.
+     */
+    override val gotoLastPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoLastPage() }
+
+    /**
+     * Handler to go to the specified page.
+     */
+    override val gotoPage: Handler<Int> = handle { pageInfo, page -> pageInfo.gotoPage(page) }
+
+    /**
+     * Handler to set a new page size.
+     */
+    override val pageSize: Handler<Int> = handle { pageInfo, pageSize -> pageInfo.pageSize(pageSize) }
+
+    /**
+     * Handler to set a new number of total items.
+     */
+    override val total: Handler<Int> = handle { pageInfo, total -> pageInfo.total(total) }
+
+    /**
+     * Handler to refresh the [PageInfo] instance.
+     */
+    override val refresh: Handler<Unit> = handle { pageInfo -> pageInfo.refresh() }
+}
 
 /**
  * Immutable class for paging over [Items]. Every modification to an instance of this class leads to a new instance with changed properties.
@@ -103,8 +197,19 @@ public data class PageInfo(
         return max(1, pages)
     }
 
+    /**
+     * Contains global constants common to all [PageInfo] instances.
+     */
     public companion object {
+
+        /**
+         * Default page size.
+         */
         public const val DEFAULT_PAGE_SIZE: Int = 10
+
+        /**
+         * Default page sizes.
+         */
         public val DEFAULT_PAGE_SIZES: IntArray = intArrayOf(10, 20, 50, 100)
     }
 }

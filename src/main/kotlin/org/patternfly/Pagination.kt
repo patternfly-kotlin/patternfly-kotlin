@@ -1,7 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.TextNode
@@ -21,9 +19,20 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 
-// TODO Document me
 // ------------------------------------------------------ dsl
 
+/**
+ * Creates a new pagination component based on the specified [ItemStore]. Use this function to bind the pagination component to an [ItemStore].
+ *
+ * @param store the item store
+ * @param pageSizes the size of one page
+ * @param compact whether to use a compact layout
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.PaginationSample.itemStore
+ */
 public fun <T> RenderContext.pagination(
     store: ItemStore<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
@@ -36,6 +45,18 @@ public fun <T> RenderContext.pagination(
     content
 )
 
+/**
+ * Creates a new pagination component based on the specified [PageInfo] instance. Use this function to bind the pagination component to a [PageInfo] instance.
+ *
+ * @param pageInfo the [PageInfo] instance
+ * @param pageSizes the size of one page
+ * @param compact whether to use a compact layout
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.PaginationSample.pageInfo
+ */
 public fun RenderContext.pagination(
     pageInfo: PageInfo = PageInfo(),
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
@@ -48,8 +69,22 @@ public fun RenderContext.pagination(
     return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass, job), content)
 }
 
+/**
+ * Creates a new pagination component inside the specified [ToolbarItem] based on the specified [ItemStore].
+ *
+ * @receiver the toolbar item this pagination component is part of
+ *
+ * @param store the item store
+ * @param pageSizes the size of one page
+ * @param compact whether to use a compact layout
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.PaginationSample.toolbar
+ */
 public fun <T> ToolbarItem.pagination(
-    itemStore: ItemStore<T>,
+    store: ItemStore<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
@@ -59,8 +94,8 @@ public fun <T> ToolbarItem.pagination(
     this.domNode.classList += "pagination".modifier()
     return register(
         Pagination(
-            itemStore,
-            itemStore.data.map { it.pageInfo },
+            store,
+            store.data.map { it.pageInfo },
             pageSizes,
             compact,
             id = id,
@@ -73,6 +108,15 @@ public fun <T> ToolbarItem.pagination(
 
 // ------------------------------------------------------ tag
 
+/**
+ * PatternFly [pagination](https://www.patternfly.org/v4/components/pagination/design-guidelines) component.
+ *
+ * A pagination component gives users more navigational capability on pages with content views.
+ *
+ * Usually a pagination component is part of a toolbar and is bound to an [ItemStore].
+ *
+ * @sample org.patternfly.sample.PaginationSample.toolbar
+ */
 public class Pagination internal constructor(
     public val pageInfoHandler: PageInfoHandler,
     public val pageInfoFlow: Flow<PageInfo>,
@@ -184,12 +228,18 @@ public class Pagination internal constructor(
         }
     }
 
+    /**
+     * Disables / enabled this pagination instance.
+     */
     public fun disabled(value: Boolean) {
         optionsMenu.disabled(value)
         controlElements.forEach { it.disabled = value }
         inputElement?.let { it.disabled = value }
     }
 
+    /**
+     * Disables / enabled this pagination instance.
+     */
     public fun disabled(value: Flow<Boolean>) {
         optionsMenu.disabled(value)
         mountSingle(job, value) { v, _ ->
@@ -205,7 +255,7 @@ public class Pagination internal constructor(
 
 // ------------------------------------------------------ store
 
-public fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
+internal fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {
         this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.asText()
         +" - "
@@ -215,28 +265,4 @@ public fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {
         this@showRange.map { it.total.toString() }.asText()
     }
-}
-
-public interface PageInfoHandler {
-
-    public val gotoFirstPage: Handler<Unit>
-    public val gotoPreviousPage: Handler<Unit>
-    public val gotoNextPage: Handler<Unit>
-    public val gotoLastPage: Handler<Unit>
-    public val gotoPage: Handler<Int>
-    public val pageSize: Handler<Int>
-    public val total: Handler<Int>
-    public val refresh: Handler<Unit>
-}
-
-public class PageInfoStore(pageInfo: PageInfo) : RootStore<PageInfo>(pageInfo), PageInfoHandler {
-
-    override val gotoFirstPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoFirstPage() }
-    override val gotoPreviousPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoPreviousPage() }
-    override val gotoNextPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoNextPage() }
-    override val gotoLastPage: Handler<Unit> = handle { pageInfo -> pageInfo.gotoLastPage() }
-    override val gotoPage: Handler<Int> = handle { pageInfo, page -> pageInfo.gotoPage(page) }
-    override val pageSize: Handler<Int> = handle { pageInfo, pageSize -> pageInfo.pageSize(pageSize) }
-    override val total: Handler<Int> = handle { pageInfo, total -> pageInfo.total(total) }
-    override val refresh: Handler<Unit> = handle { pageInfo -> pageInfo.refresh() }
 }
