@@ -307,21 +307,22 @@ public class DataTableCaption internal constructor(id: String?, baseClass: Strin
     Caption(id = id, baseClass = baseClass, job)
 
 internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) : TBody(job = job) {
-    private val ces: CollapseExpandStore = CollapseExpandStore()
+
+    private val expanded: ExpandedStore = ExpandedStore()
 
     init {
         val expandableContentId = Id.unique(ComponentType.DataList.id, "ec")
         attr("role", "rowgroup")
-        classMap(ces.data.map { mapOf("expanded".modifier() to it) })
+        classMap(expanded.data.map { mapOf("expanded".modifier() to it) })
         tr {
-            renderCells(dataTable, item, expandableContentId, this@DataTableExpandableBody.ces)
+            renderCells(dataTable, item, expandableContentId, this@DataTableExpandableBody.expanded)
         }
         val toggleColumn = dataTable.columns.toggleColumn
         if (toggleColumn != null) {
             tr(baseClass = "table".component("expandable-row")) {
                 attr("role", "row")
-                attr("hidden", this@DataTableExpandableBody.ces.data.map { !it })
-                classMap(this@DataTableExpandableBody.ces.data.map { mapOf("expanded".modifier() to it) })
+                attr("hidden", this@DataTableExpandableBody.expanded.data.map { !it })
+                classMap(this@DataTableExpandableBody.expanded.data.map { mapOf("expanded".modifier() to it) })
                 if (toggleColumn.fullWidth) {
                     td {
                         renderExpandableContent(toggleColumn, item, dataTable.columns.size, expandableContentId)
@@ -358,7 +359,7 @@ internal fun <T> Tr.renderCells(
     dataTable: DataTable<T>,
     item: T,
     expandableContentId: String,
-    ces: CollapseExpandStore?,
+    expanded: ExpandedStore?,
 ) {
     attr("role", "row")
     val itemId = dataTable.itemStore.idProvider(item)
@@ -367,7 +368,7 @@ internal fun <T> Tr.renderCells(
         when (column) {
             is ToggleColumn<T> -> {
                 if (dataTable.columns.hasToggle) {
-                    renderToggleCell(column, itemId, expandableContentId, ces)
+                    renderToggleCell(column, itemId, expandableContentId, expanded)
                 } else {
                     console.error("Illegal use of dataTableToggleColumn() for ${dataTable.domNode.debug()}")
                 }
@@ -383,7 +384,7 @@ private fun <T> Tr.renderToggleCell(
     column: Column<T>,
     itemId: String,
     expandableContentId: String,
-    ces: CollapseExpandStore?
+    expanded: ExpandedStore?
 ) {
     td(
         id = column.id,
@@ -394,7 +395,7 @@ private fun <T> Tr.renderToggleCell(
             aria["labelledby"] = itemId
             aria["controls"] = expandableContentId
             aria["label"] = "Details"
-            ces?.let { store ->
+            expanded?.let { store ->
                 aria["expancded"] = store.data.map { it.toString() }
                 classMap(store.data.map { mapOf("expanded".modifier() to it) })
                 clicks handledBy store.toggle

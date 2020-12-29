@@ -1,6 +1,7 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.ItemStore
 import org.patternfly.Notification
@@ -43,20 +44,20 @@ internal interface DrawerSample {
                         h2 { +"Details of selected item" }
                     }
                     drawerBody {
-                        store.selectOnly.asText()
+                        store.singleSelection.asText()
                     }
                 }
             }
 
             store.addAll(listOf("One", "Two", "Three"))
-            store.selectOnly.map { } handledBy drawer.ces.expand
+            store.singleSelection.filterNotNull().map { } handledBy drawer.expanded.expand
         }
     }
 
-    fun ces() {
+    fun expanded() {
         render {
             drawer {
-                ces.data handledBy Notification.add { expanded ->
+                expanded.data handledBy Notification.add { expanded ->
                     info("Expanded state of drawer: $expanded.")
                 }
                 drawerContent {

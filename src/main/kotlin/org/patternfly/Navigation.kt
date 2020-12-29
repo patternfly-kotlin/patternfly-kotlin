@@ -195,13 +195,13 @@ public class NavigationExpandableGroup<T> internal constructor(
     job
 ) {
 
-    private val ces = CollapseExpandStore()
+    private val expanded = ExpandedStore()
 
     init {
         // don't use classMap for expanded flow
         // classMap = expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) }
         (MainScope() + job).launch {
-            ces.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
+            expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
         }
         // it might interfere with router flow, which also modifies the class list
         (MainScope() + job).launch {
@@ -215,8 +215,8 @@ public class NavigationExpandableGroup<T> internal constructor(
         val linkId = Id.unique(ComponentType.Navigation.id, "eg")
         a("nav".component("link"), linkId) {
             +text
-            clicks handledBy this@NavigationExpandableGroup.ces.toggle
-            aria["expanded"] = this@NavigationExpandableGroup.ces.data.map { it.toString() }
+            clicks handledBy this@NavigationExpandableGroup.expanded.toggle
+            aria["expanded"] = this@NavigationExpandableGroup.expanded.data.map { it.toString() }
 
             span("nav".component("toggle")) {
                 span("nav".component("toggle", "icon")) {
@@ -226,7 +226,7 @@ public class NavigationExpandableGroup<T> internal constructor(
         }
         section("nav".component("subnav")) {
             aria["labelledby"] = linkId
-            attr("hidden", this@NavigationExpandableGroup.ces.data.map { !it })
+            attr("hidden", this@NavigationExpandableGroup.expanded.data.map { !it })
             navigationItems(this@NavigationExpandableGroup.navigation) {
                 content(this)
             }

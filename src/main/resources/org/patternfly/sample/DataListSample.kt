@@ -60,12 +60,12 @@ internal interface DataListSample {
         }
     }
 
-    fun ces() {
+    fun expanded() {
         render {
             dataList<String> {
                 display { item ->
                     dataListItem(item) {
-                        ces.data handledBy Notification.add { expanded ->
+                        expanded.data handledBy Notification.add { expanded ->
                             info("Expanded state of $item: $expanded.")
                         }
                         dataListRow {
@@ -86,8 +86,8 @@ internal interface DataListSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemStore<Demo> { it.id }
-            store.select handledBy Notification.add { (demo, selected) ->
-                default("${demo.name} selected: $selected.")
+            store.selection handledBy Notification.add { selection ->
+                default("Selection: $selection.")
             }
 
             dataList(store) {

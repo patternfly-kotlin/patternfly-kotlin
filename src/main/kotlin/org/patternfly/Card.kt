@@ -73,7 +73,7 @@ public fun <T> Card<T>.cardHeader(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.sample.CardSample.toggle
+ * @sample org.patternfly.sample.CardSample.expandable
  */
 public fun <T> CardHeader<T>.cardToggle(
     id: String? = null,
@@ -175,7 +175,7 @@ public fun <T> Card<T>.cardFooter(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.sample.CardSample.toggle
+ * @sample org.patternfly.sample.CardSample.expandable
  */
 public fun <T> Card<T>.cardExpandableContent(
     id: String? = null,
@@ -283,11 +283,11 @@ public class Card<T> internal constructor(
     public val selected: CardStore = CardStore()
 
     /**
-     * Manages the **c**ollapse / **e**xpand **s**tate of an expandable [Card]. Use this property if you want to track the collapse / expand state.
+     * Manages the expanded state of an expandable [Card]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.sample.CardSample.toggle
+     * @sample org.patternfly.sample.CardSample.expandable
      */
-    public val ces: CollapseExpandStore = CollapseExpandStore()
+    public val expanded: ExpandedStore = ExpandedStore()
 
     init {
         markAs(ComponentType.Card)
@@ -295,7 +295,7 @@ public class Card<T> internal constructor(
             domNode.tabIndex = 0
             if (itemStore != ItemStore.NOOP) {
                 classMap(
-                    itemStore.data.map { it.isSelected(item) }.combine(ces.data) { selected, expanded ->
+                    itemStore.data.map { it.isSelected(item) }.combine(expanded.data) { selected, expanded ->
                         selected to expanded
                     }.map { (selected, expanded) ->
                         mapOf(
@@ -307,7 +307,7 @@ public class Card<T> internal constructor(
                 clicks.map { item } handledBy itemStore.toggleSelection
             } else {
                 classMap(
-                    selected.data.combine(ces.data) { selected, expanded ->
+                    selected.data.combine(expanded.data) { selected, expanded ->
                         selected to expanded
                     }.map { (selected, expanded) ->
                         mapOf(
@@ -319,7 +319,7 @@ public class Card<T> internal constructor(
                 clicks handledBy selected.toggle
             }
         } else {
-            classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+            classMap(expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
         }
     }
 }
@@ -356,11 +356,11 @@ public class CardToggle<T> internal constructor(
             if (itemStore != ItemStore.NOOP) {
                 aria["labelledby"] = this@CardToggle.itemId(item)
             }
-            attr("aria-expanded", card.ces.data.map { it.toString() })
+            attr("aria-expanded", card.expanded.data.map { it.toString() })
             span(baseClass = "card".component("header", "toggle", "icon")) {
                 icon("angle-right".fas())
             }
-        } handledBy card.ces.toggle
+        } handledBy card.expanded.toggle
     }
 }
 
@@ -420,7 +420,7 @@ public class CardTitle<T> internal constructor(itemStore: ItemStore<T>, id: Stri
 /**
  * A container for the expandable content of a expandable [Card].
  *
- * @sample org.patternfly.sample.CardSample.toggle
+ * @sample org.patternfly.sample.CardSample.expandable
  */
 public class CardExpandableContent<T> internal constructor(
     internal val itemStore: ItemStore<T>,
@@ -432,8 +432,8 @@ public class CardExpandableContent<T> internal constructor(
     Div(id = id, baseClass = classes("card".component("expandable", "content"), baseClass), job) {
 
     init {
-        attr("hidden", card.ces.data.map { !it })
-        classMap(card.ces.data.map { expanded -> mapOf("display-none".util() to !expanded) })
+        attr("hidden", card.expanded.data.map { !it })
+        classMap(card.expanded.data.map { expanded -> mapOf("display-none".util() to !expanded) })
     }
 }
 

@@ -71,10 +71,10 @@ internal interface DropdownSample {
         }
     }
 
-    fun ces() {
+    fun expanded() {
         render {
             dropdown<String> {
-                ces.data handledBy Notification.add { expanded ->
+                expanded.data handledBy Notification.add { expanded ->
                     info("Expanded state of dropdown: $expanded.")
                 }
                 textToggle { +"Choose one" }

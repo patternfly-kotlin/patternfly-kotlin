@@ -97,8 +97,8 @@ internal interface DataTableSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemStore<Demo> { it.id }
-            store.select handledBy Notification.add { (demo, selected) ->
-                default("${demo.name} selected: $selected.")
+            store.selection handledBy Notification.add { selection ->
+                default("Selection: $selection.")
             }
 
             dataTable(store) {

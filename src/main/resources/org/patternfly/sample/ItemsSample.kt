@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 package org.patternfly.sample
 
 import org.patternfly.Items

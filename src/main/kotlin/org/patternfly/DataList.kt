@@ -283,7 +283,7 @@ public class DataListExpandableContent<T> internal constructor(
         if (dataListItem.toggleButton != null && id != null) {
             dataListItem.toggleButton!!.aria["controls"] = id
         }
-        attr("hidden", dataListItem.ces.data.map { !it })
+        attr("hidden", dataListItem.expanded.data.map { !it })
         div(baseClass = "data-list".component("expandable-content", "body")) {
             content(this)
         }
@@ -348,11 +348,11 @@ public class DataListItem<T> internal constructor(
     ) {
 
     /**
-     * Manages the **c**ollapse / **e**xpand **s**tate of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
+     * Manages the expanded state of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.sample.DataListSample.ces
+     * @sample org.patternfly.sample.DataListSample.expanded
      */
-    public val ces: CollapseExpandStore = CollapseExpandStore()
+    public val expanded: ExpandedStore = ExpandedStore()
 
     internal var toggleButton: HTMLButtonElement? = null
 
@@ -360,7 +360,7 @@ public class DataListItem<T> internal constructor(
         aria["labelledby"] = itemStore.idProvider(item)
         if (dataList.selectableRows) {
             classMap(
-                ces.data.combine(itemStore.data.map { it.isSelected(item) }) { expanded, selected ->
+                expanded.data.combine(itemStore.data.map { it.isSelected(item) }) { expanded, selected ->
                     expanded to selected
                 }.map { (expanded, selected) ->
                     mapOf(
@@ -371,7 +371,7 @@ public class DataListItem<T> internal constructor(
             )
             clicks.map { item } handledBy itemStore.selectOnly
         } else {
-            classMap(ces.data.map { mapOf("expanded".modifier() to it) })
+            classMap(expanded.data.map { mapOf("expanded".modifier() to it) })
         }
     }
 }
@@ -408,10 +408,10 @@ public class DataListToggle<T> internal constructor(
             this@DataListToggle.dataListItem.toggleButton = domNode
             aria["label"] = "Details"
             aria["labelledby"] = "$id ${this@DataListToggle.itemStore.idProvider(this@DataListToggle.item)}"
-            aria["expanded"] = this@DataListToggle.dataListItem.ces.data.map { it.toString() }
+            aria["expanded"] = this@DataListToggle.dataListItem.expanded.data.map { it.toString() }
             div(baseClass = "data-list".component("toggle", "icon")) {
                 icon("angle-right".fas())
             }
-        } handledBy this@DataListToggle.dataListItem.ces.toggle
+        } handledBy this@DataListToggle.dataListItem.expanded.toggle
     }
 }

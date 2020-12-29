@@ -217,15 +217,15 @@ public class Drawer internal constructor(id: String?, baseClass: String?, job: J
     internal val main: Div
 
     /**
-     * Manages the **c**ollapse / **e**xpand **s**tate of the [Drawer]. Use this property if you want to track the collapse / expand state.
+     * Manages the Manages the expanded state of the [Drawer]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.sample.DrawerSample.ces
+     * @sample org.patternfly.sample.DrawerSample.expanded
      */
-    public val ces: CollapseExpandStore = CollapseExpandStore()
+    public val expanded: ExpandedStore = ExpandedStore()
 
     init {
         markAs(ComponentType.Drawer)
-        classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+        classMap(expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
         main = div(baseClass = classes("drawer".component("main"))) { }
     }
 }
@@ -260,7 +260,7 @@ public class DrawerClose internal constructor(private val drawer: Drawer, id: St
         pushButton(plain) {
             icon("times".fas())
             aria["label"] = "Close drawer panel"
-            clicks.map { false } handledBy this@DrawerClose.drawer.ces.update
+            clicks.map { false } handledBy this@DrawerClose.drawer.expanded.update
         }
     }
 }
@@ -297,7 +297,7 @@ public class DrawerPanel internal constructor(
 
     init {
         if (!drawer.domNode.classList.contains("static".modifier())) {
-            attr("hidden", drawer.ces.data.map { !it })
+            attr("hidden", drawer.expanded.data.map { !it })
         }
     }
 }

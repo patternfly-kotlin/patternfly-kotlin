@@ -49,19 +49,6 @@ internal interface CardSample {
         }
     }
 
-    fun cardHeaderMain() {
-        render {
-            card {
-                cardHeader {
-                    img { src("./logo.svg") }
-                }
-                cardTitle { +"Title" }
-                cardBody { +"Body" }
-                cardFooter { +"Footer" }
-            }
-        }
-    }
-
     fun cardTitleInHeader() {
         render {
             card {
@@ -107,10 +94,10 @@ internal interface CardSample {
         }
     }
 
-    fun toggle() {
+    fun expandable() {
         render {
             card {
-                ces.data handledBy Notification.add { expanded ->
+                expanded.data handledBy Notification.add { expanded ->
                     info("Expanded state of card: $expanded.")
                 }
                 cardHeader {

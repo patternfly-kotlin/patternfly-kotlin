@@ -274,15 +274,15 @@ public class Dropdown<T> internal constructor(
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [Dropdown]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.sample.DropdownSample.ces
+     * @sample org.patternfly.sample.DropdownSample.expanded
      */
-    public val ces: CollapseExpandStore = CollapseExpandStore { target ->
+    public val expanded: ExpandedStore = ExpandedStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
     }
 
     init {
         markAs(ComponentType.Dropdown)
-        classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+        classMap(expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
 
         val classes = classes {
             +"dropdown".component("menu")
@@ -299,7 +299,7 @@ public class Dropdown<T> internal constructor(
         }
         with(tag) {
             attr("role", "menu")
-            attr("hidden", this@Dropdown.ces.data.map { !it })
+            attr("hidden", this@Dropdown.expanded.data.map { !it })
             aria["labelledby"] = this@Dropdown.toggleId
 
             this@Dropdown.store.entries.renderEach { entry ->
@@ -365,7 +365,7 @@ public class Dropdown<T> internal constructor(
             } else {
                 this@Dropdown.defaultDisplay.invoke(this, item)
             }
-            clicks handledBy this@Dropdown.ces.collapse
+            clicks handledBy this@Dropdown.expanded.collapse
             clicks.map { item } handledBy this@Dropdown.store.selectHandler
         }
     }
@@ -420,8 +420,8 @@ private fun <T> initToggle(dropdown: Dropdown<T>, tag: Tag<HTMLElement>) {
     with(tag) {
         domNode.id = dropdown.toggleId
         aria["haspopup"] = true
-        aria["expanded"] = dropdown.ces.data.map { it.toString() }
-        clicks handledBy dropdown.ces.toggle
+        aria["expanded"] = dropdown.expanded.data.map { it.toString() }
+        clicks handledBy dropdown.expanded.toggle
     }
 }
 

@@ -187,15 +187,15 @@ public class OptionsMenu<T> internal constructor(
     /**
      * Manages the **c**ollapse / **e**xpand **s**tate of the [OptionsMenu]. Use this property if you want to track the collapse / expand state.
      *
-     * @sample org.patternfly.sample.OptionsMenuSample.ces
+     * @sample org.patternfly.sample.OptionsMenuSample.expanded
      */
-    public val ces: CollapseExpandStore = CollapseExpandStore { target ->
+    public val expanded: ExpandedStore = ExpandedStore { target ->
         !domNode.contains(target) && !target.matches(By.classname("options-menu".component("menu-item")))
     }
 
     init {
         markAs(ComponentType.OptionsMenu)
-        classMap(ces.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+        classMap(expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
 
         val classes = classes {
             +"options-menu".component("menu")
@@ -212,7 +212,7 @@ public class OptionsMenu<T> internal constructor(
         }
         with(tag) {
             attr("role", "menu")
-            attr("hidden", this@OptionsMenu.ces.data.map { !it })
+            attr("hidden", this@OptionsMenu.expanded.data.map { !it })
             aria["labelledby"] = this@OptionsMenu.toggleId
 
             this@OptionsMenu.store.entries.renderEach { entry ->
@@ -279,7 +279,7 @@ public class OptionsMenu<T> internal constructor(
                 }
             }
             if (this@OptionsMenu.closeOnSelect) {
-                clicks handledBy this@OptionsMenu.ces.collapse
+                clicks handledBy this@OptionsMenu.expanded.collapse
             }
             clicks.map { item.item } handledBy this@OptionsMenu.store.select
         }
@@ -363,8 +363,8 @@ private fun <T> initToggle(optionsMenu: OptionsMenu<T>, tag: Tag<HTMLElement>) {
     with(tag) {
         domNode.id = optionsMenu.toggleId
         aria["haspopup"] = "listbox"
-        aria["expanded"] = optionsMenu.ces.data.map { it.toString() }
-        clicks handledBy optionsMenu.ces.toggle
+        aria["expanded"] = optionsMenu.expanded.data.map { it.toString() }
+        clicks handledBy optionsMenu.expanded.toggle
     }
 }
 

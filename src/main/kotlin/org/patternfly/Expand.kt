@@ -20,7 +20,7 @@ internal typealias CollapsePredicate = (Element) -> Boolean
  *
  * A state of `false` means collapsed and `true` means expanded. The initial state is `false` (collapsed).
  */
-public class CollapseExpandStore(private val collapsePredicate: CollapsePredicate? = null) :
+public class ExpandedStore internal constructor(private val collapsePredicate: CollapsePredicate? = null) :
     RootStore<Boolean>(false) {
 
     private var closeHandler: ((Event) -> Unit)? = null

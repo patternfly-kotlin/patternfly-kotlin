@@ -154,7 +154,7 @@ public class ChipGroup<T> internal constructor(
         job
     ) {
 
-    private val expanded = CollapseExpandStore()
+    private val expanded = ExpandedStore()
     private var display: (T) -> Chip = { chip { +it.toString() } }
     private var textElement: Span? = null
     private var closeButton: PushButton? = null

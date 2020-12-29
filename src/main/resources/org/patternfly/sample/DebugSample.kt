@@ -26,7 +26,7 @@ internal interface DebugSample {
             }
             console.log(link.domNode.debug()) // <a href="#foo"></a>
 
-            val img = img { src("./logo.svg")}
+            val img = img { src("./logo.svg") }
             console.log(img.domNode.debug()) // <img src="./logo.svg"/>
 
             val br = document.createElement("br")
