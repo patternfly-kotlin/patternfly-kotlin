@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Provide documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
 - Implement expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
+- Refactoring: `CollapseExpandStore` → `ExpandedStore`
 
 ### Fixed
 - Flag to control item select in options menus ([#40](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/40))
