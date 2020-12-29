@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Text component ([#53](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/53))
 - Title component ([#58](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/58))
+- Vertical divider ([#19](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/19))
 
 ### Changed
 - Documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
