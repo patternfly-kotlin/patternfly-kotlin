@@ -31,6 +31,8 @@ public fun RenderContext.title(
  * PatternFly [title](https://www.patternfly.org/v4/components/title/design-guidelines/) component.
  *
  * A title component applies top and bottom margins, font-weight, font-size, and line-height to titles.
+ *
+ * @sample org.patternfly.sample.TitleSample.title
  */
 public class Title internal constructor(
     level: Level,

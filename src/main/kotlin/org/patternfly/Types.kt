@@ -170,6 +170,7 @@ public enum class DividerVariant {
 /**
  * Heading level used for the [Title] component.
  */
+@Suppress("MagicNumber")
 public enum class Level(public val level: Int, public val size: Size) {
     H1(1, XL_2),
     H2(2, XL),
