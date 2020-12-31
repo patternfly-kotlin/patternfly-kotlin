@@ -27,6 +27,8 @@ public fun <T> items(
  * @param T the payload of the [Item]s
  *
  * @param block function executed in the context of an [ItemsBuilder]
+ *
+ * @sample org.patternfly.sample.EntrySample.storeItems
  */
 public fun <T> EntriesStore<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
     val entries = ItemsBuilder(this.idProvider, this.itemSelection).apply(block).build()

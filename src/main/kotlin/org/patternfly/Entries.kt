@@ -8,28 +8,6 @@ import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 
 /**
- * Creates an instance of [Entries] containing [Item]s from the data in [Iterable] and updates the specified store.
- *
- * @receiver the iterable which is turned into an instance of [Entries]
- *
- * @param T the payload of the [Entries]
- *
- * @param store the store to update
- * @param block function to customize the [Item]s - gets `T` as parameter
- *
- * @sample org.patternfly.sample.EntrySample.addTo
- */
-public fun <T> Iterable<T>.addTo(store: EntriesStore<T>, block: ItemBuilder<T>.(T) -> Unit = {}) {
-    store.items {
-        forEach {
-            item(it) {
-                block(this, it)
-            }
-        }
-    }
-}
-
-/**
  * Enum which controls how to select an [Item] in [Entries].
  */
 @Suppress("unused")
