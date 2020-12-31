@@ -175,6 +175,8 @@ public fun <T> DropdownCustomToggle<T>.toggleIcon(baseClass: String? = null): Sp
 /**
  * Starts a block to add flat dropdown items using the DSL.
  *
+ * @param block code block for adding the dropdown items.
+ *
  * @sample org.patternfly.sample.DropdownSample.items
  */
 public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
@@ -213,7 +215,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * **Adding entries**
  *
- * Entries can be added by using the [DropdownStore] or by using the DSL. Items can be grouped. Nested groups are not supported. See the samples below.
+ * Entries can be added by using the [DropdownStore] or by using the DSL. Items can be grouped. Nested groups are not supported.
  *
  * **Rendering entries**
  *

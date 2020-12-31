@@ -126,7 +126,7 @@ public class ChipsBuilder<T> {
  *
  * `{ chip { +it.toString() } }`
  *
- * The items can be added to the [ChipGroupStore] using different ways (see samples).
+ * The items can be added to the [ChipGroupStore] using different ways.
  *
  * @param T the type which is used for the single [Chip]s
  *

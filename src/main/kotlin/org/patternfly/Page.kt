@@ -161,8 +161,6 @@ public fun RenderContext.pageSection(
  * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
  * ```
  *
- * See the samples section for a page with a header, brand, tools, sidebar and navigation.
- *
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
 public class Page internal constructor(id: String?, baseClass: String?, job: Job) :

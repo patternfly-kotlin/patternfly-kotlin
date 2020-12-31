@@ -171,7 +171,7 @@ public fun <T> DataListControl<T>.dataListToggle(
  *
  * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in an [ItemStore] as [DataListItem]s.
  *
- * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the data list components implement [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
+ * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the data list components implement [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
  *
  * @param T the type which is used for the [DataListItem]s in this data list.
  *

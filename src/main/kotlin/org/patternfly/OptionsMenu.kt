@@ -139,7 +139,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * **Adding entries**
  *
- * Entries can be added by using the [OptionsMenuStore] or by using the DSL. Items can be grouped. Nested groups are not supported. See the samples below.
+ * Entries can be added by using the [OptionsMenuStore] or by using the DSL. Items can be grouped. Nested groups are not supported.
  *
  * **Selecting entries**
  *

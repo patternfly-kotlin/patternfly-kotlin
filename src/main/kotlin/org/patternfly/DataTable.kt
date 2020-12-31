@@ -150,7 +150,7 @@ private val RADIO_GROUP_NAME = Id.unique(ComponentType.DataTable.id, "radio")
  *
  * 1. [ToggleColumn]: Use this column *exactly once* to add an expandable row below each normal row. The column uses a display function to render the expandable content. If used this column should be the first column.
  * 1. [SelectColumn]: Use this column *exactly once* to add a checkbox or a radio button which you can use to select rows. If used this column should be should be placed after the toggle column and before the data columns.
- * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
+ * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
  * 1. [ActionColumn]: Use this column *any number of times* to add buttons, dropdowns or other action-like elements. The column uses a display function for the cells. This column should be placed after the data columns.
  *
  * @sample org.patternfly.sample.DataTableSample.dataTable
@@ -523,7 +523,7 @@ public sealed class Column<T>(
 /**
  * Column to show the actual data of an item in the [ItemStore]. Use this column any number of times to render the properties of the items.
  *
- * The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId]. See the samples for more details.
+ * The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
  *
  * If you want to make the column sortable, use one of the `sortInfo()` function to specify a [Comparator].
  *
