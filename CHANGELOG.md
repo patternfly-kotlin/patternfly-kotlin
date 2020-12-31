@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0]
 ### Added
+- Expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
 - Text component ([#53](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/53))
 - Title component ([#58](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/58))
 - Vertical divider ([#19](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/19))
@@ -13,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
 - Documentation for switch component ([#70](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/70))
-- Expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
+- Documentation for tab component ([#71](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/71))
 - Refactoring: `CollapseExpandStore` → `ExpandedStore`
 
 ### Fixed
