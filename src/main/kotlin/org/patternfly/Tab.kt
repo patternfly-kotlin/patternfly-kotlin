@@ -362,7 +362,7 @@ internal data class ScrollButton(
 /**
  * Wrapper for the data of a tab item.
  */
-public data class TabItem<T> internal constructor(
+public data class TabItem<T>(
     override val item: T,
     public val selected: Boolean = false,
     internal val icon: (Span.() -> Unit)? = null,
