@@ -180,18 +180,21 @@ public class EmptyState internal constructor(
 
     init {
         markAs(ComponentType.EmptyState)
-        register(EmptyStateContent(id = null, baseClass = null, job = job), {
-            if (iconClass != null) {
-                icon(iconClass, baseClass = "empty-state".component("icon"))
+        register(
+            EmptyStateContent(id = null, baseClass = null, job = job),
+            {
+                if (iconClass != null) {
+                    icon(iconClass, baseClass = "empty-state".component("icon"))
+                }
+                val titleSize = when (size) {
+                    XL -> XL_4
+                    XS -> MD
+                    else -> LG
+                }
+                title(size = titleSize) { +title }
+                content(it)
             }
-            val titleSize = when (size) {
-                XL -> XL_4
-                XS -> MD
-                else -> LG
-            }
-            title(size = titleSize) { +title }
-            content(it)
-        })
+        )
     }
 }
 

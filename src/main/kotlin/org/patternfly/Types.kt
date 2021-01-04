@@ -85,9 +85,7 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 // ------------------------------------------------------ enums
 
 internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
-    By.data(
-        COMPONENT_TYPE, componentType.id
-    )
+    By.data(COMPONENT_TYPE, componentType.id)
 )
 
 @Suppress("EnumNaming")
