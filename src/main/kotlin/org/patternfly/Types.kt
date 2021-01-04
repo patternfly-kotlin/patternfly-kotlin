@@ -13,8 +13,12 @@ import org.patternfly.Size.LG
 import org.patternfly.Size.MD
 import org.patternfly.Size.XL
 import org.patternfly.Size.XL_2
+import org.patternfly.dom.By
+import org.patternfly.dom.querySelector
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
+import org.w3c.dom.ParentNode
 import org.w3c.dom.get
 import org.w3c.dom.set
 
@@ -80,6 +84,12 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
 // ------------------------------------------------------ enums
 
+internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
+    By.data(
+        COMPONENT_TYPE, componentType.id
+    )
+)
+
 @Suppress("EnumNaming")
 internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
     Alert("at", "alert".component()),
@@ -108,6 +118,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Pagination("pgn", "pagination".component()),
     Section("se", "page".component("main-section")),
     Select("sel", "select".component()),
+    Spinner("sp", "spinner".component()),
     Switch("sw", "switch".component()),
     Tabs("tbs"),
     TextContent("tc", "content".component()),
@@ -218,7 +229,9 @@ public enum class Size(public val modifier: String) {
     XL_2("2xl".modifier()),
     XL("xl".modifier()),
     LG("lg".modifier()),
-    MD("md".modifier())
+    MD("md".modifier()),
+    SM("sm".modifier()),
+    XS("xs".modifier())
 }
 
 /**
