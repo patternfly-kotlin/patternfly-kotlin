@@ -1,34 +1,131 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.renderElement
 import kotlinx.coroutines.Job
+import org.patternfly.ButtonVariation.link
+import org.patternfly.Size.LG
+import org.patternfly.Size.MD
+import org.patternfly.Size.SM
+import org.patternfly.Size.XL
+import org.patternfly.Size.XL_4
+import org.patternfly.Size.XS
 import org.w3c.dom.HTMLDivElement
 
-// TODO Document me
 // ------------------------------------------------------ dsl
 
+/**
+ * Creates an [EmptyState] component.
+ *
+ * @param size the size of the empty state component. Supported sizes are [Size.XL], [Size.LG], [Size.SM] and [Size.XS]
+ * @param iconClass an optional icon class
+ * @param title the title of the empty state component
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the [EmptyStateContent] component
+ *
+ * @sample org.patternfly.sample.EmptyStateSample.emptyState
+ */
 public fun RenderContext.emptyState(
-    iconClass: String,
+    size: Size = MD,
+    iconClass: String? = null,
     title: String,
-    size: Size? = null,
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyState = register(EmptyState(iconClass, title, size, id = id, baseClass = baseClass, job, content), {})
+): EmptyState = register(EmptyState(size, iconClass, title, id = id, baseClass = baseClass, job, content), {})
 
-public fun EmptyState.emptyStateContent(
+/**
+ * Creates an [EmptyState] component containing a [Spinner] and a "Loading" header.
+ *
+ * @param title the title of the empty state component
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the [EmptyStateContent] component
+ */
+public fun RenderContext.emptyStateSpinner(
+    title: String = "Loading",
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
-): EmptyStateContent = register(EmptyStateContent(id = id, baseClass = baseClass, job), content)
+): EmptyState = emptyState(title = title, id = id, baseClass = baseClass, content = content).apply {
+    domNode.querySelector(ComponentType.Title)?.prepend(
+        renderElement {
+            div(baseClass = "empty-state".component("icon")) {
+                spinner()
+            }
+        }.domNode
+    )
+}
 
+/**
+ * Creates an [EmptyState] that can be used when a filter does not return results.
+ *
+ * @param title the title of the empty state component
+ * @param body the text shown in the empty state body
+ * @param action text for the primary action
+ * @param handler handler for the primary action
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the [EmptyStateContent] component
+ */
+public fun RenderContext.emptyStateNoResults(
+    title: String = "No results found",
+    body: String = "No results match the filter criteria. Remove all filters or clear all filters to show results.",
+    action: String = "Clear all filters",
+    handler: Handler<Unit>,
+    id: String? = null,
+    baseClass: String? = null,
+    content: EmptyStateContent.() -> Unit = {}
+): EmptyState = emptyState(iconClass = "search".fas(), title = title, id = id, baseClass = baseClass) {
+    emptyStateBody {
+        +body
+    }
+    emptyStatePrimary {
+        clickButton(link) {
+            +action
+        } handledBy handler
+    }
+    content(this)
+}
+
+/**
+ * Creates a [Div] container for the body of the [EmptyState] component. Use this function to add a description or other text related content.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
 public fun EmptyStateContent.emptyStateBody(
     id: String? = null,
     baseClass: String? = null,
-    content: EmptyStateBody.() -> Unit = {}
-): EmptyStateBody = register(EmptyStateBody(id = id, baseClass = baseClass, job), content)
+    content: Div.() -> Unit = {}
+): Div = register(Div(id = id, baseClass = baseClass, job), content)
 
+/**
+ * Creates a [Div] container for the primary action of the [EmptyState] component. Use this function if you have a special use case like multiple elements as primary action.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.EmptyStateSample.primaryContainer
+ */
+public fun EmptyStateContent.emptyStatePrimary(
+    id: String? = null,
+    baseClass: String? = null,
+    content: Div.() -> Unit = {}
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("primary"), baseClass), job), content)
+
+/**
+ * Creates a [Div] container for the secondary actions of the [EmptyState] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
 public fun EmptyStateContent.emptyStateSecondary(
     id: String? = null,
     baseClass: String? = null,
@@ -37,10 +134,36 @@ public fun EmptyStateContent.emptyStateSecondary(
 
 // ------------------------------------------------------ tag
 
+/**
+ * PatternFly [empty state](https://www.patternfly.org/v4/components/empty-state/design-guidelines) component.
+ *
+ * An empty state component fills a screen that is not yet populated with data or information. All elements are nested inside the [EmptyStateContent] component. This includes the icon, the header and the primary and secondary buttons.
+ *
+ * An empty state should contain an icon, must contain a title and should contain a body and buttons. The body must be nested inside an [emptyStateBody] container. The primary button can be added directly as a [PushButton] to the [EmptyStateContent] or nested inside a [emptyStatePrimary] container. Secondary button(s) must be added inside a [emptyStateSecondary] container.
+ *
+ * ```
+ * ┏━━━━━━━━━━━ emptyState: EmptyState ━━━━━━━━━━┓
+ * ┃                                             ┃
+ * ┃ ┌──emptyStateContent: EmptyStateContent───┐ ┃
+ * ┃ │ ┌─────────────────────────────────────┐ │ ┃
+ * ┃ │ │         emptyStateBody: Div         │ │ ┃
+ * ┃ │ └─────────────────────────────────────┘ │ ┃
+ * ┃ │ ┌─────────────────────────────────────┐ │ ┃
+ * ┃ │ │       emptyStatePrimary: Div        │ │ ┃
+ * ┃ │ └─────────────────────────────────────┘ │ ┃
+ * ┃ │ ┌─────────────────────────────────────┐ │ ┃
+ * ┃ │ │      emptyStateSecondary: Div       │ │ ┃
+ * ┃ │ └─────────────────────────────────────┘ │ ┃
+ * ┃ └─────────────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ```
+ *
+ * @sample org.patternfly.sample.EmptyStateSample.emptyState
+ */
 public class EmptyState internal constructor(
-    iconClass: String,
+    size: Size,
+    iconClass: String?,
     title: String,
-    size: Size?,
     id: String?,
     baseClass: String?,
     job: Job,
@@ -49,7 +172,7 @@ public class EmptyState internal constructor(
     id = id,
     baseClass = classes {
         +ComponentType.EmptyState
-        +size?.modifier
+        +(size.modifier `when` (size == XL || size == LG || size == SM || size == XS))
         +baseClass
     },
     job
@@ -57,20 +180,23 @@ public class EmptyState internal constructor(
 
     init {
         markAs(ComponentType.EmptyState)
-        emptyStateContent {
-            icon(iconClass).apply {
-                domNode.classList.add("empty-state".component("icon"))
+        register(EmptyStateContent(id = null, baseClass = null, job = job), {
+            if (iconClass != null) {
+                icon(iconClass, baseClass = "empty-state".component("icon"))
             }
-            title(size = Size.LG) {
-                +title
+            val titleSize = when (size) {
+                XL -> XL_4
+                XS -> MD
+                else -> LG
             }
-            content(this)
-        }
+            title(size = titleSize) { +title }
+            content(it)
+        })
     }
 }
 
-public class EmptyStateBody internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job)
-
+/**
+ * Empty state content component.
+ */
 public class EmptyStateContent internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("empty-state".component("content"), baseClass), job)
