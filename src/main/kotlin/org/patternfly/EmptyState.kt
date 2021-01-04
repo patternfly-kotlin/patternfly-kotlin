@@ -102,7 +102,7 @@ public fun EmptyStateContent.emptyStateBody(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = baseClass, job), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job), content)
 
 /**
  * Creates a [Div] container for the primary action of the [EmptyState] component. Use this function if you have a special use case like multiple elements as primary action.
@@ -180,9 +180,8 @@ public class EmptyState internal constructor(
 
     init {
         markAs(ComponentType.EmptyState)
-        register(
-            EmptyStateContent(id = null, baseClass = null, job = job),
-            {
+        register(EmptyStateContent(id = null, baseClass = null, job = job)) { esc ->
+            with(esc) {
                 if (iconClass != null) {
                     icon(iconClass, baseClass = "empty-state".component("icon"))
                 }
@@ -192,9 +191,9 @@ public class EmptyState internal constructor(
                     else -> LG
                 }
                 title(size = titleSize) { +title }
-                content(it)
+                content(esc)
             }
-        )
+        }
     }
 }
 
