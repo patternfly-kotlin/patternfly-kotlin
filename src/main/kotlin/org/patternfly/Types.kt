@@ -90,6 +90,7 @@ internal fun ParentNode.querySelector(componentType: ComponentType): Element? = 
 
 @Suppress("EnumNaming")
 internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
+    Accordion("ac", "accordion".component()),
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
     Badge("bdg", "badge".component()),
