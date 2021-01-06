@@ -46,6 +46,7 @@ import kotlinext.js.require
 fun main() {
     require("@patternfly/patternfly/patternfly.css")
     require("@patternfly/patternfly/patternfly-addons.css")
+}
 ```
 
 Another option is to download or get PatternFly using a CDN provider like [jsDelivr](https://www.jsdelivr.com/package/npm/@patternfly/patternfly) and include the stylesheets in your HTML page:
@@ -73,9 +74,7 @@ The typical setup in PatternFly starts with adding a [Page](https://patternfly-k
 A typical setup might look something like this:
 
 ```kotlin
-
 fun main() {
-
     val router = Router(StringRoute("#home"))
     render {
         page {
@@ -149,7 +148,7 @@ fun main() {
             cardBody { +"Body" }
             cardFooter { +"Footer" }
         }
-    }    
+    }.mount("entrypoint")    
 }
 ```
 
@@ -189,7 +188,7 @@ fun main() {
                 }
             }
         }
-    }
+    }.mount("entrypoint")
 }
 ```
 
