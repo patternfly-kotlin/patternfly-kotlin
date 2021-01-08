@@ -75,7 +75,7 @@ A typical setup might look something like this:
 
 ```kotlin
 fun main() {
-    val router = Router(StringRoute("#home"))
+    val router = router("home")
     render {
         page {
             pageHeader {
@@ -90,9 +90,9 @@ fun main() {
             pageSidebar {
                 sidebarBody {
                     verticalNavigation(router) {
-                        navigationItems {
-                            navigationItem("#item1", "Item 1")
-                            navigationItem("#item2", "Item 2")
+                        items {
+                            item("item1", "Item 1")
+                            item("item2", "Item 2")
                         }
                     }
                 }
