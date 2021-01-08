@@ -22,7 +22,7 @@ import org.w3c.dom.HTMLInputElement
 // ------------------------------------------------------ dsl
 
 /**
- * Creates a new pagination component based on the specified [ItemStore]. Use this function to bind the pagination component to an [ItemStore].
+ * Creates a new pagination component based on the specified [ItemsStore]. Use this function to bind the pagination component to an [ItemsStore].
  *
  * @param store the item store
  * @param pageSizes the size of one page
@@ -34,7 +34,7 @@ import org.w3c.dom.HTMLInputElement
  * @sample org.patternfly.sample.PaginationSample.itemStore
  */
 public fun <T> RenderContext.pagination(
-    store: ItemStore<T>,
+    store: ItemsStore<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
@@ -70,7 +70,7 @@ public fun RenderContext.pagination(
 }
 
 /**
- * Creates a new pagination component inside the specified [ToolbarItem] based on the specified [ItemStore].
+ * Creates a new pagination component inside the specified [ToolbarItem] based on the specified [ItemsStore].
  *
  * @receiver the toolbar item this pagination component is part of
  *
@@ -84,7 +84,7 @@ public fun RenderContext.pagination(
  * @sample org.patternfly.sample.PaginationSample.toolbar
  */
 public fun <T> ToolbarItem.pagination(
-    store: ItemStore<T>,
+    store: ItemsStore<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
@@ -113,7 +113,7 @@ public fun <T> ToolbarItem.pagination(
  *
  * A pagination component gives users more navigational capability on pages with content views.
  *
- * Usually a pagination component is part of a toolbar and is bound to an [ItemStore].
+ * Usually a pagination component is part of a toolbar and is bound to an [ItemsStore].
  *
  * @sample org.patternfly.sample.PaginationSample.toolbar
  */

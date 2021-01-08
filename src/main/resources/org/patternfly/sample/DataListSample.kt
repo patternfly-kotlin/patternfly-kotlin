@@ -5,7 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.Notification
 import org.patternfly.dataList
 import org.patternfly.dataListAction
@@ -25,7 +25,7 @@ internal interface DataListSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
             dataList(store) {
                 display { demo ->
                     dataListItem(demo) {
@@ -85,7 +85,7 @@ internal interface DataListSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
             store.selection handledBy Notification.add { selection ->
                 default("Selection: $selection.")
             }

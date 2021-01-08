@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
  * @param idProvider used to uniquely identify each item
  * @param T the type of the payload
  */
-public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
+public class ItemsStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
     WithIdProvider<T>,
     RootStore<Items<T>>(Items(idProvider)),
     PageInfoHandler {
@@ -166,7 +166,7 @@ public class ItemStore<T>(override val idProvider: IdProvider<T, String> = { it.
     }
 
     internal companion object {
-        internal val NOOP: ItemStore<Unit> = ItemStore()
+        internal val NOOP: ItemsStore<Unit> = ItemsStore()
     }
 }
 

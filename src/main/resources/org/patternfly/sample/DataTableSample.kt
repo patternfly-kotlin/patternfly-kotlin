@@ -5,7 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.Notification
 import org.patternfly.SortInfo
 import org.patternfly.dataTable
@@ -29,7 +29,7 @@ internal interface DataTableSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
             dataTable(store) {
                 dataTableCaption { +"Demo Table" }
                 dataTableColumns {
@@ -96,7 +96,7 @@ internal interface DataTableSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
             store.selection handledBy Notification.add { selection ->
                 default("Selection: $selection.")
             }

@@ -18,7 +18,7 @@ import org.w3c.dom.HTMLDivElement
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public fun <T> RenderContext.cardView(
-    store: ItemStore<T> = ItemStore(),
+    store: ItemsStore<T> = ItemsStore(),
     id: String? = null,
     baseClass: String? = null,
     content: CardView<T>.() -> Unit = {}
@@ -29,16 +29,16 @@ public fun <T> RenderContext.cardView(
 /**
  * PatternFly [card view](https://www.patternfly.org/v4/components/card/design-guidelines/#card-view-usage) component.
  *
- * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemStore] as [Card]s.
+ * A card view is a grid of cards that displays a small to moderate amount of content. The card view uses a [display] function to render the items in the [ItemsStore] as [Card]s.
  *
- * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the card components implement [WithIdProvider], this can be easily done using [WithIdProvider.itemId].
+ * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemsStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the card components implement [WithIdProvider], this can be easily done using [WithIdProvider.itemId].
  *
  * @param T the type which is used for the [Card]s in this card view.
  *
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public class CardView<T> internal constructor(
-    internal val itemStore: ItemStore<T>,
+    internal val itemsStore: ItemsStore<T>,
     id: String?,
     baseClass: String?,
     job: Job
@@ -58,9 +58,9 @@ public class CardView<T> internal constructor(
     }
 
     /**
-     * Defines how to display the items in the [ItemStore] as [Card]s.
+     * Defines how to display the items in the [ItemsStore] as [Card]s.
      */
     public fun display(display: (T) -> Card<T>) {
-        itemStore.page.renderEach({ itemStore.idProvider(it) }) { item -> display(item) }
+        itemsStore.page.renderEach({ itemsStore.idProvider(it) }) { item -> display(item) }
     }
 }

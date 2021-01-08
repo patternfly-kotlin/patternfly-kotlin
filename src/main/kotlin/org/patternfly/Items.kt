@@ -3,7 +3,7 @@ package org.patternfly
 import dev.fritz2.lenses.IdProvider
 
 /**
- * Immutable collection of items used in [ItemStore]. Items can be paged, filtered, selected and sorted. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
+ * Immutable collection of items used in [ItemsStore]. Items can be paged, filtered, selected and sorted. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
  *
  * Items can be obtained using different properties:
  *

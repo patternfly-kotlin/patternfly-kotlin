@@ -42,7 +42,7 @@ import org.w3c.dom.set
  * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.dataTable(
-    store: ItemStore<T> = ItemStore(),
+    store: ItemsStore<T> = ItemsStore(),
     id: String? = null,
     baseClass: String? = null,
     content: DataTable<T>.() -> Unit = {}
@@ -70,7 +70,7 @@ public fun <T> DataTable<T>.dataTableColumns(block: Columns<T>.() -> Unit) {
 }
 
 /**
- * Creates a [DataColumn] to render the actual data from the [ItemStore]. Use this function multiple times to add columns for each item property you want to render.
+ * Creates a [DataColumn] to render the actual data from the [ItemsStore]. Use this function multiple times to add columns for each item property you want to render.
  *
  * @param id the ID of the cell element
  * @param baseClass optional CSS class that should be applied to the cell element
@@ -144,19 +144,19 @@ private val RADIO_GROUP_NAME = Id.unique(ComponentType.DataTable.id, "radio")
 /**
  * PatternFly [table](https://www.patternfly.org/v4/components/table/design-guidelines) component.
  *
- * A table is used to display large data sets that can be easily laid out in a simple grid with column headers. The table contains different [Column]s to render the items of an [ItemStore]. Each item is rendered as one row.
+ * A table is used to display large data sets that can be easily laid out in a simple grid with column headers. The table contains different [Column]s to render the items of an [ItemsStore]. Each item is rendered as one row.
  *
  * The columns are used to render both the header and the rows of the data table. The order in which you define the columns defines the visual representation of the data table. You can choose between these columns:
  *
  * 1. [ToggleColumn]: Use this column *exactly once* to add an expandable row below each normal row. The column uses a display function to render the expandable content. If used this column should be the first column.
  * 1. [SelectColumn]: Use this column *exactly once* to add a checkbox or a radio button which you can use to select rows. If used this column should be should be placed after the toggle column and before the data columns.
- * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
+ * 1. [DataColumn]: Use this column *any number of times* to show the actual data of the items. The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemsStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
  * 1. [ActionColumn]: Use this column *any number of times* to add buttons, dropdowns or other action-like elements. The column uses a display function for the cells. This column should be placed after the data columns.
  *
  * @sample org.patternfly.sample.DataTableSample.dataTable
  */
 public class DataTable<T> internal constructor(
-    internal val itemStore: ItemStore<T>,
+    internal val itemsStore: ItemsStore<T>,
     id: String?,
     baseClass: String?,
     job: Job
@@ -202,10 +202,10 @@ public class DataTable<T> internal constructor(
         }
 
         if (columns.hasToggle) {
-            this@DataTable.itemStore.page.renderShifted(
+            this@DataTable.itemsStore.page.renderShifted(
                 1,
                 this,
-                { itemStore.idProvider(it) },
+                { itemsStore.idProvider(it) },
                 { item ->
                     DataTableExpandableBody(this@DataTable, item, job)
                 }
@@ -213,7 +213,7 @@ public class DataTable<T> internal constructor(
         } else {
             tbody {
                 attr("role", "rowgroup")
-                this@DataTable.itemStore.page.renderEach({ this@DataTable.itemStore.idProvider(it) }) { item ->
+                this@DataTable.itemsStore.page.renderEach({ this@DataTable.itemsStore.idProvider(it) }) { item ->
                     tr {
                         renderCells(this@DataTable, item, "", null)
                     }
@@ -230,9 +230,9 @@ public class DataTable<T> internal constructor(
                     type("checkbox")
                     aria["label"] = "Select all"
                     changes.states().filter { !it }
-                        .map { } handledBy this@DataTable.itemStore.selectNone
+                        .map { } handledBy this@DataTable.itemsStore.selectNone
                     changes.states().filter { it }
-                        .map { } handledBy this@DataTable.itemStore.selectAll
+                        .map { } handledBy this@DataTable.itemsStore.selectAll
                 }
             }
         }
@@ -249,13 +249,13 @@ public class DataTable<T> internal constructor(
                 attr("scope", "col")
                 attr("role", "columnheader")
                 if (column.sortInfo != null) {
-                    aria["sort"] = this@DataTable.itemStore.data.map {
+                    aria["sort"] = this@DataTable.itemsStore.data.map {
                         if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                             if (it.sortInfo.ascending) "ascending" else "descending"
                         } else "none"
                     }
                     classMap(
-                        this@DataTable.itemStore.data.map {
+                        this@DataTable.itemsStore.data.map {
                             mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
                         }
                     )
@@ -276,14 +276,14 @@ public class DataTable<T> internal constructor(
     private fun renderSortButton(th: Th, column: DataColumn<T>) {
         with(th) {
             button(baseClass = "table".component("button")) {
-                clicks.map { column.sortInfo!! } handledBy this@DataTable.itemStore.sortOrToggle
+                clicks.map { column.sortInfo!! } handledBy this@DataTable.itemsStore.sortOrToggle
                 span(baseClass = "table".component("text")) {
                     +column.caption
                 }
                 span(baseClass = "table".component("sort", "indicator")) {
                     icon("arrows-alt-v".fas()) {
                         iconClass(
-                            this@DataTable.itemStore.data.map {
+                            this@DataTable.itemsStore.data.map {
                                 if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
                                     if (it.sortInfo.ascending)
                                         "long-arrow-alt-up".fas()
@@ -362,7 +362,7 @@ internal fun <T> Tr.renderCells(
     expanded: ExpandedStore?,
 ) {
     attr("role", "row")
-    val itemId = dataTable.itemStore.idProvider(item)
+    val itemId = dataTable.itemsStore.idProvider(item)
     attr("rowId", "$itemId-row")
     dataTable.columns.forEach { column ->
         when (column) {
@@ -420,16 +420,16 @@ private fun <T> Tr.renderSelectCell(
                 type("checkbox")
                 name("$itemId-check")
                 aria["labelledby"] = itemId
-                checked(dataTable.itemStore.data.map { it.isSelected(item) })
-                changes.states().map { Pair(item, it) } handledBy dataTable.itemStore.select
+                checked(dataTable.itemsStore.data.map { it.isSelected(item) })
+                changes.states().map { Pair(item, it) } handledBy dataTable.itemsStore.select
             }
         } else if (column.selectionMode == SINGLE) {
             input {
                 type("radio")
                 name(RADIO_GROUP_NAME) // same name for all radios == radio group
                 aria["labelledby"] = itemId
-                checked(dataTable.itemStore.data.map { it.isSelected(item) })
-                changes.states().map { item } handledBy dataTable.itemStore.selectOnly
+                checked(dataTable.itemsStore.data.map { it.isSelected(item) })
+                changes.states().map { item } handledBy dataTable.itemsStore.selectOnly
             }
         }
     }
@@ -521,9 +521,9 @@ public sealed class Column<T>(
 )
 
 /**
- * Column to show the actual data of an item in the [ItemStore]. Use this column any number of times to render the properties of the items.
+ * Column to show the actual data of an item in the [ItemsStore]. Use this column any number of times to render the properties of the items.
  *
- * The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
+ * The column uses display functions for the header and cells. One of the tags used in the cell display function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemsStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since [DataTable] implements [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
  *
  * If you want to make the column sortable, use one of the `sortInfo()` function to specify a [Comparator].
  *
@@ -536,7 +536,7 @@ public class DataColumn<T>(
     id: String?,
     baseClass: String?,
     internal val caption: String
-) : Column<T>(columns, id, baseClass), WithIdProvider<T> by columns.dataTable.itemStore {
+) : Column<T>(columns, id, baseClass), WithIdProvider<T> by columns.dataTable.itemsStore {
 
     internal var cellDisplay: ComponentDisplay<Td, T> = { +it.toString() }
     internal var headerClass: String? = null
@@ -582,9 +582,9 @@ public class DataColumn<T>(
 /**
  * Column to add a checkbox or a radio button which you can use to (de)select rows. Depending on the value of [DataTableSelection] a checkbox or a radio button is used to select rows.
  *
- * The selection is bound to the selection state of the [ItemStore].
+ * The selection is bound to the selection state of the [ItemsStore].
  *
- * You can use the [ItemStore] to track the selection of an item.
+ * You can use the [ItemsStore] to track the selection of an item.
  *
  * @sample org.patternfly.sample.DataTableSample.selects
  */

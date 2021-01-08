@@ -3,7 +3,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.dom.Id
 import dev.fritz2.lenses.IdProvider
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.dataList
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
@@ -15,7 +15,7 @@ internal interface WithIdProviderSample {
             // this ID provider will be used below
             val idProvider: IdProvider<String, String> = { Id.build(it) }
 
-            dataList(ItemStore(idProvider)) {
+            dataList(ItemsStore(idProvider)) {
                 display {
                     dataListItem(it) {
                         dataListRow(id = itemId(it)) {

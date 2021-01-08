@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.map
 import org.patternfly.dom.plusAssign
 
 public fun <T> ToolbarItem.bulkSelect(
-    itemStore: ItemStore<T>,
+    itemsStore: ItemsStore<T>,
     id: String? = null,
     baseClass: String? = null,
     content: Dropdown<PreSelection>.() -> Unit = {}
@@ -15,13 +15,13 @@ public fun <T> ToolbarItem.bulkSelect(
     return dropdown(id = id, baseClass = baseClass) {
         checkboxToggle {
             text {
-                itemStore.selected.map {
+                itemsStore.selected.map {
                     if (it == 0) "" else "$it selected"
                 }.asText()
             }
             checkbox {
                 triState(
-                    itemStore.data.map {
+                    itemsStore.data.map {
                         when {
                             it.selected.isEmpty() -> TriState.OFF
                             it.selected.size == it.items.size -> TriState.ON
@@ -29,15 +29,15 @@ public fun <T> ToolbarItem.bulkSelect(
                         }
                     }
                 )
-                changes.states().filter { !it }.map { } handledBy itemStore.selectNone
-                changes.states().filter { it }.map { } handledBy itemStore.selectAll
+                changes.states().filter { !it }.map { } handledBy itemsStore.selectNone
+                changes.states().filter { it }.map { } handledBy itemsStore.selectAll
             }
         }
         display { +it.text }
         items {
             PreSelection.values().map { item(it) }
         }
-        store.selects.unwrap() handledBy itemStore.preSelect
+        store.selects.unwrap() handledBy itemsStore.preSelect
         content(this)
     }
 }

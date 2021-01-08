@@ -1,7 +1,7 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.PageInfo
 import org.patternfly.pagination
 import org.patternfly.toolbar
@@ -15,7 +15,7 @@ internal interface PaginationSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
 
             pagination(store)
         }
@@ -31,7 +31,7 @@ internal interface PaginationSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
 
             toolbar {
                 toolbarContent {

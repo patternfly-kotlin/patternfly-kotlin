@@ -2,7 +2,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.card
 import org.patternfly.cardAction
 import org.patternfly.cardBody
@@ -21,7 +21,7 @@ internal interface CardViewSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = ItemStore<Demo> { it.id }
+            val store = ItemsStore<Demo> { it.id }
             cardView(store) {
                 display { demo ->
                     card(demo) {

@@ -3,7 +3,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import org.patternfly.ItemStore
+import org.patternfly.ItemsStore
 import org.patternfly.Notification
 import org.patternfly.dataList
 import org.patternfly.dataListItem
@@ -22,7 +22,7 @@ internal interface DrawerSample {
 
     fun drawerSetup() {
         render {
-            val store = ItemStore<String>()
+            val store = ItemsStore<String>()
 
             val drawer = drawer {
                 drawerSection {
