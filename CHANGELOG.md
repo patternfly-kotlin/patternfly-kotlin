@@ -11,16 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - No match found
     - Spinner
 - Expandable cards ([#10](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/10))
+- Navigation enhancements ([#38](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/38))
+    - Horizontal scrolling
+    - Tertiary navigation
 - Spinner component ([#51](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/51))  
 - Text component ([#53](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/53))
 - Title component ([#58](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/58))
 - Vertical divider ([#19](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/19))
 
 ### Changed
-- Documentation for empty state component ([#22](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/22))
-- Documentation for pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
-- Documentation for switch component ([#70](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/70))
-- Documentation for tab component ([#71](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/71))
+- Documentation of empty state component ([#22](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/22))
+- Documentation of navigation component ([#38](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/38))
+- Documentation of pagination component ([#69](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/69))
+- Documentation of switch component ([#70](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/70))
+- Documentation of tab component ([#71](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/71))
 - Refactoring: `CollapseExpandStore` → `ExpandedStore`
 
 ### Fixed
