@@ -151,7 +151,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * **Rendering entries**
  *
- * By default the options menu uses a builtin function to render the [Item]s in the [OptionsMenuStore]. It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
+ * By default the options menu uses a builtin function to render the [Item]s in the [OptionsMenuStore]. This function takes the [Item.text] into account (if specified). If [Item.text] is `null`, the builtin function falls back to `Item.item.toString()`.
  *
  * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the options menu entries.
  *
@@ -179,10 +179,9 @@ public class OptionsMenu<T> internal constructor(
     job
 ) {
 
-    private var selector: (T) -> String = { it.toString() }
     private var customDisplay: ComponentDisplay<Button, T>? = null
     private var defaultDisplay: ComponentDisplay<Button, Item<T>> = { item ->
-        +this@OptionsMenu.selector(item.item)
+        +(item.text ?: item.item.toString())
     }
 
     private var toggle: Toggle<T, Node> = RecordingToggle()
@@ -302,13 +301,6 @@ public class OptionsMenu<T> internal constructor(
                     "Toggle has already been assigned to ${this.toggle::class.simpleName}."
             )
         }
-    }
-
-    /**
-     * Sets the selector which is used by the built in display function to select a string from `T`.
-     */
-    public fun selector(selector: (T) -> String) {
-        this.selector = selector
     }
 
     /**

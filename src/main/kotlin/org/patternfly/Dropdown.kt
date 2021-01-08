@@ -221,7 +221,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * **Rendering entries**
  *
- * By default the dropdown uses a builtin function to render the [Item]s in the [DropdownStore]. This function takes the [Item.icon] and the [Item.description] into account (if specified). It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
+ * By default the dropdown uses a builtin function to render the [Item]s in the [DropdownStore]. This function takes the [Item.text], [Item.icon] and the [Item.description] into account (if specified). If [Item.text] is `null`, the builtin function falls back to `Item.item.toString()`.
  *
  * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the dropdown entries.
  *
@@ -247,7 +247,6 @@ public class Dropdown<T> internal constructor(
     job
 ) {
 
-    private var selector: (T) -> String = { it.toString() }
     private var customDisplay: ComponentDisplay<Button, T>? = null
     private var defaultDisplay: ComponentDisplay<Button, Item<T>> = { item ->
         if (item.description != null) {
@@ -257,7 +256,7 @@ public class Dropdown<T> internal constructor(
                         iconDisplay(this)
                     }
                 }
-                +this@Dropdown.selector(item.item)
+                +(item.text ?: item.item.toString())
             }
             div(baseClass = "dropdown".component("menu-item", "description")) {
                 +item.description
@@ -268,7 +267,7 @@ public class Dropdown<T> internal constructor(
                     iconDisplay(this)
                 }
             }
-            +this@Dropdown.selector(item.item)
+            +(item.text ?: item.item.toString())
         }
     }
 
@@ -387,13 +386,6 @@ public class Dropdown<T> internal constructor(
                     "Toggle has already been assigned to ${this.toggle::class.simpleName}."
             )
         }
-    }
-
-    /**
-     * Sets the selector which is used by the built in display function to select a string from `T`.
-     */
-    public fun selector(selector: (T) -> String) {
-        this.selector = selector
     }
 
     /**

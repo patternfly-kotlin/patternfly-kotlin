@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.dom.clear
 import org.patternfly.DividerVariant.HR
 import org.patternfly.DividerVariant.LI
 import org.patternfly.Orientation.HORIZONTAL
@@ -162,14 +163,16 @@ public fun <T> Navigation<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * Items in a vertical navigation can be flat or grouped. When groups are used the value of `expandable` matters:
  *
- * - `expandable == true`: Items in a group without a title are rendered as flat items before all other groups. Items in groups with a title are rendered as expandable groups.
- * - `expandable == false`: All groups / items are treated equally.
+ * - `expandable == true`: Items in a group without a text are rendered as flat items before all other groups. Items in groups with a text are rendered as expandable groups.
+ * - `expandable == false`: All groups should have a text and are treated equally.
  *
  * **Tertiary navigation**
  *
  * While global navigation controls what users are seeing at the application-level, local navigation provides more granular navigation specific to a particular page or window in the application. For example, a user might use global navigation to get to a settings page, and then use local navigation to access privacy and general user settings.
  *
- * The data in the navigation component is managed by a [NavigationStore] and is wrapped inside instances of [Item].
+ * **Entries**
+ *
+ * The data in the navigation component is managed by a [NavigationStore] and is wrapped inside instances of [Item]. The type of the [Router] must match the type of the [Item]s.
  *
  * **Adding entries**
  *
@@ -183,7 +186,7 @@ public fun <T> Navigation<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * **Routing**
  *
- * The passed [Router] is used for the navigation (updates the location & history).
+ * The passed [Router] is used for the actual navigation (updates the location & history). As mentioned above the type of the [Router] must match the type of the [Item]s.
  *
  * @sample org.patternfly.sample.NavigationSample.expandable
  */
@@ -220,22 +223,28 @@ public class Navigation<T> internal constructor(
             aria["label"] = "Global"
         }
 
-        if (orientation == HORIZONTAL) {
-            horizontal()
-        } else {
-            if (store.data.value.groups.isEmpty()) {
-                flat()
-            } else {
-                if (expandable) {
-                    verticalExpandable()
+        (MainScope() + job).launch {
+            store.data.collect { entries ->
+                domNode.clear()
+
+                if (orientation == HORIZONTAL) {
+                    horizontal(entries)
                 } else {
-                    verticalGrouped()
+                    if (entries.groups.isEmpty()) {
+                        flat(entries)
+                    } else {
+                        if (expandable) {
+                            verticalExpandable(entries)
+                        } else {
+                            verticalGrouped(entries)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun horizontal() {
+    private fun RenderContext.horizontal(entries: Entries<T>) {
         button(baseClass = "nav".component("scroll", "button")) {
             aria["label"] = "Scroll left"
             disabled(this@Navigation.scrollStore.data.map { it.disableLeft })
@@ -245,7 +254,7 @@ public class Navigation<T> internal constructor(
             }
             icon("angle-left".fas())
         }
-        flat()
+        flat(entries)
         button(baseClass = "nav".component("scroll", "button")) {
             aria["label"] = "Scroll right"
             disabled(this@Navigation.scrollStore.data.map { it.disableRight })
@@ -257,9 +266,9 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun flat() {
+    private fun RenderContext.flat(entries: Entries<T>) {
         ul(baseClass = "nav".component("list")) {
-            this@Navigation.store.entries.renderEach { entry ->
+            entries.entries.forEach { entry ->
                 when (entry) {
                     is Group -> {
                         li(baseClass = "display-none".util()) {
@@ -288,8 +297,8 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalGrouped() {
-        store.entries.renderEach { entry ->
+    private fun RenderContext.verticalGrouped(entries: Entries<T>) {
+        entries.entries.forEach { entry ->
             when (entry) {
                 is Group<T> -> {
                     val headerId = Id.unique(ComponentType.Navigation.id, "grp")
@@ -304,7 +313,7 @@ public class Navigation<T> internal constructor(
                 is Item<T> -> {
                     section(baseClass = "display-none".util()) {
                         attr("hidden", true)
-                        val message = "Flat items are not supported for vertical grouped navigation"
+                        val message = "Flat items are not supported for grouped vertical navigation"
                         !message
                         console.warn("$message: ${domNode.debug()}")
                     }
@@ -316,22 +325,21 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalExpandable() {
+    private fun RenderContext.verticalExpandable(entries: Entries<T>) {
         ul(baseClass = "nav".component("list")) {
             // turn entries.all into a list containing
             // 1) the items and separators of all unnamed groups and
             // 2) all other entries
-            this@Navigation.store.data.map { entries ->
-                val (unnamedGroups, allOtherEntries) =
-                    entries.all.partition { it is Group<T> && it.text == null }
-                val itemsAndSeparatorsOfUnnamedGroups = unnamedGroups.flatMap { entry ->
-                    when (entry) {
-                        is Group<T> -> emptyList()
-                        else -> listOf(entry)
-                    }
+            val (unnamedGroups, allOtherEntries) =
+                entries.all.partition { it is Group<T> && it.text == null }
+            console.log("entries partitions")
+            val itemsAndSeparatorsOfUnnamedGroups = unnamedGroups.flatMap { entry ->
+                when (entry) {
+                    is Group<T> -> entry.entries.filter { it is Item<T> || it is Separator<T> }
+                    else -> listOf(entry)
                 }
-                entries.copy(all = itemsAndSeparatorsOfUnnamedGroups + allOtherEntries)
-            }.map { it.entries }.renderEach { entry ->
+            }
+            entries.copy(all = itemsAndSeparatorsOfUnnamedGroups + allOtherEntries).entries.forEach { entry ->
                 when (entry) {
                     is Group -> {
                         register(ExpandableGroup(this@Navigation, entry, job), {})
@@ -397,10 +405,7 @@ internal class ExpandableGroup<T>(
         section("nav".component("subnav")) {
             aria["labelledby"] = buttonId
             attr("hidden", this@ExpandableGroup.expanded.data.map { !it })
-
-            // navigationItems(this@ExpandableGroup.navigation) {
-            //     content(this)
-            // }
+            renderGroupEntries(this@ExpandableGroup.navigation, this@ExpandableGroup.group)
         }
     }
 }
@@ -431,11 +436,11 @@ private fun <T> RenderContext.renderLink(navigation: Navigation<T>, item: Item<T
             clicks.map { item.unwrap() } handledBy navigation.router.navTo
             classMap(
                 navigation.router.data.map { route ->
-                    mapOf("current".modifier() to (route == item))
+                    mapOf("current".modifier() to (route == item.unwrap()))
                 }
             )
             aria["current"] = navigation.router.data.map { route ->
-                if (route == item) "page" else ""
+                if (route == item.unwrap()) "page" else ""
             }
             if (navigation.display != null) {
                 navigation.display?.invoke(this, item.unwrap())
