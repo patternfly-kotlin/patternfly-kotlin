@@ -22,7 +22,6 @@ import org.patternfly.dom.isInView
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLUListElement
-import org.w3c.dom.asList
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
@@ -131,8 +130,7 @@ public class Tabs<T> internal constructor(
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job) {
 
-    @Suppress("MemberNameEqualsClassName")
-    private lateinit var tabs: Ul
+    private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
     private var tabDisplay: ComponentDisplay<Span, T> = { +it.toString() }
     private var contentDisplay: ComponentDisplay<TabContent<T>, T> = {}
@@ -158,10 +156,10 @@ public class Tabs<T> internal constructor(
                 aria["label"] = "Scroll left"
                 disabled(this@Tabs.scrollStore.data.map { it.disableLeft })
                 aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableLeft.toString() }
-                domNode.onclick = { this@Tabs.scrollLeft(this@Tabs.tabs.domNode) }
+                domNode.onclick = { this@Tabs.ul.domNode.scrollLeft() }
                 icon("angle-left".fas())
             }
-            this@Tabs.tabs = ul(baseClass = "tabs".component("list")) {
+            this@Tabs.ul = ul(baseClass = "tabs".component("list")) {
                 // update scroll buttons, when scroll event has been fired
                 // e.g. by scrollLeft() or scrollRight()
                 scrolls.map { this@Tabs.updateScrollButtons(domNode) }
@@ -194,7 +192,7 @@ public class Tabs<T> internal constructor(
                 aria["label"] = "Scroll right"
                 disabled(this@Tabs.scrollStore.data.map { it.disableRight })
                 aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableRight.toString() }
-                domNode.onclick = { this@Tabs.scrollRight(this@Tabs.tabs.domNode) }
+                domNode.onclick = { this@Tabs.ul.domNode.scrollRight() }
                 icon("angle-right".fas())
             }
         }
@@ -226,14 +224,14 @@ public class Tabs<T> internal constructor(
         )
 
         // update scroll buttons, when tab items have been updated
-        store.data.map { updateScrollButtons(tabs.domNode) }.filterNotNull() handledBy scrollStore.update
+        store.data.map { updateScrollButtons(ul.domNode) }.filterNotNull() handledBy scrollStore.update
 
         // update scroll buttons, when window has been resized
         callbackFlow {
             val listener: (Event) -> Unit = { offer(it) }
             window.addEventListener(Events.resize.name, listener)
             awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
-        }.map { updateScrollButtons(tabs.domNode) }.filterNotNull() handledBy scrollStore.update
+        }.map { updateScrollButtons(ul.domNode) }.filterNotNull() handledBy scrollStore.update
     }
 
     /**
@@ -266,47 +264,6 @@ public class Tabs<T> internal constructor(
             ScrollButton(showButtons, disableLeft, disableRight)
         } else null
     }
-
-    // find first Element that is fully in view on the left, then scroll to the element before it
-    private fun scrollLeft(tabs: HTMLUListElement) {
-        var firstElementInView: HTMLElement? = null
-        var lastElementOutOfView: HTMLElement? = null
-        val iterator = tabs.childNodes.asList().filterIsInstance<HTMLElement>().listIterator()
-
-        while (iterator.hasNext() && firstElementInView == null) {
-            val child = iterator.next()
-            if (child.isInView(tabs)) {
-                firstElementInView = child
-                if (iterator.hasPrevious()) {
-                    lastElementOutOfView = iterator.previous()
-                }
-            }
-        }
-        if (lastElementOutOfView != null) {
-            tabs.scrollLeft -= lastElementOutOfView.scrollWidth
-        }
-    }
-
-    // find last Element that is fully in view on the right, then scroll to the element after it
-    private fun scrollRight(tabs: HTMLUListElement) {
-        var lastElementInView: HTMLElement? = null
-        var firstElementOutOfView: HTMLElement? = null
-        val elements = tabs.childNodes.asList().filterIsInstance<HTMLElement>()
-        val iterator = elements.listIterator(elements.size)
-
-        while (iterator.hasPrevious() && lastElementInView == null) {
-            val child = iterator.previous()
-            if (child.isInView(tabs)) {
-                lastElementInView = child
-                if (iterator.hasNext()) {
-                    firstElementOutOfView = iterator.next()
-                }
-            }
-        }
-        if (firstElementOutOfView != null) {
-            tabs.scrollLeft += firstElementOutOfView.scrollWidth
-        }
-    }
 }
 
 /**
@@ -326,8 +283,6 @@ public class TabContent<T> internal constructor(public val item: T, tabId: Strin
 }
 
 // ------------------------------------------------------ store
-
-internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton())
 
 /**
  * Store for a list of [TabItem]s.
@@ -352,12 +307,6 @@ public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.bui
 }
 
 // ------------------------------------------------------ types
-
-internal data class ScrollButton(
-    val showButtons: Boolean = false,
-    val disableLeft: Boolean = true,
-    val disableRight: Boolean = false
-)
 
 /**
  * Wrapper for the data of a tab item.
