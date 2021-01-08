@@ -214,7 +214,6 @@ public class Navigation<T> internal constructor(
         baseClass = classes {
             +ComponentType.Navigation
             +("horizontal".modifier() `when` (orientation == HORIZONTAL))
-            +("scrollable".modifier() `when` (orientation == HORIZONTAL))
             +("tertiary".modifier() `when` tertiary)
             +baseClass
         },
@@ -252,6 +251,12 @@ public class Navigation<T> internal constructor(
         }
 
         if (orientation == HORIZONTAL) {
+            classMap(
+                scrollStore.data.map {
+                    mapOf("scrollable".modifier() to (it.showButtons))
+                }
+            )
+
             // update scroll buttons, when tab items have been updated
             store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
 
