@@ -6,6 +6,19 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
 
+internal fun Element.updateScrollButtons(): ScrollButton? {
+    val left = this.firstElementChild
+    val right = this.lastElementChild
+    return if (left != null && right != null) {
+        val overflowOnLeft = !left.isInView(this)
+        val overflowOnRight = !right.isInView(this)
+        val showButtons = overflowOnLeft || overflowOnRight
+        val disableLeft = !overflowOnLeft
+        val disableRight = !overflowOnRight
+        ScrollButton(showButtons, disableLeft, disableRight)
+    } else null
+}
+
 // find first Element that is fully in view on the left, then scroll to the element before it
 internal fun Element.scrollLeft() {
     var firstElementInView: HTMLElement? = null

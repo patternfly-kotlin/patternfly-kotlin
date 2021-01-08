@@ -18,10 +18,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
-import org.patternfly.dom.isInView
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
@@ -162,7 +160,7 @@ public class Tabs<T> internal constructor(
             this@Tabs.ul = ul(baseClass = "tabs".component("list")) {
                 // update scroll buttons, when scroll event has been fired
                 // e.g. by scrollLeft() or scrollRight()
-                scrolls.map { this@Tabs.updateScrollButtons(domNode) }
+                scrolls.map { domNode.updateScrollButtons() }
                     .filterNotNull()
                     .handledBy(this@Tabs.scrollStore.update)
 
@@ -224,14 +222,14 @@ public class Tabs<T> internal constructor(
         )
 
         // update scroll buttons, when tab items have been updated
-        store.data.map { updateScrollButtons(ul.domNode) }.filterNotNull() handledBy scrollStore.update
+        store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
 
         // update scroll buttons, when window has been resized
         callbackFlow {
             val listener: (Event) -> Unit = { offer(it) }
             window.addEventListener(Events.resize.name, listener)
             awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
-        }.map { updateScrollButtons(ul.domNode) }.filterNotNull() handledBy scrollStore.update
+        }.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
     }
 
     /**
@@ -251,19 +249,6 @@ public class Tabs<T> internal constructor(
     private fun selectId(tabItem: TabItem<T>) = Id.build(store.identifier(tabItem.item), tabItem.selected.toString())
     private fun tabId(item: T) = Id.build(store.identifier(item), "tab")
     private fun contentId(item: T) = Id.build(store.identifier(item), "cnt")
-
-    private fun updateScrollButtons(tabs: HTMLUListElement): ScrollButton? {
-        val first = tabs.firstElementChild
-        val last = tabs.lastElementChild
-        return if (first != null && last != null) {
-            val overflowOnLeft = !first.isInView(tabs)
-            val overflowOnRight = !last.isInView(tabs)
-            val showButtons = overflowOnLeft || overflowOnRight
-            val disableLeft = !overflowOnLeft
-            val disableRight = !overflowOnRight
-            ScrollButton(showButtons, disableLeft, disableRight)
-        } else null
-    }
 }
 
 /**

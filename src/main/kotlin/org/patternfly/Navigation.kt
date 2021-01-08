@@ -2,14 +2,20 @@ package org.patternfly
 
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
+import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
 import dev.fritz2.routing.Router
+import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -26,6 +32,7 @@ import org.patternfly.dom.debug
 import org.patternfly.dom.querySelector
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
+import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ dsl
 
@@ -214,6 +221,7 @@ public class Navigation<T> internal constructor(
         job
     ) {
 
+    private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
     internal var display: ComponentDisplay<A, T>? = null
 
@@ -231,7 +239,7 @@ public class Navigation<T> internal constructor(
                     horizontal(entries)
                 } else {
                     if (entries.groups.isEmpty()) {
-                        flat(entries)
+                        flat(entries, false)
                     } else {
                         if (expandable) {
                             verticalExpandable(entries)
@@ -242,6 +250,18 @@ public class Navigation<T> internal constructor(
                 }
             }
         }
+
+        if (orientation == HORIZONTAL) {
+            // update scroll buttons, when tab items have been updated
+            store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
+
+            // update scroll buttons, when window has been resized
+            callbackFlow {
+                val listener: (Event) -> Unit = { offer(it) }
+                window.addEventListener(Events.resize.name, listener)
+                awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
+            }.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
+        }
     }
 
     private fun RenderContext.horizontal(entries: Entries<T>) {
@@ -249,25 +269,29 @@ public class Navigation<T> internal constructor(
             aria["label"] = "Scroll left"
             disabled(this@Navigation.scrollStore.data.map { it.disableLeft })
             aria["hidden"] = this@Navigation.scrollStore.data.map { it.disableLeft.toString() }
-            domNode.onclick = {
-                this@Navigation.domNode.querySelector(By.classname("nav".component("list")))?.scrollLeft()
-            }
+            domNode.onclick = { this@Navigation.ul.domNode.scrollLeft() }
             icon("angle-left".fas())
         }
-        flat(entries)
+        flat(entries, true)
         button(baseClass = "nav".component("scroll", "button")) {
             aria["label"] = "Scroll right"
             disabled(this@Navigation.scrollStore.data.map { it.disableRight })
             aria["hidden"] = this@Navigation.scrollStore.data.map { it.disableRight.toString() }
-            domNode.onclick = {
-                this@Navigation.domNode.querySelector(By.classname("nav".component("list")))?.scrollRight()
-            }
+            domNode.onclick = { this@Navigation.ul.domNode.scrollRight() }
             icon("angle-right".fas())
         }
     }
 
-    private fun RenderContext.flat(entries: Entries<T>) {
-        ul(baseClass = "nav".component("list")) {
+    private fun RenderContext.flat(entries: Entries<T>, scroll: Boolean) {
+        ul = ul(baseClass = "nav".component("list")) {
+            if (scroll) {
+                // update scroll buttons, when scroll event has been fired
+                // e.g. by scrollLeft() or scrollRight()
+                scrolls.map { domNode.updateScrollButtons() }
+                    .filterNotNull()
+                    .handledBy(this@Navigation.scrollStore.update)
+            }
+
             entries.entries.forEach { entry ->
                 when (entry) {
                     is Group -> {
