@@ -22,6 +22,7 @@ import org.patternfly.textToggle
 import org.patternfly.toggleIcon
 import org.patternfly.toggleImage
 import org.patternfly.toggleText
+import org.patternfly.updateItems
 
 internal interface DropdownSample {
 
@@ -57,16 +58,15 @@ internal interface DropdownSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = DropdownStore<Demo>().apply {
-                items {
-                    item(Demo("foo", "Foo"))
-                    item(Demo("bar", "Bar"))
-                }
-            }
-
+            val store = DropdownStore<Demo>()
             dropdown(store) {
                 textToggle { +"Choose one" }
                 display { demo -> +demo.name }
+            }
+
+            store.updateItems {
+                item(Demo("foo", "Foo"))
+                item(Demo("bar", "Bar"))
             }
         }
     }

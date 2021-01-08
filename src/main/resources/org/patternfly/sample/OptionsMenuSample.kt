@@ -16,6 +16,7 @@ import org.patternfly.optionsMenu
 import org.patternfly.separator
 import org.patternfly.textToggle
 import org.patternfly.unwrapOrNull
+import org.patternfly.updateItems
 
 internal interface OptionsMenuSample {
 
@@ -51,19 +52,19 @@ internal interface OptionsMenuSample {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = OptionsMenuStore<Demo>().apply {
-                singleSelection.unwrapOrNull() handledBy Notification.add { demo ->
+            val store = OptionsMenuStore<Demo>().also {
+                it.singleSelection.unwrapOrNull() handledBy Notification.add { demo ->
                     info("You selected ${demo?.name}")
                 }
-                items {
-                    item(Demo("foo", "Foo"))
-                    item(Demo("bar", "Bar"))
-                }
             }
-
             optionsMenu(store = store) {
                 textToggle { +"Choose one" }
                 display { demo -> +demo.name }
+            }
+
+            store.updateItems {
+                item(Demo("foo", "Foo"))
+                item(Demo("bar", "Bar"))
             }
         }
     }

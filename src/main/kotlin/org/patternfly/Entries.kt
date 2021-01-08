@@ -1,55 +1,9 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import org.patternfly.ItemSelection.MULTIPLE
 import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.ItemSelection.SINGLE_PER_GROUP
-
-/**
- * Enum which controls how to select an [Item] in [Entries].
- */
-@Suppress("unused")
-public enum class ItemSelection {
-
-    /**
-     * Only a single item (across all groups) can be selected at a time.
-     */
-    SINGLE,
-
-    /**
-     * Only one item per group can be selected at a time.
-     */
-    SINGLE_PER_GROUP,
-
-    /**
-     * Multiple items can be selected.
-     */
-    MULTIPLE
-}
-
-/**
- * Abstract store for [Entries].
- *
- * Most of the flows in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
- *
- * @param T the payload of the [Item]s
- *
- * @sample org.patternfly.sample.EntrySample.unwrap
- */
-public abstract class EntriesStore<T> internal constructor(
-    override val idProvider: IdProvider<T, String>,
-    internal val itemSelection: ItemSelection
-) : RootStore<Entries<T>>(Entries(idProvider, emptyList(), itemSelection)),
-    WithIdProvider<T> {
-
-    /**
-     * Flow with the List of [entries][Entry] after an optional filter has been applied.
-     */
-    public val entries: Flow<List<Entry<T>>>
-        get() = data.map { it.entries }
-}
 
 /**
  * Immutable collection of [entries][Entry] used in different stores such as [DropdownStore], [MenuStore], [OptionsMenuStore] or [SelectStore]. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
@@ -63,17 +17,15 @@ public abstract class EntriesStore<T> internal constructor(
  * - [items]: A flat list of all [Item]s based on [entries].
  * - [selection]: A flat list of selected [Item]s based on [all].
  **
- * @param T the payload of the [Item]s
- *
  * @param idProvider used to uniquely identify each item
+ * @param itemSelection defines how to select items
  * @param all all entries managed by this instance
  * @param filter a predicate applied to [all]
- * @param itemSelection defines how to select items
  */
 public data class Entries<T>(
     val idProvider: IdProvider<T, String>,
-    val all: List<Entry<T>> = emptyList(),
     val itemSelection: ItemSelection,
+    val all: List<Entry<T>> = emptyList(),
     private val filter: ItemFilter<T>? = null
 ) {
 
@@ -123,13 +75,13 @@ public data class Entries<T>(
      * A flat list of all [Item]s based on [entries].
      */
     public val items: List<Item<T>>
-        get() = entries.flatItems()
+        get() = flatItems(entries)
 
     /**
      * The selected items based on [all].
      */
     public val selection: List<Item<T>>
-        get() = all.flatItems().filter { it.selected }
+        get() = flatItems(all).filter { it.selected }
 
     /**
      * First selected item (if any)
@@ -138,7 +90,7 @@ public data class Entries<T>(
         get() = selection.firstOrNull()
 
     /**
-     * Adds the specified filter.
+     * Applies the specified filter.
      */
     public fun filter(filter: ItemFilter<T>): Entries<T> = copy(filter = filter)
 
@@ -153,7 +105,7 @@ public data class Entries<T>(
     public fun select(data: T): Entries<T> {
         var groupWithSelection = false
         val itemId = idProvider(data)
-        val item = all.flatItems().find { idProvider(it.item) == itemId }
+        val item = flatItems(all).find { idProvider(it.item) == itemId }
 
         return if (item != null) {
             copy(
@@ -169,7 +121,7 @@ public data class Entries<T>(
                                 SINGLE, SINGLE_PER_GROUP -> {
                                     idProvider(entry.item) == itemId
                                 }
-                                ItemSelection.MULTIPLE -> {
+                                MULTIPLE -> {
                                     if (idProvider(entry.item) == itemId) {
                                         !entry.selected
                                     } else {
@@ -219,7 +171,7 @@ public data class Entries<T>(
                                 }
                             }
                         }
-                        ItemSelection.MULTIPLE -> {
+                        MULTIPLE -> {
                             if (idProvider(groupEntry.item) == itemId) {
                                 !groupEntry.selected
                             } else {
@@ -232,20 +184,42 @@ public data class Entries<T>(
             }
         }
     )
-}
 
-private fun <T> List<Entry<T>>.flatItems(): List<Item<T>> = flatMap { entry ->
-    when (entry) {
-        is Group<T> -> entry.entries.filterIsInstance<Item<T>>()
-        is Item<T> -> listOf(entry)
-        is Separator<T> -> emptyList()
+    private fun <T> flatItems(entries: List<Entry<T>>): List<Item<T>> = entries.flatMap { entry ->
+        when (entry) {
+            is Group<T> -> entry.entries.filterIsInstance<Item<T>>()
+            is Item<T> -> listOf(entry)
+            is Separator<T> -> emptyList()
+        }
+    }
+
+    private fun <T> warnAboutNestedGroups(parent: Group<T>, child: Group<T>) {
+        console.warn(
+            "Nested group detected: " +
+                "Parent group with id ${parent.id} contains nested group with id ${child.id}. " +
+                "Nested groups are not supported!"
+        )
     }
 }
 
-private fun <T> warnAboutNestedGroups(parent: Group<T>, child: Group<T>) {
-    console.warn(
-        "Nested group detected: " +
-            "Parent group with id ${parent.id} contains nested group with id ${child.id}. " +
-            "Nested groups are not supported!"
-    )
+/**
+ * Enum which controls how to select an [Item] in [Entries].
+ */
+@Suppress("unused")
+public enum class ItemSelection {
+
+    /**
+     * Only a single item (across all groups) can be selected at a time.
+     */
+    SINGLE,
+
+    /**
+     * Only one item per group can be selected at a time.
+     */
+    SINGLE_PER_GROUP,
+
+    /**
+     * Multiple items can be selected.
+     */
+    MULTIPLE
 }

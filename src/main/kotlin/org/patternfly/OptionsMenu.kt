@@ -101,7 +101,9 @@ public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: But
 }
 
 /**
- * Starts a block to add flat option menu items using the DSL.
+ * Starts a block to add flat options menu items using the DSL.
+ *
+ * @param block code block for adding the options menu items.
  *
  * @sample org.patternfly.sample.OptionsMenuSample.items
  */
@@ -112,6 +114,8 @@ public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
 
 /**
  * Starts a block to add dropdown groups using the DSL.
+ *
+ * @param block code block for adding the options menu groups.
  *
  * @sample org.patternfly.sample.OptionsMenuSample.groups
  */
@@ -135,7 +139,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [plain text toggle][OptionsMenuPlainTextToggle]
  * - [icon toggle][DropdownIconToggle]
  *
- * The data in the menu is managed by a [OptionsMenuStore].
+ * The data in the menu is managed by a [OptionsMenuStore] and is wrapped inside instances of [Item].
  *
  * **Adding entries**
  *
@@ -149,7 +153,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * By default the options menu uses a builtin function to render the [Item]s in the [OptionsMenuStore]. It uses the function passed to [selector] to select a string from [Item.item] which defaults to `{ it.toString() }`.
  *
- * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the option menu entries.
+ * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the options menu entries.
  *
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuDsl
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuStore
@@ -217,9 +221,6 @@ public class OptionsMenu<T> internal constructor(
 
             this@OptionsMenu.store.entries.renderEach { entry ->
                 when (entry) {
-                    is Item<T> -> {
-                        li(content = this@OptionsMenu.itemContent(entry))
-                    }
                     is Group<T> -> {
                         section(baseClass = "options-menu".component("group")) {
                             entry.text?.let {
@@ -241,6 +242,9 @@ public class OptionsMenu<T> internal constructor(
                                 }
                             }
                         }
+                    }
+                    is Item<T> -> {
+                        li(content = this@OptionsMenu.itemContent(entry))
                     }
                     is Separator<T> -> {
                         if (domNode.tagName.toLowerCase() == "ul") {

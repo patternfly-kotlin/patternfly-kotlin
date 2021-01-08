@@ -13,7 +13,7 @@ import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 class EntriesTests : FunSpec({
 
     test("Empty entries") {
-        with(Entries<Int>({ it.toString() }, emptyList(), SINGLE)) {
+        with(Entries<Int>({ it.toString() }, SINGLE, emptyList())) {
             all.shouldBeEmpty()
             entries.shouldBeEmpty()
             groups.shouldBeEmpty()

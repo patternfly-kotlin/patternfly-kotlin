@@ -10,6 +10,7 @@ import org.patternfly.item
 import org.patternfly.items
 import org.patternfly.textToggle
 import org.patternfly.unwrap
+import org.patternfly.updateItems
 
 internal interface EntrySample {
 
@@ -28,7 +29,7 @@ internal interface EntrySample {
             }
         }
 
-        store.items {
+        store.updateItems {
             loadUser().forEach { user ->
                 item(user) {
                     icon = { icon("user".fas()) }

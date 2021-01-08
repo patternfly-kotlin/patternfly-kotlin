@@ -187,6 +187,8 @@ public fun <T> Dropdown<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
 /**
  * Starts a block to add dropdown groups using the DSL.
  *
+ * @param block code block for adding the dropdown groups.
+ *
  * @sample org.patternfly.sample.DropdownSample.groups
  */
 public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
@@ -211,7 +213,7 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - [action toggle][DropdownActionToggle]
  * - [custom toggle][DropdownCustomToggle]
  *
- * The data in the menu is managed by a [DropdownStore].
+ * The data in the menu is managed by a [DropdownStore] and is wrapped inside instances of [Item].
  *
  * **Adding entries**
  *
@@ -306,9 +308,6 @@ public class Dropdown<T> internal constructor(
 
             this@Dropdown.store.entries.renderEach { entry ->
                 when (entry) {
-                    is Item<T> -> {
-                        li(content = this@Dropdown.itemContent(entry))
-                    }
                     is Group<T> -> {
                         section(baseClass = "dropdown".component("group")) {
                             entry.text?.let {
@@ -330,6 +329,9 @@ public class Dropdown<T> internal constructor(
                                 }
                             }
                         }
+                    }
+                    is Item<T> -> {
+                        li(content = this@Dropdown.itemContent(entry))
                     }
                     is Separator<T> -> {
                         if (domNode.tagName.toLowerCase() == "ul") {
