@@ -102,11 +102,11 @@ public fun <T> TabItemsBuilder<T>.item(
  *
  * Tabs are managed by a [TabStore] and rendered by display functions (see below). Each tab is typed to a specific type `T` and wrapped inside an [TabItem] instance.
  *
- * **Adding items**
+ * ### Adding items
  *
  * Tabs can be added by using the [TabStore] or by using the DSL.
  *
- * **Rendering items**
+ * ### Rendering items
  *
  * The actual tabs are rendered by the [tabDisplay] function, which defaults to `{ +it.toString() }`. The function to render the tab content can be specified using two different ways:
  *

@@ -12,15 +12,15 @@ import dev.fritz2.lenses.IdProvider
  * - [page]: Paged version of [items].
  * - [selection]: Selected items based on [all].
  *
- * **Paging**
+ * ### Paging
  *
  * Paging information is kept in an instance of [PageInfo]. Use [page] to get the items of the current page. Use a call to `copy(pageInfo = ...)` to change the paging.
  *
- * **Filter**
+ * ### Filter
  *
  * Each filter is identified by an unique name. They are applied to [all] items. Filters can be added and removed using [addFilter] and [removeFilter].
  *
- * **Select**
+ * ### Select
  *
  * Items can be selected using of of the following methods
  *
@@ -33,7 +33,7 @@ import dev.fritz2.lenses.IdProvider
  *
  * Selected items are stored in the [selection] property.
  *
- * **Sort**
+ * ### Sort
  *
  * To sort the items use an instance of [SortInfo]. Only one sort info at a time is supported.
  *

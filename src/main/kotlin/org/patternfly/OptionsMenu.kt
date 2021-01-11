@@ -141,15 +141,15 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * The data in the menu is managed by a [OptionsMenuStore] and is wrapped inside instances of [Item].
  *
- * **Adding entries**
+ * ### Adding entries
  *
  * Entries can be added by using the [OptionsMenuStore] or by using the DSL. Items can be grouped. Nested groups are not supported.
  *
- * **Selecting entries**
+ * ### Selecting entries
  *
  * Options menus support different selection modes based on the value of [ItemSelection].
  *
- * **Rendering entries**
+ * ### Rendering entries
  *
  * By default the options menu uses a builtin function to render the [Item]s in the [OptionsMenuStore]. This function takes the [Item.text] into account (if specified). If [Item.text] is `null`, the builtin function falls back to `Item.item.toString()`.
  *
@@ -188,7 +188,7 @@ public class OptionsMenu<T> internal constructor(
     internal val toggleId: String = Id.unique(ComponentType.OptionsMenu.id, "tgl")
 
     /**
-     * Manages the **c**ollapse / **e**xpand **s**tate of the [OptionsMenu]. Use this property if you want to track the collapse / expand state.
+     * Manages the expanded state of the [OptionsMenu]. Use this property if you want to track the collapse / expand state.
      *
      * @sample org.patternfly.sample.OptionsMenuSample.expanded
      */

@@ -207,19 +207,20 @@ public fun <T> Dropdown<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * A dropdown presents a menu of actions in a constrained space that will trigger a process or navigate to a new location. A dropdown consists of a toggle control to open and close a menu of [entries][Entry].
  *
  * You can choose between different toggle variations:
- * - [text toggle][DropdownTextToggle]
- * - [icon toggle][DropdownIconToggle]
- * - [checkbox toggle][DropdownCheckboxToggle]
- * - [action toggle][DropdownActionToggle]
- * - [custom toggle][DropdownCustomToggle]
+ * - [text toggle][Dropdown.textToggle]
+ * - [icon toggle][Dropdown.iconToggle]
+ * - [kebab toggle][Dropdown.kebabToggle]
+ * - [checkbox toggle][Dropdown.checkboxToggle]
+ * - [action toggle][Dropdown.actionToggle]
+ * - [custom toggle][Dropdown.customToggle]
  *
  * The data in the menu is managed by a [DropdownStore] and is wrapped inside instances of [Item].
  *
- * **Adding entries**
+ * ### Adding entries
  *
  * Entries can be added by using the [DropdownStore] or by using the DSL. Items can be grouped. Nested groups are not supported.
  *
- * **Rendering entries**
+ * ### Rendering entries
  *
  * By default the dropdown uses a builtin function to render the [Item]s in the [DropdownStore]. This function takes the [Item.text], [Item.icon] and the [Item.description] into account (if specified). If [Item.text] is `null`, the builtin function falls back to `Item.item.toString()`.
  *
@@ -275,7 +276,7 @@ public class Dropdown<T> internal constructor(
     internal val toggleId: String = Id.unique(ComponentType.Dropdown.id, "tgl")
 
     /**
-     * Manages the **c**ollapse / **e**xpand **s**tate of the [Dropdown]. Use this property if you want to track the collapse / expand state.
+     * Manages the expanded state of the [Dropdown]. Use this property if you want to track the collapse / expand state.
      *
      * @sample org.patternfly.sample.DropdownSample.expanded
      */

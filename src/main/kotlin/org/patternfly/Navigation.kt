@@ -160,11 +160,11 @@ public fun <T> Navigation<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * The navigation component comes in three different variations:
  *
- * **Horizontal navigation**
+ * ### Horizontal navigation
  *
  * Horizontal navigation is global navigation that displays navigation items from left to right in the [Header].
  *
- * **Vertical navigation**
+ * ### Vertical navigation
  *
  * Vertical navigation is hierarchical global navigation that displays navigation options from top to bottom on the left side of a screen. Vertical navigation can be collapsed to provide additional screen real estate by using a menu icon button at the top left.
  *
@@ -173,25 +173,25 @@ public fun <T> Navigation<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * - `expandable == true`: Items in a group without a text are rendered as flat items before all other groups. Items in groups with a text are rendered as expandable groups.
  * - `expandable == false`: All groups should have a text and are treated equally.
  *
- * **Tertiary navigation**
+ * ### Tertiary navigation
  *
  * While global navigation controls what users are seeing at the application-level, local navigation provides more granular navigation specific to a particular page or window in the application. For example, a user might use global navigation to get to a settings page, and then use local navigation to access privacy and general user settings.
  *
- * **Entries**
+ * ### Entries
  *
  * The data in the navigation component is managed by a [NavigationStore] and is wrapped inside instances of [Item]. The type of the [Router] must match the type of the [Item]s.
  *
- * **Adding entries**
+ * #### Adding entries
  *
  * Entries can be added by using the [NavigationStore] or by using the DSL. Horizontal and tertiary navigation supports only flat items while vertical navigation also supports groups. Nested groups are not supported.
  *
- * **Rendering entries**
+ * #### Rendering entries
  *
  * By default the navigation uses [Group.text] and [Item.text] to render the data in the [NavigationStore]. If you don't want to use the builtin defaults you can specify a custom display function by calling [display].
  *
  * [Item.icon], [Item.description], [Item.href] and [Item.disabled] are ignored by the navigation component.
  *
- * **Routing**
+ * ### Routing
  *
  * The passed [Router] is used for the actual navigation (updates the location & history). As mentioned above the type of the [Router] must match the type of the [Item]s.
  *
