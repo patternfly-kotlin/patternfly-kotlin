@@ -178,6 +178,16 @@ public enum class DividerVariant {
 }
 
 /**
+ * Modifiers for the [DrawerPanel] position.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class DrawerPanelPosition(internal val modifier: String) {
+    LEFT("panel-left".modifier()),
+    RIGHT(""),
+    BOTTOM("panel-bottom".modifier()),
+}
+
+/**
  * Heading level used for the [Title] component.
  */
 @Suppress("MagicNumber")

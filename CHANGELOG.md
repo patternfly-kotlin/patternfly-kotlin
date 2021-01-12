@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0]
 ### Added
-- Accordion component ([#3](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/3))  
+- Accordion component ([#3](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/3))
+- Drawer enhancements ([#20](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/20))
+    - Resizable
+    - Panel on bottom
 - Empty state enhancements ([#22](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/22))
     - No match found
     - Spinner
