@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.patternfly:patternfly-fritz2:0.1.0")
+    implementation("org.patternfly:patternfly-fritz2:0.2.0")
 }
 ```
 

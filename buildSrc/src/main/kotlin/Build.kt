@@ -3,7 +3,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 object Constants {
     const val group = "org.patternfly"
     const val name = "patternfly-fritz2"
-    const val version = "0.1.0"
+    const val version = "0.2.0"
     const val description = "Kotlin implementation of PatternFly 4 based on fritz2"
     const val license = "Apache-2.0"
     const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
