@@ -1,0 +1,358 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Entries</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+    <link href="../../../styles/style.css" rel="Stylesheet">
+    <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+    <link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+    <link href="../../../styles/main.css" rel="Stylesheet">
+    <script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+    <script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+    <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+    <script type="text/javascript" src="../../../scripts/main.js" async="async"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="logo"></div>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+        <script type="text/javascript" src="../../../scripts/pages.js"></script>
+        <script type="text/javascript" src="../../../scripts/main.js"></script>
+        <div class="main-content" id="content" pageIds="org.patternfly/Entries///PointingToDeclaration//-344602713">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../index.html">patternfly-fritz2</a>/<a href="../index.html">org.patternfly</a>/<a href="index.html">Entries</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Entries</span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">data class <a href="index.html">Entries</a>&lt;<a href="index.html">T</a>&gt;(idProvider: <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="index.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, itemSelection: <a href="../-item-selection/index.html">ItemSelection</a>, all: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt;, filter: <a href="../index.html#%5Borg.patternfly%2FItemFilter%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F-344602713">ItemFilter</a>&lt;<a href="index.html">T</a>&gt;?)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Immutable collection of <a href="../-entry/index.html">entries</a> used in different stores such as <a href="../-dropdown-store/index.html">DropdownStore</a>, <a href="../-menu-store/index.html">MenuStore</a>, <a href="../-options-menu-store/index.html">OptionsMenuStore</a> or <a href="../-select-store/index.html">SelectStore</a>. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified <a href="id-provider.html">idProvider</a>.</p><p class="paragraph">This class holds instances of class <a href="../-entry/index.html">Entry</a>. Each Entry is either an <a href="../-item/index.html">Item</a>, a <a href="../-group/index.html">Group</a> or a <a href="../-separator/index.html">Separator</a>. A group can contain nested <a href="../-item/index.html">Item</a>s or <a href="../-separator/index.html">Separator</a>s, but must not contain nested groups. An <a href="../-item/index.html">Item</a> can have additional properties such as an <a href="../-item/icon.html">icon</a>, a <a href="../-item/description.html">description</a> or a <a href="../-item/disabled.html">disabled</a> state. A <a href="../-separator/index.html">Separator</a> has no additional properties and is only used to visually separate groups and items.</p><p class="paragraph">Entries can be obtained using different properties:</p><ul><li><p class="paragraph"><a href="all.html">all</a>: All entries given when this instance was created. This collection never changes.</p></li><li><p class="paragraph"><a href="entries.html">entries</a>: List of entries after an optional <a href="filter.html">filter</a> has been applied to <a href="all.html">all</a>.</p></li><li><p class="paragraph"><a href="items.html">items</a>: A flat list of all <a href="../-item/index.html">Item</a>s based on <a href="entries.html">entries</a>.</p></li><li><p class="paragraph"><a href="selection.html">selection</a>: A flat list of selected <a href="../-item/index.html">Item</a>s based on <a href="all.html">all</a>.</p></li></ul></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Parameters">Parameters</button><button class="section-tab" data-togglable="Sources">Sources</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Parameters</h2>
+              <div data-togglable="Parameters">
+                <div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">idProvider</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">used to uniquely identify each item</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">itemSelection</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">defines how to select items</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">all</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">all entries managed by this instance</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">filter</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">a predicate applied to <a href="all.html">all</a></p></div></div></div></div></div></div></div></div></div>
+              </div>
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="%5Borg.patternfly%2FEntries%2FEntries%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FConstructors%2F-344602713" anchor-label="Entries" id="%5Borg.patternfly%2FEntries%2FEntries%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FConstructors%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex"><a href="-entries.html">Entries</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2FEntries%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FConstructors%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="index.html">T</a>&gt; <a href="-entries.html">Entries</a>(idProvider: <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="index.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, itemSelection: <a href="../-item-selection/index.html">ItemSelection</a>, all: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt; = emptyList(), filter: <a href="../index.html#%5Borg.patternfly%2FItemFilter%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F-344602713">ItemFilter</a>&lt;<a href="index.html">T</a>&gt;? = null)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief ">used to uniquely identify each item</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="clearFilter" id="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="clear-filter.html">clearFilter</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun <a href="clear-filter.html">clearFilter</a>(): <a href="index.html">Entries</a>&lt;<a href="index.html">T</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="clearFilter" id="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="clearFilter" id="%5Borg.patternfly%2FEntries%2FclearFilter%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>Removes any filter.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fcomponent1%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="component1" id="%5Borg.patternfly%2FEntries%2Fcomponent1%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="component1.html">component1</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fcomponent1%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">operator fun <a href="component1.html">component1</a>(): <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="index.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fcomponent2%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="component2" id="%5Borg.patternfly%2FEntries%2Fcomponent2%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="component2.html">component2</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fcomponent2%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">operator fun <a href="component2.html">component2</a>(): <a href="../-item-selection/index.html">ItemSelection</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fcomponent3%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="component3" id="%5Borg.patternfly%2FEntries%2Fcomponent3%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="component3.html">component3</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fcomponent3%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">operator fun <a href="component3.html">component3</a>(): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fcopy%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="copy" id="%5Borg.patternfly%2FEntries%2Fcopy%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="copy.html">copy</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fcopy%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.String%5D%23org.patternfly.ItemSelection%23kotlin.collections.List%5Borg.patternfly.Entry%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%5D%5D%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun <a href="copy.html">copy</a>(idProvider: <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="index.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, itemSelection: <a href="../-item-selection/index.html">ItemSelection</a>, all: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt; = emptyList(), filter: <a href="../index.html#%5Borg.patternfly%2FItemFilter%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F-344602713">ItemFilter</a>&lt;<a href="index.html">T</a>&gt;? = null): <a href="index.html">Entries</a>&lt;<a href="index.html">T</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Bkotlin%2FAny%2Fequals%2F%23kotlin.Any%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="equals" id="%5Bkotlin%2FAny%2Fequals%2F%23kotlin.Any%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2Fequals%2F%23kotlin.Any%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">equals</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Bkotlin%2FAny%2Fequals%2F%23kotlin.Any%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">open operator override fun <a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2Fequals%2F%23kotlin.Any%3F%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">equals</a>(other: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>?): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="filter" id="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="filter.html">filter</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun <a href="filter.html">filter</a>(filter: <a href="../index.html#%5Borg.patternfly%2FItemFilter%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F-344602713">ItemFilter</a>&lt;<a href="index.html">T</a>&gt;): <a href="index.html">Entries</a>&lt;<a href="index.html">T</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="filter" id="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="filter" id="%5Borg.patternfly%2FEntries%2Ffilter%2F%23kotlin.Function1%5BTypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2Ckotlin.Boolean%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>Applies the specified filter.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Bkotlin%2FAny%2FhashCode%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="hashCode" id="%5Bkotlin%2FAny%2FhashCode%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2FhashCode%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">hashCode</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Bkotlin%2FAny%2FhashCode%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">open override fun <a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2FhashCode%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">hashCode</a>(): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="select" id="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="select.html">select</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun <a href="select.html">select</a>(data: <a href="index.html">T</a>): <a href="index.html">Entries</a>&lt;<a href="index.html">T</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="select" id="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="select" id="%5Borg.patternfly%2FEntries%2Fselect%2F%23TypeParam%28bounds%3D%5Bkotlin.Any%3F%5D%29%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>Selects the specified data and returns a new instance.</div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Bkotlin%2FAny%2FtoString%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" anchor-label="toString" id="%5Bkotlin%2FAny%2FtoString%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2FtoString%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">toString</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Bkotlin%2FAny%2FtoString%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">open override fun <a href="../../org.patternfly.dom/-id/index.html#%5Bkotlin%2FAny%2FtoString%2F%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F-344602713">toString</a>(): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="all" id="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="all.html">all</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="all" id="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="all.html">all</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="all" id="%5Borg.patternfly%2FEntries%2Fall%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>all entries managed by this instance</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="entries" id="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="entries.html">entries</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="entries" id="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="entries.html">entries</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-entry/index.html">Entry</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="entries" id="%5Borg.patternfly%2FEntries%2Fentries%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>List after an optional <a href="filter.html">filter</a> has been applied to <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index.html">all</a>.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="groups" id="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="groups.html">groups</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="groups" id="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="groups.html">groups</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-group/index.html">Group</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="groups" id="%5Borg.patternfly%2FEntries%2Fgroups%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>A list of all <a href="../-group/index.html">Group</a>s based on <a href="entries.html">entries</a>.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="idProvider" id="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="id-provider.html">idProvider</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="idProvider" id="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="id-provider.html">idProvider</a>: <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="index.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="idProvider" id="%5Borg.patternfly%2FEntries%2FidProvider%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>used to uniquely identify each item</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="items" id="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="items.html">items</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="items" id="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="items.html">items</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-item/index.html">Item</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="items" id="%5Borg.patternfly%2FEntries%2Fitems%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>A flat list of all <a href="../-item/index.html">Item</a>s based on <a href="entries.html">entries</a>.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="itemSelection" id="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="item-selection.html">itemSelection</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="itemSelection" id="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="item-selection.html">itemSelection</a>: <a href="../-item-selection/index.html">ItemSelection</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="itemSelection" id="%5Borg.patternfly%2FEntries%2FitemSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>defines how to select items</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="selection" id="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="selection.html">selection</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="selection" id="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="selection.html">selection</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../-item/index.html">Item</a>&lt;<a href="index.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="selection" id="%5Borg.patternfly%2FEntries%2Fselection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>The selected items based on <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index.html">all</a>.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="singleSelection" id="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="single-selection.html">singleSelection</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><a data-name="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="singleSelection" id="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a><div class="symbol monospace">val <a href="single-selection.html">singleSelection</a>: <a href="../-item/index.html">Item</a>&lt;<a href="index.html">T</a>&gt;?<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" anchor-label="singleSelection" id="%5Borg.patternfly%2FEntries%2FsingleSelection%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>First selected item (if any)</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Sources</h2>
+              <div class="table" data-togglable="Sources"><a data-name="%5Borg.patternfly%2FEntries%2F%2F%2FPointingToDeclaration%2F%5D%2FSource%2F-344602713" anchor-label="https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/src/main/kotlin//org/patternfly/Entries.kt#L8" id="%5Borg.patternfly%2FEntries%2F%2F%2FPointingToDeclaration%2F%5D%2FSource%2F-344602713" data-filterable-set=":dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/src/main/kotlin//org/patternfly/Entries.kt#L8">(source)</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Borg.patternfly%2FEntries%2F%2F%2FPointingToDeclaration%2F%5D%2FSource%2F-344602713"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2020 Copyright</span><span class="pull-right"><span>Sponsored and developed by dokka</span><a href="https://github.com/Kotlin/dokka"><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+

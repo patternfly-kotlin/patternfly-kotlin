@@ -25,7 +25,7 @@
         <div id="leftToggler"><span class="icon-toggler"></span></div>
         <script type="text/javascript" src="../../scripts/pages.js"></script>
         <script type="text/javascript" src="../../scripts/main.js"></script>
-        <div class="main-content" id="content" pageIds="org.patternfly//groups/org.patternfly.Dropdown[TypeParam(bounds=[kotlin.Any?])]#kotlin.Function1[org.patternfly.GroupsBuilder[TypeParam(bounds=[kotlin.Any?])],kotlin.Unit]/PointingToDeclaration//-1661673043">
+        <div class="main-content" id="content" pageIds="org.patternfly//groups/org.patternfly.Dropdown[TypeParam(bounds=[kotlin.Any?])]#kotlin.Function1[org.patternfly.GroupsBuilder[TypeParam(bounds=[kotlin.Any?])],kotlin.Unit]/PointingToDeclaration//-344602713">
           <div class="navigation-wrapper" id="navigation-wrapper">
             <div class="breadcrumbs"><a href="../index.html">patternfly-fritz2</a>/<a href="index.html">org.patternfly</a>/<a href="groups.html">groups</a></div>
             <div class="pull-right d-flex">
@@ -60,7 +60,7 @@ import org.patternfly.textToggle
 import org.patternfly.toggleIcon
 import org.patternfly.toggleImage
 import org.patternfly.toggleText
-import org.patternfly.unwrap
+import org.patternfly.updateItems
 fun main() { 
    //sampleStart 
    render {
@@ -79,19 +79,19 @@ fun main() {
     }
 } 
    //sampleEnd
-}</pre></code></div></div></div></div>
+}</pre></code></div></div></div><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">block</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">code block for adding the dropdown groups.</p></div></div></div></div></div></div></div></div></div></div></div>
 <div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="groups.html">T</a>&gt; <a href="groups.html">groups</a>(block: <a href="-groups-builder/index.html">GroupsBuilder</a>&lt;<a href="groups.html">T</a>&gt;.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> = {}): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="-entry/index.html">Entry</a>&lt;<a href="groups.html">T</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="groups.html">T</a>&gt; <a href="groups.html">groups</a>(idProvider: <a href="https://api.fritz2.dev/core/core/dev.fritz2.lenses/-id-provider/index.html">IdProvider</a>&lt;<a href="groups.html">T</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, itemSelection: <a href="-item-selection/index.html">ItemSelection</a>, block: <a href="-groups-builder/index.html">GroupsBuilder</a>&lt;<a href="groups.html">T</a>&gt;.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> = {}): <a href="-entries/index.html">Entries</a>&lt;<a href="groups.html">T</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<p class="paragraph">Entrypoint for building groups.</p></div>
+<p class="paragraph">Creates an instance of <a href="-entries/index.html">Entries</a> containing <a href="-group/index.html">Group</a>s from the specified code block.</p><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">idProvider</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">used to uniquely identify each item</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">itemSelection</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">defines how to select items</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">block</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">function executed in the context of an <a href="-groups-builder/index.html">GroupsBuilder</a></p></div></div></div></div></div></div></div></div></div></div></div>
 <div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="groups.html">T</a>&gt; <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx/coroutines/flow/Flow.html">Flow</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="-entry/index.html">Entry</a>&lt;<a href="groups.html">T</a>&gt;&gt;&gt;.<a href="groups.html">groups</a>(): <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx/coroutines/flow/Flow.html">Flow</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="-group/index.html">Group</a>&lt;<a href="groups.html">T</a>&gt;&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div class="symbol monospace">fun &lt;<a href="groups.html">T</a>&gt; <a href="-navigation/index.html">Navigation</a>&lt;<a href="groups.html">T</a>&gt;.<a href="groups.html">groups</a>(block: <a href="-groups-builder/index.html">GroupsBuilder</a>&lt;<a href="groups.html">T</a>&gt;.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a> = {})<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<p class="paragraph">Maps the specified flow into a flow with groups only.</p></div>
+<p class="paragraph">Starts a block to add navigation groups using the DSL.</p><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">block</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">code block for adding the navigation groups.</p></div></div></div></div></div></div></div></div></div></div></div>
 <div class="divergent-group" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
@@ -110,8 +110,8 @@ import org.patternfly.items
 import org.patternfly.optionsMenu
 import org.patternfly.separator
 import org.patternfly.textToggle
-import org.patternfly.unwrap
 import org.patternfly.unwrapOrNull
+import org.patternfly.updateItems
 fun main() { 
    //sampleStart 
    render {
@@ -130,7 +130,7 @@ fun main() {
     }
 } 
    //sampleEnd
-}</pre></code></div></div></div></div>
+}</pre></code></div></div></div><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/main" data-filterable-set=":dokkaHtml/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex">block</span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">code block for adding the options menu groups.</p></div></div></div></div></div></div></div></div></div></div></div>
         </div>
         <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2020 Copyright</span><span class="pull-right"><span>Sponsored and developed by dokka</span><a href="https://github.com/Kotlin/dokka"><span class="padded-icon"></span></a></span></div>
       </div>
