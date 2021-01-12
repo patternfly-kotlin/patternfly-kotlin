@@ -28,7 +28,7 @@ dependencies {
 
 ### PatternFly Assets
 
-PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. You have to include them on your own. One way is to add a `npm` dependency to PatternFly 
+PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. You have to include them on your own. One way is to add a `npm` dependency to PatternFly: 
 
 
 ```kotlin

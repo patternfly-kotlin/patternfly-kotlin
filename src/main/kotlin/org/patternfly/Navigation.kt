@@ -361,7 +361,6 @@ public class Navigation<T> internal constructor(
             // 2) all other entries
             val (unnamedGroups, allOtherEntries) =
                 entries.all.partition { it is Group<T> && it.text == null }
-            console.log("entries partitions")
             val itemsAndSeparatorsOfUnnamedGroups = unnamedGroups.flatMap { entry ->
                 when (entry) {
                     is Group<T> -> entry.entries.filter { it is Item<T> || it is Separator<T> }
