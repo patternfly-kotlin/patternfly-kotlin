@@ -108,6 +108,11 @@ public data class Items<T>(
     }
 
     /**
+     * Removes all filters.
+     */
+    public fun clearFilter(): Items<T> = copy(filters = emptyMap())
+
+    /**
      * Applies the specified sort info and returns a new instance.
      */
     public fun sortWith(sortInfo: SortInfo<T>): Items<T> {

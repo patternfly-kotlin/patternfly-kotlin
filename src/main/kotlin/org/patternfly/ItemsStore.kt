@@ -56,6 +56,11 @@ public class ItemsStore<T>(override val idProvider: IdProvider<T, String> = { it
     public val removeFilter: Handler<String> = handle { items, name -> items.removeFilter(name) }
 
     /**
+     * Removes all filters.
+     */
+    public val clearFilter: Handler<Unit> = handle { items -> items.clearFilter() }
+
+    /**
      * Handler to go to the first page.
      */
     override val gotoFirstPage: Handler<Unit> = handle { it.copy(pageInfo = it.pageInfo.gotoFirstPage()) }
