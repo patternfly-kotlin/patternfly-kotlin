@@ -93,7 +93,9 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Accordion("ac", "accordion".component()),
     Alert("at", "alert".component()),
     AlertGroup("ag", "alert-group".component()),
+    Avatar("av", "avatar".component()),
     Badge("bdg", "badge".component()),
+    Breadcrumb("bc", "breadcrumb".component()),
     Button("btn", "button".component()),
     Card("crd", "card".component()),
     CardView("cv"),
@@ -106,16 +108,15 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     EmptyState("es", "empty-state".component()),
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
-    Main("mn", "page".component("main")),
     Menu("mu", "menu".component()),
     Navigation("nav", "nav".component()),
     NotificationBadge("nb", "button".component()),
     OptionsMenu("opt", "options-menu".component()),
     Page("pg", "page".component()),
     PageHeader("pgh", "page".component("header")),
+    PageMain("mn", "page".component("main")),
     PageSidebar("pgs", "page".component("sidebar")),
     Pagination("pgn", "pagination".component()),
-    Section("se", "page".component("main-section")),
     Select("sel", "select".component()),
     Spinner("sp", "spinner".component()),
     Switch("sw", "switch".component()),
@@ -241,6 +242,14 @@ public enum class Size(public val modifier: String) {
     MD("md".modifier()),
     SM("sm".modifier()),
     XS("xs".modifier())
+}
+
+/**
+ * Sticky modifier for [Page] components.
+ */
+public enum class Sticky(public val modifier: String) {
+    TOP("sticky-top".modifier()),
+    BOTTOM("sticky-bottom".modifier())
 }
 
 /**

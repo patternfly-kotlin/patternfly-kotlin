@@ -162,7 +162,7 @@ public fun <T> Navigation<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  *
  * ### Horizontal navigation
  *
- * Horizontal navigation is global navigation that displays navigation items from left to right in the [Header].
+ * Horizontal navigation is global navigation that displays navigation items from left to right in the [PageHeader].
  *
  * ### Vertical navigation
  *

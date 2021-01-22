@@ -36,7 +36,7 @@ public fun RenderContext.notificationBadge(
  *
  * The notification badge is intended to be used with the notification drawer as a visible indicator to alert the user about incoming notifications. It uses the [NotificationStore] to decide which visible indicator to show.
  *
- * The notification badge is typically part of the [headerTools].
+ * The notification badge is typically part of the [pageHeaderTools].
  */
 public class NotificationBadge internal constructor(withCount: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLButtonElement>,

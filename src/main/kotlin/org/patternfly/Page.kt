@@ -3,16 +3,12 @@ package org.patternfly
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.binding.mountSingle
-import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -32,7 +28,7 @@ public fun RenderContext.page(
 ): Page = register(Page(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [Header] component inside the [Page] component.
+ * Creates the [PageHeader] component inside the [Page] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -41,63 +37,80 @@ public fun RenderContext.page(
 public fun Page.pageHeader(
     id: String? = null,
     baseClass: String? = null,
-    content: Header.() -> Unit = {}
-): Header = register(Header(this, id = id, baseClass = baseClass, job), content)
+    content: PageHeader.() -> Unit = {}
+): PageHeader = register(PageHeader(this, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [Brand] component inside the [Header] component.
+ * Creates the [PageHeaderTools] component inside the [PageHeader] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun Header.brand(
+public fun PageHeader.pageHeaderTools(
     id: String? = null,
     baseClass: String? = null,
-    content: Brand.() -> Unit = {}
-): Brand = register(Brand(this.page.sidebarStore, id = id, baseClass = baseClass, job), content)
+    content: PageHeaderTools.() -> Unit = {}
+): PageHeaderTools = register(PageHeaderTools(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a container for the tools inside the [Header] component.
+ * Creates a [PageHeaderToolsGroup] component inside the [PageHeaderTools] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
-public fun Header.headerTools(
+public fun PageHeaderTools.pageHeaderToolsGroup(
     id: String? = null,
     baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("page".component("header", "tools"), baseClass), job), content)
+    content: PageHeaderToolsGroup.() -> Unit = {}
+): PageHeaderToolsGroup = register(PageHeaderToolsGroup(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates the [Sidebar] component inside the [Page].
+ * Creates a [PageHeaderToolsItem] component inside a [PageHeaderToolsGroup] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
+ */
+public fun PageHeaderToolsGroup.pageHeaderToolsItem(
+    id: String? = null,
+    baseClass: String? = null,
+    content: PageHeaderToolsItem.() -> Unit = {}
+): PageHeaderToolsItem = register(PageHeaderToolsItem(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [PageHeaderToolsItem] component inside the [PageHeaderTools] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the component itself
+ */
+public fun PageHeaderTools.pageHeaderToolsItem(
+    id: String? = null,
+    baseClass: String? = null,
+    content: PageHeaderToolsItem.() -> Unit = {}
+): PageHeaderToolsItem = register(PageHeaderToolsItem(id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates the [PageSidebar] component inside the [Page] component.
+ *
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the sidebar body
  */
 public fun Page.pageSidebar(
     id: String? = null,
     baseClass: String? = null,
-    content: Sidebar.() -> Unit = {}
-): Sidebar = register(Sidebar(sidebarStore, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the body container inside the [Sidebar] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun Sidebar.sidebarBody(
-    id: String? = null,
-    baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("page".component("sidebar", "body"), baseClass), job), content)
+): PageSidebar = register(PageSidebar(sidebarStore, id = id, baseClass = baseClass, job), {
+    div(baseClass = "page".component("sidebar", "body")) {
+        content(this)
+    }
+})
 
 /**
- * Creates the [PageMain] container inside the [Page].
+ * Creates the [PageMain] component inside the [Page] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -110,25 +123,115 @@ public fun Page.pageMain(
 ): PageMain = register(PageMain(id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [PageSection] container.
+ * Creates a [PageGroup] component inside the [PageMain] component.
  *
+ * @param sticky whether the component should be sticky
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param content a lambda expression for setting up the sidebar body
  */
-public fun RenderContext.pageSection(
+public fun PageMain.pageGroup(
+    sticky: Sticky? = null,
     id: String? = null,
     baseClass: String? = null,
-    content: PageSection.() -> Unit = {}
-): PageSection = register(PageSection(id = id, baseClass = baseClass, job), content)
+    content: PageGroup.() -> Unit = {}
+): PageGroup = register(PageGroup(sticky, id = id, baseClass = baseClass, job), content)
+
+/**
+ * Creates a [PageSection] component for adding a page navigation component.
+ *
+ * @param sticky whether the component should be sticky
+ * @param limitWidth whether the page section limits the `max-width` of the content inside.
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the content
+ */
+public fun RenderContext.pageNavigation(
+    sticky: Sticky? = null,
+    limitWidth: Boolean = false,
+    id: String? = null,
+    baseClass: String? = null,
+    content: RenderContext.() -> Unit = {}
+): PageSection = genericPageSection(
+    sticky,
+    limitWidth,
+    "page".component("main", "nav"),
+    id,
+    baseClass,
+    content
+)
+
+/**
+ * Creates a [PageSection] component for adding a page breadcrumb component.
+ *
+ * @param sticky whether the component should be sticky
+ * @param limitWidth whether the page section limits the `max-width` of the content inside.
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the content
+ */
+public fun RenderContext.pageBreadcrumb(
+    sticky: Sticky? = null,
+    limitWidth: Boolean = false,
+    id: String? = null,
+    baseClass: String? = null,
+    content: RenderContext.() -> Unit = {}
+): PageSection = genericPageSection(
+    sticky,
+    limitWidth,
+    "page".component("main", "breadcrumb"),
+    id,
+    baseClass,
+    content
+)
+
+/**
+ * Creates a [PageSection] component.
+ *
+ * @param sticky whether the component should be sticky
+ * @param limitWidth whether the page section limits the `max-width` of the content inside.
+ * @param id the ID of the element
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param content a lambda expression for setting up the content
+ */
+public fun RenderContext.pageSection(
+    sticky: Sticky? = null,
+    limitWidth: Boolean = false,
+    id: String? = null,
+    baseClass: String? = null,
+    content: RenderContext.() -> Unit = {}
+): PageSection = genericPageSection(
+    sticky,
+    limitWidth,
+    "page".component("main", "section"),
+    id,
+    baseClass,
+    content
+)
+
+private fun RenderContext.genericPageSection(
+    sticky: Sticky?,
+    limitWidth: Boolean,
+    pageSectionClass: String,
+    id: String? = null,
+    baseClass: String? = null,
+    content: RenderContext.() -> Unit = {}
+): PageSection = if (limitWidth) {
+    register(PageSection(sticky, id = id, baseClass = classes(pageSectionClass, baseClass), job), {
+        div(baseClass = "page".component("main", "body")) {
+            content(this)
+        }
+    })
+} else {
+    register(PageSection(sticky, id = id, baseClass = baseClass, job), content)
+}
 
 // ------------------------------------------------------ tag
 
 /**
  * PatternFly [page](https://www.patternfly.org/v4/components/page/design-guidelines) component.
  *
- * A page component is used to create the basic structure of an application. It should be added directly to the
- * document body.
+ * The page component is used to define the basic layout of a page with either vertical or horizontal navigation. It should be added directly to the document body.
  *
  * Typically a page contains some but not necessarily all of the following components.
  *
@@ -136,28 +239,47 @@ public fun RenderContext.pageSection(
  * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ page: Page ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
  * ┃                                                                           ┃
  * ┃ ┌──────────────────────── pageHeader: PageHeader ───────────────────────┐ ┃
- * ┃ │ ┌──────────────┐ ┌─────────────────────────────┐ ┌──────────────────┐ │ ┃
- * ┃ │ │              │ │    horizontalNavigation:    │ │                  │ │ ┃
- * ┃ │ │ brand: Brand │ │         Navigation          │ │ headerTools: Div │ │ ┃
- * ┃ │ │              │ │                             │ │                  │ │ ┃
- * ┃ │ └──────────────┘ └─────────────────────────────┘ └──────────────────┘ │ ┃
+ * ┃ │                                                                       │ ┃
+ * ┃ │ ┌──────────┐ ┌─────────────────────┐ ┌────── pageHeaderTools: ──────┐ │ ┃
+ * ┃ │ │          │ │                     │ │       PageHeaderTools        │ │ ┃
+ * ┃ │ │          │ │                     │ │                              │ │ ┃
+ * ┃ │ │          │ │                     │ │ ┌── pageHeaderToolsGroup: ─┐ │ │ ┃
+ * ┃ │ │          │ │                     │ │ │   PageHeaderToolsGroup   │ │ │ ┃
+ * ┃ │ │          │ │                     │ │ │ ┌──────────────────────┐ │ │ │ ┃
+ * ┃ │ │  brand:  │ │horizontalNavigation:│ │ │ │ pageHeaderToolsItem: │ │ │ │ ┃
+ * ┃ │ │  Brand   │ │     Navigation      │ │ │ │ PageHeaderToolsItem  │ │ │ │ ┃
+ * ┃ │ │          │ │                     │ │ │ └──────────────────────┘ │ │ │ ┃
+ * ┃ │ │          │ │                     │ │ └──────────────────────────┘ │ │ ┃
+ * ┃ │ │          │ │                     │ │ ┌──────────────────────────┐ │ │ ┃
+ * ┃ │ │          │ │                     │ │ │   pageHeaderToolsItem:   │ │ │ ┃
+ * ┃ │ │          │ │                     │ │ │   PageHeaderToolsItem    │ │ │ ┃
+ * ┃ │ │          │ │                     │ │ └──────────────────────────┘ │ │ ┃
+ * ┃ │ └──────────┘ └─────────────────────┘ └──────────────────────────────┘ │ ┃
  * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
  * ┃                                                                           ┃
- * ┃ ┌─── pageSidebar: PageSidebar ───┐ ┌──────── pageMain: PageMain ────────┐ ┃
- * ┃ │                                │ │                                    │ ┃
- * ┃ │ ┌───── sidebarBody: Div ─────┐ │ │ ┌────────────────────────────────┐ │ ┃
- * ┃ │ │ ┌────────────────────────┐ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │  verticalNavigation:   │ │ │ │ │    pageSection: PageSection    │ │ ┃
- * ┃ │ │ │       Navigation       │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ │                        │ │ │ │ │                                │ │ ┃
- * ┃ │ │ └────────────────────────┘ │ │ │ │                                │ │ ┃
- * ┃ │ └────────────────────────────┘ │ │ └────────────────────────────────┘ │ ┃
- * ┃ └────────────────────────────────┘ └────────────────────────────────────┘ ┃
+ * ┃ ┌ pageSidebar: PageSidebar ┐ ┌─────────── pageMain: PageMain ───────────┐ ┃
+ * ┃ │ ┌──────────────────────┐ │ │                                          │ ┃
+ * ┃ │ │                      │ │ │ ┌──────── pageGroup: PageGroup ────────┐ │ ┃
+ * ┃ │ │                      │ │ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │                      │ │ │ │ │   pageNavigation: PageSection    │ │ │ ┃
+ * ┃ │ │                      │ │ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ │                      │ │ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │                      │ │ │ │ │   pageBreadcrumb: PageSection    │ │ │ ┃
+ * ┃ │ │                      │ │ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ │                      │ │ │ │ ┌──────────────────────────────────┐ │ │ ┃
+ * ┃ │ │ verticalNavigation:  │ │ │ │ │     pageSection: PageSection     │ │ │ ┃
+ * ┃ │ │      Navigation      │ │ │ │ └──────────────────────────────────┘ │ │ ┃
+ * ┃ │ │                      │ │ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ │ │                      │ │ │ ┌──────────────────────────────────────┐ │ ┃
+ * ┃ │ │                      │ │ │ │     pageNavigation: PageSection      │ │ ┃
+ * ┃ │ │                      │ │ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ │ │                      │ │ │ ┌──────────────────────────────────────┐ │ ┃
+ * ┃ │ │                      │ │ │ │     pageBreadcrumb: PageSection      │ │ ┃
+ * ┃ │ │                      │ │ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ │ │                      │ │ │ ┌──────────────────────────────────────┐ │ ┃
+ * ┃ │ │                      │ │ │ │       pageSection: PageSection       │ │ ┃
+ * ┃ │ └──────────────────────┘ │ │ └──────────────────────────────────────┘ │ ┃
+ * ┃ └──────────────────────────┘ └──────────────────────────────────────────┘ ┃
  * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
  * ```
  *
@@ -174,9 +296,9 @@ public class Page internal constructor(id: String?, baseClass: String?, job: Job
 }
 
 /**
- * Header component.
+ * Page header or [masthead](https://www.patternfly.org/v4/components/page/design-guidelines/#masthead) component.
  */
-public class Header internal constructor(internal val page: Page, id: String?, baseClass: String?, job: Job) :
+public class PageHeader internal constructor(internal val page: Page, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
     TextElement("header", id = id, baseClass = classes(ComponentType.PageHeader, baseClass), job) {
 
@@ -187,54 +309,31 @@ public class Header internal constructor(internal val page: Page, id: String?, b
 }
 
 /**
- * [PatternFly brand](https://www.patternfly.org/v4/components/page/design-guidelines) component.
- *
- * A brand is used to place a product logotype on a screen.
+ * Page header tools component.
  */
-public class Brand internal constructor(sidebarStore: SidebarStore, id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("page".component("header", "brand"), baseClass), job) {
+public class PageHeaderTools internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("page".component("header", "tools"), baseClass), job)
 
-    private var link: A
-    private lateinit var img: Img
+/**
+ * Page header tools group component.
+ */
+public class PageHeaderToolsGroup internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("page".component("header", "tools", "group"), baseClass), job)
 
-    init {
-        div(baseClass = "page".component("header", "brand", "toggle")) {
-            attr("hidden", sidebarStore.data.map { !it.visible })
-            classMap(sidebarStore.data.map { mapOf("display-none".util() to !it.visible) })
-            clickButton(plain) {
-                aria["expanded"] = sidebarStore.data.map { it.expanded.toString() }
-                icon("bars".fas())
-            } handledBy sidebarStore.toggle
-        }
-        this@Brand.link = a(baseClass = "page".component("header", "brand", "link")) {
-            href("#")
-            this@Brand.img = img(baseClass = "brand".component()) {}
-        }
-    }
-
-    /**
-     * Sets the link to the homepage of the application.
-     */
-    public fun home(href: String) {
-        link.href(href)
-    }
-
-    /**
-     * Sets the image for the brand.
-     */
-    public fun img(src: String, content: Img.() -> Unit = {}) {
-        img.apply(content).src(src)
-    }
-}
+/**
+ * Page header tools item component.
+ */
+public class PageHeaderToolsItem internal constructor(id: String?, baseClass: String?, job: Job) :
+    Div(id = id, baseClass = classes("page".component("header", "tools", "item"), baseClass), job)
 
 /**
  * Sidebar component.
  *
- * If a sidebar is added to the page, a toggle button is displayed in the [Header] to toggle and expand the sidebar.
+ * If a sidebar is added to the page, a toggle button is displayed in the [PageHeader] to toggle and expand the sidebar.
  *
  * To show & hide the sidebar (e.g. because some views don't require a sidebar) you can use the [visible] functions.
  */
-public class Sidebar internal constructor(
+public class PageSidebar internal constructor(
     private val sidebarStore: SidebarStore,
     id: String?,
     baseClass: String?,
@@ -278,26 +377,38 @@ public class Sidebar internal constructor(
  */
 public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("main", id = id, baseClass = classes(ComponentType.Main, baseClass), job) {
+    TextElement("main", id = id, baseClass = classes(ComponentType.PageMain, baseClass), job) {
 
     init {
-        markAs(ComponentType.Main)
+        markAs(ComponentType.PageMain)
         attr("role", "main")
         attr("tabindex", "-1")
     }
 }
 
 /**
- * Page section component inside the [PageMain] component.
+ * Page group component.
  */
-public class PageSection internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLElement>,
-    TextElement("section", id = id, baseClass = classes(ComponentType.Section, baseClass), job) {
+public class PageGroup internal constructor(sticky: Sticky?, id: String?, baseClass: String?, job: Job) :
+    Div(
+        id = id,
+        baseClass = classes {
+            +"page".component("main-group")
+            +sticky?.modifier
+            +baseClass
+        },
+        job
+    )
 
-    init {
-        markAs(ComponentType.Section)
-    }
-}
+/**
+ * Page section component.
+ */
+public class PageSection internal constructor(
+    sticky: Sticky?,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : TextElement("section", id = id, baseClass = classes(sticky?.modifier, baseClass), job)
 
 // ------------------------------------------------------ store
 
