@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0]
+### Added
+- Avatar component ([#6](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/6))
+- Breadcrumb component ([#8](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/8))
+
+### Changed
+- Revisit page components ([#73](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/73))
+
 ## [0.2.0]
 ### Added
 - Accordion component ([#3](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/3))
@@ -58,5 +66,6 @@ First public release
 ### Security
 - in case of vulnerabilities
 
+[0.3.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/patternfly-kotlin/patternfly-fritz2/releases/tag/v0.1.0
