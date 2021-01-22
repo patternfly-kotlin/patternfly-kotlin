@@ -114,7 +114,7 @@ public class TreeView<T> internal constructor(
                             this@TreeView.toggle(this@li.domNode, treeItem)
                             this@TreeView.select(this.domNode)
                         }
-                        if (treeItem.hasChildren) {
+                        if (treeItem.hasChildren || this@TreeView.fetchItems != null) {
                             this@TreeView.renderToggle(this)
                         }
                         if (this@TreeView.checkboxes) {
@@ -203,6 +203,9 @@ public class TreeView<T> internal constructor(
                         val treeItems = fetch(treeItem)
                         if (treeItems.isNotEmpty()) {
                             expand(li, treeItems)
+                        } else {
+                            li.querySelector(By.classname("tree-view".component("node", "toggle")))
+                                ?.removeFromParent()
                         }
                     }
                 }
