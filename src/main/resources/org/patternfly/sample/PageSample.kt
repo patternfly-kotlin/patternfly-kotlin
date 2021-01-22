@@ -51,8 +51,8 @@ internal interface PageSample {
                     }
                     horizontalNavigation(router) {
                         items {
-                            item("#item1", "Item 1")
-                            item("#item2", "Item 2")
+                            item("item1", "Item 1")
+                            item("item2", "Item 2")
                         }
                     }
                     pageHeaderTools {
@@ -65,8 +65,8 @@ internal interface PageSample {
                 pageSidebar {
                     verticalNavigation(router) {
                         items {
-                            item("#item1", "Item 1")
-                            item("#item2", "Item 2")
+                            item("item1", "Item 1")
+                            item("item2", "Item 2")
                         }
                     }
                 }
@@ -75,16 +75,16 @@ internal interface PageSample {
                         pageNavigation(limitWidth = true) {
                             tertiaryNavigation(router) {
                                 items {
-                                    item("#item1", "Item 1")
-                                    item("#item2", "Item 2")
+                                    item("item1", "Item 1")
+                                    item("item2", "Item 2")
                                 }
                             }
                         }
                         pageBreadcrumb(limitWidth = true) {
                             breadcrumb(router) {
                                 items {
-                                    item("#item1", "Item 1")
-                                    item("#item2", "Item 2")
+                                    item("item1", "Item 1")
+                                    item("item2", "Item 2")
                                 }
                             }
                         }
