@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
@@ -284,7 +283,7 @@ public class OptionsMenu<T> internal constructor(
             if (this@OptionsMenu.closeOnSelect) {
                 clicks handledBy this@OptionsMenu.expanded.collapse
             }
-            clicks.map { item.item } handledBy this@OptionsMenu.store.select
+            clicks.map { item.unwrap() } handledBy this@OptionsMenu.store.select
         }
     }
 
@@ -468,21 +467,4 @@ internal class OptionsMenuIconToggle<T>(
 public class OptionsMenuStore<T>(
     idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
     itemSelection: ItemSelection = ItemSelection.SINGLE_PER_GROUP
-) : EntriesStore<T>(idProvider, itemSelection) {
-
-    internal val select: Handler<T> = handle { entries, data ->
-        entries.select(data)
-    }
-
-    /**
-     * Flow with the list of selected [Item]s.
-     */
-    public val selection: Flow<List<Item<T>>>
-        get() = data.map { it.selection }
-
-    /**
-     * Flow with the first selected [Item] (if any)
-     */
-    public val singleSelection: Flow<Item<T>?>
-        get() = data.map { it.singleSelection }
-}
+) : EntriesStore<T>(idProvider, itemSelection)
