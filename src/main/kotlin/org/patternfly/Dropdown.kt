@@ -2,7 +2,6 @@
 
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
@@ -370,7 +369,7 @@ public class Dropdown<T> internal constructor(
                 this@Dropdown.defaultDisplay.invoke(this, item)
             }
             clicks handledBy this@Dropdown.expanded.collapse
-            clicks.map { item } handledBy this@Dropdown.store.selectHandler
+            clicks.map { item.unwrap() } handledBy this@Dropdown.store.select
         }
     }
 
@@ -642,15 +641,4 @@ public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, 
  * An [EntriesStore] with [ItemSelection.SINGLE] selection mode.
  */
 public class DropdownStore<T>(idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
-    EntriesStore<T>(idProvider, ItemSelection.SINGLE) {
-
-    internal val selectHandler: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, item ->
-        emit(item)
-        entries.select(item.item)
-    }
-
-    /**
-     * Flow for selected items. Shortcut for `singleSelection.filterNotNull()`
-     */
-    public val selects: Flow<Item<T>> = selectHandler
-}
+    EntriesStore<T>(idProvider, ItemSelection.SINGLE)
