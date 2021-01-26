@@ -65,28 +65,30 @@ public fun RenderContext.emptyStateSpinner(
  *
  * @param title the title of the empty state component
  * @param body the text shown in the empty state body
- * @param action text for the primary action
- * @param handler handler for the primary action
+ * @param action text and handler for the primary action
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the [EmptyStateContent] component
  */
 public fun RenderContext.emptyStateNoResults(
     title: String = "No results found",
-    body: String = "No results match the filter criteria. Remove all filters or clear all filters to show results.",
-    action: String = "Clear all filters",
-    handler: Handler<Unit>,
+    body: Div.() -> Unit = {
+        +"No results match the filter criteria. Remove all filters or clear all filters to show results."
+    },
+    action: Pair<String, Handler<Unit>>? = null,
     id: String? = null,
     baseClass: String? = null,
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyState = emptyState(iconClass = "search".fas(), title = title, id = id, baseClass = baseClass) {
     emptyStateBody {
-        +body
+        body(this)
     }
-    emptyStatePrimary {
-        clickButton(link) {
-            +action
-        } handledBy handler
+    action?.let { (text, handler) ->
+        emptyStatePrimary {
+            clickButton(link) {
+                +text
+            } handledBy handler
+        }
     }
     content(this)
 }
