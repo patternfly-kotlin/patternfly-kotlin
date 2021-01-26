@@ -3,26 +3,28 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import dev.fritz2.routing.router
-import org.patternfly.avatar
+import org.patternfly.Notification
 import org.patternfly.breadcrumb
 import org.patternfly.item
 import org.patternfly.items
+import org.patternfly.unwrap
 
 internal interface BreadcrumbSample {
 
     fun breadcrumb() {
         render {
-            val router = router("home")
-            breadcrumb(router) {
+            breadcrumb<String> {
+                store.singleSelection handledBy Notification.add {
+                    info("You are here: ${it.unwrap()}")
+                }
                 items {
-                    item("universe", "Universe")
-                    item("milky-way", "Milky way")
-                    item("solar-system", "Solar system")
-                    item("earth", "Earth")
-                    item("europe", "Europe")
-                    item("germany", "Germany")
-                    item("wuerzburg", "Würzburg")
+                    item("Universe")
+                    item("Milky way")
+                    item("Solar system")
+                    item("Earth")
+                    item("Europe")
+                    item("Germany")
+                    item("Würzburg")
                 }
             }
         }
