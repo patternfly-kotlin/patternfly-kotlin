@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
@@ -43,7 +44,7 @@ public fun Page.pageMain(
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the sidebar body
  */
-public fun PageMain.pageGroup(
+public fun RenderContext.pageGroup(
     sticky: Sticky? = null,
     id: String? = null,
     baseClass: String? = null,
@@ -64,7 +65,7 @@ public fun RenderContext.pageNavigation(
     limitWidth: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
-    content: RenderContext.() -> Unit = {}
+    content: Tag<HTMLElement>.() -> Unit = {}
 ): PageSection = genericPageSection(
     sticky,
     limitWidth,
@@ -88,7 +89,7 @@ public fun RenderContext.pageBreadcrumb(
     limitWidth: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
-    content: RenderContext.() -> Unit = {}
+    content: Tag<HTMLElement>.() -> Unit = {}
 ): PageSection = genericPageSection(
     sticky,
     limitWidth,
@@ -112,7 +113,7 @@ public fun RenderContext.pageSection(
     limitWidth: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
-    content: RenderContext.() -> Unit = {}
+    content: Tag<HTMLElement>.() -> Unit = {}
 ): PageSection = genericPageSection(
     sticky,
     limitWidth,
@@ -128,23 +129,29 @@ private fun RenderContext.genericPageSection(
     pageSectionClass: String,
     id: String? = null,
     baseClass: String? = null,
-    content: RenderContext.() -> Unit = {}
+    content: Tag<HTMLElement>.() -> Unit = {}
 ): PageSection = if (limitWidth) {
     register(
         PageSection(
             sticky,
             id = id,
-            baseClass = classes(pageSectionClass, baseClass),
+            baseClass = classes {
+                +pageSectionClass
+                +("limit-width".modifier() `when` limitWidth)
+                +baseClass
+            },
             job
         ),
         {
-            div(baseClass = "page".component("main", "body")) {
-                content(this)
+            with(it) {
+                div(baseClass = "page".component("main", "body")) {
+                    content(this)
+                }
             }
         }
     )
 } else {
-    register(PageSection(sticky, id = id, baseClass = baseClass, job), content)
+    register(PageSection(sticky, id = id, baseClass = classes(pageSectionClass, baseClass), job), content)
 }
 
 // ------------------------------------------------------ tag
