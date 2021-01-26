@@ -27,13 +27,10 @@ public fun Page.pageSidebar(
         sidebarStore,
         id = id,
         baseClass = baseClass,
-        job
+        job,
+        content
     ),
-    {
-        div(baseClass = "page".component("sidebar", "body")) {
-            content(this)
-        }
-    }
+    {}
 )
 
 // ------------------------------------------------------ tag
@@ -49,7 +46,8 @@ public class PageSidebar internal constructor(
     private val sidebarStore: SidebarStore,
     id: String?,
     baseClass: String?,
-    job: Job
+    job: Job,
+    content: Div.() -> Unit
 ) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.PageSidebar, baseClass), job) {
 
     init {
@@ -64,6 +62,9 @@ public class PageSidebar internal constructor(
                 )
             }
         )
+        div(baseClass = "page".component("sidebar", "body")) {
+            content(this)
+        }
     }
 
     /**
