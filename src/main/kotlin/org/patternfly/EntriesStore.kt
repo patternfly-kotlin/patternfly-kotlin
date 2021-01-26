@@ -1,8 +1,10 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 /**
@@ -38,13 +40,30 @@ public fun <T> EntriesStore<T>.updateGroups(block: GroupsBuilder<T>.() -> Unit =
  */
 public abstract class EntriesStore<T> internal constructor(
     override val idProvider: IdProvider<T, String>,
-    internal val itemSelection: ItemSelection
+    public val itemSelection: ItemSelection
 ) : RootStore<Entries<T>>(Entries(idProvider, itemSelection, emptyList())),
     WithIdProvider<T> {
+
+    @Suppress("LeakingThis")
+    internal val select: Handler<T> = handle { entries, data ->
+        entries.select(data)
+    }
 
     /**
      * Flow with the List of [entries][Entry] after an optional filter has been applied.
      */
     public val entries: Flow<List<Entry<T>>>
         get() = data.map { it.entries }
+
+    /**
+     * Flow with the list of selected [Item]s.
+     */
+    public val selection: Flow<List<Item<T>>>
+        get() = data.map { it.selection }
+
+    /**
+     * Flow with the first selected [Item] (if any)
+     */
+    public val singleSelection: Flow<Item<T>>
+        get() = data.map { it.singleSelection }.filterNotNull()
 }
