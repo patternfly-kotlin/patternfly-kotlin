@@ -118,9 +118,12 @@ public class TreeView<T> internal constructor(
                 div(baseClass = "tree-view".component("content")) {
                     button(baseClass = "tree-view".component("node")) {
                         clicks.map { treeItem } handledBy this@TreeView.store.select
-                        domNode.addEventListener(Events.click.name, {
-                            this@TreeView.select(this.domNode, this@li.domNode, treeItem)
-                        })
+                        domNode.addEventListener(
+                            Events.click.name,
+                            {
+                                this@TreeView.select(this.domNode, this@li.domNode, treeItem)
+                            }
+                        )
                         if (treeItem.hasChildren || (this@TreeView.fetchItems != null && !treeItem.fetched)) {
                             div(baseClass = "tree-view".component("node", "toggle")) {
                                 span(baseClass = "tree-view".component("node", "toggle", "icon")) {
