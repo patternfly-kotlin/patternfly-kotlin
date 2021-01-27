@@ -10,7 +10,7 @@ public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): Tre
     TreeItemBuilder(item).apply(block).build()
 
 public fun <T> TreeView<T>.tree(block: TreeBuilder<T>.() -> Unit = {}) {
-    initTree(TreeBuilder<T>().apply(block).build())
+    store.update(TreeBuilder<T>().apply(block).build())
 }
 
 public fun <T> TreeBuilder<T>.treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}) {
@@ -24,18 +24,11 @@ public fun <T> TreeItemBuilder<T>.children(block: TreeBuilder<T>.() -> Unit = {}
 
 // ------------------------------------------------------ type
 
-public class Tree<T> {
-
-    private val _roots: MutableList<TreeItem<T>> = mutableListOf()
-
-    public val roots: List<TreeItem<T>>
-        get() = _roots
-
-    public fun add(treeItem: TreeItem<T>): Boolean = _roots.add(treeItem)
+public class Tree<T> internal constructor(public val roots: List<TreeItem<T>>) {
 
     public fun find(predicate: (TreeItem<T>) -> Boolean): TreeItem<T>? {
         var result: TreeItem<T>? = null
-        val iterator = _roots.iterator()
+        val iterator = roots.iterator()
         while (iterator.hasNext() && result == null) {
             val root = iterator.next()
             result = root.find(predicate)
@@ -45,7 +38,7 @@ public class Tree<T> {
 
     public fun findAll(predicate: (TreeItem<T>) -> Boolean): List<TreeItem<T>> {
         val result: MutableList<TreeItem<T>> = mutableListOf()
-        for (root in _roots) {
+        for (root in roots) {
             result.addAll(root.findAll(predicate))
         }
         return result
@@ -53,6 +46,7 @@ public class Tree<T> {
 }
 
 public class TreeItem<T>(override val item: T) : HasItem<T> {
+
     private var _parent: TreeItem<T>? = null
     private val _children: MutableList<TreeItem<T>> = mutableListOf()
     internal var fetched: Boolean = false
@@ -68,6 +62,18 @@ public class TreeItem<T>(override val item: T) : HasItem<T> {
 
     public val hasChildren: Boolean
         get() = _children.isNotEmpty()
+
+    public val path: List<TreeItem<T>>
+        get() {
+            val path = mutableListOf<TreeItem<T>>()
+            var current = this
+            path.add(current)
+            while (current.hasParent) {
+                current = current.parent!!
+                path.add(current)
+            }
+            return path.reversed()
+        }
 
     public fun addChild(treeItem: TreeItem<T>) {
         treeItem._parent = this
@@ -109,26 +115,20 @@ public class TreeItem<T>(override val item: T) : HasItem<T> {
 // ------------------------------------------------------ builder
 
 public class TreeBuilder<T> {
+
     internal val builders: MutableList<TreeItemBuilder<T>> = mutableListOf()
 
-    internal fun build(): Tree<T> {
-        val tree = Tree<T>()
-        for (builder in builders) {
-            tree.add(builder.build())
-        }
-        return tree
-    }
+    internal fun build(): Tree<T> = Tree(builders.map { it.build() })
 }
 
 public class TreeItemBuilder<T>(private val item: T) {
+
+    public var expanded: Boolean = false
     internal val childrenBuilder: TreeBuilder<T> = TreeBuilder()
 
     internal fun build(): TreeItem<T> {
         val treeItem = TreeItem(item)
-        for (cb in childrenBuilder.builders) {
-            val child = cb.build()
-            treeItem.addChild(child)
-        }
+        childrenBuilder.builders.forEach { treeItem.addChild(it.build()) }
         return treeItem
     }
 }
