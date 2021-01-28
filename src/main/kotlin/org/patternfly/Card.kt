@@ -258,7 +258,7 @@ public fun <T> CardExpandableContent<T>.cardFooter(
  * @sample org.patternfly.sample.CardSample.card
  */
 public class Card<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     internal val selectable: Boolean,
     id: String?,
@@ -295,7 +295,7 @@ public class Card<T> internal constructor(
             domNode.tabIndex = 0
             if (itemsStore != ItemsStore.NOOP) {
                 classMap(
-                    itemsStore.data.map { it.isSelected(item) }.combine(expanded.data) { selected, expanded ->
+                    itemsStore.isSelected(item).combine(expanded.data) { selected, expanded ->
                         selected to expanded
                     }.map { (selected, expanded) ->
                         mapOf(
@@ -328,7 +328,7 @@ public class Card<T> internal constructor(
  * The header component of a [Card].
  */
 public class CardHeader<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     internal val card: Card<T>,
     id: String?,
@@ -341,7 +341,7 @@ public class CardHeader<T> internal constructor(
  * The toggle control of a expandable card inside the [CardHeader].
  */
 public class CardToggle<T> internal constructor(
-    itemsStore: ItemsStore<T>,
+    itemsStore: SelectableItemPageContents<T>,
     item: T,
     card: Card<T>,
     id: String?,
@@ -368,7 +368,7 @@ public class CardToggle<T> internal constructor(
  * A component to group actions in the [CardHeader]. Besides the [CardCheckbox] the [CardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
  */
 public class CardAction<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     internal val card: Card<T>,
     id: String?,
@@ -387,7 +387,7 @@ public class CardAction<T> internal constructor(
  * Checkbox to (de)select a card. If the card is used standalone and is [selectable][Card.selectable], the checkbox is bound to a [CardStore]. If the card is part of a [CardView], the checkbox is bound to the selection state of the [ItemsStore].
  */
 public class CardCheckbox<T> internal constructor(
-    itemsStore: ItemsStore<T>,
+    itemsStore: SelectableItemPageContents<T>,
     item: T,
     card: Card<T>,
     id: String?,
@@ -399,7 +399,7 @@ public class CardCheckbox<T> internal constructor(
         type("checkbox")
         aria["invalid"] = false
         if (itemsStore != ItemsStore.NOOP) {
-            checked(itemsStore.data.map { it.isSelected(item) })
+            checked(itemsStore.isSelected(item))
             changes.states().map { Pair(item, it) } handledBy itemsStore.select
         } else {
             checked(card.selected.data)
@@ -414,7 +414,7 @@ public class CardCheckbox<T> internal constructor(
  * @sample org.patternfly.sample.CardSample.cardTitleInHeader
  * @sample org.patternfly.sample.CardSample.cardTitleInCard
  */
-public class CardTitle<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
+public class CardTitle<T> internal constructor(itemsStore: SelectableItemPageContents<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("title"), baseClass), job)
 
 /**
@@ -423,7 +423,7 @@ public class CardTitle<T> internal constructor(itemsStore: ItemsStore<T>, id: St
  * @sample org.patternfly.sample.CardSample.expandable
  */
 public class CardExpandableContent<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     card: Card<T>,
     id: String?,
     baseClass: String?,
@@ -442,13 +442,13 @@ public class CardExpandableContent<T> internal constructor(
  *
  * @sample org.patternfly.sample.CardSample.multipleBodies
  */
-public class CardBody<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
+public class CardBody<T> internal constructor(itemsStore: SelectableItemPageContents<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("body"), baseClass), job)
 
 /**
  * The footer of a [Card].
  */
-public class CardFooter<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
+public class CardFooter<T> internal constructor(itemsStore: SelectableItemPageContents<T>, id: String?, baseClass: String?, job: Job) :
     WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("footer"), baseClass), job)
 
 // ------------------------------------------------------ store

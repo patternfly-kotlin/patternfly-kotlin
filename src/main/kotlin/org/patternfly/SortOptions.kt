@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 public fun <T> ToolbarItem.sortOptions(
-    itemsStore: ItemsStore<T>,
+    itemsStore: Sortable<T>,
     options: List<SortInfo<T>>,
     id: String? = null,
     baseClass: String? = null,
@@ -36,7 +36,7 @@ public fun <T> ToolbarItem.sortOptions(
 
     // Two-way data binding (1): update selection according to Items.sortInfo
     select(
-        itemsStore.data.map { it.sortInfo }.filterNotNull().map {
+        itemsStore.currentSortInfo.filterNotNull().map {
             listOf(
                 SortProperty(it.id, it.text, it.comparator),
                 SortOrder(it.ascending)
