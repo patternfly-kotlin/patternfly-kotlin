@@ -31,7 +31,7 @@ import org.w3c.dom.HTMLUListElement
  * @sample org.patternfly.sample.DataListSample.dataList
  */
 public fun <T> RenderContext.dataList(
-    store: ItemsStore<T> = ItemsStore(),
+    store: SelectableItemPageContents<T> = ItemsStore(),
     selectableRows: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
@@ -182,7 +182,7 @@ public fun <T> DataListControl<T>.dataListToggle(
  * @sample org.patternfly.sample.DataListSample.dataList
  */
 public class DataList<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val selectableRows: Boolean,
     id: String?,
     baseClass: String?,
@@ -212,7 +212,7 @@ public class DataListAction internal constructor(id: String?, baseClass: String?
  * A cell in a [DataListContent] component. Cells are usually used to display properties of the items.
  */
 public class DataListCell<T> internal constructor(
-    itemsStore: ItemsStore<T>,
+    itemsStore: ItemPageContents<T>,
     id: String?,
     baseClass: String?,
     job: Job
@@ -228,7 +228,7 @@ public class DataListCell<T> internal constructor(
  * @sample org.patternfly.sample.DataListSample.selects
  */
 public class DataListCheckbox<T> internal constructor(
-    private val itemsStore: ItemsStore<T>,
+    private val itemsStore: SelectableItemPageContents<T>,
     private val item: T,
     id: String?,
     baseClass: String?,
@@ -240,7 +240,7 @@ public class DataListCheckbox<T> internal constructor(
             val inputId = Id.unique(ComponentType.DataList.id, "chk")
             name(inputId)
             type("checkbox")
-            checked(this@DataListCheckbox.itemsStore.data.map { it.isSelected(this@DataListCheckbox.item) })
+            checked(this@DataListCheckbox.itemsStore.isSelected(this@DataListCheckbox.item))
             aria["invalid"] = false
             aria["labelledby"] = this@DataListCheckbox.itemsStore.idProvider(this@DataListCheckbox.item)
             changes.states()
@@ -253,7 +253,7 @@ public class DataListCheckbox<T> internal constructor(
  * Component to group [DataListCell]s components inside a [DataListRow] component.
  */
 public class DataListContent<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: ItemPageContents<T>,
     id: String?,
     baseClass: String?,
     job: Job
@@ -264,7 +264,7 @@ public class DataListContent<T> internal constructor(
  * Component for controls of a [DataListRow] component. Use this class to add a [DataListToggle] or a [DataListCheckbox] component.
  */
 public class DataListControl<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     internal val dataListItem: DataListItem<T>,
     id: String?,
@@ -340,7 +340,7 @@ public class DataListExpandableContent<T> internal constructor(
  * ```
  */
 public class DataListItem<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     dataList: DataList<T>,
     id: String?,
@@ -370,7 +370,7 @@ public class DataListItem<T> internal constructor(
         aria["labelledby"] = itemsStore.idProvider(item)
         if (dataList.selectableRows) {
             classMap(
-                expanded.data.combine(itemsStore.data.map { it.isSelected(item) }) { expanded, selected ->
+                expanded.data.combine(itemsStore.isSelected(item)) { expanded, selected ->
                     expanded to selected
                 }.map { (expanded, selected) ->
                     mapOf(
@@ -390,7 +390,7 @@ public class DataListItem<T> internal constructor(
  * Component for the main data of a [DataListItem] component (except content for [DataListExpandableContent]).
  */
 public class DataListRow<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     internal val item: T,
     internal val dataListItem: DataListItem<T>,
     id: String?,
@@ -405,7 +405,7 @@ public class DataListRow<T> internal constructor(
  * If you use this component, don't forget to also add a [DataListExpandableContent] component to the [DataListItem] component.
  */
 public class DataListToggle<T> internal constructor(
-    private val itemsStore: ItemsStore<T>,
+    private val itemsStore: ItemPageContents<T>,
     private val item: T,
     private val dataListItem: DataListItem<T>,
     id: String?,

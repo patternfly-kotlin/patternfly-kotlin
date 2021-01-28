@@ -18,7 +18,7 @@ import org.w3c.dom.HTMLDivElement
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public fun <T> RenderContext.cardView(
-    store: ItemsStore<T> = ItemsStore(),
+    store: SelectableItemPageContents<T> = ItemsStore(),
     id: String? = null,
     baseClass: String? = null,
     content: CardView<T>.() -> Unit = {}
@@ -38,7 +38,7 @@ public fun <T> RenderContext.cardView(
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
 public class CardView<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableItemPageContents<T>,
     id: String?,
     baseClass: String?,
     job: Job

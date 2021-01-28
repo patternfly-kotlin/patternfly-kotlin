@@ -34,14 +34,14 @@ import org.w3c.dom.HTMLInputElement
  * @sample org.patternfly.sample.PaginationSample.itemStore
  */
 public fun <T> RenderContext.pagination(
-    store: ItemsStore<T>,
+    store: ItemPageContents<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: Pagination.() -> Unit = {}
 ): Pagination = register(
-    Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass, job),
+    Pagination(store, store.currPageInfo, pageSizes, compact, id = id, baseClass = baseClass, job),
     content
 )
 
@@ -84,7 +84,7 @@ public fun RenderContext.pagination(
  * @sample org.patternfly.sample.PaginationSample.toolbar
  */
 public fun <T> ToolbarItem.pagination(
-    store: ItemsStore<T>,
+    store: ItemPageContents<T>,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
     id: String? = null,
@@ -95,7 +95,7 @@ public fun <T> ToolbarItem.pagination(
     return register(
         Pagination(
             store,
-            store.data.map { it.pageInfo },
+            store.currPageInfo,
             pageSizes,
             compact,
             id = id,

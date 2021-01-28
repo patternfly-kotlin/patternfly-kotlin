@@ -42,7 +42,7 @@ import org.w3c.dom.set
  * @param content a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.dataTable(
-    store: ItemsStore<T> = ItemsStore(),
+    store: SelectableAndSortableItemPageContents<T> = ItemsStore(),
     id: String? = null,
     baseClass: String? = null,
     content: DataTable<T>.() -> Unit = {}
@@ -156,7 +156,7 @@ private val RADIO_GROUP_NAME = Id.unique(ComponentType.DataTable.id, "radio")
  * @sample org.patternfly.sample.DataTableSample.dataTable
  */
 public class DataTable<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
+    internal val itemsStore: SelectableAndSortableItemPageContents<T>,
     id: String?,
     baseClass: String?,
     job: Job
@@ -249,14 +249,14 @@ public class DataTable<T> internal constructor(
                 attr("scope", "col")
                 attr("role", "columnheader")
                 if (column.sortInfo != null) {
-                    aria["sort"] = this@DataTable.itemsStore.data.map {
-                        if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
-                            if (it.sortInfo.ascending) "ascending" else "descending"
+                    aria["sort"] = this@DataTable.itemsStore.currentSortInfo.map {
+                        if (it != null && it.id == column.sortInfo?.id) {
+                            if (it.ascending) "ascending" else "descending"
                         } else "none"
                     }
                     classMap(
-                        this@DataTable.itemsStore.data.map {
-                            mapOf("selected".modifier() to (column.sortInfo!!.id == it.sortInfo?.id))
+                        this@DataTable.itemsStore.currentSortInfo.map {
+                            mapOf("selected".modifier() to (column.sortInfo!!.id == it?.id))
                         }
                     )
                 }
@@ -283,9 +283,9 @@ public class DataTable<T> internal constructor(
                 span(baseClass = "table".component("sort", "indicator")) {
                     icon("arrows-alt-v".fas()) {
                         iconClass(
-                            this@DataTable.itemsStore.data.map {
-                                if (it.sortInfo != null && it.sortInfo.id == column.sortInfo?.id) {
-                                    if (it.sortInfo.ascending)
+                            this@DataTable.itemsStore.currentSortInfo.map {
+                                if (it != null && it.id == column.sortInfo?.id) {
+                                    if (it.ascending)
                                         "long-arrow-alt-up".fas()
                                     else
                                         "long-arrow-alt-down".fas()
@@ -420,7 +420,7 @@ private fun <T> Tr.renderSelectCell(
                 type("checkbox")
                 name("$itemId-check")
                 aria["labelledby"] = itemId
-                checked(dataTable.itemsStore.data.map { it.isSelected(item) })
+                checked(dataTable.itemsStore.isSelected(item))
                 changes.states().map { Pair(item, it) } handledBy dataTable.itemsStore.select
             }
         } else if (column.selectionMode == SINGLE) {
@@ -428,7 +428,7 @@ private fun <T> Tr.renderSelectCell(
                 type("radio")
                 name(RADIO_GROUP_NAME) // same name for all radios == radio group
                 aria["labelledby"] = itemId
-                checked(dataTable.itemsStore.data.map { it.isSelected(item) })
+                checked(dataTable.itemsStore.isSelected(item))
                 changes.states().map { item } handledBy dataTable.itemsStore.selectOnly
             }
         }
