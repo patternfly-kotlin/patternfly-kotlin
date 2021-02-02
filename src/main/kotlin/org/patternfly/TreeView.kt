@@ -103,7 +103,7 @@ public class TreeView<T> internal constructor(
         this.fetchItems = fetchItems
     }
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "ComplexMethod")
     private fun renderTreeItem(ul: Ul, treeItem: TreeItem<T>) {
         with(ul) {
             li(
@@ -169,6 +169,9 @@ public class TreeView<T> internal constructor(
                             }
                         }
                     }
+                }
+                if (treeItem.expanded && treeItem.hasChildren) {
+                    this@TreeView.expand(domNode, treeItem)
                 }
             }
         }
@@ -261,10 +264,11 @@ public class DoubleIcon(
 public class TreeStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
     RootStore<Tree<T>>(Tree(emptyList())), WithIdProvider<T> {
 
-    internal val select: EmittingHandler<TreeItem<T>, TreeItem<T>> = handleAndEmit { tree, treeItem ->
-        emit(treeItem)
-        tree
-    }
+    internal val select: EmittingHandler<TreeItem<T>, TreeItem<T>> =
+        handleAndEmit { tree, treeItem ->
+            emit(treeItem)
+            tree
+        }
 
     public val currentTreeItem: Flow<TreeItem<T>> = select
 

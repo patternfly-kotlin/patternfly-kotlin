@@ -6,12 +6,12 @@ package org.patternfly
 
 public fun <T> tree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
 
-public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
-    TreeItemBuilder(item).apply(block).build()
-
 public fun <T> TreeView<T>.tree(block: TreeBuilder<T>.() -> Unit = {}) {
     store.update(TreeBuilder<T>().apply(block).build())
 }
+
+public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
+    TreeItemBuilder(item).apply(block).build()
 
 public fun <T> TreeBuilder<T>.treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}) {
     val builder = TreeItemBuilder(item).apply(block)
@@ -45,7 +45,8 @@ public class Tree<T> internal constructor(public val roots: List<TreeItem<T>>) {
     }
 }
 
-public class TreeItem<T>(override val item: T) : HasItem<T> {
+public class TreeItem<T> internal constructor(override val item: T, internal val expanded: Boolean = false) :
+    HasItem<T> {
 
     private var _parent: TreeItem<T>? = null
     private val _children: MutableList<TreeItem<T>> = mutableListOf()
@@ -127,7 +128,7 @@ public class TreeItemBuilder<T>(private val item: T) {
     internal val childrenBuilder: TreeBuilder<T> = TreeBuilder()
 
     internal fun build(): TreeItem<T> {
-        val treeItem = TreeItem(item)
+        val treeItem = TreeItem(item, expanded)
         childrenBuilder.builders.forEach { treeItem.addChild(it.build()) }
         return treeItem
     }
