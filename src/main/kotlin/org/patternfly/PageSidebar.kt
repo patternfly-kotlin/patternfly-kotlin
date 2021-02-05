@@ -22,16 +22,19 @@ public fun Page.pageSidebar(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): PageSidebar = register(
-    PageSidebar(
-        sidebarStore,
-        id = id,
-        baseClass = baseClass,
-        job,
-        content
-    ),
-    {}
-)
+): PageSidebar {
+    sidebarStore.visible(true)
+    return register(
+        PageSidebar(
+            sidebarStore,
+            id = id,
+            baseClass = baseClass,
+            job,
+            content
+        ),
+        {}
+    )
+}
 
 // ------------------------------------------------------ tag
 
@@ -89,7 +92,7 @@ public class PageSidebar internal constructor(
 
 internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 
-internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = true, expanded = true)) {
+internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
 
     val visible: SimpleHandler<Boolean> = handle { status, visible ->
         status.copy(visible = visible)
