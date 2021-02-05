@@ -24,16 +24,7 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build/dokka/html
           CLEAN: true
-      - run: ./gradlew build
-      - uses: docker://antonyurchenko/git-release:latest
+      - run: ./gradlew publish
         env:
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ALLOW_TAG_PREFIX: "true"
-        with:
-          args: |
-            build/libs/patternfly-fritz2*.jar
-      - run: ./gradlew build publish generatePomFileForMavenPublication bintrayUpload
-        env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-          BINTRAY_ORG: ${{ secrets.BINTRAY_ORG }}

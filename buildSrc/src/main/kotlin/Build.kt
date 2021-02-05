@@ -10,16 +10,15 @@ object Constants {
 }
 
 object PluginVersions {
-    const val bintray = "1.8.5"
     const val dokka = "1.4.20"
-    const val js = "1.4.20"
+    const val js = "1.4.30"
     const val ktlint = "9.4.1"
     const val detekt = "1.15.0"
 }
 
 object Versions {
     const val fritz2 = "0.8"
-    const val kotest = "4.3.2"
+    const val kotest = "4.4.0"
 }
 
 fun DependencyHandler.fritz2() {

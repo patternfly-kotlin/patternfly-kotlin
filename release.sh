@@ -15,6 +15,8 @@
 #   3. Commit version change
 #   4. Create and push tag 'v<version>'
 #   5. GitHub workflow defined in 'release.yml' kicks in
+#        - Publish API documentation
+#        - Publish packages
 
 
 
@@ -59,4 +61,4 @@ printf "\n\n\n# Tag and push %s\n\n" "$VERSION_TAG"
 git tag "$VERSION_TAG"
 git push --tags origin
 
-printf "\n\n\n<<--==  PatternFly Fritz2 successfully released  ==-->>\n\n"
+printf "\n\n\n<<--==  PatternFly Fritz2 %s successfully released  ==-->>\n\n" "$VERSION_TAG"

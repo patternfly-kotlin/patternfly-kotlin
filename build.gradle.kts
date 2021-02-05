@@ -1,11 +1,9 @@
 import org.jetbrains.dokka.Platform
 import java.net.URL
-import java.util.Date
 
 plugins {
     kotlin("js") version PluginVersions.js
     id("org.jetbrains.dokka") version PluginVersions.dokka
-    id("com.jfrog.bintray") version PluginVersions.bintray
     id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlint
     id("org.jlleitschuh.gradle.ktlint-idea") version PluginVersions.ktlint
     id("io.gitlab.arturbosch.detekt") version PluginVersions.detekt
@@ -124,30 +122,14 @@ publishing {
             }
         }
     }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_API_KEY")
-    publish = true
-    setPublications("maven")
-
-    pkg.apply {
-        repo = Constants.name
-        name = Constants.name
-        desc = Constants.description
-        userOrg = System.getenv("BINTRAY_ORG")
-        githubRepo = Constants.githubRepo
-        vcsUrl = "https://github.com/${Constants.githubRepo}.git"
-        websiteUrl = "https://github.com/${Constants.githubRepo}"
-        issueTrackerUrl = "https://github.com/${Constants.githubRepo}/issues"
-        setLabels("kotlin", "kotlin-js", "patternfly", "reactive", "fritz2")
-        setLicenses(Constants.license)
-
-        version.apply {
-            name = Constants.version
-            released = Date().toString()
-            vcsTag = "v${Constants.version}"
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${Constants.githubRepo}")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
