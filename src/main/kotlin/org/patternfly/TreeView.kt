@@ -1,9 +1,9 @@
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
-import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
+import dev.fritz2.dom.html.EventType
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
@@ -12,9 +12,8 @@ import dev.fritz2.dom.html.renderElement
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
@@ -30,13 +29,14 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
+import org.w3c.dom.events.Event
 import org.w3c.dom.set
 
 // TODO Document me
 // ------------------------------------------------------ dsl
 
 public fun <T> RenderContext.treeView(
-    store: TreeStore<T> = TreeStore(),
+    idProvider: IdProvider<T, String> = { it.toString() },
     checkboxes: Boolean = false,
     badges: Boolean = false,
     id: String? = null,
@@ -44,7 +44,7 @@ public fun <T> RenderContext.treeView(
     content: TreeView<T>.() -> Unit = {}
 ): TreeView<T> = register(
     TreeView(
-        store,
+        idProvider,
         checkboxes = checkboxes,
         badges = badges,
         id = id,
@@ -62,34 +62,48 @@ private const val COLLAPSED_ICON = TREE_ITEM + "ci"
 
 @Suppress("LongParameterList")
 public class TreeView<T> internal constructor(
-    public val store: TreeStore<T>,
+    private val idProvider: IdProvider<T, String>,
     private val checkboxes: Boolean,
     private val badges: Boolean,
     id: String?,
     baseClass: String?,
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
-    WithIdProvider<T> by store,
     Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
+    private var ul: Ul
     private var display: ComponentDisplay<Span, T> = { +it.toString() }
     private var iconProvider: TreeIconProvider<T>? = null
     private var fetchItems: (suspend (TreeItem<T>) -> List<TreeItem<T>>)? = null
 
+    public val treeItemSelects: Listener<TreeItemSelectEvent<T>, HTMLElement> by lazy {
+        val type = EventType<TreeItemSelectEvent<T>>(TREE_ITEM_SELECT)
+        Listener(
+            callbackFlow {
+                val listener: (Event) -> Unit = {
+                    offer(it.unsafeCast<TreeItemSelectEvent<T>>())
+                }
+                domNode.addEventListener(type.name, listener)
+                awaitClose { domNode.removeEventListener(type.name, listener) }
+            }
+        )
+    }
+
     init {
         markAs(ComponentType.TreeView)
-        ul(baseClass = "tree-view".component("list")) {
+        ul = ul(baseClass = "tree-view".component("list")) {
             attr("role", "tree")
-            (MainScope() + job).launch {
-                this@TreeView.store.data.collect { tree ->
-                    this@ul.domNode.clear()
-                    tree.roots.forEach { treeItem ->
-                        this@TreeView.renderTreeItem(this@ul, treeItem)
-                    }
-                }
-            }
         }
     }
+
+    public var tree: Tree<T> = Tree(emptyList())
+        set(value) {
+            ul.domNode.clear()
+            value.roots.forEach { treeItem ->
+                this@TreeView.renderTreeItem(ul, treeItem)
+            }
+            field = value
+        }
 
     public fun display(display: ComponentDisplay<Span, T>) {
         this.display = display
@@ -101,6 +115,26 @@ public class TreeView<T> internal constructor(
 
     public fun fetchItems(fetchItems: FetchItems<T>) {
         this.fetchItems = fetchItems
+    }
+
+    @Suppress("NestedBlockDepth")
+    public fun select(item: T) {
+        tree.find { idProvider(item) == idProvider(it.unwrap()) }?.let { match ->
+            val lastIndex = match.path.lastIndex
+            match.path.forEachIndexed { index, treeItem ->
+                val identifier = idProvider(treeItem.unwrap())
+                domNode.querySelector(By.data(TREE_ITEM, identifier))?.let { li ->
+                    if (index != lastIndex) {
+                        expand(li, treeItem)
+                    } else {
+                        li.querySelector(By.classname("tree-view".component("node")))?.let { button ->
+                            selectInternal(li, button, treeItem)
+                            button.scrollIntoView()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Suppress("LongMethod", "ComplexMethod")
@@ -117,11 +151,10 @@ public class TreeView<T> internal constructor(
                 domNode.dataset[TREE_ITEM] = this@TreeView.idProvider(treeItem.item)
                 div(baseClass = "tree-view".component("content")) {
                     button(baseClass = "tree-view".component("node")) {
-                        clicks.map { treeItem } handledBy this@TreeView.store.select
                         domNode.addEventListener(
                             Events.click.name,
                             {
-                                this@TreeView.select(this.domNode, this@li.domNode, treeItem)
+                                this@TreeView.selectInternal(this@li.domNode, this.domNode, treeItem)
                             }
                         )
                         if (treeItem.hasChildren || (this@TreeView.fetchItems != null && !treeItem.fetched)) {
@@ -170,14 +203,11 @@ public class TreeView<T> internal constructor(
                         }
                     }
                 }
-                if (treeItem.expanded && treeItem.hasChildren) {
-                    this@TreeView.expand(domNode, treeItem)
-                }
             }
         }
     }
 
-    private fun select(button: Element, li: Element, treeItem: TreeItem<T>) {
+    private fun selectInternal(li: Element, button: Element, treeItem: TreeItem<T>) {
         // (1) deselect all
         domNode.querySelectorAll(By.classname("tree-view".component("node"))).asList().forEach {
             if (it is HTMLElement) {
@@ -211,6 +241,10 @@ public class TreeView<T> internal constructor(
                 }
             }
         }
+
+        // (4) fire select event
+        // TODO Fix custom event creation
+        // domNode.dispatchEvent(TreeItemSelectEvent(treeItem))
     }
 
     private fun expand(li: Element, treeItem: TreeItem<T>) {
@@ -259,18 +293,7 @@ public class DoubleIcon(
     public val expanded: RenderContext.() -> Tag<HTMLElement>
 ) : TreeIcon()
 
-// ------------------------------------------------------ store
+@Suppress("SpellCheckingInspection")
+internal const val TREE_ITEM_SELECT = "treeitemselect"
 
-public class TreeStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
-    RootStore<Tree<T>>(Tree(emptyList())), WithIdProvider<T> {
-
-    internal val select: EmittingHandler<TreeItem<T>, TreeItem<T>> =
-        handleAndEmit { tree, treeItem ->
-            emit(treeItem)
-            tree
-        }
-
-    public val currentTreeItem: Flow<TreeItem<T>> = select
-
-    public val currentPath: Flow<List<TreeItem<T>>> = currentTreeItem.map { it.path }
-}
+public class TreeItemSelectEvent<T>(public val treeItem: TreeItem<T>) : Event(TREE_ITEM_SELECT)
