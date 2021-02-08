@@ -13,7 +13,7 @@ object PluginVersions {
     const val dokka = "1.4.20"
     const val js = "1.4.30"
     const val ktlint = "9.4.1"
-    const val detekt = "1.15.0"
+    const val detekt = "1.16.0-RC1"
 }
 
 object Versions {
