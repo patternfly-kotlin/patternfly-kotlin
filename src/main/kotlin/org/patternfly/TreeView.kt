@@ -249,7 +249,6 @@ public class TreeView<T> internal constructor(
         }
 
         // (4) fire select event
-        console.log("Fire tree item select for ${idProvider(treeItem.unwrap())}")
         domNode.dispatchEvent(CustomEvent(TREE_ITEM_SELECT, CustomEventInit(treeItem)))
     }
 

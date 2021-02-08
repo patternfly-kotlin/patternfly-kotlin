@@ -74,7 +74,6 @@ public class PageSidebar internal constructor(
      * Manually show & hide the sidebar.
      */
     public fun visible(value: Boolean) {
-        console.log("${if (value) "Show" else "Hide"} sidebar")
         sidebarStore.visible(value)
     }
 
