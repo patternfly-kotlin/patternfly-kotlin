@@ -13,6 +13,7 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -25,6 +26,8 @@ import org.patternfly.dom.plusAssign
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.querySelectorAll
 import org.patternfly.dom.removeFromParent
+import org.w3c.dom.CustomEvent
+import org.w3c.dom.CustomEventInit
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -72,21 +75,20 @@ public class TreeView<T> internal constructor(
     Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
 
     private var ul: Ul
+    private var _tree: Tree<T> = Tree(emptyList())
     private var display: ComponentDisplay<Span, T> = { +it.toString() }
     private var iconProvider: TreeIconProvider<T>? = null
     private var fetchItems: (suspend (TreeItem<T>) -> List<TreeItem<T>>)? = null
 
-    public val treeItemSelects: Listener<TreeItemSelectEvent<T>, HTMLElement> by lazy {
-        val type = EventType<TreeItemSelectEvent<T>>(TREE_ITEM_SELECT)
-        Listener(
+    public val treeItemSelects: Flow<TreeItem<T>> by lazy {
+        val type = EventType<CustomEvent>(TREE_ITEM_SELECT)
+        Listener<CustomEvent, HTMLElement>(
             callbackFlow {
-                val listener: (Event) -> Unit = {
-                    offer(it.unsafeCast<TreeItemSelectEvent<T>>())
-                }
+                val listener: (Event) -> Unit = { offer(it.unsafeCast<CustomEvent>()) }
                 domNode.addEventListener(type.name, listener)
                 awaitClose { domNode.removeEventListener(type.name, listener) }
             }
-        )
+        ).map { it.detail.unsafeCast<TreeItem<T>>() }
     }
 
     init {
@@ -96,14 +98,38 @@ public class TreeView<T> internal constructor(
         }
     }
 
-    public var tree: Tree<T> = Tree(emptyList())
-        set(value) {
-            ul.domNode.clear()
-            value.roots.forEach { treeItem ->
-                this@TreeView.renderTreeItem(ul, treeItem)
-            }
-            field = value
+    public val tree: Tree<T>
+        get() = _tree
+
+    public fun show(tree: Tree<T>) {
+        ul.domNode.clear()
+        tree.roots.forEach { treeItem ->
+            this@TreeView.renderTreeItem(ul, treeItem)
         }
+        this._tree = tree
+    }
+
+    @Suppress("NestedBlockDepth")
+    public fun select(item: T) {
+        tree.find { idProvider(item) == idProvider(it.unwrap()) }?.let { match ->
+            val lastIndex = match.path.lastIndex
+            match.path.forEachIndexed { index, treeItem ->
+                val identifier = idProvider(treeItem.unwrap())
+                domNode.querySelector(By.data(TREE_ITEM, identifier))?.let { li ->
+                    if (index != lastIndex) {
+                        if (li.aria["expanded"] != "true") {
+                            expand(li, treeItem)
+                        }
+                    } else {
+                        li.querySelector(By.classname("tree-view".component("node")))?.let { button ->
+                            selectInternal(li, button, treeItem)
+                            button.scrollIntoView()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public fun display(display: ComponentDisplay<Span, T>) {
         this.display = display
@@ -115,26 +141,6 @@ public class TreeView<T> internal constructor(
 
     public fun fetchItems(fetchItems: FetchItems<T>) {
         this.fetchItems = fetchItems
-    }
-
-    @Suppress("NestedBlockDepth")
-    public fun select(item: T) {
-        tree.find { idProvider(item) == idProvider(it.unwrap()) }?.let { match ->
-            val lastIndex = match.path.lastIndex
-            match.path.forEachIndexed { index, treeItem ->
-                val identifier = idProvider(treeItem.unwrap())
-                domNode.querySelector(By.data(TREE_ITEM, identifier))?.let { li ->
-                    if (index != lastIndex) {
-                        expand(li, treeItem)
-                    } else {
-                        li.querySelector(By.classname("tree-view".component("node")))?.let { button ->
-                            selectInternal(li, button, treeItem)
-                            button.scrollIntoView()
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Suppress("LongMethod", "ComplexMethod")
@@ -243,8 +249,8 @@ public class TreeView<T> internal constructor(
         }
 
         // (4) fire select event
-        // TODO Fix custom event creation
-        // domNode.dispatchEvent(TreeItemSelectEvent(treeItem))
+        console.log("Fire tree item select for ${idProvider(treeItem.unwrap())}")
+        domNode.dispatchEvent(CustomEvent(TREE_ITEM_SELECT, CustomEventInit(treeItem)))
     }
 
     private fun expand(li: Element, treeItem: TreeItem<T>) {
@@ -282,6 +288,9 @@ public class TreeView<T> internal constructor(
 
 // ------------------------------------------------------ type
 
+@Suppress("SpellCheckingInspection")
+private const val TREE_ITEM_SELECT = "treeitemselect"
+
 public typealias FetchItems<T> = suspend (TreeItem<T>) -> List<TreeItem<T>>
 
 public typealias TreeIconProvider<T> = (T) -> TreeIcon
@@ -292,8 +301,3 @@ public class DoubleIcon(
     public val collapsed: RenderContext.() -> Tag<HTMLElement>,
     public val expanded: RenderContext.() -> Tag<HTMLElement>
 ) : TreeIcon()
-
-@Suppress("SpellCheckingInspection")
-internal const val TREE_ITEM_SELECT = "treeitemselect"
-
-public class TreeItemSelectEvent<T>(public val treeItem: TreeItem<T>) : Event(TREE_ITEM_SELECT)

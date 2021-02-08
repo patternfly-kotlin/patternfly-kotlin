@@ -7,7 +7,7 @@ package org.patternfly
 public fun <T> tree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
 
 public fun <T> TreeView<T>.tree(block: TreeBuilder<T>.() -> Unit = {}) {
-    tree = TreeBuilder<T>().apply(block).build()
+    show(TreeBuilder<T>().apply(block).build())
 }
 
 public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
