@@ -369,7 +369,7 @@ public class Dropdown<T> internal constructor(
                 this@Dropdown.defaultDisplay.invoke(this, item)
             }
             clicks handledBy this@Dropdown.expanded.collapse
-            clicks.map { item.unwrap() } handledBy this@Dropdown.store.select
+            clicks.map { item } handledBy this@Dropdown.store.handleClicks
         }
     }
 

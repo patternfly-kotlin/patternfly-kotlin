@@ -39,6 +39,16 @@ public fun <T> Breadcrumb<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
     store.update(entries)
 }
 
+/**
+ * Starts a block to add navigation items using the DSL.
+ *
+ * @param block code block for adding the navigation items.
+ */
+public fun <T> BreadcrumbStore<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
+    val entries = ItemsBuilder(idProvider, itemSelection).apply(block).build()
+    update(entries)
+}
+
 // ------------------------------------------------------ tag
 
 /**
@@ -113,7 +123,7 @@ public class Breadcrumb<T> internal constructor(
                                     mapOf("current".modifier() to item.selected)
                                 }
                             )
-                            clicks.map { item.unwrap() } handledBy this@Breadcrumb.store.select
+                            clicks.map { item } handledBy this@Breadcrumb.store.handleClicks
                             if (this@Breadcrumb.customDisplay != null) {
                                 this@Breadcrumb.customDisplay?.invoke(this, item.item)
                             } else {

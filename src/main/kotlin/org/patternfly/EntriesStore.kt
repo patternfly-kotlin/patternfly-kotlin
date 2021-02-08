@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.lenses.IdProvider
@@ -45,8 +46,14 @@ public abstract class EntriesStore<T> internal constructor(
     WithIdProvider<T> {
 
     @Suppress("LeakingThis")
-    internal val select: Handler<T> = handle { entries, data ->
-        entries.select(data)
+    internal val handleClicks: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, data ->
+        emit(data)
+        entries
+    }
+
+    @Suppress("LeakingThis")
+    internal val handleSelection: Handler<Item<T>> = handle { entries, data ->
+        entries.select(data.unwrap())
     }
 
     /**
@@ -66,4 +73,7 @@ public abstract class EntriesStore<T> internal constructor(
      */
     public val singleSelection: Flow<Item<T>>
         get() = data.map { it.singleSelection }.filterNotNull()
+
+    /** Flow with the last clicked item */
+    public val clicked: Flow<Item<T>> = handleClicks
 }
