@@ -283,7 +283,7 @@ public class OptionsMenu<T> internal constructor(
             if (this@OptionsMenu.closeOnSelect) {
                 clicks handledBy this@OptionsMenu.expanded.collapse
             }
-            clicks.map { item } handledBy this@OptionsMenu.store.handleSelection
+            clicks.map { item.unwrap() } handledBy this@OptionsMenu.store.handleSelection
         }
     }
 
@@ -348,9 +348,7 @@ public class OptionsMenu<T> internal constructor(
      * Updates the selection based on the specified value.
      */
     public fun select(value: T) {
-        store.data.value.items.find { store.idProvider(value) == store.idProvider(it.unwrap()) }?.let {
-            store.handleSelection(it)
-        }
+        store.handleSelection(value)
     }
 }
 

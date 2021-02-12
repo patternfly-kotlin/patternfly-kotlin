@@ -15,6 +15,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -51,6 +53,14 @@ public fun <T> RenderContext.tabs(
 )
 
 /**
+ * Creates and returns a list of [TabItem]s.
+ *
+ * @param block code block for adding the tab items.
+ */
+public fun <T> items(block: TabItemsBuilder<T>.() -> Unit = {}): List<TabItem<T>> =
+    TabItemsBuilder<T>().apply(block).build()
+
+/**
  * Starts a block to add tab items to the [TabStore].
  *
  * @receiver the [Tabs] component.
@@ -71,7 +81,7 @@ public fun <T> Tabs<T>.items(block: TabItemsBuilder<T>.() -> Unit = {}) {
  *
  * @sample org.patternfly.sample.TabsSample.store
  */
-public fun <T> TabStore<T>.items(block: TabItemsBuilder<T>.() -> Unit = {}) {
+public fun <T> TabStore<T>.updateItems(block: TabItemsBuilder<T>.() -> Unit = {}) {
     val tabItems = TabItemsBuilder<T>().apply(block).build()
     update(tabItems)
 }
@@ -173,7 +183,7 @@ public class Tabs<T> internal constructor(
                     ) {
                         button(id = this@Tabs.tabId(tab.item), baseClass = "tabs".component("link")) {
                             aria["controls"] = this@Tabs.contentId(tab.item)
-                            clicks.map { tab } handledBy this@Tabs.store.selectHandler
+                            clicks.map { tab } handledBy this@Tabs.store.selectTab
                             if (tab.icon != null) {
                                 span(baseClass = "tabs".component("item", "icon")) {
                                     tab.icon.invoke(this)
@@ -275,20 +285,32 @@ public class TabContent<T> internal constructor(public val item: T, tabId: Strin
 public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
     RootStore<List<TabItem<T>>>(emptyList()) {
 
-    internal val selectHandler: EmittingHandler<TabItem<T>, TabItem<T>> = handleAndEmit { items, tab ->
-        emit(tab)
-        items.map {
-            if (identifier(it.item) == identifier(tab.item))
-                it.copy(selected = true)
-            else
-                it.copy(selected = false)
+    internal val selectTab: EmittingHandler<TabItem<T>, TabItem<T>> =
+        handleAndEmit { items, tab ->
+            emit(tab)
+            items.map {
+                if (identifier(it.unwrap()) == identifier(tab.unwrap()))
+                    it.copy(selected = true)
+                else
+                    it.copy(selected = false)
+            }
         }
-    }
+
+    public val selectItem: EmittingHandler<T, TabItem<T>> =
+        handleAndEmit { items, item ->
+            items.find { identifier(it.unwrap()) == identifier(item) }?.let { emit(it) }
+            items.map {
+                if (identifier(it.item) == identifier(item))
+                    it.copy(selected = true)
+                else
+                    it.copy(selected = false)
+            }
+        }
 
     /**
      * Flow with the last selected tab item.
      */
-    public val selects: Flow<TabItem<T>> = selectHandler
+    public val selects: Flow<TabItem<T>> = flowOf(selectTab, selectItem).flattenMerge()
 }
 
 // ------------------------------------------------------ types

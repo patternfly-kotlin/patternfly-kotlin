@@ -46,14 +46,16 @@ public abstract class EntriesStore<T> internal constructor(
     WithIdProvider<T> {
 
     @Suppress("LeakingThis")
-    internal val handleClicks: EmittingHandler<Item<T>, Item<T>> = handleAndEmit { entries, data ->
-        emit(data)
+    internal val handleClicks: EmittingHandler<T, Item<T>> = handleAndEmit { entries, data ->
+        entries.items.find { idProvider(data) == idProvider(it.unwrap()) }?.let {
+            emit(it)
+        }
         entries
     }
 
     @Suppress("LeakingThis")
-    internal val handleSelection: Handler<Item<T>> = handle { entries, data ->
-        entries.select(data.unwrap())
+    internal val handleSelection: Handler<T> = handle { entries, data ->
+        entries.select(data)
     }
 
     /**

@@ -43,8 +43,8 @@ internal interface EntrySample {
     fun unwrap() {
         render {
             dropdown<String> {
-                store.selects.unwrap() handledBy Notification.add {
-                    info("You selected on $it")
+                store.clicked.unwrap() handledBy Notification.add {
+                    info("You clicked on $it")
                 }
                 textToggle { +"Text" }
                 items {
