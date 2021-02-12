@@ -7,7 +7,7 @@ package org.patternfly
 public fun <T> tree(block: TreeBuilder<T>.() -> Unit = {}): Tree<T> = TreeBuilder<T>().apply(block).build()
 
 public fun <T> TreeView<T>.tree(block: TreeBuilder<T>.() -> Unit = {}) {
-    show(TreeBuilder<T>().apply(block).build())
+    store.update(TreeBuilder<T>().apply(block).build())
 }
 
 public fun <T> treeItem(item: T, block: TreeItemBuilder<T>.() -> Unit = {}): TreeItem<T> =
@@ -24,7 +24,10 @@ public fun <T> TreeItemBuilder<T>.children(block: TreeBuilder<T>.() -> Unit = {}
 
 // ------------------------------------------------------ type
 
-public class Tree<T> internal constructor(public val roots: List<TreeItem<T>>) {
+public class Tree<T> internal constructor(
+    public val roots: List<TreeItem<T>>,
+    internal val initialSelection: ((TreeItem<T>) -> Boolean)?
+) {
 
     public fun find(predicate: (TreeItem<T>) -> Boolean): TreeItem<T>? {
         var result: TreeItem<T>? = null
@@ -116,9 +119,10 @@ public class TreeItem<T> internal constructor(override val item: T) : HasItem<T>
 
 public class TreeBuilder<T> {
 
+    public var initialSelection: ((TreeItem<T>) -> Boolean)? = null
     internal val builders: MutableList<TreeItemBuilder<T>> = mutableListOf()
 
-    internal fun build(): Tree<T> = Tree(builders.map { it.build() })
+    internal fun build(): Tree<T> = Tree(builders.map { it.build() }, initialSelection)
 }
 
 public class TreeItemBuilder<T>(private val item: T) {
