@@ -4,6 +4,8 @@ package org.patternfly.dom
 
 import dev.fritz2.dom.Tag
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import org.patternfly.util
 import org.w3c.dom.DOMTokenList
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
@@ -153,6 +155,22 @@ public fun Element.hide() {
  */
 public fun Element.show() {
     this.unsafeCast<HTMLElement>().style.display = ""
+}
+
+/**
+ * Adds the `hidden` attribute and the CSS class `pf-u-display-none` to this tag if [condition] evaluates to true, removes the attribute and the CSS class otherwise.
+ */
+public fun <E : Element, T> Tag<E>.hideIf(flow: Flow<T>, condition: (T) -> Boolean) {
+    attr("hidden", flow.map { condition(it) })
+    classMap(flow.map { mapOf("display-none".util() to condition(it)) })
+}
+
+/**
+ * Removes the `hidden` attribute and the CSS class `pf-u-display-none` from this tag if [condition] evaluates to true, adds the attribute and the CSS class otherwise.
+ */
+public fun <E : Element, T> Tag<E>.showIf(flow: Flow<T>, condition: (T) -> Boolean) {
+    attr("hidden", flow.map { !condition(it) })
+    classMap(flow.map { mapOf("display-none".util() to !condition(it)) })
 }
 
 /**
