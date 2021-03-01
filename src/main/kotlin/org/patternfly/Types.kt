@@ -118,6 +118,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     PageSidebar("pgs", "page".component("sidebar")),
     Pagination("pgn", "pagination".component()),
     Select("sel", "select".component()),
+    Skeleton("sk", "skeleton".component()),
     Spinner("sp", "spinner".component()),
     Switch("sw", "switch".component()),
     Tabs("tbs"),
@@ -259,4 +260,57 @@ public enum class TriState(internal val checked: Boolean, internal val indetermi
     OFF(false, false),
     INDETERMINATE(false, true),
     ON(true, false)
+}
+
+/**
+ * Width modifier for [Skeleton] components.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class Width(public val modifier: String) {
+    SM("sm".width()),
+    MD("md".width()),
+    LG("lg".width()),
+    _25("25".width()),
+    _33("33".width()),
+    _50("50".width()),
+    _66("66".width()),
+    _75("75".width()),
+}
+
+/**
+ * Width modifier for [Skeleton] components.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class Height(public val modifier: String) {
+    SM("sm".width()),
+    MD("md".width()),
+    LG("lg".width()),
+    _25("25".height()),
+    _33("33".height()),
+    _50("50".height()),
+    _66("66".height()),
+    _75("75".height()),
+    _100("100".height()),
+}
+
+/**
+ * FontSize modifier for [Skeleton] components.
+ */
+public enum class FontSize(public val modifier: String) {
+    XL_4("4xl".text()),
+    XL_3("3xl".text()),
+    XL_2("2xl".text()),
+    XL("xl".text()),
+    LG("lg".text()),
+    MD("md".text()),
+    SM("sm".text()),
+    XS("xs".text())
+}
+
+/**
+ * Shape modifier for [Skeleton] components.
+ */
+public enum class Shape(public val modifier: String) {
+    CIRCLE("circle".modifier()),
+    SQUARE("square".modifier()),
 }
