@@ -1,17 +1,24 @@
-import org.jetbrains.dokka.Platform
 import java.net.URL
 
 plugins {
-    kotlin("js") version PluginVersions.js
-    id("org.jetbrains.dokka") version PluginVersions.dokka
-    id("org.jlleitschuh.gradle.ktlint") version PluginVersions.ktlint
-    id("org.jlleitschuh.gradle.ktlint-idea") version PluginVersions.ktlint
-    id("io.gitlab.arturbosch.detekt") version PluginVersions.detekt
+    kotlin("js") version "1.4.30"
+    id("org.jetbrains.dokka") version "1.4.20"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    id("org.jlleitschuh.gradle.ktlint-idea") version "9.4.1"
+    id("io.gitlab.arturbosch.detekt") version "1.16.0-RC1"
     `maven-publish`
 }
 
-group = Constants.group
-version = Constants.version
+group = "org.patternfly"
+version = "0.2.0"
+
+val name = "patternfly-fritz2"
+val description = "Kotlin implementation of PatternFly 4 based on fritz2"
+val license = "Apache-2.0"
+val githubRepo = "patternfly-kotlin/patternfly-fritz2"
+
+val fritz2 = "0.9-SNAPSHOT"
+val kotest = "4.4.1"
 
 repositories {
     mavenLocal()
@@ -22,8 +29,10 @@ repositories {
 }
 
 dependencies {
-    fritz2()
-    kotest()
+    implementation("dev.fritz2:core:$fritz2")
+    testImplementation("io.kotest:kotest-assertions-core:$kotest")
+    testImplementation("io.kotest:kotest-property:$kotest")
+    testImplementation("io.kotest:kotest-framework-engine:$kotest")
 }
 
 kotlin {
@@ -61,14 +70,14 @@ tasks {
                 noStdlibLink.set(false)
                 includeNonPublic.set(false)
                 skipEmptyPackages.set(true)
-                platform.set(Platform.js)
+                platform.set(org.jetbrains.dokka.Platform.js)
                 includes.from("src/main/resources/module.md")
                 samples.from("src/main/resources/")
                 sourceLink {
                     localDirectory.set(file("src/main/kotlin"))
                     remoteUrl.set(
                         URL(
-                            "https://github.com/patternfly-kotlin/patternfly-fritz2/blob/master/" +
+                            "https://github.com/${githubRepo}/blob/master/" +
                                 "src/main/kotlin/"
                         )
                     )
@@ -88,18 +97,18 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = Constants.group
-            artifactId = Constants.name
-            version = Constants.version
+            groupId = group.toString()
+            artifactId = name
+            version = version
             from(components["kotlin"])
             artifact(tasks["sourcesJar"])
             pom {
-                name.set("patternfly-fritz2")
-                description.set(Constants.description)
-                url.set("https://github.com/${Constants.githubRepo}")
+                name.set(name)
+                description.set(description)
+                url.set("https://github.com/${githubRepo}")
                 licenses {
                     license {
-                        name.set(Constants.license)
+                        name.set(license)
                         url.set("https://opensource.org/licenses/Apache-2.0")
                     }
                 }
@@ -112,12 +121,12 @@ publishing {
                     }
                 }
                 scm {
-                    url.set("https://github.com/${Constants.githubRepo}.git")
-                    connection.set("scm:git:git://github.com/${Constants.githubRepo}.git")
-                    developerConnection.set("scm:git:git://github.com/#${Constants.githubRepo}.git")
+                    url.set("https://github.com/${githubRepo}.git")
+                    connection.set("scm:git:git://github.com/${githubRepo}.git")
+                    developerConnection.set("scm:git:git://github.com/#${githubRepo}.git")
                 }
                 issueManagement {
-                    url.set("https://github.com/${Constants.githubRepo}/issues")
+                    url.set("https://github.com/${githubRepo}/issues")
                 }
             }
         }
@@ -125,7 +134,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${Constants.githubRepo}")
+            url = uri("https://maven.pkg.github.com/${githubRepo}")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
