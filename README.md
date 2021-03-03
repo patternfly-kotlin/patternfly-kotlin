@@ -6,7 +6,8 @@
 [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/)
 [![Gitter](https://img.shields.io/gitter/room/patternfly-kotlin/patternfly-fritz2)](https://gitter.im/patternfly-kotlin/patternfly-fritz2)
 
-![IR](https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow)](https://kotl.in/jsirsupported)
+[comment]: <> (Enable when Kotest is IR ready)
+[comment]: <> (![IR]&#40;https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow&#41;]&#40;https://kotl.in/jsirsupported&#41;)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2?sort=semver)](https://github.com/patternfly-kotlin/patternfly-fritz2/releases/latest) 
 [![Download](https://api.bintray.com/packages/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/images/download.svg) ](https://bintray.com/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/_latestVersion) 
 
