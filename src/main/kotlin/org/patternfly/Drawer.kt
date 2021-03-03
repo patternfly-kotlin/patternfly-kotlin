@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.TagContext
 import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -97,8 +98,23 @@ public fun Drawer.drawerPanel(
     id: String? = null,
     baseClass: String? = null,
     content: DrawerPanel.() -> Unit = {}
-): DrawerPanel =
-    main.register(DrawerPanel(this, id = id, baseClass = baseClass, job), content)
+): DrawerPanel {
+    return if (resizable) {
+        val drawerPanel = DrawerPanelMain(this, id = id, baseClass = baseClass, job)
+        main.register(
+            ResizableDrawerPanel(this, id = id, baseClass = baseClass, job),
+            {
+                it.register(drawerPanel, content)
+            }
+        )
+        return drawerPanel
+    } else {
+        main.register(
+            NonResizableDrawerPanel(this, id = id, baseClass = baseClass, job),
+            content
+        )
+    }
+}
 
 /**
  * Creates a [DrawerBody] component inside the [DrawerPanel] component which contains a [DrawerHead], [DrawerAction] and [DrawerClose] component. Use this as a shortcut if you don't need any customization of the built components.
@@ -157,7 +173,7 @@ public fun DrawerContent.drawerBody(
 ): DrawerBody = register(DrawerBody(drawer, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [DrawerHead] component iside the [DrawerBody] component.
+ * Creates a [DrawerHead] component inside the [DrawerBody] component.
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -363,16 +379,38 @@ public class DrawerHead internal constructor(internal val drawer: Drawer, id: St
  *
  * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
-public class DrawerPanel internal constructor(
-    internal val drawer: Drawer,
+public interface DrawerPanel : TagContext {
+    public val drawer: Drawer
+}
+
+internal class NonResizableDrawerPanel internal constructor(
+    override val drawer: Drawer,
     id: String?,
     baseClass: String?,
-    job: Job
+    job: Job,
+) : DrawerPanel, Div(
+    id = id,
+    baseClass = classes("drawer".component("panel"), baseClass),
+    job
+) {
+
+    init {
+        if (!drawer.static) {
+            attr("hidden", drawer.expanded.data.map { !it })
+        }
+    }
+}
+
+internal class ResizableDrawerPanel internal constructor(
+    private val drawer: Drawer,
+    id: String?,
+    baseClass: String?,
+    job: Job,
 ) : Div(
     id = id,
     baseClass = classes {
         +"drawer".component("panel")
-        +("resizable".modifier() `when` (drawer.resizable))
+        +"resizable".modifier()
         +baseClass
     },
     job
@@ -392,37 +430,33 @@ public class DrawerPanel internal constructor(
     }
 
     init {
-        if (!drawer.static) {
-            attr("hidden", drawer.expanded.data.map { !it })
-        }
-        if (drawer.resizable) {
-            div(
-                baseClass = classes {
-                    +"drawer".component("splitter")
-                    +("vertical".modifier() `when` (drawer.panelPosition != BOTTOM))
-                }
-            ) {
-                aria["orientation"] = if (this@DrawerPanel.drawer.panelPosition == BOTTOM) "horizontal" else "vertical"
-                aria["label"] = this@DrawerPanel.drawer.resizeAriaLabel
-                aria["describedby"] = this@DrawerPanel.drawer.resizeAriaDescribedBy
-                attr("role", "separator")
-                attr("tabindex", 0)
+        div(
+            baseClass = classes {
+                +"drawer".component("splitter")
+                +("vertical".modifier() `when` (drawer.panelPosition != BOTTOM))
+            }
+        ) {
+            aria["orientation"] =
+                if (this@ResizableDrawerPanel.drawer.panelPosition == BOTTOM) "horizontal" else "vertical"
+            aria["label"] = this@ResizableDrawerPanel.drawer.resizeAriaLabel
+            aria["describedby"] = this@ResizableDrawerPanel.drawer.resizeAriaDescribedBy
+            attr("role", "separator")
+            attr("tabindex", 0)
 
-                domNode.addEventListener(Events.mousedown.name, { this@DrawerPanel.handleMouseDown(it) })
-                domNode.addEventListener(
-                    Events.keydown.name,
-                    {
-                        with(this@DrawerPanel) {
-                            if (domNode.parentElement != null) {
-                                handleKeyDown(it as KeyboardEvent, domNode.parentElement!!)
-                            }
+            domNode.addEventListener(Events.mousedown.name, { this@ResizableDrawerPanel.handleMouseDown(it) })
+            domNode.addEventListener(
+                Events.keydown.name,
+                {
+                    with(this@ResizableDrawerPanel) {
+                        if (domNode.parentElement != null) {
+                            handleKeyDown(it as KeyboardEvent, domNode.parentElement!!)
                         }
                     }
-                )
-
-                div(baseClass = "drawer".component("splitter", "handle")) {
-                    aria["hidden"] = true
                 }
+            )
+
+            div(baseClass = "drawer".component("splitter", "handle")) {
+                aria["hidden"] = true
             }
         }
     }
@@ -542,6 +576,17 @@ public class DrawerPanel internal constructor(
         )
     }
 }
+
+public class DrawerPanelMain internal constructor(
+    override val drawer: Drawer,
+    id: String?,
+    baseClass: String?,
+    job: Job,
+) : DrawerPanel, Div(
+    id = id,
+    baseClass = classes("drawer".component("panel", "main"), baseClass),
+    job
+)
 
 /**
  * Component for content above [DrawerContent] and [DrawerPanel].
