@@ -47,7 +47,7 @@ dependencies {
 }
 ```
 
-and make a call to `require()`:
+and make a call to `require()` (provided by [Kotlin JS wrappers](https://github.com/JetBrains/kotlin-wrappers)):
 
 ```kotlin
 import kotlinext.js.require
@@ -69,7 +69,8 @@ Another option is to download or get PatternFly using a CDN provider like [jsDel
     <link rel="stylesheet" href="patternfly.css">
     <link rel="stylesheet" href="patternfly-addons.css">
 </head>
-<body id="entrypoint">
+<body>
+<script src="your-app.js"></script>
 </body>
 </html>
 ```
@@ -116,7 +117,7 @@ fun main() {
                 }
             }
         }
-    }.mount("entrypoint") // given the index.html from above
+    }
 }
 ```
 
@@ -157,7 +158,7 @@ fun main() {
             cardBody { +"Body" }
             cardFooter { +"Footer" }
         }
-    }.mount("entrypoint")    
+    }    
 }
 ```
 
@@ -197,7 +198,7 @@ fun main() {
                 }
             }
         }
-    }.mount("entrypoint")
+    }
 }
 ```
 
