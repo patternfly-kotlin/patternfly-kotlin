@@ -67,6 +67,16 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 tasks {
+    ktlint {
+        filter {
+            exclude("**/org/patternfly/sample/**")
+        }
+    }
+
+    detekt.configure {
+        exclude("**/org/patternfly/sample/**")
+    }
+
     dokkaHtml.configure {
         dokkaSourceSets {
             named("main") {
@@ -76,7 +86,7 @@ tasks {
                 skipEmptyPackages.set(true)
                 platform.set(Platform.js)
                 includes.from("src/main/resources/module.md")
-                samples.from("src/main/resources/")
+                samples.from("src/main/kotlin/")
                 sourceLink {
                     localDirectory.set(file("src/main/kotlin"))
                     remoteUrl.set(
@@ -89,6 +99,10 @@ tasks {
                 }
                 externalDocumentationLink {
                     this.url.set(URL("https://api.fritz2.dev/core/core/"))
+                }
+                perPackageOption {
+                    matchingRegex.set("org\\.patternfly\\.sample")
+                    suppress.set(true)
                 }
             }
         }

@@ -5,7 +5,7 @@ import dev.fritz2.lenses.IdProvider
 /**
  * Immutable collection of items used in [ItemsStore]. Items can be paged, filtered, selected and sorted. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
  *
- * Items can be obtained using different properties:
+ * The data inside an [Items] instance can be obtained using different properties:
  *
  * - [all]: All items given when this instance was created. This collection never changes.
  * - [items]: List after [sortInfo] and [filters] have been applied to [all].

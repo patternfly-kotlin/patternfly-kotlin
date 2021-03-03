@@ -15,7 +15,7 @@ internal interface NotificationSample {
                 textToggle { +"1, 2 or 3" }
                 items {
                     (1..3).forEach { item(it) }
-                    store.selects handledBy Notification.add { item ->
+                    store.clicked handledBy Notification.add { item ->
                         info("You selected $item")
                     }
                 }

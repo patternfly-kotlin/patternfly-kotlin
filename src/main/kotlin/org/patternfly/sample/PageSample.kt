@@ -81,7 +81,7 @@ internal interface PageSample {
                             }
                         }
                         pageBreadcrumb(limitWidth = true) {
-                            breadcrumb(router) {
+                            breadcrumb<String> {
                                 items {
                                     item("item1", "Item 1")
                                     item("item2", "Item 2")
