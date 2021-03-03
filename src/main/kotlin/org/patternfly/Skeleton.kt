@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.Node
+import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ dsl
 
@@ -59,6 +59,7 @@ public class Skeleton internal constructor(
     shape: Shape?,
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
+    WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(
         id = id,
         baseClass = classes {
@@ -72,14 +73,8 @@ public class Skeleton internal constructor(
         job
     ) {
 
-    /**
-     * Override the default text content by creating an accessible SPAN which contains the given text.
-     */
-    override fun String.unaryPlus(): Node {
-        val screenReaderElement = span(baseClass = screenReader()) {
-            +this@unaryPlus
-        }
-        return domNode.appendChild(screenReaderElement.domNode)
+    override fun delegate(): HTMLSpanElement {
+        return span(baseClass = screenReader()) {}.domNode
     }
 
     init {
