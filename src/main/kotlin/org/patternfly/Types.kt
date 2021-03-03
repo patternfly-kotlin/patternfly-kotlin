@@ -66,7 +66,16 @@ public interface WithIdProvider<T> {
     public fun itemId(item: T): String = idProvider(item)
 }
 
-// Delegates the text related methods to another element
+/**
+ * Interface meant to be implemented by components which want to overwrite the default [String.unaryPlus] implementation.
+ *
+ * Note about the current implementation:
+ *  It delegates the text to the provided element.
+ *  Be aware that the text will be appended directly to the root of the provided Element.
+ *
+ * @param E component root Element
+ * @param D delegated root Element
+ */
 internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
 
     override fun Flow<String>.asText() {
@@ -79,6 +88,9 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
     override operator fun String.unaryPlus(): Node = delegate().appendChild(document.createTextNode(this))
 
+    /**
+     * Provide the desired Element
+     */
     fun delegate(): D
 }
 
