@@ -42,19 +42,19 @@ dependencies {
 kotlin {
     js {
         explicitApi()
-        browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
-                }
-            }
-        }
         sourceSets {
             named("main") {
                 languageSettings.apply {
                     useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
                     useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
                     useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+                }
+            }
+        }
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
