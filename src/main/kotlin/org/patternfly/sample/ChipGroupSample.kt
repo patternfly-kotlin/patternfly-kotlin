@@ -3,9 +3,9 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.ChipGroupStore
 import org.patternfly.Notification
+import org.patternfly.chip
 import org.patternfly.chipGroup
 import org.patternfly.chips
-import org.patternfly.chip
 
 internal interface ChipGroupSample {
 

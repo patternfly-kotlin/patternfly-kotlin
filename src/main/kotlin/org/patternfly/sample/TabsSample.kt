@@ -4,9 +4,9 @@ import dev.fritz2.dom.html.render
 import org.patternfly.TabStore
 import org.patternfly.item
 import org.patternfly.items
-import org.patternfly.updateItems
 import org.patternfly.tabs
 import org.patternfly.textContent
+import org.patternfly.updateItems
 
 internal interface TabsSample {
 
