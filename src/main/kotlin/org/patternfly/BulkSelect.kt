@@ -37,7 +37,7 @@ public fun <T> ToolbarItem.bulkSelect(
         items {
             PreSelection.values().map { item(it) }
         }
-        store.singleSelection.unwrap() handledBy itemsStore.preSelect
+        store.clicked.unwrap() handledBy itemsStore.preSelect
         content(this)
     }
 }
