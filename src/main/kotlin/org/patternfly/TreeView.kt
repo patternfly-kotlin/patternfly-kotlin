@@ -172,6 +172,7 @@ public class TreeView<T> internal constructor(
                         if (this@TreeView.badges && treeItem.hasChildren) {
                             span(baseClass = "tree-view".component("node", "count")) {
                                 badge {
+                                    read(true)
                                     +treeItem.children.size.toString()
                                 }
                             }
