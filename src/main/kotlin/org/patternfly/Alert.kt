@@ -167,14 +167,15 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
         markAs(ComponentType.AlertGroup)
         if (toast) {
             (MainScope() + job).launch {
-                NotificationStore.latest.collect {
+                NotificationStore.latest.collect { notification ->
                     val alertId = Id.unique("alert")
-                    val li = Li(baseClass = "alert-group".component("item"), job = Job()).apply {
-                        alert(it.severity, it.text, true, id = alertId) {
+                    val li = Li(baseClass = "alert-group".component("item"), job = Job())
+                    with(li) {
+                        alert(notification.severity, notification.text, true, id = alertId) {
                             with(domNode) {
                                 onmouseover = { this@AlertGroup.stopTimeout(alertId) }
-                                onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
-                                this@AlertGroup.startTimeout(alertId, this)
+                                onmouseout = { this@AlertGroup.startTimeout(alertId, li.domNode) }
+                                this@AlertGroup.startTimeout(alertId, li.domNode)
                             }
                         }
                     }
@@ -204,8 +205,9 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
          */
         public fun addToastAlertGroup(baseClass: String? = null) {
             if (document.querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
-                val toastAlertGroup = AlertGroup(false, id = TOAST_ALERT_GROUP, baseClass = baseClass, Job())
-                document.body?.prepend(toastAlertGroup.domNode)
+                document.body?.prepend(
+                    AlertGroup(toast = true, id = TOAST_ALERT_GROUP, baseClass = baseClass, job = Job()).domNode
+                )
             }
         }
     }
