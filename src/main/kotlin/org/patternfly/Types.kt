@@ -267,44 +267,44 @@ public enum class TriState(internal val checked: Boolean, internal val indetermi
  */
 @Suppress("EnumEntryName", "EnumNaming")
 public enum class Width(public val modifier: String) {
-    SM("sm".width()),
-    MD("md".width()),
-    LG("lg".width()),
-    _25("25".width()),
-    _33("33".width()),
-    _50("50".width()),
-    _66("66".width()),
-    _75("75".width()),
+    SM("width-sm".modifier()),
+    MD("width-md".modifier()),
+    LG("width-lg".modifier()),
+    _25("width-25".modifier()),
+    _33("width-33".modifier()),
+    _50("width-50".modifier()),
+    _66("width-66".modifier()),
+    _75("width-75".modifier()),
 }
 
 /**
- * Width modifier for [Skeleton] components.
+ * Height modifier for [Skeleton] components.
  */
 @Suppress("EnumEntryName", "EnumNaming")
 public enum class Height(public val modifier: String) {
-    SM("sm".width()),
-    MD("md".width()),
-    LG("lg".width()),
-    _25("25".height()),
-    _33("33".height()),
-    _50("50".height()),
-    _66("66".height()),
-    _75("75".height()),
-    _100("100".height()),
+    SM("height-sm".modifier()),
+    MD("height-md".modifier()),
+    LG("height-lg".modifier()),
+    _25("height-25".modifier()),
+    _33("height-33".modifier()),
+    _50("height-50".modifier()),
+    _66("height-66".modifier()),
+    _75("height-75".modifier()),
+    _100("height-100".modifier()),
 }
 
 /**
  * FontSize modifier for [Skeleton] components.
  */
 public enum class FontSize(public val modifier: String) {
-    XL_4("4xl".text()),
-    XL_3("3xl".text()),
-    XL_2("2xl".text()),
-    XL("xl".text()),
-    LG("lg".text()),
-    MD("md".text()),
-    SM("sm".text()),
-    XS("xs".text())
+    XL_4("text-4xl".modifier()),
+    XL_3("text-3xl".modifier()),
+    XL_2("text-2xl".modifier()),
+    XL("text-xl".modifier()),
+    LG("text-lg".modifier()),
+    MD("text-md".modifier()),
+    SM("text-sm".modifier()),
+    XS("text-xs".modifier())
 }
 
 /**

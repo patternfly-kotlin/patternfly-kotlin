@@ -29,27 +29,6 @@ public fun String.layout(vararg elements: String): String = combine("pf-l", this
 public fun String.modifier(): String = "pf-m-$this"
 
 /**
- * Creates a PatternFly modifier CSS class starting with `pf-m-text-`.
- *
- * @receiver the modifier name
- */
-public fun String.text(): String = "pf-m-text-$this"
-
-/**
- * Creates a PatternFly modifier CSS class starting with `pf-m-height-`.
- *
- * @receiver the modifier name
- */
-public fun String.height(): String = "pf-m-height-$this"
-
-/**
- * Creates a PatternFly modifier CSS class starting with `pf-m-width-`.
- *
- * @receiver the modifier name
- */
-public fun String.width(): String = "pf-m-width-$this"
-
-/**
  * Creates a PatternFly utility CSS class starting with `pf-u-`.
  *
  * @receiver the utility name
