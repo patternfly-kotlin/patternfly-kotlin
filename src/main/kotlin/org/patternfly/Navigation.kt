@@ -269,7 +269,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun RenderContext.horizontal(entries: Entries<T>) {
+    private fun horizontal(entries: Entries<T>) {
         button(baseClass = "nav".component("scroll", "button")) {
             aria["label"] = "Scroll left"
             disabled(this@Navigation.scrollStore.data.map { it.disableLeft })
@@ -287,7 +287,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun RenderContext.flat(entries: Entries<T>, scroll: Boolean) {
+    private fun flat(entries: Entries<T>, scroll: Boolean) {
         ul = ul(baseClass = "nav".component("list")) {
             if (scroll) {
                 // update scroll buttons, when scroll event has been fired
@@ -326,7 +326,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun RenderContext.verticalGrouped(entries: Entries<T>) {
+    private fun verticalGrouped(entries: Entries<T>) {
         entries.entries.forEach { entry ->
             when (entry) {
                 is Group<T> -> {
@@ -354,7 +354,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun RenderContext.verticalExpandable(entries: Entries<T>) {
+    private fun verticalExpandable(entries: Entries<T>) {
         ul(baseClass = "nav".component("list")) {
             // turn entries.all into a list containing
             // 1) the items and separators of all unnamed groups and

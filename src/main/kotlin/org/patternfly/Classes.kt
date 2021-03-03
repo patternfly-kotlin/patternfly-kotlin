@@ -3,7 +3,7 @@ package org.patternfly
 /**
  * Combines the specified classes using " " as the separator.
  *
- * @sample org.patternfly.sample.CssSample.classesDsl
+ * @sample org.patternfly.sample.BemSample.classesDsl
  */
 public fun classes(builderAction: ClassBuilder.() -> Unit): String? =
     ClassBuilder().apply { builderAction() }.build()
@@ -11,7 +11,7 @@ public fun classes(builderAction: ClassBuilder.() -> Unit): String? =
 /**
  * Combines the specified classes using " " as the separator.
  *
- * @sample org.patternfly.sample.CssSample.classesVararg
+ * @sample org.patternfly.sample.BemSample.classesVararg
  */
 public fun classes(vararg classes: String): String? = classes.joinToString(" ").ifEmpty { null }
 
@@ -26,7 +26,7 @@ internal fun classes(baseClass: String?, optionalClass: String? = null): String?
 /**
  * DSL for combining CSS classes.
  *
- * @sample org.patternfly.sample.CssSample.classesDsl
+ * @sample org.patternfly.sample.BemSample.classesDsl
  */
 public class ClassBuilder {
 
@@ -44,7 +44,7 @@ public class ClassBuilder {
     /**
      * Adds the specified CSS class if the `condition == true`.
      *
-     * @sample org.patternfly.sample.CssSample.classesDsl
+     * @sample org.patternfly.sample.BemSample.classesDsl
      */
     public infix fun String.`when`(condition: Boolean): String? = if (condition) this else null
 

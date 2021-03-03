@@ -1,10 +1,12 @@
 package org.patternfly
 
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.HTMLAnchorElement
@@ -46,8 +48,8 @@ public fun RenderContext.clickButton(
     id: String? = null,
     baseClass: String? = null,
     content: PushButton.() -> Unit = {}
-): Listener<MouseEvent, HTMLButtonElement> {
-    var clickEvents: Listener<MouseEvent, HTMLButtonElement>? = null
+): DomListener<MouseEvent, HTMLButtonElement> {
+    var clickEvents: DomListener<MouseEvent, HTMLButtonElement>? = null
     pushButton(*variations, id = id, baseClass = baseClass) {
         content(this)
         clickEvents = clicks
@@ -96,7 +98,7 @@ public fun ButtonLike.buttonIcon(
 // ------------------------------------------------------ tag
 
 /** Marker interface for [PushButton] and [LinkButton]s. */
-public interface ButtonLike : RenderContext
+public interface ButtonLike : TagContext
 
 /**
  * PatternFly [push button](https://www.patternfly.org/v4/components/button/design-guidelines) component based on a `<button/>` element.

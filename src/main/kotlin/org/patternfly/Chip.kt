@@ -1,6 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.dom.Listener
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
@@ -93,7 +93,7 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
      *
      * @sample org.patternfly.sample.ChipSample.closes
      */
-    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy {
+    public val closes: DomListener<MouseEvent, HTMLButtonElement> by lazy {
         subscribe(
             closeButton,
             Events.click

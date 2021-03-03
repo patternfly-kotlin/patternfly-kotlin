@@ -1,12 +1,11 @@
 package org.patternfly
 
-import dev.fritz2.dom.Listener
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.dom.html.renderElement
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.Job
@@ -170,17 +169,16 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
             (MainScope() + job).launch {
                 NotificationStore.latest.collect {
                     val alertId = Id.unique("alert")
-                    domNode.prepend(
-                        renderElement {
-                            alert(it.severity, it.text, true, id = alertId) {
-                                with(domNode) {
-                                    onmouseover = { this@AlertGroup.stopTimeout(alertId) }
-                                    onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
-                                    this@AlertGroup.startTimeout(alertId, this)
-                                }
+                    val li = Li(baseClass = "alert-group".component("item"), job = Job()).apply {
+                        alert(it.severity, it.text, true, id = alertId) {
+                            with(domNode) {
+                                onmouseover = { this@AlertGroup.stopTimeout(alertId) }
+                                onmouseout = { this@AlertGroup.startTimeout(alertId, this) }
+                                this@AlertGroup.startTimeout(alertId, this)
                             }
-                        }.domNode
-                    )
+                        }
+                    }
+                    domNode.prepend(li.domNode)
                 }
             }
         }
@@ -206,9 +204,7 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
          */
         public fun addToastAlertGroup(baseClass: String? = null) {
             if (document.querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
-                val toastAlertGroup = renderElement {
-                    AlertGroup(true, TOAST_ALERT_GROUP, baseClass, job)
-                }
+                val toastAlertGroup = AlertGroup(false, id = TOAST_ALERT_GROUP, baseClass = baseClass, Job())
                 document.body?.prepend(toastAlertGroup.domNode)
             }
         }
@@ -256,7 +252,7 @@ public class Alert internal constructor(
      *
      * @sample org.patternfly.sample.AlertSample.closes
      */
-    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
+    public val closes: DomListener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 
     init {
         markAs(ComponentType.Alert)

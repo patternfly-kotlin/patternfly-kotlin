@@ -5,7 +5,7 @@ package org.patternfly
  *
  * @receiver the component name
  *
- * @sample org.patternfly.sample.CssSample.component
+ * @sample org.patternfly.sample.BemSample.component
  */
 public fun String.component(vararg elements: String): String = combine("pf-c", this, elements)
 

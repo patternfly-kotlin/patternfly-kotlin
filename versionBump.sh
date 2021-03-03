@@ -31,5 +31,5 @@ fi
 
 # Replace versions
 sed -i.versionsBackup "s/implementation(\"org\.patternfly:patternfly-fritz2:.*\")/implementation(\"org\.patternfly:patternfly-fritz2:$1\")/" README.md
-sed -i.versionsBackup "s/const val version = \".*\"/const val version = \"$1\"/" buildSrc/src/main/kotlin/Build.kt
+sed -i.versionsBackup "s/version = \".*\"/version = \"$1\"/" build.gradle.kts
 find . -name "*.versionsBackup" -exec rm {} \;

@@ -3,7 +3,6 @@ package org.patternfly
 import dev.fritz2.binding.Handler
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.renderElement
 import kotlinx.coroutines.Job
 import org.patternfly.ButtonVariation.link
 import org.patternfly.Size.LG
@@ -52,10 +51,8 @@ public fun RenderContext.emptyStateSpinner(
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyState = emptyState(title = title, id = id, baseClass = baseClass, content = content).apply {
     domNode.querySelector(ComponentType.Title)?.prepend(
-        renderElement {
-            div(baseClass = "empty-state".component("icon")) {
-                spinner()
-            }
+        Div(baseClass = "empty-state".component("icon"), job = Job()).apply {
+            spinner()
         }.domNode
     )
 }

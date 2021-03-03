@@ -1,6 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.dom.Listener
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.EventType
 import kotlinx.coroutines.channels.awaitClose
@@ -10,9 +10,9 @@ import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 
 // Taken from dev.fritz2.dom.WithEvents.subscribe()
-internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: EventType<E>): Listener<E, T> =
+internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: EventType<E>): DomListener<E, T> =
     if (wdn != null) {
-        Listener(
+        DomListener(
             callbackFlow {
                 val listener: (Event) -> Unit = {
                     offer(it.unsafeCast<E>())
@@ -23,5 +23,5 @@ internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: Even
             }
         )
     } else {
-        Listener(emptyFlow())
+        DomListener(emptyFlow())
     }

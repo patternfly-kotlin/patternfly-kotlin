@@ -6,6 +6,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
@@ -176,7 +177,7 @@ public class Accordion<E : HTMLElement> internal constructor(
  * Artificial component to group a ([AccordionTitle], [AccordionContent]) pair. The component uses the [Accordion] component to implement [RenderContext].
  */
 public class AccordionItem<E : HTMLElement>(internal val accordion: Accordion<E>, override val job: Job) :
-    RenderContext by accordion {
+    TagContext by accordion {
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal val expanded: ExpandedStore = ExpandedStore()

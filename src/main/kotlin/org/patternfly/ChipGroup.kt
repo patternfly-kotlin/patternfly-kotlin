@@ -3,7 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.Listener
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
@@ -164,7 +164,7 @@ public class ChipGroup<T> internal constructor(
      *
      * @sample org.patternfly.sample.ChipGroupSample.closes
      */
-    public val closes: Listener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
+    public val closes: DomListener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
 
     init {
         markAs(ComponentType.ChipGroup)

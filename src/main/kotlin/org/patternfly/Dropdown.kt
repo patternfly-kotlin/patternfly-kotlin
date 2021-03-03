@@ -3,6 +3,7 @@
 package org.patternfly
 
 import dev.fritz2.binding.mountSingle
+import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.Listener
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
@@ -120,7 +121,7 @@ public fun <T> Dropdown<T>.checkboxToggle(baseClass: String? = null, content: Dr
 public fun <T> Dropdown<T>.actionToggle(
     baseClass: String? = null,
     content: Button.() -> Unit
-): Listener<MouseEvent, HTMLButtonElement> {
+): DomListener<MouseEvent, HTMLButtonElement> {
     val actionToggle = DropdownActionToggle(this, baseClass, job, content)
     assignToggle(actionToggle)
     return actionToggle.clickEvents!!
@@ -589,7 +590,7 @@ internal class DropdownActionToggle<T>(
 
     private val actionButton: Button
     private val toggleButton: Button
-    internal var clickEvents: Listener<MouseEvent, HTMLButtonElement>? = null
+    internal var clickEvents: DomListener<MouseEvent, HTMLButtonElement>? = null
 
     init {
         actionButton = button(baseClass = "dropdown".component("toggle", "button")) {

@@ -8,7 +8,6 @@ import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.dom.html.renderElement
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -244,12 +243,10 @@ public class TreeView<T> internal constructor(
     private fun expand(li: Element, treeItem: TreeItem<T>) {
         flipIcons(li, true)
         li.appendChild(
-            renderElement {
-                ul {
-                    attr("role", "group")
-                    for (childItem in treeItem.children) {
-                        this@TreeView.renderTreeItem(this, childItem)
-                    }
+            Ul(job = Job()).apply {
+                attr("role", "group")
+                for (childItem in treeItem.children) {
+                    this@TreeView.renderTreeItem(this, childItem)
                 }
             }.domNode
         )

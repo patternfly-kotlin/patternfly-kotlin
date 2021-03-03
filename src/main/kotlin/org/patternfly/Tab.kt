@@ -213,8 +213,8 @@ public class Tabs<T> internal constructor(
                 register(
                     TabContent(
                         tabItem.item,
-                        tabId(tabItem.item),
-                        contentId(tabItem.item),
+                        this@Tabs.tabId(tabItem.item),
+                        this@Tabs.contentId(tabItem.item),
                         job
                     ),
                     { tabContent ->
@@ -224,7 +224,7 @@ public class Tabs<T> internal constructor(
                         // tab content rendering order:
                         // (1) content display function of this Tabs instance
                         // (2) content display function from the TabItem
-                        contentDisplay.invoke(tabContent, tabContent.item)
+                        this@Tabs.contentDisplay.invoke(tabContent, tabContent.item)
                         tabItem.content.invoke(tabContent, tabContent.item)
                     },
                 )
