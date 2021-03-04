@@ -55,13 +55,21 @@ git checkout -b my_cool_feature
 
 ## Make the changes
 
-Make whatever code changes, including new tests to verify your change. Make sure your code changes apply to the [Kotlin coding conventions](https://kotlinlang.org/docs/reference/coding-conventions.html):
+Make whatever code changes, including new tests to verify your change. Make sure your code don't break existing tests and apply to the [ktlint](https://ktlint.github.io/#rules) and [detekt](config/detekt/detekt.yml) rules. 
+
+You can verify this by running the 'Can I push?' script:
+
+```bash
+./cip.sh
+```
+
+Of course the normal build should run as well:
 
 ```bash
 ./gradlew build
 ```
 
-> If you're making non code changes, the above step is not required.
+> If you're making non code changes, the above steps are not required.
 
 ## Commit changes
 
@@ -81,7 +89,7 @@ git pull --rebase upstream master
 
 ## Push to your repo
 
-Now that you've sync'd your topic branch with upstream, it's time to push it to your GitHub repo.
+Now that you've sync'd your topic branch with upstream, it's time to push it to your GitHub repo. 
 
 ```bash
 git push origin my_cool_feature
