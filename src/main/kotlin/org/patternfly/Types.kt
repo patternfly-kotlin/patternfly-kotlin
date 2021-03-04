@@ -41,6 +41,10 @@ internal fun <E : HTMLElement> PatternFlyComponent<E>.markAs(componentType: Comp
     }
 }
 
+internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
+    By.data(COMPONENT_TYPE, componentType.id)
+)
+
 /**
  * Marker interface implemented by all PatternFly components.
  */
@@ -94,11 +98,30 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
     fun delegate(): D
 }
 
-// ------------------------------------------------------ enums
+// ------------------------------------------------------ enums (a-z)
 
-internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
-    By.data(COMPONENT_TYPE, componentType.id)
-)
+/**
+ * Alignment modifier for [Dropdown]s and [OptionsMenu]s.
+ */
+public enum class Align(public val modifier: String) {
+    LEFT("align-left".modifier()), RIGHT("align-right".modifier())
+}
+
+/**
+ * Visual modifiers for [PushButton]s and [LinkButton]s.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class ButtonVariation(internal val modifier: String) {
+    control("control".modifier()),
+    danger("danger".modifier()),
+    `inline`("inline".modifier()),
+    link("link".modifier()),
+    plain("plain".modifier()),
+    primary("primary".modifier()),
+    secondary("secondary".modifier()),
+    tertiary("tertiary".modifier()),
+    warning("warning".modifier()),
+}
 
 @Suppress("EnumNaming")
 internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
@@ -141,29 +164,6 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
 }
 
 /**
- * Alignment modifier for [Dropdown]s and [OptionsMenu]s.
- */
-public enum class Align(public val modifier: String) {
-    LEFT("align-left".modifier()), RIGHT("align-right".modifier())
-}
-
-/**
- * Visual modifiers for [PushButton]s and [LinkButton]s.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class ButtonVariation(internal val modifier: String) {
-    control("control".modifier()),
-    danger("danger".modifier()),
-    `inline`("inline".modifier()),
-    link("link".modifier()),
-    plain("plain".modifier()),
-    primary("primary".modifier()),
-    secondary("secondary".modifier()),
-    tertiary("tertiary".modifier()),
-    warning("warning".modifier()),
-}
-
-/**
  * Enum for the [DataTable] selection mode.
  */
 public enum class DataTableSelection {
@@ -202,6 +202,44 @@ public enum class DrawerPanelPosition(internal val modifier: String) {
 }
 
 /**
+ * FontSize modifier for [Skeleton] components.
+ */
+public enum class FontSize(public val modifier: String) {
+    XL_4("text-4xl".modifier()),
+    XL_3("text-3xl".modifier()),
+    XL_2("text-2xl".modifier()),
+    XL("text-xl".modifier()),
+    LG("text-lg".modifier()),
+    MD("text-md".modifier()),
+    SM("text-sm".modifier()),
+    XS("text-xs".modifier())
+}
+
+/**
+ * Height modifier for [Skeleton] components.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class Height(public val modifier: String) {
+    SM("height-sm".modifier()),
+    MD("height-md".modifier()),
+    LG("height-lg".modifier()),
+    _25("height-25".modifier()),
+    _33("height-33".modifier()),
+    _50("height-50".modifier()),
+    _66("height-66".modifier()),
+    _75("height-75".modifier()),
+    _100("height-100".modifier()),
+}
+
+/**
+ * Enum used in [buttonIcon] to specify the position of the icon in buttons when used together with text.
+ */
+public enum class IconPosition(public val modifier: String) {
+    ICON_FIRST("start".modifier()),
+    ICON_LAST("end".modifier())
+}
+
+/**
  * Heading level used for the [Title] component.
  */
 @Suppress("MagicNumber")
@@ -222,14 +260,6 @@ public enum class Orientation {
 }
 
 /**
- * Enum used in [buttonIcon] to specify the position of the icon in buttons when used together with text.
- */
-public enum class IconPosition(public val modifier: String) {
-    ICON_FIRST("start".modifier()),
-    ICON_LAST("end".modifier())
-}
-
-/**
  * Enum for the level in [Alert]s and [Notification]s.
  */
 public enum class Severity(
@@ -241,6 +271,14 @@ public enum class Severity(
     SUCCESS("success".modifier(), "check-circle".fas()),
     WARNING("warning".modifier(), "exclamation-triangle".fas()),
     DANGER("danger".modifier(), "exclamation-circle".fas());
+}
+
+/**
+ * Shape modifier for [Skeleton] components.
+ */
+public enum class Shape(public val modifier: String) {
+    CIRCLE("circle".modifier()),
+    SQUARE("square".modifier()),
 }
 
 /**
@@ -287,42 +325,4 @@ public enum class Width(public val modifier: String) {
     _50("width-50".modifier()),
     _66("width-66".modifier()),
     _75("width-75".modifier()),
-}
-
-/**
- * Height modifier for [Skeleton] components.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class Height(public val modifier: String) {
-    SM("height-sm".modifier()),
-    MD("height-md".modifier()),
-    LG("height-lg".modifier()),
-    _25("height-25".modifier()),
-    _33("height-33".modifier()),
-    _50("height-50".modifier()),
-    _66("height-66".modifier()),
-    _75("height-75".modifier()),
-    _100("height-100".modifier()),
-}
-
-/**
- * FontSize modifier for [Skeleton] components.
- */
-public enum class FontSize(public val modifier: String) {
-    XL_4("text-4xl".modifier()),
-    XL_3("text-3xl".modifier()),
-    XL_2("text-2xl".modifier()),
-    XL("text-xl".modifier()),
-    LG("text-lg".modifier()),
-    MD("text-md".modifier()),
-    SM("text-sm".modifier()),
-    XS("text-xs".modifier())
-}
-
-/**
- * Shape modifier for [Skeleton] components.
- */
-public enum class Shape(public val modifier: String) {
-    CIRCLE("circle".modifier()),
-    SQUARE("square".modifier()),
 }
