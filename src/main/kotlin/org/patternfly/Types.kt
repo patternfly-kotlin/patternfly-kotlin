@@ -66,7 +66,16 @@ public interface WithIdProvider<T> {
     public fun itemId(item: T): String = idProvider(item)
 }
 
-// Delegates the text related methods to another element
+/**
+ * Interface meant to be implemented by components which want to overwrite the default [String.unaryPlus] implementation.
+ *
+ * Note about the current implementation:
+ *  It delegates the text to the provided element.
+ *  Be aware that the text will be appended directly to the root of the provided Element.
+ *
+ * @param E component root Element
+ * @param D delegated root Element
+ */
 internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
 
     override fun Flow<String>.asText() {
@@ -79,6 +88,9 @@ internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText
 
     override operator fun String.unaryPlus(): Node = delegate().appendChild(document.createTextNode(this))
 
+    /**
+     * Provide the desired Element
+     */
     fun delegate(): D
 }
 
@@ -118,6 +130,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     PageSidebar("pgs", "page".component("sidebar")),
     Pagination("pgn", "pagination".component()),
     Select("sel", "select".component()),
+    Skeleton("sk", "skeleton".component()),
     Spinner("sp", "spinner".component()),
     Switch("sw", "switch".component()),
     Tabs("tbs"),
@@ -259,4 +272,57 @@ public enum class TriState(internal val checked: Boolean, internal val indetermi
     OFF(false, false),
     INDETERMINATE(false, true),
     ON(true, false)
+}
+
+/**
+ * Width modifier for [Skeleton] components.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class Width(public val modifier: String) {
+    SM("width-sm".modifier()),
+    MD("width-md".modifier()),
+    LG("width-lg".modifier()),
+    _25("width-25".modifier()),
+    _33("width-33".modifier()),
+    _50("width-50".modifier()),
+    _66("width-66".modifier()),
+    _75("width-75".modifier()),
+}
+
+/**
+ * Height modifier for [Skeleton] components.
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class Height(public val modifier: String) {
+    SM("height-sm".modifier()),
+    MD("height-md".modifier()),
+    LG("height-lg".modifier()),
+    _25("height-25".modifier()),
+    _33("height-33".modifier()),
+    _50("height-50".modifier()),
+    _66("height-66".modifier()),
+    _75("height-75".modifier()),
+    _100("height-100".modifier()),
+}
+
+/**
+ * FontSize modifier for [Skeleton] components.
+ */
+public enum class FontSize(public val modifier: String) {
+    XL_4("text-4xl".modifier()),
+    XL_3("text-3xl".modifier()),
+    XL_2("text-2xl".modifier()),
+    XL("text-xl".modifier()),
+    LG("text-lg".modifier()),
+    MD("text-md".modifier()),
+    SM("text-sm".modifier()),
+    XS("text-xs".modifier())
+}
+
+/**
+ * Shape modifier for [Skeleton] components.
+ */
+public enum class Shape(public val modifier: String) {
+    CIRCLE("circle".modifier()),
+    SQUARE("square".modifier()),
 }
