@@ -1,7 +1,7 @@
 package org.patternfly
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.ints.shouldBeInRange
 import io.kotest.matchers.ints.shouldBeLessThanOrEqual
@@ -14,9 +14,9 @@ import io.kotest.property.checkAll
 import kotlin.math.min
 
 @Suppress("EmptyRange", "unused")
-class PageInfoTests : FunSpec({
+class PageInfoTests : StringSpec({
 
-    test("New page info") {
+    "new page info should be empty" {
         with(PageInfo()) {
             range shouldBe 1..0
             pages shouldBe 1
@@ -25,7 +25,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Illegal page size") {
+    "using an illegal page size should result in an exception" {
         checkAll(Arb.int(Int.MIN_VALUE..0)) { pageSize ->
             shouldThrow<IllegalArgumentException> {
                 PageInfo(pageSize = pageSize)
@@ -33,7 +33,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Illegal page") {
+    "using an illegal page should result in an exception" {
         checkAll(Arb.negativeInts()) { page ->
             shouldThrow<IllegalArgumentException> {
                 PageInfo(page = page)
@@ -41,7 +41,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Illegal total") {
+    "using an illegal total should result in an exception" {
         checkAll(Arb.negativeInts()) { total ->
             shouldThrow<IllegalArgumentException> {
                 PageInfo(total = total)
@@ -49,7 +49,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Valid range and pages") {
+    "using valid ranges and pages should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts()) { pageSize, total ->
             with(PageInfo(pageSize = pageSize, total = total)) {
                 range.first shouldBeGreaterThanOrEqual 1
@@ -61,7 +61,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Goto first page") {
+    "going to the first page should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts()) { pageSize, total ->
             val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoFirstPage()
             with(pageInfo) {
@@ -74,7 +74,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Goto last page") {
+    "going to the last page should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts()) { pageSize, total ->
             val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoLastPage()
             with(pageInfo) {
@@ -87,7 +87,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Goto page") {
+    "going to a specific page should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.int()) { pageSize, total, pg ->
             val pageInfo = PageInfo(pageSize = pageSize, total = total).gotoPage(pg)
             with(pageInfo) {
@@ -100,7 +100,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Change page size") {
+    "changing the page size should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.positiveInts()) { pageSize, total, ps ->
             val pageInfo = PageInfo(pageSize = pageSize, total = total).pageSize(ps)
             with(pageInfo) {
@@ -113,7 +113,7 @@ class PageInfoTests : FunSpec({
         }
     }
 
-    test("Change total") {
+    "changing the total number of items should work" {
         checkAll(Arb.positiveInts(), Arb.positiveInts(), Arb.positiveInts()) { pageSize, total, tt ->
             val pageInfo = PageInfo(pageSize = pageSize, total = total).total(tt)
             with(pageInfo) {
