@@ -1,6 +1,6 @@
 package org.patternfly
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainInOrder
@@ -14,9 +14,9 @@ import io.kotest.property.checkAll
 import io.kotest.property.forAll
 
 @Suppress("unused")
-class ItemsTests : FunSpec({
+class ItemsTests : StringSpec({
 
-    test("New Items") {
+    "new items should be empty" {
         with(Items<Int>({ it.toString() })) {
             all.shouldBeEmpty()
             items.shouldBeEmpty()
@@ -26,7 +26,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Add items") {
+    "adding items should return the correct collection properties" {
         checkAll(Arb.positiveInts(100)) { size ->
             val numbers = (0 until size).toList()
             with(Items<Int>({ it.toString() }).addAll(numbers)) {
@@ -39,7 +39,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Filter items") {
+    "filtering items should work" {
         val numbers = (1..10).toList()
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 
@@ -79,7 +79,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Sort items") {
+    "sorting items should work" {
         val numbers = listOf(2, 65, 7, 89, 33, 123, 38, 75)
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 
@@ -100,7 +100,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Select no items") {
+    "selecting no items should work" {
         forAll(Arb.positiveInts(100)) { size ->
             val numbers = (0 until size).toList()
             with(Items<Int>({ it.toString() }).addAll(numbers).selectNone()) {
@@ -109,7 +109,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Select page") {
+    "selecting all items of the current page should work" {
         forAll(Arb.positiveInts(100), Arb.positiveInts(100)) { size, pageSize ->
             val numbers = (0 until size).toList()
             with(
@@ -122,7 +122,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Select all items") {
+    "select all items should work" {
         forAll(Arb.positiveInts(100)) { size ->
             val numbers = (0 until size).toList()
             with(Items<Int>({ it.toString() }).addAll(numbers).selectAll()) {
@@ -131,7 +131,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Select items") {
+    "select multiple items items should work" {
         val numbers = (1..10).toList()
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 
@@ -155,7 +155,7 @@ class ItemsTests : FunSpec({
         }
     }
 
-    test("Toggle selection") {
+    "toggling a selection should work" {
         val numbers = (1..10).toList()
         var numberItems = Items<Int>({ it.toString() }).addAll(numbers)
 

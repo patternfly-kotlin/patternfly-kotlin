@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package org.patternfly
 
 /**
