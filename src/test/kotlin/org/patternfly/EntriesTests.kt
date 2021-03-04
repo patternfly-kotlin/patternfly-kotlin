@@ -1,7 +1,7 @@
 package org.patternfly
 
 import io.kotest.assertions.fail
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
@@ -10,9 +10,9 @@ import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 
 @Suppress("unused")
-class EntriesTests : FunSpec({
+class EntriesTests : StringSpec({
 
-    test("Empty entries") {
+    "new entries should be empty" {
         with(Entries<Int>({ it.toString() }, SINGLE, emptyList())) {
             all.shouldBeEmpty()
             entries.shouldBeEmpty()
@@ -25,7 +25,7 @@ class EntriesTests : FunSpec({
 
     // ------------------------------------------------------ items
 
-    test("Filter items") {
+    "adding and removing filters should filter items" {
         val even = numbers(1..10, SINGLE).filter { it % 2 == 0 }
         even.all.size shouldBe 10
         even.entries.size shouldBe 5
@@ -42,7 +42,7 @@ class EntriesTests : FunSpec({
         numbers.items.unwrap().shouldContainAll((1..10).toList())
     }
 
-    test("Select single item") {
+    "selecting a single item should return a single item" {
         var numbers = numbers(1..3, SINGLE)
         for (i in 1..3) {
             numbers = numbers.select(i)
@@ -52,7 +52,7 @@ class EntriesTests : FunSpec({
         }
     }
 
-    test("Select multiple items") {
+    "selecting multiple items should return multiple items" {
         var numbers = numbers(1..3, MULTIPLE)
         for (i in 1..3) {
             numbers = numbers.select(i)
@@ -63,7 +63,7 @@ class EntriesTests : FunSpec({
 
     // ------------------------------------------------------ groups
 
-    test("Just some groups") {
+    "using groups should return the correct item sizes" {
         val groups = groups(1..12, 3, SINGLE)
         groups.all.size shouldBe 4
         groups.entries.size shouldBe 4
@@ -76,7 +76,7 @@ class EntriesTests : FunSpec({
         groups.groups[3].items.unwrap().shouldContainAll(10, 11, 12)
     }
 
-    test("Filter items in groups") {
+    "filtering groups should return the correct item sizes" {
         val groups = groups(1..12, 3, SINGLE).filter { it in 8..11 }
         groups.all.size shouldBe 4
         groups.entries.size shouldBe 2
@@ -87,7 +87,7 @@ class EntriesTests : FunSpec({
         groups.groups[1].items.unwrap().shouldContainAll(10, 11)
     }
 
-    test("Select single item across all groups") {
+    "selecting a single item across all groups should work" {
         var groups = groups(1..12, 3, SINGLE)
         for (i in 1..12) {
             groups = groups.select(i)
@@ -97,7 +97,7 @@ class EntriesTests : FunSpec({
         }
     }
 
-    test("Select single item per group") {
+    "selecting a single item per group should work" {
         var groups = groups(1..12, 3, SINGLE_PER_GROUP)
         for (i in 1..12) {
             groups = groups.select(i)
@@ -125,7 +125,7 @@ class EntriesTests : FunSpec({
         }
     }
 
-    test("Select multiple items with groups") {
+    "selecting  multiple items with groups should work" {
         var groups = groups(1..12, 3, MULTIPLE)
         for (i in 1..12) {
             groups = groups.select(i)
