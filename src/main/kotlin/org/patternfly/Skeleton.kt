@@ -64,20 +64,20 @@ public class Skeleton internal constructor(
         id = id,
         baseClass = classes {
             +ComponentType.Skeleton
-            +baseClass
             +fontSize?.modifier
             +height?.modifier
             +width?.modifier
             +shape?.modifier
+            +baseClass
         },
         job
     ) {
 
-    override fun delegate(): HTMLSpanElement {
-        return span(baseClass = screenReader()) {}.domNode
-    }
-
     init {
         markAs(ComponentType.Skeleton)
+    }
+
+    override fun delegate(): HTMLSpanElement {
+        return span(baseClass = screenReader()) {}.domNode
     }
 }
