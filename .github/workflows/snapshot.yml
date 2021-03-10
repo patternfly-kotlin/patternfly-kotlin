@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    name: Publish latest build as snapshot to Maven Central
+    name: Publish snapshot to Maven Central
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish snapshot to Maven Central
+        if: success()
         run: ./gradlew publish
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}

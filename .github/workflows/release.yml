@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    name: Release & Publish PatternFly Fritz2
+    name: Publish release to Maven Central
     runs-on: ubuntu-latest
 
     steps:

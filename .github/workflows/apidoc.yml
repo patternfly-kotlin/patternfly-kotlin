@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    name: Build & Publish PatternFly Fritz2 API documentation
+    name: Publish API documentation
     runs-on: ubuntu-latest
 
     steps:

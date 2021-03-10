@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Detekt Code Base
+    name: Detekt code base
     runs-on: ubuntu-latest
 
     steps:
