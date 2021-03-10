@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    name: Publish release to Maven Central
+    name: Make GitHub release and publish to Maven Central
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,19 @@ jobs:
           java-version: 11
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Publish release to Maven Central
+      - name: Gradle build
+        run: ./gradlew build
+      - name: GitHub release
+        if: success()
+        uses: docker://antonyurchenko/git-release:latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_TAG_PREFIX: "true"
+        with:
+          args: |
+            build/libs/patternfly-fritz2*.jar
+      - name: Publish to Maven Central
+        if: success()
         run: ./gradlew publish closeAndReleaseStagingRepository
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}

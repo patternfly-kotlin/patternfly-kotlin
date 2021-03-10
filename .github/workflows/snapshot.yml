@@ -20,7 +20,9 @@ jobs:
           java-version: 11
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Publish snapshot to Maven Central
+      - name: Gradle build
+        run: ./gradlew build
+      - name: Publish to Maven Central
         if: success()
         run: ./gradlew publish
         env:

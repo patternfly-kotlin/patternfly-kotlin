@@ -9,14 +9,14 @@ on:
 
 jobs:
   lint:
-    name: Lint code base
+    name: Check code base with ktlint
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Run linter
+      - name: Run ktlint
         uses: github/super-linter@v3
         env:
           DEFAULT_BRANCH: master

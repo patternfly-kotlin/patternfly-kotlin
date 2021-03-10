@@ -6,11 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0]
 ### Added
+- Support for new [JS IR compiler](https://kotlinlang.org/docs/js-ir-compiler.html)
 - Avatar component ([#6](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/6))
 - Breadcrumb component ([#8](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/8))
+- Skeleton component ([#48](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/48))
+- Add `Items.clearFilter()`
+- Add methods to hide and show tags based on `Tag.classMap()`
 
 ### Changed
+- Upgrade to fritz2 0.9
 - Revisit page components ([#73](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/73))
+- Different handlers for clicking and selecting entries in `EntriesStore`
+- Make sidebar body implicit
+
+### Fixed
+- Fix resizable drawer panels
+- Fix bulk select selection
 
 ## [0.2.0]
 ### Added
