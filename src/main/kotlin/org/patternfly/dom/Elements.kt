@@ -158,11 +158,43 @@ public fun Element.show() {
 }
 
 /**
+ * Adds the `hidden` attribute and the CSS class `pf-u-display-none` to this tag if [value] is true, removes the attribute and the CSS class otherwise.
+ */
+public fun <E : Element> Tag<E>.hideIf(value: Boolean) {
+    attr("hidden", value)
+    domNode.classList.toggle("display-none".util(), value)
+}
+
+/**
+ * Adds the `hidden` attribute and the CSS class `pf-u-display-none` to this tag if the flow yields true, removes the attribute and the CSS class otherwise.
+ */
+public fun <E : Element> Tag<E>.hideIf(flow: Flow<Boolean>) {
+    attr("hidden", flow)
+    classMap(flow.map { mapOf("display-none".util() to it) })
+}
+
+/**
  * Adds the `hidden` attribute and the CSS class `pf-u-display-none` to this tag if [condition] evaluates to true, removes the attribute and the CSS class otherwise.
  */
 public fun <E : Element, T> Tag<E>.hideIf(flow: Flow<T>, condition: (T) -> Boolean) {
     attr("hidden", flow.map { condition(it) })
     classMap(flow.map { mapOf("display-none".util() to condition(it)) })
+}
+
+/**
+ * Removes the `hidden` attribute and the CSS class `pf-u-display-none` from this tag if [value] is true, adds the attribute and the CSS class otherwise.
+ */
+public fun <E : Element> Tag<E>.showIf(value: Boolean) {
+    attr("hidden", !value)
+    domNode.classList.toggle("display-none".util(), !value)
+}
+
+/**
+ * Removes the `hidden` attribute and the CSS class `pf-u-display-none` from this tag if the flow yields to true, adds the attribute and the CSS class otherwise.
+ */
+public fun <E : Element> Tag<E>.showIf(flow: Flow<Boolean>) {
+    attr("hidden", flow.map { !it })
+    classMap(flow.map { mapOf("display-none".util() to !it) })
 }
 
 /**

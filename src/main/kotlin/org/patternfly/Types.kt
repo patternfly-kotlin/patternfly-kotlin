@@ -141,6 +141,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Drawer("dw", "drawer".component()),
     Dropdown("dd", "dropdown".component()),
     EmptyState("es", "empty-state".component()),
+    Form("frm", "form".component()),
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
     Menu("mu", "menu".component()),

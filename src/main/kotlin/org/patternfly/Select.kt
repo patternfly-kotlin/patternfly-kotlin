@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
@@ -30,6 +29,8 @@ public class Select internal constructor(id: String?, baseClass: String?, job: J
 
 // ------------------------------------------------------ store
 
-public class SelectStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
-    RootStore<List<Entry<T>>>(listOf()),
-    WithIdProvider<T>
+public class SingleSelectStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    EntriesStore<T>(idProvider, ItemSelection.SINGLE)
+
+public class MultiSelectStore<T>(override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
+    EntriesStore<T>(idProvider, ItemSelection.MULTIPLE)

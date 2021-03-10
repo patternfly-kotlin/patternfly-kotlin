@@ -2,14 +2,11 @@
 
 [![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) 
 [![Detekt](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/detekt/badge.svg)](https://detekt.github.io/detekt/index.html) 
-[![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions) 
+[![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions)
 [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/)
-[![Gitter](https://img.shields.io/gitter/room/patternfly-kotlin/patternfly-fritz2)](https://gitter.im/patternfly-kotlin/patternfly-fritz2)
-
-[comment]: <> (Enable when Kotest is IR ready)
-[comment]: <> (![IR]&#40;https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow&#41;]&#40;https://kotl.in/jsirsupported&#41;)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/patternfly-kotlin/patternfly-fritz2?sort=semver)](https://github.com/patternfly-kotlin/patternfly-fritz2/releases/latest) 
-[![Download](https://api.bintray.com/packages/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/images/download.svg) ](https://bintray.com/patternfly-kotlin/patternfly-fritz2/patternfly-fritz2/_latestVersion) 
+[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://patternfly.slack.com/archives/C01RC86378Q)
+[![IR](https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow)](https://kotl.in/jsirsupported)
+[![Download](https://img.shields.io/maven-central/v/org.patternfly/patternfly-fritz2)](https://search.maven.org/search?q=g:org.patternfly%20AND%20a:patternfly-fritz2)
 
 PatternFly Fritz2 is a 💯 Kotlin implementation of [PatternFly](https://www.patternfly.org/) based on [fritz2](https://www.fritz2.dev/) targeting [Kotlin/JS](https://kotl.in/js).
 
@@ -31,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.patternfly:patternfly-fritz2:0.2.0")
+    implementation("org.patternfly:patternfly-fritz2:0.3.0-SNAPSHOT")
 }
 ```
 
