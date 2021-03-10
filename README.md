@@ -4,7 +4,7 @@
 [![Detekt](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/detekt/badge.svg)](https://detekt.github.io/detekt/index.html) 
 [![Build Passing](https://github.com/patternfly-kotlin/patternfly-fritz2/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-fritz2/actions)
 [![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-fritz2/patternfly-fritz2/)
-[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://patternfly.slack.com/archives/C01RC86378Q)
+[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://patternfly.slack.com/messages/C01RC86378Q)
 [![IR](https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow)](https://kotl.in/jsirsupported)
 [![Download](https://img.shields.io/maven-central/v/org.patternfly/patternfly-fritz2)](https://search.maven.org/search?q=g:org.patternfly%20AND%20a:patternfly-fritz2)
 
@@ -20,11 +20,24 @@ To get all details about how to use PatternFly Fritz2 take a look at the [API do
 
 ### Dependencies
 
-To use PatternFly Fritz2 add its dependency to your `gradle.build.kts` file. All PatternFly components are implemented in Kotlin only. You won't need any additional external JS libraries. 
+To use PatternFly Fritz2 add its dependency to your `gradle.build.kts` file. PatternFly Fritz2 is available on Maven Central. All components are implemented in Kotlin only. You won't need any additional external JS libraries. 
 
 ```kotlin
 repositories {
-    maven("https://dl.bintray.com/patternfly-kotlin/patternfly-fritz2")
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.patternfly:patternfly-fritz2:0.2.0")
+}
+```
+
+If you want to use the latest snapshot build of PatternFly Fritz2, add the following lines to your `gradle.build.kts` file:
+
+```kotlin
+repositories {
+    mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
@@ -34,7 +47,7 @@ dependencies {
 
 ### PatternFly Assets
 
-PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. You have to include them on your own. One way is to add a `npm` dependency to PatternFly: 
+PatternFly Fritz2 does *not* come with stylesheets, fonts or other static PatternFly assets. We don't want to dictate how to embed these assets. One way is to add a `npm` dependency to PatternFly: 
 
 
 ```kotlin
@@ -203,6 +216,6 @@ To see more components in action, take a look at the [showcase](https://patternf
 
 ## Get Involved
 
-PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and share your feedback. Join the chat at [Gitter](https://gitter.im/patternfly-kotlin/patternfly-fritz2) or use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to report bugs or request new features. 
+PatternFly Fritz2 is still under development. The API might change and things might not work as expected. Please give it a try and share your feedback. Join the chat at https://slack.patternfly.org/ or use the GitHub [issues](https://github.com/patternfly-kotlin/patternfly-fritz2/issues) to report bugs or request new features. 
 
-Of course, you're very welcome to [contribute](CONTRIBUTING.md) to PatternFly Fritz2.  
+Of course, you're very welcome to [contribute](CONTRIBUTING.md) to PatternFly Fritz2. If you like what you're seeing, leave us a star!
