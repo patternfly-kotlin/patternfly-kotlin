@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to build, deploy and release PatternFly Fritz2.
+# Script to release PatternFly Fritz2.
 #
 # Prerequisites
 #   - Clean git status (no uncommitted changes in branch 'master')
@@ -14,9 +14,8 @@
 #   2. Bump version to '<version>'
 #   3. Commit version change
 #   4. Create and push tag 'v<version>'
-#   5. GitHub workflow defined in 'release.yml' kicks in
-#        - Publish API documentation
-#        - Publish packages
+#      By pushing the tag, the GitHub actions
+#      'release' and 'apidoc' kick in.
 
 
 
@@ -24,6 +23,8 @@ VERSION=$1
 VERSION_TAG=v$1
 
 
+
+# Prerequisites
 if [[ "$#" -ne 1 ]]; then
     echo "Illegal number of parameters. Please use $0 <version>"
     exit 1
@@ -53,7 +54,9 @@ git pull origin master
 ./gradlew build || { echo "Build failed" ; exit 1; }
 
 printf "\n\n\n# Bump to %s\n\n" "$VERSION"
-./versionBump.sh "$VERSION"
+sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-fritz2:.*\"/\"patternfly-fritz2:$VERSION\"/" README.md
+sed -i.versionsBackup "s/^version = \".*\"$/version = \"$VERSION\"/" build.gradle.kts
+find . -name "*.versionsBackup" -exec rm {} \;
 git commit -am "Bump to $VERSION"
 git push origin master
 
