@@ -8,7 +8,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.20"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     id("org.jlleitschuh.gradle.ktlint-idea") version "9.4.1"
-    id("io.gitlab.arturbosch.detekt") version "1.16.0-RC1"
+    id("io.gitlab.arturbosch.detekt") version "1.16.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
     `maven-publish`
     signing
@@ -23,6 +23,8 @@ object Meta {
     const val desc = "Kotlin implementation of PatternFly 4 based on fritz2"
     const val license = "Apache-2.0"
     const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
+    const val release = "https://s01.oss.sonatype.org/service/local/"
+    const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 }
 
 object Versions {
@@ -139,12 +141,6 @@ tasks {
 
 // ------------------------------------------------------ sign & publish
 
-fun Project.signing(configure: SigningExtension.() -> Unit): Unit =
-    configure(configure)
-
-fun Project.publishing(action: PublishingExtension.() -> Unit) =
-    configure(action)
-
 signing {
     val signingKey = System.getenv("GPG_SIGNING_KEY").orEmpty()
     val signingPassphrase = System.getenv("GPG_SIGNING_PASSPHRASE").orEmpty()
@@ -197,9 +193,9 @@ publishing {
 
 nexusPublishing {
     repositories {
-        create("nexus") {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        sonatype {
+            nexusUrl.set(uri(Meta.release))
+            snapshotRepositoryUrl.set(uri(Meta.snapshot))
             username.set(System.getenv("OSSRH_USERNAME"))
             password.set(System.getenv("OSSRH_PASSWORD"))
         }
