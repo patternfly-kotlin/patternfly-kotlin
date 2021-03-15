@@ -142,12 +142,18 @@ tasks {
 // ------------------------------------------------------ sign & publish
 
 signing {
-    val signingKey = System.getenv("GPG_SIGNING_KEY").orEmpty()
-    val signingPassphrase = System.getenv("GPG_SIGNING_PASSPHRASE").orEmpty()
+    val signingKey = providers
+        .environmentVariable("GPG_SIGNING_KEY")
+        .forUseAtConfigurationTime()
+    val signingPassphrase = providers
+        .environmentVariable("GPG_SIGNING_PASSPHRASE")
+        .forUseAtConfigurationTime()
 
-    if (signingKey.isNotBlank() && signingPassphrase.isNotBlank()) {
-        useInMemoryPgpKeys(signingKey, signingPassphrase)
-        sign((extensions.getByName("publishing") as PublishingExtension).publications)
+    if (signingKey.isPresent && signingPassphrase.isPresent) {
+        useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
+        val extension = extensions
+            .getByName("publishing") as PublishingExtension
+        sign(extension.publications)
     }
 }
 
@@ -196,8 +202,16 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri(Meta.release))
             snapshotRepositoryUrl.set(uri(Meta.snapshot))
-            username.set(System.getenv("OSSRH_USERNAME"))
-            password.set(System.getenv("OSSRH_PASSWORD"))
+            val ossrhUsername = providers
+                .environmentVariable("OSSRH_USERNAME")
+                .forUseAtConfigurationTime()
+            val ossrhPassword = providers
+                .environmentVariable("OSSRH_PASSWORD")
+                .forUseAtConfigurationTime()
+            if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
+                username.set(ossrhUsername.get())
+                password.set(ossrhPassword.get())
+            }
         }
     }
 }
