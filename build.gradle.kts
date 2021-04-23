@@ -4,12 +4,12 @@ import java.net.URL
 // ------------------------------------------------------ plugins
 
 plugins {
-    kotlin("js") version "1.4.31"
-    id("org.jetbrains.dokka") version "1.4.20"
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
-    id("org.jlleitschuh.gradle.ktlint-idea") version "9.4.1"
+    kotlin("js") version "1.4.32"
+    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint-idea") version "10.0.0"
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
-    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
 }
@@ -28,8 +28,8 @@ object Meta {
 }
 
 object Versions {
-    const val fritz2 = "0.9"
-    const val kotest = "4.4.2"
+    const val fritz2 = "0.9.2"
+    const val kotest = "4.4.3"
 }
 
 val repositories = arrayOf(
@@ -43,7 +43,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     repositories.forEach { maven(it) }
-    jcenter()
 }
 
 // ------------------------------------------------------ dependencies
@@ -110,13 +109,16 @@ tasks {
     dokkaHtml.configure {
         dokkaSourceSets {
             named("main") {
+                includeNonPublic.set(false)
                 noJdkLink.set(false)
                 noStdlibLink.set(false)
-                includeNonPublic.set(false)
-                skipEmptyPackages.set(true)
                 platform.set(Platform.js)
+                skipEmptyPackages.set(true)
                 includes.from("src/main/resources/module.md")
                 samples.from("src/main/kotlin/")
+                pluginsMapConfiguration.set(
+                    mapOf("org.jetbrains.dokka.base.DokkaBase" to """{ "separateInheritedMembers": true}""")
+                )
                 sourceLink {
                     localDirectory.set(file("src/main/kotlin"))
                     remoteUrl.set(
@@ -125,10 +127,10 @@ tasks {
                     remoteLineSuffix.set("#L")
                 }
                 externalDocumentationLink {
-                    this.url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
+                    url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
                 }
                 externalDocumentationLink {
-                    this.url.set(URL("https://api.fritz2.dev/core/core/"))
+                    url.set(URL("https://api.fritz2.dev/core/core/"))
                 }
                 perPackageOption {
                     matchingRegex.set("org\\.patternfly\\.sample")
