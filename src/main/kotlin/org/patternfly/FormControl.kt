@@ -105,10 +105,26 @@ public fun RenderContext.textareaFormControl(
  *
  * ### Errors and validation
  */
+@Suppress("EmptyFunctionBlock")
 public class FormControl internal constructor(id: String?, baseClass: String?, job: Job) :
     Div(id = id, baseClass = classes("form".component("group"), baseClass), job) {
 
     internal val groupId: String = Id.unique("frm", "grp")
+
+    public fun label(text: String) {
+    }
+
+    public fun helpText(text: String) {
+    }
+
+    public fun popover(text: String) {
+    }
+
+    public fun placeHolder(text: String) {
+    }
+
+    public fun required(value: Boolean) {
+    }
 }
 
 public class FormControlLabel internal constructor(

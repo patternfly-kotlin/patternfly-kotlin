@@ -136,6 +136,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     CardView("cv"),
     Chip("chp", "chip".component()),
     ChipGroup("cpg", "chip-group".component()),
+    ContextSelector("cs", "context-selector".component()),
     DataList("dl", "data-list".component()),
     DataTable("dt", "table".component()),
     Drawer("dw", "drawer".component()),

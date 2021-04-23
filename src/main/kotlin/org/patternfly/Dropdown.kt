@@ -554,11 +554,10 @@ public class DropdownCheckboxToggle internal constructor(
                     id = Id.unique(ComponentType.Dropdown.id, "tgl", "txt"),
                     baseClass = "dropdown".component("toggle", "text"),
                     job
-                ),
-                {
-                    it.aria["hidden"] = true
-                }
-            )
+                )
+            ) {
+                it.aria["hidden"] = true
+            }
             checkbox.aria["labelledby"] = text!!.domNode.id
         }
         content.invoke(text!!)

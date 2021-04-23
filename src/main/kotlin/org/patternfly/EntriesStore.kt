@@ -59,6 +59,22 @@ public abstract class EntriesStore<T> internal constructor(
     }
 
     /**
+     * Handler to add a filter.
+     */
+    @Suppress("LeakingThis")
+    public val addFilter: Handler<ItemFilter<T>> = handle { entries, filter ->
+        entries.filter(filter)
+    }
+
+    /**
+     * Handler to remove a filter.
+     */
+    @Suppress("LeakingThis")
+    public val removeFilter: Handler<Unit> = handle { entries, _ ->
+        entries.clearFilter()
+    }
+
+    /**
      * Flow with the List of [entries][Entry] after an optional filter has been applied.
      */
     public val entries: Flow<List<Entry<T>>>
