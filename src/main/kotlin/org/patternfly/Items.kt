@@ -60,6 +60,7 @@ public data class Items<T>(
     val pageInfo: PageInfo = PageInfo(),
     val filters: Map<String, ItemFilter<T>> = emptyMap(),
     val selected: Set<String> = emptySet(), // selected identifiers
+    val singleSelection: Boolean = false,
     val sortInfo: SortInfo<T>? = null
 ) {
 

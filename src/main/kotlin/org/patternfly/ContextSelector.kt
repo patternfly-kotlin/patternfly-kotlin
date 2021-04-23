@@ -89,16 +89,12 @@ public class ContextSelector<T> internal constructor(
     job
 ) {
 
-    private var customDisplay: ComponentDisplay<A, T>? = null
-    private var defaultDisplay: ComponentDisplay<A, Item<T>> = { item ->
-        +(item.text ?: item.item.toString())
-    }
-    private var selectedDisplay: (Item<T>) -> String = { item ->
-        item.text ?: item.item.toString()
-    }
+    private var asString: (T) -> String = { item -> item.toString() }
+    private var display: ComponentDisplay<A, T> = { item -> +this@ContextSelector.asString(item) }
     private var filter: (String, T) -> Boolean = { filter, item ->
-        item.toString().toLowerCase().contains(filter.toLowerCase())
+        this@ContextSelector.asString(item).toLowerCase().contains(filter.toLowerCase())
     }
+    private var selected: (T) -> String = asString
     private var toggle: Button
 
     /**
@@ -135,7 +131,7 @@ public class ContextSelector<T> internal constructor(
             clicks handledBy this@ContextSelector.expanded.toggle
             span(baseClass = "context-selector".component("toggle", "text")) {
                 this@ContextSelector.store.singleSelection.map {
-                    this@ContextSelector.selectedDisplay(it)
+                    this@ContextSelector.selected.invoke(it.item)
                 }.asText()
             }
             span(baseClass = "context-selector".component("toggle", "icon")) {
@@ -180,11 +176,7 @@ public class ContextSelector<T> internal constructor(
                                 aria["disabled"] = true
                                 attr("tabindex", "-1")
                             }
-                            if (this@ContextSelector.customDisplay != null) {
-                                this@ContextSelector.customDisplay?.invoke(this, item.item)
-                            } else {
-                                this@ContextSelector.defaultDisplay.invoke(this, item)
-                            }
+                            this@ContextSelector.display(this, item.item)
                             clicks handledBy this@ContextSelector.expanded.collapse
                             clicks.map { item.unwrap() } handledBy this@ContextSelector.store.handleSelection
                         }
@@ -198,7 +190,14 @@ public class ContextSelector<T> internal constructor(
      * Sets a custom display function to render the data inside the context selector menu.
      */
     public fun display(display: ComponentDisplay<A, T>) {
-        this.customDisplay = display
+        this.display = display
+    }
+
+    /**
+     * Sets the display function for the selected item.
+     */
+    public fun selected(selected: (T) -> String) {
+        this.selected = selected
     }
 
     /**

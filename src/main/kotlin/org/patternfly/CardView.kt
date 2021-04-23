@@ -19,10 +19,11 @@ import org.w3c.dom.HTMLDivElement
  */
 public fun <T> RenderContext.cardView(
     store: ItemsStore<T> = ItemsStore(),
+    singleSelection: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
     content: CardView<T>.() -> Unit = {}
-): CardView<T> = register(CardView(store, id = id, baseClass = baseClass, job), content)
+): CardView<T> = register(CardView(store, singleSelection, id = id, baseClass = baseClass, job), content)
 
 // ------------------------------------------------------ tag
 
@@ -39,6 +40,7 @@ public fun <T> RenderContext.cardView(
  */
 public class CardView<T> internal constructor(
     internal val itemsStore: ItemsStore<T>,
+    internal val singleSelection: Boolean,
     id: String?,
     baseClass: String?,
     job: Job

@@ -34,7 +34,18 @@ public fun <T> CardView<T>.card(
     id: String? = null,
     baseClass: String? = null,
     content: Card<T>.() -> Unit = {}
-): Card<T> = register(Card(this.itemsStore, item, selectable, id = id, baseClass = baseClass, job), content)
+): Card<T> = register(
+    Card(
+        itemsStore = this.itemsStore,
+        item = item,
+        selectable = selectable,
+        singleSelection = this.singleSelection,
+        id = id,
+        baseClass = baseClass,
+        job = job
+    ),
+    content
+)
 
 /**
  * Creates a standalone [Card] component.
@@ -51,7 +62,18 @@ public fun RenderContext.card(
     id: String? = null,
     baseClass: String? = null,
     content: Card<Unit>.() -> Unit = {}
-): Card<Unit> = register(Card(ItemsStore.NOOP, Unit, selectable, id = id, baseClass = baseClass, job), content)
+): Card<Unit> = register(
+    Card(
+        itemsStore = ItemsStore.NOOP,
+        item = Unit,
+        selectable = selectable,
+        singleSelection = false,
+        id = id,
+        baseClass = baseClass,
+        job
+    ),
+    content
+)
 
 /**
  * Creates the [CardHeader] component inside a [Card] component. Use a header if you want to add images, actions or a checkbox to the card.
@@ -261,6 +283,7 @@ public class Card<T> internal constructor(
     internal val itemsStore: ItemsStore<T>,
     internal val item: T,
     internal val selectable: Boolean,
+    internal val singleSelection: Boolean,
     id: String?,
     baseClass: String?,
     job: Job
@@ -304,7 +327,11 @@ public class Card<T> internal constructor(
                         )
                     }
                 )
-                clicks.map { item } handledBy itemsStore.toggleSelection
+                if (singleSelection) {
+                    clicks.map { item } handledBy itemsStore.selectOnly
+                } else {
+                    clicks.map { item } handledBy itemsStore.toggleSelection
+                }
             } else {
                 classMap(
                     selected.data.combine(expanded.data) { selected, expanded ->
@@ -400,7 +427,11 @@ public class CardCheckbox<T> internal constructor(
         aria["invalid"] = false
         if (itemsStore != ItemsStore.NOOP) {
             checked(itemsStore.data.map { it.isSelected(item) })
-            changes.states().map { Pair(item, it) } handledBy itemsStore.select
+            if (card.singleSelection) {
+                // TODO Implement single selection
+            } else {
+                changes.states().map { Pair(item, it) } handledBy itemsStore.select
+            }
         } else {
             checked(card.selected.data)
             changes.states() handledBy card.selected.update
