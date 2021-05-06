@@ -3,14 +3,14 @@
 # Script to release PatternFly Fritz2.
 #
 # Prerequisites
-#   - Clean git status (no uncommitted changes in branch 'master')
+#   - Clean git status (no uncommitted changes in branch 'main')
 #   - No tag for the specified version
 #
 # Parameters
 #   1. New semantic version number
 #
 # What it does
-#   1. Build branch 'master'
+#   1. Build branch 'main'
 #   2. Bump version to '<version>'
 #   3. Commit version change
 #   4. Create and push tag 'v<version>'
@@ -43,14 +43,14 @@ if git rev-parse -q --verify "refs/tags/$VERSION_TAG" >/dev/null; then
 fi
 
 printf "\n# Check clean status\n\n"
-git checkout master
+git checkout main
 if ! git diff --no-ext-diff --quiet --exit-code; then
-    echo "Unable to release. You have uncommitted changes in the branch 'master'."
+    echo "Unable to release. You have uncommitted changes in the branch 'main'."
     exit 1
 fi
 
-printf "\n\n\n# Build master\n\n"
-git pull origin master
+printf "\n\n\n# Build main\n\n"
+git pull origin main
 ./gradlew build || { echo "Build failed" ; exit 1; }
 
 printf "\n\n\n# Bump to %s\n\n" "$VERSION"
@@ -58,7 +58,7 @@ sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-fritz2:.*\"/\"patternfly
 sed -i.versionsBackup "s/^version = \".*\"$/version = \"$VERSION\"/" build.gradle.kts
 find . -name "*.versionsBackup" -exec rm {} \;
 git commit -am "Bump to $VERSION"
-git push origin master
+git push origin main
 
 printf "\n\n\n# Tag and push %s\n\n" "$VERSION_TAG"
 git tag "$VERSION_TAG"

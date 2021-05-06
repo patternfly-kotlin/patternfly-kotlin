@@ -34,7 +34,7 @@ This is the typical process you would follow to submit any changes to PatternFly
 ## Pulling updates from upstream
 
 ```bash
-git pull --rebase upstream master
+git pull --rebase upstream main
 ```
 
 > Note that --rebase will automatically move your local commits, if you have
@@ -84,7 +84,7 @@ git commit
 Once all your commits for the issue have been made against your local topic branch, we need to rebase it against develop in upstream to ensure that your commits are added on top of the current state of develop. This will make it easier to incorporate your changes into the develop branch, especially if there has been any significant time passed since you rebased at the beginning.
 
 ```bash
-git pull --rebase upstream master
+git pull --rebase upstream main
 ```
 
 ## Push to your repo

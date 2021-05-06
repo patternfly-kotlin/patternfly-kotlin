@@ -116,7 +116,7 @@ tasks {
                 sourceLink {
                     localDirectory.set(file("src/main/kotlin"))
                     remoteUrl.set(
-                        URL("https://github.com/${Meta.githubRepo}/blob/master/src/main/kotlin/")
+                        URL("https://github.com/${Meta.githubRepo}/blob/main/src/main/kotlin/")
                     )
                     remoteLineSuffix.set("#L")
                 }
