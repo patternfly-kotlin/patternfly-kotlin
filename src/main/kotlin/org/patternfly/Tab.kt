@@ -217,17 +217,16 @@ public class Tabs<T> internal constructor(
                         this@Tabs.contentId(tabItem.item),
                         job
                     ),
-                    { tabContent ->
-                        if (!tabItem.selected) {
-                            tabContent.attr("hidden", "")
-                        }
-                        // tab content rendering order:
-                        // (1) content display function of this Tabs instance
-                        // (2) content display function from the TabItem
-                        this@Tabs.contentDisplay.invoke(tabContent, tabContent.item)
-                        tabItem.content.invoke(tabContent, tabContent.item)
-                    },
-                )
+                ) { tabContent ->
+                    if (!tabItem.selected) {
+                        tabContent.attr("hidden", "")
+                    }
+                    // tab content rendering order:
+                    // (1) content display function of this Tabs instance
+                    // (2) content display function from the TabItem
+                    this@Tabs.contentDisplay.invoke(tabContent, tabContent.item)
+                    tabItem.content.invoke(tabContent, tabContent.item)
+                }
             }
         )
 
