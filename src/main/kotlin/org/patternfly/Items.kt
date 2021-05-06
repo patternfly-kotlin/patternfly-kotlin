@@ -86,6 +86,7 @@ public data class Items<T>(
      * Adds all items to the current items and returns a new instance.
      */
     public fun addAll(items: List<T>): Items<T> =
+        // TODO Handle selection
         copy(all = items, items = items, pageInfo = pageInfo.total(items.size))
 
     /**

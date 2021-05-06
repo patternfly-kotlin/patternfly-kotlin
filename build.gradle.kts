@@ -4,12 +4,12 @@ import java.net.URL
 // ------------------------------------------------------ plugins
 
 plugins {
-    kotlin("js") version "1.4.32"
-    id("org.jetbrains.dokka") version "1.4.32"
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
-    id("org.jlleitschuh.gradle.ktlint-idea") version "10.0.0"
-    id("io.gitlab.arturbosch.detekt") version "1.16.0"
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    kotlin("js") version "1.5.0"
+    id("org.jetbrains.dokka")
+    id("org.jlleitschuh.gradle.ktlint")
+    id("org.jlleitschuh.gradle.ktlint-idea")
+    id("io.gitlab.arturbosch.detekt")
+    id("io.github.gradle-nexus.publish-plugin")
     `maven-publish`
     signing
 }
@@ -27,14 +27,9 @@ object Meta {
     const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 }
 
-object Versions {
-    const val fritz2 = "0.9.2"
-    const val kotest = "4.4.3"
-}
-
 val repositories = arrayOf(
-    "https://oss.jfrog.org/artifactory/jfrog-dependencies",
-    "https://oss.sonatype.org/content/repositories/snapshots/"
+    "https://oss.sonatype.org/content/repositories/snapshots/",
+    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 )
 
 // ------------------------------------------------------ repositories
@@ -48,11 +43,10 @@ repositories {
 // ------------------------------------------------------ dependencies
 
 dependencies {
-    implementation("dev.fritz2:core:${Versions.fritz2}")
-    testImplementation("io.kotest:kotest-assertions-core:${Versions.kotest}")
-    testImplementation("io.kotest:kotest-property:${Versions.kotest}")
-    testImplementation("io.kotest:kotest-framework-engine:${Versions.kotest}")
-    implementation(kotlin("stdlib-js"))
+    implementation("dev.fritz2:core:_")
+    testImplementation("io.kotest:kotest-assertions-core:_")
+    testImplementation("io.kotest:kotest-property:_")
+    testImplementation("io.kotest:kotest-framework-engine:_")
 }
 
 // ------------------------------------------------------ kotlin/js
