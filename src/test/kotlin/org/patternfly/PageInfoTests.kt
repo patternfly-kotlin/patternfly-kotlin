@@ -18,7 +18,7 @@ class PageInfoTests : StringSpec({
 
     "new page info should be empty" {
         with(PageInfo()) {
-            range shouldBe 1..0
+            range shouldBe 0..0
             pages shouldBe 1
             firstPage shouldBe true
             lastPage shouldBe true

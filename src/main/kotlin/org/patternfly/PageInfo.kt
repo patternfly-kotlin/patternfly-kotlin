@@ -121,7 +121,7 @@ public data class PageInfo(
      */
     val range: IntRange
         get() {
-            val from = if (total == 0) 1 else page * pageSize + 1
+            val from = if (total == 0) 0 else page * pageSize + 1
             val to = min(total, from + pageSize - 1)
             return from..to
         }
