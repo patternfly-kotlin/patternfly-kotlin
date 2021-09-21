@@ -5,6 +5,7 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.valuesAsNumber
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -133,7 +134,8 @@ public class Pagination internal constructor(
             +("compact".modifier() `when` compact)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()

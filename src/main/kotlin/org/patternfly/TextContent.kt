@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 
@@ -31,7 +32,7 @@ public fun RenderContext.textContent(
  */
 public class TextContent internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.TextContent, baseClass), job) {
+    Div(id = id, baseClass = classes(ComponentType.TextContent, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.TextContent)

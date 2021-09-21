@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.Orientation.HORIZONTAL
 import org.w3c.dom.HTMLFormElement
@@ -74,7 +75,8 @@ public class Form internal constructor(labelOrientation: Orientation, id: String
             +("horizontal".modifier() `when` (labelOrientation == HORIZONTAL))
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {
@@ -93,7 +95,8 @@ public class FormActions internal constructor(id: String?, baseClass: String?, j
             +"action".modifier()
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

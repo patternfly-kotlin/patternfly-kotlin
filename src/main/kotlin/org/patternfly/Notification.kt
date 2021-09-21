@@ -4,6 +4,7 @@ import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,7 +41,7 @@ public fun RenderContext.notificationBadge(
  */
 public class NotificationBadge internal constructor(withCount: Boolean, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLButtonElement>,
-    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass), job) {
+    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.NotificationBadge)

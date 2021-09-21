@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 
@@ -52,7 +53,8 @@ public class CardView<T> internal constructor(
             +"gutter".modifier()
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

@@ -6,6 +6,7 @@ import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -175,7 +176,8 @@ public class OptionsMenu<T> internal constructor(
         +("top".modifier() `when` up)
         +baseClass
     },
-    job
+    job,
+    scope = Scope()
 ) {
 
     private var customDisplay: ComponentDisplay<Button, T>? = null
@@ -245,7 +247,7 @@ public class OptionsMenu<T> internal constructor(
                         li(content = this@OptionsMenu.itemContent(entry))
                     }
                     is Separator<T> -> {
-                        if (domNode.tagName.toLowerCase() == "ul") {
+                        if (domNode.tagName.lowercase() == "ul") {
                             divider(DividerVariant.LI)
                         } else {
                             divider(DividerVariant.DIV)
@@ -369,7 +371,7 @@ internal class OptionsMenuTextToggle<T>(
     job: Job,
     content: Span.() -> Unit
 ) : Toggle<T, HTMLButtonElement>,
-    Button(baseClass = classes("options-menu".component("toggle"), baseClass), job = job) {
+    Button(baseClass = classes("options-menu".component("toggle"), baseClass), job = job, scope = Scope()) {
 
     init {
         initToggle(optionsMenu, this)
@@ -403,7 +405,8 @@ internal class OptionsMenuPlainTextToggle<T>(
             +"plain".modifier()
             +baseClass
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     private val toggleButton: Button
@@ -442,7 +445,8 @@ internal class OptionsMenuIconToggle<T>(
             +"plain".modifier()
             +baseClass
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     init {

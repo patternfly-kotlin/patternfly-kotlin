@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.states
@@ -187,7 +188,7 @@ public class DataList<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLUListElement>, Ul(id = id, baseClass = classes(ComponentType.DataList, baseClass), job) {
+) : PatternFlyComponent<HTMLUListElement>, Ul(id = id, baseClass = classes(ComponentType.DataList, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.DataList)
@@ -206,7 +207,7 @@ public class DataList<T> internal constructor(
  * A component to group the actions in a [DataListRow] component.
  */
 public class DataListAction internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("data-list".component("item-action"), baseClass), job)
+    Div(id = id, baseClass = classes("data-list".component("item-action"), baseClass), job, Scope())
 
 /**
  * A cell in a [DataListContent] component. Cells are usually used to display properties of the items.
@@ -218,7 +219,7 @@ public class DataListCell<T> internal constructor(
     job: Job
 ) :
     WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job)
+    Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job, Scope())
 
 /**
  * Checkbox to (de)select a data item. The checkbox is bound to the selection state of the [ItemsStore].
@@ -233,7 +234,7 @@ public class DataListCheckbox<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("data-list".component("check"), baseClass), job) {
+) : Div(id = id, baseClass = classes("data-list".component("check"), baseClass), job, Scope()) {
 
     init {
         input {
@@ -258,7 +259,7 @@ public class DataListContent<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job)
+    Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job, Scope())
 
 /**
  * Component for controls of a [DataListRow] component. Use this class to add a [DataListToggle] or a [DataListCheckbox] component.
@@ -270,7 +271,7 @@ public class DataListControl<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("data-list".component("item-control"), baseClass), job)
+) : Div(id = id, baseClass = classes("data-list".component("item-control"), baseClass), job, Scope())
 
 /**
  * Component for the expandable content inside a [DataListItem] component.
@@ -285,7 +286,8 @@ public class DataListExpandableContent<T> internal constructor(
     "section",
     id = id,
     baseClass = classes("data-list".component("expandable-content"), baseClass),
-    job
+    job,
+    scope = Scope()
 ) {
 
     init {
@@ -354,7 +356,8 @@ public class DataListItem<T> internal constructor(
             +("selectable".modifier() `when` dataList.selectableRows)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     /**
@@ -397,7 +400,7 @@ public class DataListRow<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job)
+    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job, Scope())
 
 /**
  * Toggle to expand / collapse the [DataListExpandableContent].
@@ -411,7 +414,7 @@ public class DataListToggle<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(baseClass = classes("data-list".component("toggle"), baseClass), job = job) {
+) : Div(baseClass = classes("data-list".component("toggle"), baseClass), job = job, scope = Scope()) {
 
     init {
         clickButton(plain) {

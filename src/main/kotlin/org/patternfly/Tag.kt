@@ -5,6 +5,7 @@ import dev.fritz2.dom.MultipleRootElementsException
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.mountDomNodePatch
 import dev.fritz2.lenses.IdProvider
 import dev.fritz2.utils.Myer
@@ -63,6 +64,7 @@ private inline fun registerSingle(
         parent.id,
         parent.baseClass,
         job,
+        Scope(),
         parent.domNode.unsafeCast<HTMLElement>()
     ) {
         var alreadyRegistered: Boolean = false

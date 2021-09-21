@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,12 @@ public class Badge internal constructor(
     id: String? = null,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLSpanElement>, Span(id = id, baseClass = classes(ComponentType.Badge, baseClass), job) {
+) : PatternFlyComponent<HTMLSpanElement>, Span(
+    id = id,
+    baseClass = classes(ComponentType.Badge, baseClass),
+    job = job,
+    scope = Scope()
+) {
 
     init {
         markAs(ComponentType.Badge)

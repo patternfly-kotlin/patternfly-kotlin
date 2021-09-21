@@ -6,6 +6,7 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
@@ -67,7 +68,7 @@ public class TreeView<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job) {
+    Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job, Scope()) {
 
     private var ul: Ul
     private var display: ComponentDisplay<Span, T> = { +it.toString() }
@@ -244,7 +245,7 @@ public class TreeView<T> internal constructor(
     private fun expand(li: Element, treeItem: TreeItem<T>) {
         flipIcons(li, true)
         li.appendChild(
-            Ul(job = Job()).apply {
+            Ul(job = Job(), scope = Scope()).apply {
                 attr("role", "group")
                 for (childItem in treeItem.children) {
                     this@TreeView.renderTreeItem(this, childItem)

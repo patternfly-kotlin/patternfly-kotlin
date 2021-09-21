@@ -4,6 +4,7 @@ import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import org.patternfly.dom.By
@@ -82,7 +83,8 @@ public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass
             +("read-only".modifier() `when` readOnly)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     private var textElement: Span

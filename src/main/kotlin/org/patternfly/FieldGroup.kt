@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
@@ -198,7 +199,8 @@ public class FieldGroup internal constructor(
         +("expandable".modifier() `when` expandable)
         +baseClass
     },
-    job
+    job,
+    Scope()
 ) {
 
     private val toggleId = Id.unique("fg", "tgl")
@@ -235,7 +237,8 @@ public class FieldGroupHeader internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "header"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupHeaderMain internal constructor(
@@ -246,7 +249,8 @@ public class FieldGroupHeaderMain internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "header", "main"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupHeaderTitle internal constructor(
@@ -257,7 +261,8 @@ public class FieldGroupHeaderTitle internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "header", "title"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupHeaderTitleText internal constructor(
@@ -268,7 +273,8 @@ public class FieldGroupHeaderTitleText internal constructor(
 ) : Div(
     id = id ?: fieldGroup.titleId,
     baseClass = classes("form".component("field-group", "header", "title", "text"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupHeaderDescription internal constructor(
@@ -278,7 +284,8 @@ public class FieldGroupHeaderDescription internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "header", "description"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupHeaderActions internal constructor(
@@ -288,7 +295,8 @@ public class FieldGroupHeaderActions internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "header", "actions"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 public class FieldGroupBody internal constructor(
@@ -299,7 +307,8 @@ public class FieldGroupBody internal constructor(
 ) : Div(
     id = id,
     baseClass = classes("form".component("field-group", "body"), baseClass),
-    job
+    job,
+    scope = Scope()
 ) {
     init {
         if (fieldGroup.expandable) {

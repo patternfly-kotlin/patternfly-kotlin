@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,7 @@ public fun RenderContext.switch(
  * @sample org.patternfly.sample.SwitchSample.switch
  */
 public class Switch internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, baseClass), job) {
+    PatternFlyComponent<HTMLLabelElement>, Label(id = id, baseClass = classes(ComponentType.Switch, baseClass), job, Scope()) {
 
     private val toggleTag: Span
     private val labelTag: Span

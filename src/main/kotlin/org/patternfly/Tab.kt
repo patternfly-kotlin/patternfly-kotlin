@@ -5,6 +5,7 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
@@ -136,7 +137,7 @@ public class Tabs<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job) {
+) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job, scope = Scope()) {
 
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
@@ -267,7 +268,7 @@ public class Tabs<T> internal constructor(
  */
 public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("section", id = contentId, baseClass = classes("tab".component("content")), job) {
+    TextElement("section", id = contentId, baseClass = classes("tab".component("content")), job, Scope()) {
 
     init {
         aria["labeledby"] = tabId

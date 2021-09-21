@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TagContext
 import kotlinx.browser.document
 import kotlinx.coroutines.Job
@@ -275,7 +276,8 @@ public class Drawer internal constructor(
             +("static".modifier() `when` static)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     internal val main: Div
@@ -329,7 +331,7 @@ public class DrawerAction internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("drawer".component("actions"), baseClass), job)
+) : Div(id = id, baseClass = classes("drawer".component("actions"), baseClass), job, Scope())
 
 /**
  * Component for the content inside the [DrawerContent] and [DrawerPanel] components.
@@ -339,13 +341,13 @@ public class DrawerAction internal constructor(
  * @sample org.patternfly.sample.DrawerSample.drawerPanels
  */
 public class DrawerBody internal constructor(internal val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("drawer".component("body"), baseClass), job)
+    Div(id = id, baseClass = classes("drawer".component("body"), baseClass), job, Scope())
 
 /**
  * Component for the close button inside the [DrawerAction] component.
  */
 public class DrawerClose internal constructor(private val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("drawer".component("close"), baseClass), job) {
+    Div(id = id, baseClass = classes("drawer".component("close"), baseClass), job, Scope()) {
 
     init {
         pushButton(plain) {
@@ -366,13 +368,13 @@ public class DrawerContent internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("drawer".component("content"), baseClass), job)
+) : Div(id = id, baseClass = classes("drawer".component("content"), baseClass), job, Scope())
 
 /**
  * Component for the content left from the [DrawerAction] component in the [DrawerBody] component.
  */
 public class DrawerHead internal constructor(internal val drawer: Drawer, id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("drawer".component("head"), baseClass), job)
+    Div(id = id, baseClass = classes("drawer".component("head"), baseClass), job, Scope())
 
 /**
  * Component for the actual content of the drawer which slides in from the right edge. Use any number of nested [DrawerBody] components to add the actual content. The first [DrawerBody] should contain a [DrawerHead] with a nested [DrawerAction] and [DrawerClose] component.
@@ -391,7 +393,8 @@ internal class NonResizableDrawerPanel internal constructor(
 ) : DrawerPanel, Div(
     id = id,
     baseClass = classes("drawer".component("panel"), baseClass),
-    job
+    job,
+    scope = Scope()
 ) {
 
     init {
@@ -413,7 +416,8 @@ internal class ResizableDrawerPanel internal constructor(
         +"resizable".modifier()
         +baseClass
     },
-    job
+    job,
+    scope = Scope()
 ) {
 
     private var newSize: Int = 0
@@ -585,11 +589,12 @@ public class DrawerPanelMain internal constructor(
 ) : DrawerPanel, Div(
     id = id,
     baseClass = classes("drawer".component("panel", "main"), baseClass),
-    job
+    job,
+    scope = Scope()
 )
 
 /**
  * Component for content above [DrawerContent] and [DrawerPanel].
  */
 public class DrawerSection internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("drawer".component("section"), baseClass), job)
+    Div(id = id, baseClass = classes("drawer".component("section"), baseClass), job, Scope())

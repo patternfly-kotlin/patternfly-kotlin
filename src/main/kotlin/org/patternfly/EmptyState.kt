@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.Handler
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.ButtonVariation.link
 import org.patternfly.Size.LG
@@ -51,7 +52,7 @@ public fun RenderContext.emptyStateSpinner(
     content: EmptyStateContent.() -> Unit = {}
 ): EmptyState = emptyState(title = title, id = id, baseClass = baseClass, content = content).apply {
     domNode.querySelector(ComponentType.Title)?.prepend(
-        Div(baseClass = "empty-state".component("icon"), job = Job()).apply {
+        Div(baseClass = "empty-state".component("icon"), job = Job(), scope = Scope()).apply {
             spinner()
         }.domNode
     )
@@ -101,7 +102,7 @@ public fun EmptyStateContent.emptyStateBody(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job, Scope()), content)
 
 /**
  * Creates a [Div] container for the primary action of the [EmptyState] component. Use this function if you have a special use case like multiple elements as primary action.
@@ -116,7 +117,7 @@ public fun EmptyStateContent.emptyStatePrimary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("primary"), baseClass), job), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("primary"), baseClass), job, Scope()), content)
 
 /**
  * Creates a [Div] container for the secondary actions of the [EmptyState] component.
@@ -129,7 +130,7 @@ public fun EmptyStateContent.emptyStateSecondary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass), job), content)
+): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass), job, Scope()), content)
 
 // ------------------------------------------------------ tag
 
@@ -174,7 +175,8 @@ public class EmptyState internal constructor(
         +(size.modifier `when` (size == XL || size == LG || size == SM || size == XS))
         +baseClass
     },
-    job
+    job,
+    scope = Scope()
 ) {
 
     init {
@@ -200,4 +202,4 @@ public class EmptyState internal constructor(
  * Empty state content component.
  */
 public class EmptyStateContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass), job)
+    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass), job, Scope())

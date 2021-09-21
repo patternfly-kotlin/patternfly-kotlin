@@ -5,6 +5,7 @@ import dev.fritz2.dom.Listener
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
@@ -115,13 +116,14 @@ public class PushButton internal constructor(
 ) : PatternFlyComponent<HTMLButtonElement>,
     ButtonLike,
     Button(
-        id,
-        classes {
+        id = id,
+        baseClass = classes {
             +ComponentType.Button
             +variations.joinToString(" ") { it.modifier }
             +baseClass
         },
-        job
+        job = job,
+        scope = Scope()
     ) {
 
     init {
@@ -150,7 +152,8 @@ public class LinkButton internal constructor(
             +variations.joinToString(" ") { it.modifier }
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {
@@ -175,7 +178,8 @@ public class ButtonIcon internal constructor(
         +"button".component("icon")
         +iconPosition.modifier
     },
-    job = job
+    job = job,
+    scope = Scope()
 ) {
 
     init {

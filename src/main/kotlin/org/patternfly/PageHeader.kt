@@ -1,6 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Div
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLElement
@@ -79,7 +80,7 @@ public fun PageHeaderTools.pageHeaderToolsItem(
  */
 public class PageHeader internal constructor(internal val page: Page, id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("header", id = id, baseClass = classes(ComponentType.PageHeader, baseClass), job) {
+    TextElement("header", id = id, baseClass = classes(ComponentType.PageHeader, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.PageHeader)
@@ -91,16 +92,16 @@ public class PageHeader internal constructor(internal val page: Page, id: String
  * Page header tools component.
  */
 public class PageHeaderTools internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("page".component("header", "tools"), baseClass), job)
+    Div(id = id, baseClass = classes("page".component("header", "tools"), baseClass), job, Scope())
 
 /**
  * Page header tools group component.
  */
 public class PageHeaderToolsGroup internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("page".component("header", "tools", "group"), baseClass), job)
+    Div(id = id, baseClass = classes("page".component("header", "tools", "group"), baseClass), job, Scope())
 
 /**
  * Page header tools item component.
  */
 public class PageHeaderToolsItem internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("page".component("header", "tools", "item"), baseClass), job)
+    Div(id = id, baseClass = classes("page".component("header", "tools", "item"), baseClass), job, Scope())

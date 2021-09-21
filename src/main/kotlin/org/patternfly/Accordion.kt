@@ -5,6 +5,7 @@ import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
@@ -159,7 +160,8 @@ public class Accordion<E : HTMLElement> internal constructor(
             +ComponentType.Accordion
             +baseClass
         },
-        job
+        job,
+        Scope()
     ) {
 
     internal val items: MutableList<AccordionItem<E>> = mutableListOf()
@@ -195,7 +197,8 @@ public class AccordionTitle<E : HTMLElement>(
 ) : WithText<HTMLElement>,
     Tag<HTMLElement>(
         tagName = if (item.accordion.definitionList) "dt" else "h${item.accordion.headingLevel}",
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     init {
@@ -233,7 +236,8 @@ public class AccordionContent<E : HTMLElement>(
             +"accordion".component("expanded", "content")
             +("fixed".modifier() `when` item.accordion.fixed)
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     init {

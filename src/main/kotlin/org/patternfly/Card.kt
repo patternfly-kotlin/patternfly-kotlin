@@ -6,6 +6,7 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.states
 import kotlinx.coroutines.Job
@@ -297,7 +298,8 @@ public class Card<T> internal constructor(
             +("selectable".modifier() `when` selectable)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     /**
@@ -362,7 +364,10 @@ public class CardHeader<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("card".component("header"), baseClass), job)
+    Div(
+        id = id, baseClass = classes("card".component("header"), baseClass), job,
+        scope = Scope()
+    )
 
 /**
  * The toggle control of a expandable card inside the [CardHeader].
@@ -375,7 +380,10 @@ public class CardToggle<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("card".component("header", "toggle"), baseClass), job) {
+    Div(
+        id = id, baseClass = classes("card".component("header", "toggle"), baseClass), job,
+        scope = Scope()
+    ) {
 
     init {
         clickButton(plain) {
@@ -401,7 +409,10 @@ public class CardAction<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("card".component("actions"), baseClass), job) {
+) : Div(
+    id = id, baseClass = classes("card".component("actions"), baseClass), job,
+    scope = Scope()
+) {
 
     init {
         if (card.selectable) {
@@ -420,7 +431,10 @@ public class CardCheckbox<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Input(id = id, baseClass = baseClass, job) {
+) : Input(
+    id = id, baseClass = baseClass, job,
+    scope = Scope()
+) {
 
     init {
         type("checkbox")
@@ -446,7 +460,11 @@ public class CardCheckbox<T> internal constructor(
  * @sample org.patternfly.sample.CardSample.cardTitleInCard
  */
 public class CardTitle<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("title"), baseClass), job)
+    WithIdProvider<T> by itemsStore,
+    Div(
+        id = id, baseClass = classes("card".component("title"), baseClass), job,
+        scope = Scope()
+    )
 
 /**
  * A container for the expandable content of a expandable [Card].
@@ -460,7 +478,10 @@ public class CardExpandableContent<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("card".component("expandable", "content"), baseClass), job) {
+    Div(
+        id = id, baseClass = classes("card".component("expandable", "content"), baseClass), job,
+        scope = Scope()
+    ) {
 
     init {
         attr("hidden", card.expanded.data.map { !it })
@@ -474,13 +495,21 @@ public class CardExpandableContent<T> internal constructor(
  * @sample org.patternfly.sample.CardSample.multipleBodies
  */
 public class CardBody<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("body"), baseClass), job)
+    WithIdProvider<T> by itemsStore,
+    Div(
+        id = id, baseClass = classes("card".component("body"), baseClass), job,
+        scope = Scope()
+    )
 
 /**
  * The footer of a [Card].
  */
 public class CardFooter<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore, Div(id = id, baseClass = classes("card".component("footer"), baseClass), job)
+    WithIdProvider<T> by itemsStore,
+    Div(
+        id = id, baseClass = classes("card".component("footer"), baseClass), job,
+        scope = Scope()
+    )
 
 // ------------------------------------------------------ store
 

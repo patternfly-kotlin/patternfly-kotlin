@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 
@@ -54,7 +55,7 @@ public fun FormSection.formSectionTitle(
  * ```
  */
 public class FormSection internal constructor(id: String?, baseClass: String?, job: Job) :
-    TextElement("section", id = id, baseClass = classes("form".component("section"), baseClass), job)
+    TextElement("section", id = id, baseClass = classes("form".component("section"), baseClass), job, Scope())
 
 public class FormSectionTitle internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("form".component("section", "title"), baseClass), job)
+    Div(id = id, baseClass = classes("form".component("section", "title"), baseClass), job, Scope())

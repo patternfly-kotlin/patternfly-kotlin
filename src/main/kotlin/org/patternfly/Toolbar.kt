@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 
@@ -59,23 +60,23 @@ public fun ToolbarExpandableContent.toolbarGroup(
 // ------------------------------------------------------ tag
 
 public class Toolbar internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Toolbar, baseClass), job) {
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Toolbar, baseClass), job, Scope()) {
     init {
         markAs(ComponentType.Toolbar)
     }
 }
 
 public class ToolbarContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("toolbar".component("content"), baseClass), job)
+    Div(id = id, baseClass = classes("toolbar".component("content"), baseClass), job, Scope())
 
 public class ToolbarContentSection internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("toolbar".component("content", "section"), baseClass), job)
+    Div(id = id, baseClass = classes("toolbar".component("content", "section"), baseClass), job, Scope())
 
 public class ToolbarGroup internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("toolbar".component("group"), baseClass), job)
+    Div(id = id, baseClass = classes("toolbar".component("group"), baseClass), job, Scope())
 
 public class ToolbarItem internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("toolbar".component("item"), baseClass), job)
+    Div(id = id, baseClass = classes("toolbar".component("item"), baseClass), job, Scope())
 
 public class ToolbarExpandableContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass), job)
+    Div(id = id, baseClass = classes("toolbar".component("expandable", "content"), baseClass), job, Scope())

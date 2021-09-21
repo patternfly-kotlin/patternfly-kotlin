@@ -1,38 +1,28 @@
 import org.jetbrains.dokka.Platform
 import java.net.URL
 
-// ------------------------------------------------------ plugins
+// ------------------------------------------------------ core
 
 plugins {
-    kotlin("js") version "1.5.0"
-    id("org.jetbrains.dokka")
-    id("org.jlleitschuh.gradle.ktlint")
-    id("org.jlleitschuh.gradle.ktlint-idea")
-    id("io.gitlab.arturbosch.detekt")
-    id("io.github.gradle-nexus.publish-plugin")
+    kotlin("js") version Versions.kotlin
+    id("org.jetbrains.dokka") version Versions.kotlin
+    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlint
+    id("org.jlleitschuh.gradle.ktlint-idea") version Versions.ktlint
+    id("io.gitlab.arturbosch.detekt") version Versions.detekt
+    id("io.github.gradle-nexus.publish-plugin") version Versions.publish
     `maven-publish`
     signing
 }
 
-// ------------------------------------------------------ constants
-
 group = "org.patternfly"
 version = "0.3.0-SNAPSHOT"
 
-object Meta {
-    const val desc = "Kotlin implementation of PatternFly 4 based on fritz2"
-    const val license = "Apache-2.0"
-    const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
-    const val release = "https://s01.oss.sonatype.org/service/local/"
-    const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-}
+// ------------------------------------------------------ repositories
 
 val repositories = arrayOf(
     "https://oss.sonatype.org/content/repositories/snapshots/",
     "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 )
-
-// ------------------------------------------------------ repositories
 
 repositories {
     mavenLocal()
@@ -43,26 +33,17 @@ repositories {
 // ------------------------------------------------------ dependencies
 
 dependencies {
-    implementation("dev.fritz2:core:_")
-    testImplementation("io.kotest:kotest-assertions-core:_")
-    testImplementation("io.kotest:kotest-property:_")
-    testImplementation("io.kotest:kotest-framework-engine:_")
+    implementation("dev.fritz2:core:${Versions.fritz2}")
+    testImplementation("io.kotest:kotest-assertions-core:${Versions.kotest}")
+    testImplementation("io.kotest:kotest-property:${Versions.kotest}")
+    testImplementation("io.kotest:kotest-framework-engine:${Versions.kotest}")
 }
 
 // ------------------------------------------------------ kotlin/js
 
 kotlin {
-    js(BOTH) {
+    js {
         explicitApi()
-        sourceSets {
-            named("main") {
-                languageSettings.apply {
-                    useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
-                    useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                    useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
-                }
-            }
-        }
         browser {
             testTask {
                 useKarma {

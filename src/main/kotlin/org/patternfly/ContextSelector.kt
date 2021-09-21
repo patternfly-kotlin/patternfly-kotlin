@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.values
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -86,7 +87,8 @@ public class ContextSelector<T> internal constructor(
 ) : PatternFlyComponent<HTMLDivElement>, Div(
     id = id,
     baseClass = classes(ComponentType.ContextSelector, baseClass),
-    job
+    job,
+    scope = Scope()
 ) {
 
     private var asString: (T) -> String = { item -> item.toString() }

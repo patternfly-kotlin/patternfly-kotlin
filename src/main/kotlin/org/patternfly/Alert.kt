@@ -5,6 +5,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Ul
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -158,7 +159,8 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
             +("toast".modifier() `when` toast)
             +baseClass
         },
-        job
+        job = job,
+        scope = Scope()
     ) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
@@ -169,7 +171,7 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
             (MainScope() + job).launch {
                 NotificationStore.latest.collect { notification ->
                     val alertId = Id.unique("alert")
-                    val li = Li(baseClass = "alert-group".component("item"), job = Job())
+                    val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
                     with(li) {
                         alert(notification.severity, notification.text, true, id = alertId) {
                             with(domNode) {
@@ -237,7 +239,8 @@ public class Alert internal constructor(
             +("inline".modifier() `when` inline)
             +baseClass
         },
-        job
+        job = job,
+        scope = Scope()
     ) {
 
     private var closeButton: PushButton? = null

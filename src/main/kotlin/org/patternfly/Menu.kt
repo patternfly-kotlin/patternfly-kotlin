@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import org.patternfly.dom.Id
@@ -29,7 +30,7 @@ public class Menu<T> internal constructor(
     baseClass: String?,
     job: Job
 ) : PatternFlyComponent<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.Menu, baseClass), job) {
+    Div(id = id, baseClass = classes(ComponentType.Menu, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.Menu)

@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLImageElement
 
@@ -39,7 +40,8 @@ public class Avatar internal constructor(src: String, id: String?, baseClass: St
             +ComponentType.Avatar
             +baseClass
         },
-        job
+        job = job,
+        scope = Scope()
     ) {
 
     init {

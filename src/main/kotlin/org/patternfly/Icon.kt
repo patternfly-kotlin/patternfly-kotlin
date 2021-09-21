@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -46,7 +47,8 @@ public class Icon internal constructor(iconClass: String, id: String?, baseClass
             +iconClass
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

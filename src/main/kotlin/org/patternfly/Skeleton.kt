@@ -2,7 +2,10 @@ package org.patternfly
 
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 
@@ -40,6 +43,70 @@ public fun RenderContext.skeleton(
     content
 )
 
+// ------------------------------------------------------ component
+
+public fun RenderContext.skeleton2(baseClass: String? = null, id: String? = null, build: Skeleton2.() -> Unit) {
+    Skeleton2().apply(build).render(this, baseClass, id)
+}
+
+public class Skeleton2 : PatternFlyComponent2<Unit> {
+
+    private var fontSize: FontSize? = null
+    private var height: Height? = null
+    private var width: Width? = null
+    private var shape: Shape? = null
+    private var text: (RenderContext.() -> Unit)? = null
+
+    public fun fontSize(fontSize: FontSize) {
+        this.fontSize = fontSize
+    }
+
+    public fun height(height: Height) {
+        this.height = height
+    }
+
+    public fun width(width: Width) {
+        this.width = width
+    }
+
+    public fun shape(shape: Shape) {
+        this.shape = shape
+    }
+
+    public fun text(value: String) {
+        this.text(flowOf(value))
+    }
+
+    public fun text(value: Flow<String>) {
+        text = {
+            span(baseClass = screenReader()) {
+                value.asText()
+            }
+        }
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(
+                baseClass = classes {
+                    +ComponentType.Skeleton
+                    +fontSize?.modifier
+                    +height?.modifier
+                    +width?.modifier
+                    +shape?.modifier
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Skeleton)
+                text?.let {
+                    it.invoke(this)
+                }
+            }
+        }
+    }
+}
+
 // ------------------------------------------------------ tag
 
 /**
@@ -70,7 +137,8 @@ public class Skeleton internal constructor(
             +shape?.modifier
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -84,7 +85,8 @@ public class Breadcrumb<T> internal constructor(
             +ComponentType.Breadcrumb
             +baseClass
         },
-        job
+        job = job,
+        scope = Scope()
     ) {
 
     private var customDisplay: ComponentDisplay<A, T>? = null

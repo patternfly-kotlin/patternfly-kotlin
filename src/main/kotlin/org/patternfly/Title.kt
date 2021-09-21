@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.Level.H1
 import org.w3c.dom.HTMLHeadingElement
@@ -49,7 +50,8 @@ public class Title internal constructor(
             +size.modifier
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

@@ -4,6 +4,7 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
@@ -217,7 +218,8 @@ public class Navigation<T> internal constructor(
             +("tertiary".modifier() `when` tertiary)
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     private lateinit var ul: Ul
@@ -398,7 +400,8 @@ internal class ExpandableGroup<T>(
 ) : Tag<HTMLLIElement>(
     "li",
     baseClass = classes("nav".component("item"), "expandable".modifier()),
-    job = job
+    job = job,
+    scope = Scope()
 ) {
 
     private val expanded = ExpandedStore()

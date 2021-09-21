@@ -12,6 +12,7 @@ import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -245,7 +246,7 @@ public class Dropdown<T> internal constructor(
         +("top".modifier() `when` up)
         +baseClass
     },
-    job
+    job, Scope()
 ) {
 
     private var customDisplay: ComponentDisplay<Button, T>? = null
@@ -435,7 +436,7 @@ internal class DropdownTextToggle<T>(
             +variations.joinToString(" ") { it.modifier }
             +baseClass
         },
-        job = job
+        job = job, scope = Scope()
     ) {
 
     init {
@@ -469,7 +470,8 @@ internal class DropdownIconToggle<T>(
             +"plain".modifier()
             +baseClass
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     init {
@@ -498,7 +500,8 @@ internal class DropdownInternalCheckboxToggle<T>(
             +"split-button".modifier()
             +baseClass
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     private val label: Label
@@ -553,7 +556,7 @@ public class DropdownCheckboxToggle internal constructor(
                 Span(
                     id = Id.unique(ComponentType.Dropdown.id, "tgl", "txt"),
                     baseClass = "dropdown".component("toggle", "text"),
-                    job
+                    job, Scope()
                 )
             ) {
                 it.aria["hidden"] = true
@@ -584,7 +587,8 @@ internal class DropdownActionToggle<T>(
             +"action".modifier()
             +baseClass
         },
-        job = job
+        job = job,
+        scope = Scope()
     ) {
 
     private val actionButton: Button
@@ -620,7 +624,7 @@ internal class DropdownActionToggle<T>(
  */
 public class DropdownCustomToggle<T>(dropdown: Dropdown<T>, baseClass: String?, job: Job) :
     Toggle<T, HTMLButtonElement>,
-    Button(baseClass = classes("dropdown".component("toggle"), baseClass), job = job) {
+    Button(baseClass = classes("dropdown".component("toggle"), baseClass), job = job, scope = Scope()) {
 
     init {
         initToggle(dropdown, this)

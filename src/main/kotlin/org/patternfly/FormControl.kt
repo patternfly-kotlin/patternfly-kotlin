@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Select
 import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextArea
@@ -59,19 +60,19 @@ public fun RenderContext.inputFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: Input.() -> Unit = {}
-): Input = register(Input(id = id, baseClass = classes("form-control".component(), baseClass), job), content)
+): Input = register(Input(id = id, baseClass = classes("form-control".component(), baseClass), job, Scope()), content)
 
 public fun RenderContext.selectFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: Select.() -> Unit = {}
-): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass), job), content)
+): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass), job, Scope()), content)
 
 public fun RenderContext.textareaFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: TextArea.() -> Unit = {}
-): TextArea = register(TextArea(id = id, baseClass = classes("form-control".component(), baseClass), job), content)
+): TextArea = register(TextArea(id = id, baseClass = classes("form-control".component(), baseClass), job, Scope()), content)
 
 // ------------------------------------------------------ tag
 
@@ -107,7 +108,7 @@ public fun RenderContext.textareaFormControl(
  */
 @Suppress("EmptyFunctionBlock")
 public class FormControl internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("form".component("group"), baseClass), job) {
+    Div(id = id, baseClass = classes("form".component("group"), baseClass), job, Scope()) {
 
     internal val groupId: String = Id.unique("frm", "grp")
 
@@ -132,7 +133,7 @@ public class FormControlLabel internal constructor(
     baseClass: String?,
     job: Job
 ) : WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
-    Div(id = id, baseClass = classes("form".component("group", "label"), baseClass), job) {
+    Div(id = id, baseClass = classes("form".component("group", "label"), baseClass), job, Scope()) {
 
     private val label: Label
     private lateinit var text: Span
@@ -173,4 +174,4 @@ public class FormControlControl internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : Div(id = id, baseClass = classes("form".component("group", "control"), baseClass), job)
+) : Div(id = id, baseClass = classes("form".component("group", "control"), baseClass), job, Scope())

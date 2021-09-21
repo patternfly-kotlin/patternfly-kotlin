@@ -7,6 +7,7 @@ import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -151,7 +152,8 @@ public class ChipGroup<T> internal constructor(
             +ComponentType.ChipGroup
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     private val expanded = ExpandedStore()
@@ -233,7 +235,7 @@ public class ChipGroup<T> internal constructor(
     override fun delegate(): HTMLSpanElement {
         if (textElement == null) {
             val textId = Id.unique("cgt")
-            textElement = Span(id = textId, baseClass = "chip-group".component("label"), job).apply {
+            textElement = Span(id = textId, baseClass = "chip-group".component("label"), job, Scope()).apply {
                 aria["hidden"] = true
             }
             with(domNode) {

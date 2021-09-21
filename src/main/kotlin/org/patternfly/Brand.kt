@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
+import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
@@ -34,7 +35,12 @@ public fun PageHeader.brand(
  * A brand is used to place a product logotype on a screen.
  */
 public class Brand internal constructor(sidebarStore: SidebarStore, id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("page".component("header", "brand"), baseClass), job) {
+    Div(
+        id = id,
+        baseClass = classes("page".component("header", "brand"), baseClass),
+        job = job,
+        scope = Scope()
+    ) {
 
     private var link: A
 

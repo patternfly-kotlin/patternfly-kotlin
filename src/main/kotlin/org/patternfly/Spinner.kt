@@ -1,6 +1,7 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import org.patternfly.Size.XL
@@ -42,7 +43,8 @@ public class Spinner internal constructor(size: Size, id: String?, baseClass: St
             +size.modifier
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     ) {
 
     init {

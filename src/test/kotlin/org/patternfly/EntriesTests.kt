@@ -14,13 +14,13 @@ class EntriesTests : StringSpec({
 
     "new entries should be empty" {
         with(Entries<Int>({ it.toString() }, SINGLE, emptyList())) {
-            all.shouldBeEmpty()
-            entries.shouldBeEmpty()
-            groups.shouldBeEmpty()
-            items.shouldBeEmpty()
-            selection.shouldBeEmpty()
-            singleSelection shouldBe null
-        }
+        all.shouldBeEmpty()
+        entries.shouldBeEmpty()
+        groups.shouldBeEmpty()
+        items.shouldBeEmpty()
+        selection.shouldBeEmpty()
+        singleSelection shouldBe null
+    }
     }
 
     // ------------------------------------------------------ items
@@ -137,14 +137,14 @@ class EntriesTests : StringSpec({
 
 private fun numbers(range: IntRange, itemSelection: ItemSelection) =
     items<Int>({ it.toString() }, itemSelection) {
-        range.forEach { item(it) }
-    }
+    range.forEach { item(it) }
+}
 
 private fun groups(range: IntRange, step: Int, itemSelection: ItemSelection) =
     groups<Int>({ it.toString() }, itemSelection) {
-        range.chunked(step).forEach { group ->
-            group {
-                group.forEach { item(it) }
-            }
+    range.chunked(step).forEach { group ->
+        group {
+            group.forEach { item(it) }
         }
     }
+}

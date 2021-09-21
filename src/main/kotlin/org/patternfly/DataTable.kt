@@ -5,6 +5,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Caption
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TBody
 import dev.fritz2.dom.html.Table
 import dev.fritz2.dom.html.Td
@@ -167,7 +168,8 @@ public class DataTable<T> internal constructor(
         +"grid-md".modifier()
         +baseClass
     },
-    job
+    job,
+    scope = Scope()
 ) {
 
     internal val columns: Columns<T> = Columns(this)
@@ -304,9 +306,9 @@ public class DataTable<T> internal constructor(
  * Component to add a caption above the [DataTable].
  */
 public class DataTableCaption internal constructor(id: String?, baseClass: String?, job: Job) :
-    Caption(id = id, baseClass = baseClass, job)
+    Caption(id = id, baseClass = baseClass, job, Scope())
 
-internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) : TBody(job = job) {
+internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) : TBody(job = job, scope = Scope()) {
 
     private val expanded: ExpandedStore = ExpandedStore()
 

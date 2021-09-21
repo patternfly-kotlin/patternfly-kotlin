@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
@@ -214,7 +215,7 @@ private fun RenderContext.genericPageSection(
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
 public class Page internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, baseClass), job) {
+    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Page, baseClass), job, Scope()) {
 
     internal val sidebarStore: SidebarStore = SidebarStore()
 
@@ -228,7 +229,7 @@ public class Page internal constructor(id: String?, baseClass: String?, job: Job
  */
 public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
     PatternFlyComponent<HTMLElement>,
-    TextElement("main", id = id, baseClass = classes(ComponentType.PageMain, baseClass), job) {
+    TextElement("main", id = id, baseClass = classes(ComponentType.PageMain, baseClass), job, Scope()) {
 
     init {
         markAs(ComponentType.PageMain)
@@ -248,7 +249,8 @@ public class PageGroup internal constructor(sticky: Sticky?, id: String?, baseCl
             +sticky?.modifier
             +baseClass
         },
-        job
+        job,
+        scope = Scope()
     )
 
 /**
@@ -259,4 +261,4 @@ public class PageSection internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : TextElement("section", id = id, baseClass = classes(sticky?.modifier, baseClass), job)
+) : TextElement("section", id = id, baseClass = classes(sticky?.modifier, baseClass), job, Scope())
