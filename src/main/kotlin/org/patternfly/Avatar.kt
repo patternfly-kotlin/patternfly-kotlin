@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ dsl

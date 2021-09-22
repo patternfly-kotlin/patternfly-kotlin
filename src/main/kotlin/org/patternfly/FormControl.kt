@@ -66,13 +66,29 @@ public fun RenderContext.selectFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: Select.() -> Unit = {}
-): Select = register(Select(id = id, baseClass = classes("form-control".component(), baseClass), job, Scope()), content)
+): Select = register(
+    Select(
+        id = id,
+        baseClass = classes("form-control".component(), baseClass),
+        job,
+        Scope()
+    ),
+    content
+)
 
 public fun RenderContext.textareaFormControl(
     id: String? = null,
     baseClass: String? = null,
     content: TextArea.() -> Unit = {}
-): TextArea = register(TextArea(id = id, baseClass = classes("form-control".component(), baseClass), job, Scope()), content)
+): TextArea = register(
+    TextArea(
+        id = id,
+        baseClass = classes("form-control".component(), baseClass),
+        job,
+        Scope()
+    ),
+    content
+)
 
 // ------------------------------------------------------ tag
 

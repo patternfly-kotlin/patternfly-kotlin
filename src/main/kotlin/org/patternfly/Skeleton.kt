@@ -6,6 +6,8 @@ import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import org.patternfly.component.PatternFlyComponent2
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 
@@ -99,9 +101,7 @@ public class Skeleton2 : PatternFlyComponent2<Unit> {
                 id = id
             ) {
                 markAs(ComponentType.Skeleton)
-                text?.let {
-                    it.invoke(this)
-                }
+                text?.invoke(this)
             }
         }
     }

@@ -19,6 +19,7 @@ import org.patternfly.ButtonVariation.plain
 import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE
+import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.debug
@@ -308,7 +309,8 @@ public class DataTable<T> internal constructor(
 public class DataTableCaption internal constructor(id: String?, baseClass: String?, job: Job) :
     Caption(id = id, baseClass = baseClass, job, Scope())
 
-internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) : TBody(job = job, scope = Scope()) {
+internal class DataTableExpandableBody<T>(dataTable: DataTable<T>, item: T, job: Job) :
+    TBody(job = job, scope = Scope()) {
 
     private val expanded: ExpandedStore = ExpandedStore()
 

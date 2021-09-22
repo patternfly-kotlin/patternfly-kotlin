@@ -10,6 +10,7 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.events.MouseEvent

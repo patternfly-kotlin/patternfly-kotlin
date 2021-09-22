@@ -5,7 +5,7 @@ import java.net.URL
 
 plugins {
     kotlin("js") version Versions.kotlin
-    id("org.jetbrains.dokka") version Versions.kotlin
+    id("org.jetbrains.dokka") version Versions.dokka
     id("org.jlleitschuh.gradle.ktlint") version Versions.ktlint
     id("org.jlleitschuh.gradle.ktlint-idea") version Versions.ktlint
     id("io.gitlab.arturbosch.detekt") version Versions.detekt
@@ -42,7 +42,7 @@ dependencies {
 // ------------------------------------------------------ kotlin/js
 
 kotlin {
-    js {
+    js(BOTH) {
         explicitApi()
         browser {
             testTask {

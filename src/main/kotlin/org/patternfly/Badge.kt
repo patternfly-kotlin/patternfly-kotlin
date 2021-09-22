@@ -7,6 +7,7 @@ import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.component.markAs
 import org.patternfly.dom.minusAssign
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLSpanElement

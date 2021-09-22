@@ -5,6 +5,7 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import org.patternfly.Size.XL
+import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLSpanElement
 

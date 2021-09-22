@@ -15,6 +15,14 @@ import org.w3c.dom.events.Event
 
 internal typealias CollapsePredicate = (Element) -> Boolean
 
+public interface Expandable {
+    public val expanded: ExpandedStore
+}
+
+public class ExpandedMixin : Expandable {
+    override val expanded: ExpandedStore = ExpandedStore()
+}
+
 /**
  * Store to manage the collapsed and expanded state of various components like [Dropdown], [Drawer] or [OptionsMenu].
  *

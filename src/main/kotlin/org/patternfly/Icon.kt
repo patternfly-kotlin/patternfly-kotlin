@@ -6,6 +6,7 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLElement
 

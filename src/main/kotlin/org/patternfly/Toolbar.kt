@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // TODO Document me
@@ -60,7 +61,13 @@ public fun ToolbarExpandableContent.toolbarGroup(
 // ------------------------------------------------------ tag
 
 public class Toolbar internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.Toolbar, baseClass), job, Scope()) {
+    PatternFlyComponent<HTMLDivElement>,
+    Div(
+        id = id,
+        baseClass = classes(ComponentType.Toolbar, baseClass),
+        job,
+        Scope()
+    ) {
     init {
         markAs(ComponentType.Toolbar)
     }

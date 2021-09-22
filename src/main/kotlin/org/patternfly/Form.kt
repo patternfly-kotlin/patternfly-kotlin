@@ -5,6 +5,7 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.Orientation.HORIZONTAL
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLFormElement
 
 // ------------------------------------------------------ dsl

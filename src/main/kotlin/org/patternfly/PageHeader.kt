@@ -4,6 +4,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl

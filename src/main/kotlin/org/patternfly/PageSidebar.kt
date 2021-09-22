@@ -8,6 +8,7 @@ import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -52,7 +53,13 @@ public class PageSidebar internal constructor(
     baseClass: String?,
     job: Job,
     content: Div.() -> Unit
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, baseClass = classes(ComponentType.PageSidebar, baseClass), job, Scope()) {
+) : PatternFlyComponent<HTMLDivElement>,
+    Div(
+        id = id,
+        baseClass = classes(ComponentType.PageSidebar, baseClass),
+        job,
+        Scope()
+    ) {
 
     init {
         markAs(ComponentType.PageSidebar)

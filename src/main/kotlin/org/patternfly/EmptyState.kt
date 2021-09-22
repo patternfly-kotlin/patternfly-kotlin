@@ -12,6 +12,7 @@ import org.patternfly.Size.SM
 import org.patternfly.Size.XL
 import org.patternfly.Size.XL_4
 import org.patternfly.Size.XS
+import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -117,7 +118,15 @@ public fun EmptyStateContent.emptyStatePrimary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("primary"), baseClass), job, Scope()), content)
+): Div = register(
+    Div(
+        id = id,
+        baseClass = classes("empty-state".component("primary"), baseClass),
+        job,
+        Scope()
+    ),
+    content
+)
 
 /**
  * Creates a [Div] container for the secondary actions of the [EmptyState] component.
@@ -130,7 +139,15 @@ public fun EmptyStateContent.emptyStateSecondary(
     id: String? = null,
     baseClass: String? = null,
     content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("secondary"), baseClass), job, Scope()), content)
+): Div = register(
+    Div(
+        id = id,
+        baseClass = classes("empty-state".component("secondary"), baseClass),
+        job,
+        Scope()
+    ),
+    content
+)
 
 // ------------------------------------------------------ tag
 
