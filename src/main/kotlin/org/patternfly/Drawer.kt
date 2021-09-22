@@ -12,7 +12,6 @@ import org.patternfly.ButtonVariation.plain
 import org.patternfly.DrawerPanelPosition.BOTTOM
 import org.patternfly.DrawerPanelPosition.LEFT
 import org.patternfly.DrawerPanelPosition.RIGHT
-import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.DOMRect
 import org.w3c.dom.Element
@@ -267,7 +266,7 @@ public class Drawer internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     Div(
         id = id,
         baseClass = classes {

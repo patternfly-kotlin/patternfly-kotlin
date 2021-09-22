@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.control
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -85,7 +84,7 @@ public class ContextSelector<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(
+) : PatternFlyElement<HTMLDivElement>, Div(
     id = id,
     baseClass = classes(ComponentType.ContextSelector, baseClass),
     job,

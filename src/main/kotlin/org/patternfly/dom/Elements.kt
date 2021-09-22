@@ -267,7 +267,7 @@ public fun ParentNode.querySelectorAll(selector: By): NodeList = this.querySelec
  * @sample org.patternfly.sample.DebugSample.debug
  */
 public fun Element.debug(): String = buildString {
-    append("<${tagName.toLowerCase()}")
+    append("<${tagName.lowercase()}")
     getAttributeNames().joinTo(this, " ", " ") { name ->
         buildString {
             append(name)
@@ -277,7 +277,7 @@ public fun Element.debug(): String = buildString {
         }
     }
     if (hasChildNodes()) {
-        append("></${tagName.toLowerCase()}")
+        append("></${tagName.lowercase()}")
     } else {
         append("/>")
     }

@@ -7,7 +7,6 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.plusAssign
@@ -38,7 +37,7 @@ public fun RenderContext.switch(
  * @sample org.patternfly.sample.SwitchSample.switch
  */
 public class Switch internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLLabelElement>,
+    PatternFlyElement<HTMLLabelElement>,
     Label(id = id, baseClass = classes(ComponentType.Switch, baseClass), job, Scope()) {
 
     private val toggleTag: Span

@@ -26,7 +26,6 @@ import org.patternfly.DividerVariant.LI
 import org.patternfly.Orientation.HORIZONTAL
 import org.patternfly.Orientation.VERTICAL
 import org.patternfly.Settings.UI_TIMEOUT
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -209,7 +208,7 @@ public class Navigation<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLElement>,
+) : PatternFlyElement<HTMLElement>,
     TextElement(
         "nav",
         id = id,

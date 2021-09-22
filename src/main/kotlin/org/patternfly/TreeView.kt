@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.aria
 import org.patternfly.dom.displayNone
@@ -68,7 +67,7 @@ public class TreeView<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     Div(id = id, baseClass = classes(ComponentType.TreeView, baseClass), job, Scope()) {
 
     private var ul: Ul

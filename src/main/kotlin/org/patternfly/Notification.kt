@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.NotificationStore.addInternal
-import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
@@ -41,7 +40,7 @@ public fun RenderContext.notificationBadge(
  * The notification badge is typically part of the [pageHeaderTools].
  */
 public class NotificationBadge internal constructor(withCount: Boolean, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLButtonElement>,
+    PatternFlyElement<HTMLButtonElement>,
     Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass), job, Scope()) {
 
     init {

@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemSelection.SINGLE
-import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLButtonElement
@@ -127,7 +126,7 @@ public class Pagination internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     Div(
         id = id,
         baseClass = classes {

@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -144,7 +143,7 @@ public class ChipGroup<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     WithIdProvider<T> by store,
     Div(

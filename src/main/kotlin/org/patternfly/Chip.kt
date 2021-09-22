@@ -7,7 +7,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -75,7 +74,7 @@ public fun Chip.badge(
  * @sample org.patternfly.sample.ChipSample.basicChips
  */
 public class Chip internal constructor(readOnly: Boolean, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>,
+    PatternFlyElement<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(
         id = id,

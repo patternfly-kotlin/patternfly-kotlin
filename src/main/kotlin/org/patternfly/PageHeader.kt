@@ -4,7 +4,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl
@@ -80,7 +79,7 @@ public fun PageHeaderTools.pageHeaderToolsItem(
  * Page header or [masthead](https://www.patternfly.org/v4/components/page/design-guidelines/#masthead) component.
  */
 public class PageHeader internal constructor(internal val page: Page, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLElement>,
+    PatternFlyElement<HTMLElement>,
     TextElement("header", id = id, baseClass = classes(ComponentType.PageHeader, baseClass), job, Scope()) {
 
     init {

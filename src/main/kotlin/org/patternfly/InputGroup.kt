@@ -4,7 +4,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // TODO Document me
@@ -19,7 +18,7 @@ public fun RenderContext.inputGroup(
 // ------------------------------------------------------ tag
 
 public class InputGroup internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>,
+    PatternFlyElement<HTMLDivElement>,
     Div(id = id, baseClass = classes(ComponentType.InputGroup, baseClass), job, Scope()) {
 
     init {

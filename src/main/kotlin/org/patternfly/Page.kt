@@ -6,7 +6,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
@@ -216,7 +215,7 @@ private fun RenderContext.genericPageSection(
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
 public class Page internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>,
+    PatternFlyElement<HTMLDivElement>,
     Div(id = id, baseClass = classes(ComponentType.Page, baseClass), job, Scope()) {
 
     internal val sidebarStore: SidebarStore = SidebarStore()
@@ -230,7 +229,7 @@ public class Page internal constructor(id: String?, baseClass: String?, job: Job
  * Main component inside the [Page] component.
  */
 public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLElement>,
+    PatternFlyElement<HTMLElement>,
     TextElement("main", id = id, baseClass = classes(ComponentType.PageMain, baseClass), job, Scope()) {
 
     init {

@@ -5,7 +5,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLDivElement
 
@@ -21,7 +20,7 @@ public fun RenderContext.select(
 // ------------------------------------------------------ tag
 
 public class Select internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>,
+    PatternFlyElement<HTMLDivElement>,
     Div(id = id, baseClass = classes(ComponentType.Select, baseClass), job, Scope()) {
 
     init {

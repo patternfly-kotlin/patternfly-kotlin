@@ -6,23 +6,14 @@ import dev.fritz2.dom.WithText
 import dev.fritz2.dom.mountDomNode
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.document
-import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.patternfly.Size.LG
 import org.patternfly.Size.MD
 import org.patternfly.Size.XL
 import org.patternfly.Size.XL_2
-import org.patternfly.dom.By
-import org.patternfly.dom.querySelector
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
-import org.w3c.dom.ParentNode
-import org.w3c.dom.get
-import org.w3c.dom.set
-
-private const val COMPONENT_TYPE: String = "pfct"
 
 /**
  * Generic display function for components.
@@ -34,21 +25,10 @@ public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
 
-internal fun <E : HTMLElement> PatternFlyComponent<E>.markAs(componentType: ComponentType) {
-    domNode.dataset[COMPONENT_TYPE] = componentType.id
-    if (window.localStorage["ouia"].toString() == "true") {
-        domNode.dataset["ouiaComponentType"] = componentType.name
-    }
-}
-
-internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
-    By.data(COMPONENT_TYPE, componentType.id)
-)
-
 /**
  * Marker interface implemented by all PatternFly components.
  */
-public interface PatternFlyComponent<out E : HTMLElement> : WithDomNode<E>
+public interface PatternFlyElement<out E : HTMLElement> : WithDomNode<E>
 
 /**
  * Interface meant to be implemented by components which want to have an easy access to an item ID based on [IdProvider]. These components can for example use [itemId] to set the ID attribute on their DOM element.
@@ -121,48 +101,6 @@ public enum class ButtonVariation(internal val modifier: String) {
     secondary("secondary".modifier()),
     tertiary("tertiary".modifier()),
     warning("warning".modifier()),
-}
-
-@Suppress("EnumNaming")
-internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
-    Accordion("ac", "accordion".component()),
-    Alert("at", "alert".component()),
-    AlertGroup("ag", "alert-group".component()),
-    Avatar("av", "avatar".component()),
-    Badge("bdg", "badge".component()),
-    Breadcrumb("bc", "breadcrumb".component()),
-    Button("btn", "button".component()),
-    Card("crd", "card".component()),
-    CardView("cv"),
-    Chip("chp", "chip".component()),
-    ChipGroup("cpg", "chip-group".component()),
-    ContextSelector("cs", "context-selector".component()),
-    DataList("dl", "data-list".component()),
-    DataTable("dt", "table".component()),
-    Drawer("dw", "drawer".component()),
-    Dropdown("dd", "dropdown".component()),
-    EmptyState("es", "empty-state".component()),
-    Form("frm", "form".component()),
-    Icon("icn"),
-    InputGroup("ig", "input-group".component()),
-    Menu("mu", "menu".component()),
-    Navigation("nav", "nav".component()),
-    NotificationBadge("nb", "button".component()),
-    OptionsMenu("opt", "options-menu".component()),
-    Page("pg", "page".component()),
-    PageHeader("pgh", "page".component("header")),
-    PageMain("mn", "page".component("main")),
-    PageSidebar("pgs", "page".component("sidebar")),
-    Pagination("pgn", "pagination".component()),
-    Select("sel", "select".component()),
-    Skeleton("sk", "skeleton".component()),
-    Spinner("sp", "spinner".component()),
-    Switch("sw", "switch".component()),
-    Tabs("tbs"),
-    TextContent("tc", "content".component()),
-    Title("tlt", "title".component()),
-    Toolbar("tb", "toolbar".component()),
-    TreeView("tv", "tree-view".component());
 }
 
 /**

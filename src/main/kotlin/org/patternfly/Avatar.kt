@@ -4,7 +4,6 @@ import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ dsl
@@ -34,7 +33,7 @@ public fun RenderContext.avatar(
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
 public class Avatar internal constructor(src: String, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLImageElement>,
+    PatternFlyElement<HTMLImageElement>,
     Img(
         id = id,
         baseClass = classes {

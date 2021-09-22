@@ -5,7 +5,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.Level.H1
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLHeadingElement
 
 // ------------------------------------------------------ dsl
@@ -42,7 +41,7 @@ public class Title internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLHeadingElement>,
+) : PatternFlyElement<HTMLHeadingElement>,
     H(
         level.level,
         id = id,

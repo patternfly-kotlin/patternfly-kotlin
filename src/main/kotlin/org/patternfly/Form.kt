@@ -5,7 +5,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import org.patternfly.Orientation.HORIZONTAL
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLFormElement
 
 // ------------------------------------------------------ dsl
@@ -68,7 +67,7 @@ public fun Form.formActions(
  * @sample org.patternfly.sample.FormSample.form
  */
 public class Form internal constructor(labelOrientation: Orientation, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLFormElement>,
+    PatternFlyElement<HTMLFormElement>,
     dev.fritz2.dom.html.Form(
         id = id,
         baseClass = classes {

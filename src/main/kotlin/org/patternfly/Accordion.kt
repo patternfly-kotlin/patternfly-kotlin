@@ -3,8 +3,6 @@ package org.patternfly
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
-import org.patternfly.component.PatternFlyComponent2
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
@@ -35,7 +33,7 @@ public fun RenderContext.accordion(
  *
  * @sample org.patternfly.sample.AccordionSample.accordion
  */
-public class Accordion : PatternFlyComponent2<Unit> {
+public class Accordion : PatternFlyComponent<Unit> {
     private var fixed: Boolean = false
     private var singleExpand: Boolean = false
     private var bordered: Boolean = false

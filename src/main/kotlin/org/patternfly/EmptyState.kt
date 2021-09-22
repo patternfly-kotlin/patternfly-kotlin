@@ -12,7 +12,6 @@ import org.patternfly.Size.SM
 import org.patternfly.Size.XL
 import org.patternfly.Size.XL_4
 import org.patternfly.Size.XS
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -185,7 +184,7 @@ public class EmptyState internal constructor(
     baseClass: String?,
     job: Job,
     content: EmptyStateContent.() -> Unit
-) : PatternFlyComponent<HTMLDivElement>, Div(
+) : PatternFlyElement<HTMLDivElement>, Div(
     id = id,
     baseClass = classes {
         +ComponentType.EmptyState

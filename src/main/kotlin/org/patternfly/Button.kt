@@ -10,7 +10,6 @@ import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TagContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.events.MouseEvent
@@ -114,7 +113,7 @@ public class PushButton internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLButtonElement>,
+) : PatternFlyElement<HTMLButtonElement>,
     ButtonLike,
     Button(
         id = id,
@@ -144,7 +143,7 @@ public class LinkButton internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLAnchorElement>,
+) : PatternFlyElement<HTMLAnchorElement>,
     ButtonLike,
     A(
         id,

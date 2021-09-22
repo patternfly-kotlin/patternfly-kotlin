@@ -6,8 +6,6 @@ import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import org.patternfly.component.PatternFlyComponent2
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 
@@ -51,7 +49,7 @@ public fun RenderContext.skeleton2(baseClass: String? = null, id: String? = null
     Skeleton2().apply(build).render(this, baseClass, id)
 }
 
-public class Skeleton2 : PatternFlyComponent2<Unit> {
+public class Skeleton2 : PatternFlyComponent<Unit> {
 
     private var fontSize: FontSize? = null
     private var height: Height? = null
@@ -125,7 +123,7 @@ public class Skeleton internal constructor(
     width: Width?,
     shape: Shape?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
     Div(
         id = id,

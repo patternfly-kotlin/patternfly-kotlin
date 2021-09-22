@@ -7,7 +7,6 @@ import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.patternfly.component.markAs
 import org.patternfly.dom.minusAssign
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLSpanElement
@@ -50,7 +49,7 @@ public class Badge internal constructor(
     id: String? = null,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLSpanElement>, Span(
+) : PatternFlyElement<HTMLSpanElement>, Span(
     id = id,
     baseClass = classes(ComponentType.Badge, baseClass),
     job = job,

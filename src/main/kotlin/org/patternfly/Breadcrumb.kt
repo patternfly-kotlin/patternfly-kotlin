@@ -7,7 +7,6 @@ import dev.fritz2.dom.html.TextElement
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLElement
@@ -78,7 +77,7 @@ public class Breadcrumb<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLElement>,
+) : PatternFlyElement<HTMLElement>,
     TextElement(
         "nav",
         id = id,

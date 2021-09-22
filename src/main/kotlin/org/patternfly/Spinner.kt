@@ -5,7 +5,6 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import org.patternfly.Size.XL
-import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLSpanElement
 
@@ -36,7 +35,7 @@ public fun RenderContext.spinner(
  * @sample org.patternfly.sample.SpinnerSample.spinner
  */
 public class Spinner internal constructor(size: Size, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLSpanElement>,
+    PatternFlyElement<HTMLSpanElement>,
     Span(
         id = id,
         baseClass = classes {

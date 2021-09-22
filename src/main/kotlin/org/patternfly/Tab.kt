@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
@@ -138,7 +137,7 @@ public class Tabs<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(id = id, job = job, scope = Scope()) {
+) : PatternFlyElement<HTMLDivElement>, Div(id = id, job = job, scope = Scope()) {
 
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
@@ -268,7 +267,7 @@ public class Tabs<T> internal constructor(
  * A tab content component must always be used with the [Tabs] component.
  */
 public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String, job: Job) :
-    PatternFlyComponent<HTMLElement>,
+    PatternFlyElement<HTMLElement>,
     TextElement("section", id = contentId, baseClass = classes("tab".component("content")), job, Scope()) {
 
     init {

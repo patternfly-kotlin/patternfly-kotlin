@@ -12,7 +12,6 @@ import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -169,7 +168,7 @@ public class OptionsMenu<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>, Div(
+) : PatternFlyElement<HTMLDivElement>, Div(
     id = id,
     baseClass = classes {
         +ComponentType.OptionsMenu

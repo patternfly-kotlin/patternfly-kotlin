@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.component.markAs
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
@@ -29,7 +28,7 @@ import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 internal val TOAST_ALERT_GROUP = Id.unique("toast", ComponentType.AlertGroup.id)
 
@@ -152,7 +151,7 @@ public fun Alert.alertActions(
  * @sample org.patternfly.sample.AlertSample.inlineAlertGroup
  */
 public class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLUListElement>,
+    PatternFlyElement<HTMLUListElement>,
     Ul(
         id = id,
         baseClass = classes {
@@ -231,7 +230,7 @@ public class Alert internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLDivElement>,
+) : PatternFlyElement<HTMLDivElement>,
     Div(
         id = id,
         baseClass = classes {

@@ -19,7 +19,6 @@ import org.patternfly.ButtonVariation.plain
 import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE
-import org.patternfly.component.markAs
 import org.patternfly.dom.Id
 import org.patternfly.dom.aria
 import org.patternfly.dom.debug
@@ -162,7 +161,7 @@ public class DataTable<T> internal constructor(
     id: String?,
     baseClass: String?,
     job: Job
-) : PatternFlyComponent<HTMLTableElement>, Table(
+) : PatternFlyElement<HTMLTableElement>, Table(
     id = id,
     baseClass = classes {
         +ComponentType.DataTable

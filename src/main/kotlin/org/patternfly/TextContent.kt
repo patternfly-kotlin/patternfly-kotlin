@@ -4,7 +4,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
-import org.patternfly.component.markAs
 import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ dsl
@@ -32,7 +31,7 @@ public fun RenderContext.textContent(
  * @sample org.patternfly.sample.TextContentSample.textContent
  */
 public class TextContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLDivElement>,
+    PatternFlyElement<HTMLDivElement>,
     Div(id = id, baseClass = classes(ComponentType.TextContent, baseClass), job, Scope()) {
 
     init {

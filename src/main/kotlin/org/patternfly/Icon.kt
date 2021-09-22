@@ -6,7 +6,6 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import org.patternfly.component.markAs
 import org.patternfly.dom.aria
 import org.w3c.dom.HTMLElement
 
@@ -39,7 +38,7 @@ public fun RenderContext.icon(
  * @sample org.patternfly.sample.IconSample.icons
  */
 public class Icon internal constructor(iconClass: String, id: String?, baseClass: String?, job: Job) :
-    PatternFlyComponent<HTMLElement>,
+    PatternFlyElement<HTMLElement>,
     TextElement(
         "i",
         id = id,
