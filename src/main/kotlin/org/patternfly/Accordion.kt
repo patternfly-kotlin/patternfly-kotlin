@@ -1,9 +1,11 @@
 package org.patternfly
 
+import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ factory
 
@@ -125,8 +127,10 @@ public class Accordion : PatternFlyComponent<Unit> {
             ) {
                 attr("hidden", item.expanded.data.map { !it })
                 classMap(item.expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
-                div(baseClass = "accordion".component("expanded", "content", "body")) {
-                    item.content(this)
+                item.content?.let { content ->
+                    div(baseClass = "accordion".component("expanded", "content", "body")) {
+                        content(this)
+                    }
                 }
             }
         }
@@ -140,30 +144,17 @@ public class Accordion : PatternFlyComponent<Unit> {
 /**
  * An item in an [Accordion] component. The item consists of a title and a content.
  */
-public class AccordionItem : Expandable by ExpandedMixin() {
+public class AccordionItem : Expandable by ExpandedMixin(),
+    HasTitle by TitleMixin(),
+    HasContent<Div, HTMLDivElement> by ContentMixin() {
+
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal var initiallyExpanded: Boolean = false
-    internal var title: String = ""
-    internal var content: RenderContext.() -> Unit = {}
 
     /**
      * Whether the item is initially expanded
      */
     public fun expanded(expanded: Boolean) {
         this.initiallyExpanded = expanded
-    }
-
-    /**
-     * The title of the item
-     */
-    public fun title(title: String) {
-        this.title = title
-    }
-
-    /**
-     * The content of the item
-     */
-    public fun content(content: RenderContext.() -> Unit) {
-        this.content = content
     }
 }

@@ -24,7 +24,7 @@ internal interface AccordionSample {
                     }
                 }
                 item {
-                    title("Item three" )
+                    title("Item three")
                     content {
                         p { +"Quisque vel commodo urna." }
                     }

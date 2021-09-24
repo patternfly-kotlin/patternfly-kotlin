@@ -17,7 +17,6 @@ import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.matches
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
@@ -173,6 +172,10 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
                     val alertId = Id.unique("alert")
                     val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
                     with(li) {
+                        alert2(id = alertId) {
+                            severity(notification.severity)
+                            title(notification.text)
+                        }
                         alert(notification.severity, notification.text, true, id = alertId) {
                             with(domNode) {
                                 onmouseover = { this@AlertGroup.stopTimeout(alertId) }
