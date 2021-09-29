@@ -9,7 +9,6 @@ import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.HTMLButtonElement

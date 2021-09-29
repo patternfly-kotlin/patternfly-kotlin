@@ -4,7 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import kotlinx.browser.document
-import org.patternfly.dom.aria
+import org.patternfly.aria
 
 internal interface AriaSample {
 

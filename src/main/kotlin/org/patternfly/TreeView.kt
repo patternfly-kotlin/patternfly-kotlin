@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
 import org.patternfly.dom.By
-import org.patternfly.dom.aria
 import org.patternfly.dom.displayNone
 import org.patternfly.dom.minusAssign
 import org.patternfly.dom.plusAssign

@@ -13,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.aria
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl

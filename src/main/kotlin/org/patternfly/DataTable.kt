@@ -20,7 +20,6 @@ import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLTableElement

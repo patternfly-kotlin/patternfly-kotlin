@@ -8,7 +8,6 @@ import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLLabelElement
 

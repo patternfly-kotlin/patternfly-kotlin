@@ -172,15 +172,16 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
                     val alertId = Id.unique("alert")
                     val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
                     with(li) {
-                        alert2(id = alertId) {
+                        alert(id = alertId) {
                             severity(notification.severity)
                             title(notification.text)
-                        }
-                        alert(notification.severity, notification.text, true, id = alertId) {
-                            with(domNode) {
-                                onmouseover = { this@AlertGroup.stopTimeout(alertId) }
-                                onmouseout = { this@AlertGroup.startTimeout(alertId, li.domNode) }
-                                this@AlertGroup.startTimeout(alertId, li.domNode)
+                            closable(true)
+                            element {
+                                with(domNode) {
+                                    onmouseover = { this@AlertGroup.stopTimeout(alertId) }
+                                    onmouseout = { this@AlertGroup.startTimeout(alertId, li.domNode) }
+                                    this@AlertGroup.startTimeout(alertId, li.domNode)
+                                }
                             }
                         }
                     }

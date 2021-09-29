@@ -181,7 +181,7 @@ private class ByData(name: String, operator: AttributeOperator?, value: String?)
     companion object {
         private fun camelToKebabCase(str: String): String {
             // from https://codepen.io/wpatter6/pen/wvweWZa
-            return str.replace("([a-z0-9]|(?=[A-Z]))([A-Z])".toRegex(), "$1-$2").toLowerCase()
+            return str.replace("([a-z0-9]|(?=[A-Z]))([A-Z])".toRegex(), "$1-$2").lowercase()
         }
     }
 }

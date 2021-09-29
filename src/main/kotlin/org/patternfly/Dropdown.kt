@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.matches
 import org.w3c.dom.HTMLButtonElement
@@ -335,7 +334,7 @@ public class Dropdown<T> internal constructor(
                         li(content = this@Dropdown.itemContent(entry))
                     }
                     is Separator<T> -> {
-                        if (domNode.tagName.toLowerCase() == "ul") {
+                        if (domNode.tagName.lowercase() == "ul") {
                             divider(DividerVariant.LI)
                         } else {
                             divider(DividerVariant.DIV)

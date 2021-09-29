@@ -85,7 +85,7 @@ internal interface DataTableSample {
                     }
                     dataTableColumn("Shout") {
                         headerDisplay { icon("volume-up") }
-                        cellDisplay { +it.toUpperCase() }
+                        cellDisplay { +it.uppercase() }
                     }
                 }
             }

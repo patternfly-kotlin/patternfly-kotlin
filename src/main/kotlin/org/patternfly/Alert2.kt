@@ -17,7 +17,16 @@ import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
 
-public fun RenderContext.alert2(
+/**
+ * Creates a standalone [Alert2] component.
+ *
+ * @param baseClass optional CSS class that should be applied to the element
+ * @param id the ID of the element
+ * @param build a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.AlertSample.standaloneAlert
+ */
+public fun RenderContext.alert(
     baseClass: String? = null,
     id: String? = null,
     build: Alert2.() -> Unit
@@ -27,7 +36,7 @@ public fun RenderContext.alert2(
 
 public fun test() {
     render {
-        alert2 {
+        alert {
             title("foo")
             content {
                 +"Description"
@@ -48,10 +57,13 @@ public fun test() {
 
 // ------------------------------------------------------ component
 
-public class Alert2 : PatternFlyComponent<Unit>,
+public class Alert2 :
+    PatternFlyComponent<Unit>,
     Aria by AriaMixin(),
     HasTitle by TitleMixin(),
-    HasContent<Div, HTMLDivElement> by ContentMixin() {
+    HasContent<Div, HTMLDivElement> by ContentMixin(),
+    ElementProperties<Div, HTMLDivElement> by ElementMixin(),
+    EventProperties<HTMLDivElement> by EventMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var severity: Severity = Severity.INFO
@@ -80,7 +92,7 @@ public class Alert2 : PatternFlyComponent<Unit>,
         this.inline = inline
     }
 
-    public fun action(text: String, action: EventContext<HTMLButtonElement>.() -> Unit) {
+    public fun action(text: String, action: EventContext<HTMLButtonElement>.() -> Unit = {}) {
         actions[text] = action
     }
 
@@ -98,6 +110,9 @@ public class Alert2 : PatternFlyComponent<Unit>,
                 markAs(ComponentType.Alert)
                 aria["label"] = ariaLabels.first
                 ariaContext.applyTo(this)
+                events(this)
+                element(this)
+
                 div(baseClass = "alert".component("icon")) {
                     icon(severity.iconClass)
                 }

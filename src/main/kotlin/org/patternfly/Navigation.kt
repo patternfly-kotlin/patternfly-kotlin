@@ -28,7 +28,6 @@ import org.patternfly.Orientation.VERTICAL
 import org.patternfly.Settings.UI_TIMEOUT
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.debug
 import org.patternfly.dom.querySelector
 import org.w3c.dom.HTMLElement
@@ -264,7 +263,7 @@ public class Navigation<T> internal constructor(
 
             // update scroll buttons, when window has been resized
             callbackFlow {
-                val listener: (Event) -> Unit = { offer(it) }
+                val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
                 window.addEventListener(Events.resize.name, listener)
                 awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
             }.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
@@ -372,7 +371,7 @@ public class Navigation<T> internal constructor(
             entries.copy(all = itemsAndSeparatorsOfUnnamedGroups + allOtherEntries).entries.forEach { entry ->
                 when (entry) {
                     is Group -> {
-                        register(ExpandableGroup(this@Navigation, entry, job), {})
+                        register(ExpandableGroup(this@Navigation, entry, job)) {}
                     }
                     is Item -> {
                         renderLink(this@Navigation, entry)

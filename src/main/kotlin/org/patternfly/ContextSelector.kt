@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.control
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.matches
 import org.w3c.dom.HTMLDivElement
 
@@ -94,7 +93,7 @@ public class ContextSelector<T> internal constructor(
     private var asString: (T) -> String = { item -> item.toString() }
     private var display: ComponentDisplay<A, T> = { item -> +this@ContextSelector.asString(item) }
     private var filter: (String, T) -> Boolean = { filter, item ->
-        this@ContextSelector.asString(item).toLowerCase().contains(filter.toLowerCase())
+        this@ContextSelector.asString(item).lowercase().contains(filter.lowercase())
     }
     private var selected: (T) -> String = asString
     private var toggle: Button

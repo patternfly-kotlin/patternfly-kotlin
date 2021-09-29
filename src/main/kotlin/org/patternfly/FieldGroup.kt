@@ -6,7 +6,6 @@ import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.patternfly.dom.hideIf
 
 // ------------------------------------------------------ dsl

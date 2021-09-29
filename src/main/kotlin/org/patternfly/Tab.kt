@@ -11,6 +11,7 @@ import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.window
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
@@ -236,7 +236,7 @@ public class Tabs<T> internal constructor(
 
         // update scroll buttons, when window has been resized
         callbackFlow {
-            val listener: (Event) -> Unit = { offer(it) }
+            val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
             window.addEventListener(Events.resize.name, listener)
             awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
         }.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
@@ -310,6 +310,7 @@ public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.bui
     /**
      * Flow with the last selected tab item.
      */
+    @FlowPreview
     public val selects: Flow<TabItem<T>> = flowOf(selectTab, selectItem).flattenMerge()
 }
 

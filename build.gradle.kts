@@ -1,7 +1,10 @@
 import org.jetbrains.dokka.Platform
 import java.net.URL
 
-// ------------------------------------------------------ core
+group = "org.patternfly"
+version = "0.3.0-SNAPSHOT"
+
+// ------------------------------------------------------ plugins
 
 plugins {
     kotlin("js") version Versions.kotlin
@@ -13,9 +16,6 @@ plugins {
     `maven-publish`
     signing
 }
-
-group = "org.patternfly"
-version = "0.3.0-SNAPSHOT"
 
 // ------------------------------------------------------ repositories
 
@@ -42,6 +42,15 @@ dependencies {
 // ------------------------------------------------------ kotlin/js
 
 kotlin {
+    sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.coroutines.FlowPreview")
+            }
+        }
+    }
     js(BOTH) {
         explicitApi()
         browser {
@@ -68,7 +77,7 @@ val javadocJar by tasks.creating(Jar::class) {
     from(tasks.named("dokkaHtml"))
 }
 
-// ------------------------------------------------------ tasks
+// ------------------------------------------------------ ktlint, detekt & dokka
 
 tasks {
     ktlint {

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.NotificationStore.addInternal
-import org.patternfly.dom.aria
 import org.w3c.dom.HTMLButtonElement
 import kotlin.js.Date
 

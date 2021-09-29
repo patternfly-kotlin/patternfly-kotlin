@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.Id
-import org.patternfly.dom.aria
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
 

@@ -44,7 +44,7 @@ internal interface ChipGroupSample {
             chipGroup<String> {
                 +"Display demo"
                 display {
-                    chip { +it.toUpperCase() }
+                    chip { +it.uppercase() }
                 }
                 chips("Foo", "Bar")
             }

@@ -46,7 +46,7 @@ public object Id {
         .map { it.replace("""\s+""".toRegex(), "-") }
         .map { it.replace("[^a-zA-Z0-9-_]".toRegex(), "-") }
         .map { it.replace('_', '-') }
-        .map { it.toLowerCase() }
+        .map { it.lowercase() }
         .filter { it.isNotEmpty() }
         .joinToString()
 }

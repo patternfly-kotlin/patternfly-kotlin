@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithText
 import kotlinx.coroutines.flow.Flow
@@ -45,9 +46,29 @@ public class ContentMixin<E : WithText<N>, N : Node> : HasContent<E, N> {
 }
 
 public interface ElementProperties<T : Tag<E>, E : HTMLElement> {
-    public val element: T.() -> Unit
+    public var element: T.() -> Unit
+
+    public fun element(build: T.() -> Unit)
 }
 
 public class ElementMixin<T : Tag<E>, E : HTMLElement> : ElementProperties<T, E> {
-    override val element: T.() -> Unit = {}
+    override var element: T.() -> Unit = {}
+
+    override fun element(build: T.() -> Unit) {
+        this.element = build
+    }
+}
+
+public interface EventProperties<T : HTMLElement> {
+    public var events: EventContext<T>.() -> Unit
+
+    public fun events(build: EventContext<T>.() -> Unit)
+}
+
+public class EventMixin<T : HTMLElement> : EventProperties<T> {
+    override var events: EventContext<T>.() -> Unit = {}
+
+    override fun events(build: EventContext<T>.() -> Unit) {
+        this.events = build
+    }
 }

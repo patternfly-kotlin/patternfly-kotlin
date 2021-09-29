@@ -14,6 +14,7 @@ import org.patternfly.alertActions
 import org.patternfly.alertDescription
 import org.patternfly.alertGroup
 import org.patternfly.pushButton
+import org.patternfly.title
 
 internal interface AlertSample {
 
@@ -29,6 +30,14 @@ internal interface AlertSample {
                     pushButton(inline, link) { +"View details" }
                     pushButton(inline, link) { +"Ignore" }
                 }
+            }
+            alert {
+                title {  }
+                severity(INFO)
+                title("Alert title")
+                content { +"Lorem ipsum dolor sit amet."}
+                action("View details")
+                action("Ignore")
             }
         }
     }

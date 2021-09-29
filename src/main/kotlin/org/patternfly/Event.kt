@@ -15,7 +15,7 @@ internal fun <T : Element, E : Event> subscribe(wdn: WithDomNode<T>?, type: Even
         DomListener(
             callbackFlow {
                 val listener: (Event) -> Unit = {
-                    offer(it.unsafeCast<E>())
+                    this.trySend(it.unsafeCast<E>()).isSuccess
                 }
                 wdn.domNode.addEventListener(type.name, listener)
 

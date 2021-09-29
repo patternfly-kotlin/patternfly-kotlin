@@ -12,7 +12,6 @@ import org.patternfly.ButtonVariation.plain
 import org.patternfly.DrawerPanelPosition.BOTTOM
 import org.patternfly.DrawerPanelPosition.LEFT
 import org.patternfly.DrawerPanelPosition.RIGHT
-import org.patternfly.dom.aria
 import org.w3c.dom.DOMRect
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLDivElement

@@ -144,7 +144,8 @@ public class Accordion : PatternFlyComponent<Unit> {
 /**
  * An item in an [Accordion] component. The item consists of a title and a content.
  */
-public class AccordionItem : Expandable by ExpandedMixin(),
+public class AccordionItem :
+    Expandable by ExpandedMixin(),
     HasTitle by TitleMixin(),
     HasContent<Div, HTMLDivElement> by ContentMixin() {
 

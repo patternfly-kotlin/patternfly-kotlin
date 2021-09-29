@@ -43,7 +43,7 @@ public class AriaContext {
         properties[name] = value
     }
 
-    internal fun <T: Tag<HTMLElement>> applyTo(tag: T) {
+    internal fun <T : Tag<HTMLElement>> applyTo(tag: T) {
         role?.let {
             tag.aria["role"] = it
         }
