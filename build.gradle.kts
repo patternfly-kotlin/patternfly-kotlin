@@ -43,7 +43,7 @@ dependencies {
 
 kotlin {
     sourceSets {
-        all {
+        named("main") {
             languageSettings.apply {
                 optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
