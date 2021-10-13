@@ -4,15 +4,25 @@ import java.net.URL
 group = "org.patternfly"
 version = "0.3.0-SNAPSHOT"
 
+object Meta {
+    const val desc = "Kotlin implementation of PatternFly 4 based on fritz2"
+    const val license = "Apache-2.0"
+    const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
+    const val release = "https://s01.oss.sonatype.org/service/local/"
+    const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+}
+
 // ------------------------------------------------------ plugins
 
+// https://youtrack.jetbrains.com/issue/KTIJ-19369#focus=Comments-27-5181027.0-0
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("js") version Versions.kotlin
-    id("org.jetbrains.dokka") version Versions.dokka
-    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlint
-    id("org.jlleitschuh.gradle.ktlint-idea") version Versions.ktlint
-    id("io.gitlab.arturbosch.detekt") version Versions.detekt
-    id("io.github.gradle-nexus.publish-plugin") version Versions.publish
+    alias(libs.plugins.js)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.ktlintIdea)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.nexusPublish)
     `maven-publish`
     signing
 }
@@ -33,10 +43,8 @@ repositories {
 // ------------------------------------------------------ dependencies
 
 dependencies {
-    implementation("dev.fritz2:core:${Versions.fritz2}")
-    testImplementation("io.kotest:kotest-assertions-core:${Versions.kotest}")
-    testImplementation("io.kotest:kotest-property:${Versions.kotest}")
-    testImplementation("io.kotest:kotest-framework-engine:${Versions.kotest}")
+    implementation(libs.fritz2.core)
+    testImplementation(libs.bundles.kotest)
 }
 
 // ------------------------------------------------------ kotlin/js
@@ -114,7 +122,7 @@ tasks {
                     url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
                 }
                 externalDocumentationLink {
-                    url.set(URL("https://api.fritz2.dev/core/core/"))
+                    url.set(URL("https://api.fritz2.dev/core/"))
                 }
                 perPackageOption {
                     matchingRegex.set("org\\.patternfly\\.sample")

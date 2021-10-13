@@ -146,8 +146,8 @@ public class Accordion : PatternFlyComponent<Unit> {
  */
 public class AccordionItem :
     Expandable by ExpandedMixin(),
-    HasTitle by TitleMixin(),
-    HasContent<Div, HTMLDivElement> by ContentMixin() {
+    WithTitle by TitleMixin(),
+    WithContent<Div, HTMLDivElement> by ContentMixin() {
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal var initiallyExpanded: Boolean = false

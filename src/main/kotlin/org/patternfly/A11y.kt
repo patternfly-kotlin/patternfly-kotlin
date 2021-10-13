@@ -14,20 +14,6 @@ import org.w3c.dom.HTMLElement
  */
 public fun screenReader(): String = "screen-reader".util()
 
-public interface Aria {
-    public val ariaContext: AriaContext
-
-    public fun aria(build: AriaContext.() -> Unit)
-}
-
-public class AriaMixin : Aria {
-    override val ariaContext: AriaContext = AriaContext()
-
-    override fun aria(build: AriaContext.() -> Unit) {
-        ariaContext.apply(build)
-    }
-}
-
 public class AriaContext {
     private var role: String? = null
     private val properties: MutableMap<String, String> = mutableMapOf()
@@ -48,6 +34,20 @@ public class AriaContext {
             tag.aria["role"] = it
         }
         properties.forEach { (key, value) -> tag.aria[key] = value }
+    }
+}
+
+public interface WithAria {
+    public val ariaContext: AriaContext
+
+    public fun aria(build: AriaContext.() -> Unit)
+}
+
+public class AriaMixin : WithAria {
+    override val ariaContext: AriaContext = AriaContext()
+
+    override fun aria(build: AriaContext.() -> Unit) {
+        ariaContext.apply(build)
     }
 }
 

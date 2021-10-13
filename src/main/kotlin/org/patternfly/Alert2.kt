@@ -17,6 +17,14 @@ import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
 
+public fun RenderContext.alertGroup2(
+    baseClass: String? = null,
+    id: String? = null,
+    build: AlertGroup2.() -> Unit
+) {
+    AlertGroup2().apply(build).render(this, baseClass, id)
+}
+
 /**
  * Creates a standalone [Alert2] component.
  *
@@ -36,6 +44,11 @@ public fun RenderContext.alert(
 
 public fun test() {
     render {
+        alertGroup2 {
+            alert {
+                title("Foo")
+            }
+        }
         alert {
             title("foo")
             content {
@@ -57,13 +70,28 @@ public fun test() {
 
 // ------------------------------------------------------ component
 
+public class AlertGroup2 : PatternFlyComponent<Unit> {
+
+    public fun alert(
+        baseClass: String? = null,
+        id: String? = null,
+        build: Alert2.() -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        TODO("Not yet implemented")
+    }
+}
+
 public class Alert2 :
     PatternFlyComponent<Unit>,
-    Aria by AriaMixin(),
-    HasTitle by TitleMixin(),
-    HasContent<Div, HTMLDivElement> by ContentMixin(),
-    ElementProperties<Div, HTMLDivElement> by ElementMixin(),
-    EventProperties<HTMLDivElement> by EventMixin() {
+    WithAria by AriaMixin(),
+    WithTitle by TitleMixin(),
+    WithContent<Div, HTMLDivElement> by ContentMixin(),
+    WithElement<Div, HTMLDivElement> by ElementMixin(),
+    WithEvents<HTMLDivElement> by EventMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var severity: Severity = Severity.INFO

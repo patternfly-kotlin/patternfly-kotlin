@@ -1,0 +1,25 @@
+[versions]
+detekt = "1.18.1"
+dokka = "1.5.30"
+fritz2 = "0.12"
+kotest = "4.6.3"
+kotlin = "1.5.31"
+ktlint = "10.2.0"
+nexusPublish = "1.1.0"
+
+[libraries]
+fritz2-core = { module = "dev.fritz2:core", version.ref = "fritz2" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+
+[bundles]
+kotest = ["kotest-assertions-core", "kotest-framework-engine", "kotest-property"]
+
+[plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+js = { id = "org.jetbrains.kotlin.js", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+ktlintIdea = { id = "org.jlleitschuh.gradle.ktlint-idea", version.ref = "ktlint" }
+nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
