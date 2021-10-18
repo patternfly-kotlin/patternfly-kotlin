@@ -5,6 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Notification
 import org.patternfly.OptionsMenuStore
+import org.patternfly.Severity
 import org.patternfly.fas
 import org.patternfly.group
 import org.patternfly.groups
@@ -12,6 +13,7 @@ import org.patternfly.icon
 import org.patternfly.iconToggle
 import org.patternfly.item
 import org.patternfly.items
+import org.patternfly.notification
 import org.patternfly.optionsMenu
 import org.patternfly.separator
 import org.patternfly.textToggle
@@ -53,8 +55,9 @@ internal interface OptionsMenuSample {
             data class Demo(val id: String, val name: String)
 
             val store = OptionsMenuStore<Demo>().also {
-                it.singleSelection.unwrapOrNull() handledBy Notification.add { demo ->
-                    info("You selected ${demo?.name}")
+                it.singleSelection.unwrapOrNull() handledBy notification { demo ->
+                    severity(Severity.INFO)
+                    title("You selected ${demo?.name}")
                 }
             }
             optionsMenu(store = store) {
@@ -72,8 +75,9 @@ internal interface OptionsMenuSample {
     fun expanded() {
         render {
             optionsMenu<String> {
-                expanded.data handledBy Notification.add { expanded ->
-                    info("Expanded state of options menu: $expanded.")
+                expanded.data handledBy notification { expanded ->
+                    severity(Severity.INFO)
+                    title("Expanded state of options menu: $expanded.")
                 }
                 textToggle { +"Choose one" }
                 items {

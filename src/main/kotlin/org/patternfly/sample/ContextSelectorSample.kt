@@ -4,10 +4,11 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.ContextSelectorStore
-import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.contextSelector
 import org.patternfly.item
 import org.patternfly.items
+import org.patternfly.notification
 import org.patternfly.updateItems
 
 internal interface ContextSelectorSample {
@@ -48,8 +49,9 @@ internal interface ContextSelectorSample {
     fun expanded() {
         render {
             contextSelector<String> {
-                expanded.data handledBy Notification.add { expanded ->
-                    info("Expanded state of context selector: $expanded.")
+                expanded.data handledBy notification { expanded ->
+                    severity(Severity.INFO)
+                    title("Expanded state of context selector: $expanded.")
                 }
                 items {
                     item("Foo")

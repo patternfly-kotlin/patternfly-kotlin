@@ -5,6 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.DropdownStore
 import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.actionToggle
 import org.patternfly.checkboxToggle
 import org.patternfly.customToggle
@@ -17,6 +18,7 @@ import org.patternfly.iconToggle
 import org.patternfly.item
 import org.patternfly.items
 import org.patternfly.kebabToggle
+import org.patternfly.notification
 import org.patternfly.separator
 import org.patternfly.textToggle
 import org.patternfly.toggleIcon
@@ -74,8 +76,9 @@ internal interface DropdownSample {
     fun expanded() {
         render {
             dropdown<String> {
-                expanded.data handledBy Notification.add { expanded ->
-                    info("Expanded state of dropdown: $expanded.")
+                expanded.data handledBy notification { expanded ->
+                    severity(Severity.INFO)
+                    title("Expanded state of dropdown: $expanded.")
                 }
                 textToggle { +"Choose one" }
                 items {

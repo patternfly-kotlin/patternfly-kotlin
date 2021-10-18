@@ -3,9 +3,11 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.ChipGroupStore
 import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.chip
 import org.patternfly.chipGroup
 import org.patternfly.chips
+import org.patternfly.notification
 
 internal interface ChipGroupSample {
 
@@ -87,8 +89,9 @@ internal interface ChipGroupSample {
             chipGroup<String> {
                 +"Remove one"
                 chips("Foo", "Bar")
-                store.removes handledBy Notification.add { chip ->
-                    info("You removed $chip.")
+                store.removes handledBy notification { chip ->
+                    severity(Severity.INFO)
+                    title("You removed $chip.")
                 }
             }
         }

@@ -7,6 +7,7 @@ import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
 import org.patternfly.ItemsStore
 import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.dataList
 import org.patternfly.dataListAction
 import org.patternfly.dataListCell
@@ -17,6 +18,7 @@ import org.patternfly.dataListExpandableContent
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
 import org.patternfly.dataListToggle
+import org.patternfly.notification
 import org.patternfly.pushButton
 
 internal interface DataListSample {
@@ -65,8 +67,9 @@ internal interface DataListSample {
             dataList<String> {
                 display { item ->
                     dataListItem(item) {
-                        expanded.data handledBy Notification.add { expanded ->
-                            info("Expanded state of $item: $expanded.")
+                        expanded.data handledBy notification { expanded ->
+                            severity(Severity.INFO)
+                            title("Expanded state of $item: $expanded.")
                         }
                         dataListRow {
                             dataListControl { dataListToggle() }
@@ -86,8 +89,9 @@ internal interface DataListSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemsStore<Demo> { it.id }
-            store.selection handledBy Notification.add { selection ->
-                default("Selection: $selection.")
+            store.selection handledBy notification { selection ->
+                severity(Severity.DEFAULT)
+                title("Selection: $selection.")
             }
 
             dataList(store) {

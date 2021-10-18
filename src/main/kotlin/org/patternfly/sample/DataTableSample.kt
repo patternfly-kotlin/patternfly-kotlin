@@ -7,6 +7,7 @@ import org.patternfly.Align.RIGHT
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemsStore
 import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.SortInfo
 import org.patternfly.dataTable
 import org.patternfly.dataTableActionColumn
@@ -21,6 +22,7 @@ import org.patternfly.icon
 import org.patternfly.item
 import org.patternfly.items
 import org.patternfly.kebabToggle
+import org.patternfly.notification
 import org.patternfly.pushButton
 
 internal interface DataTableSample {
@@ -97,8 +99,9 @@ internal interface DataTableSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemsStore<Demo> { it.id }
-            store.selection handledBy Notification.add { selection ->
-                default("Selection: $selection.")
+            store.selection handledBy notification { selection ->
+                severity(Severity.DEFAULT)
+                title("Selection: $selection.")
             }
 
             dataTable(store) {

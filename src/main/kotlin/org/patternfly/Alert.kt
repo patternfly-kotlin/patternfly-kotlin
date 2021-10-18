@@ -1,223 +1,116 @@
 package org.patternfly
 
-import dev.fritz2.dom.DomListener
+import dev.fritz2.dom.EventContext
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
-import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.Ul
-import kotlinx.browser.document
-import kotlinx.browser.window
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.By
-import org.patternfly.dom.Id
 import org.patternfly.dom.matches
-import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.events.Event
-import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ factory
 
-internal val TOAST_ALERT_GROUP = Id.unique("toast", ComponentType.AlertGroup.id)
-
 /**
- * Creates an [AlertGroup] component. Alert groups are used to stack and position [Alert]s. Besides the singleton toast alert group, alert groups are most often used to group inline alerts.
+ * Creates an [StaticAlertGroup] component. This alert group is used to stack and position inline [Alert]s.
  *
- * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param id the ID of the element
+ * @param build a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.sample.AlertSample.inlineAlertGroup
+ * @sample org.patternfly.sample.AlertSample.staticAlertGroup
  */
 public fun RenderContext.alertGroup(
-    id: String? = null,
     baseClass: String? = null,
-    content: AlertGroup.() -> Unit = {}
-): AlertGroup = register(AlertGroup(false, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: StaticAlertGroup.() -> Unit
+) {
+    StaticAlertGroup().apply(build).render(this, baseClass, id)
+}
 
 /**
- * Creates a standalone [Alert] component.
+ * Creates an [Alert] component.
  *
- * @param severity the severity level
- * @param text the text of the alert
- * @param closable whether the alert can be closed
- * @param inline whether the alert is rendered as an inline alert
- * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param id the ID of the element
+ * @param build a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.AlertSample.standaloneAlert
  */
 public fun RenderContext.alert(
-    severity: Severity,
-    text: String,
-    closable: Boolean = false,
-    inline: Boolean = false,
-    id: String? = null,
     baseClass: String? = null,
-    content: Alert.() -> Unit = {}
-): Alert = register(Alert(severity, text, closable, inline, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: Alert.() -> Unit
+) {
+    Alert().apply(build).render(this, baseClass, id)
+}
 
-/**
- * Creates an [Alert] component nested inside an [AlertGroup] component.
- *
- * @param severity the severity level
- * @param text the text of the alert
- * @param closable whether the alert can be closed
- * @param inline whether the alert is rendered as an inline alert
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.AlertSample.inlineAlertGroup
- */
-public fun AlertGroup.alert(
-    severity: Severity,
-    text: String,
-    closable: Boolean = false,
-    inline: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Alert.() -> Unit = {}
-): Li = register(
-    li("alert-group".component("item")) {
-        alert(severity, text, closable, inline, id = id, baseClass = baseClass) {
-            content(this)
+// ------------------------------------------------------ component
+
+public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyComponent<Unit> {
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            ul(
+                baseClass = classes {
+                    +ComponentType.AlertGroup
+                    +("toast".modifier() `when` toast)
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.AlertGroup)
+                renderAlerts(this)
+            }
         }
-    },
-    {}
-)
+    }
 
-/**
- * Adds a description to an [Alert] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.AlertSample.description
- */
-public fun Alert.alertDescription(
-    id: String? = null,
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(
-    div(id = id, baseClass = classes("alert".component("description"), baseClass)) {
-        content()
-    },
-    {}
-)
-
-/**
- * Adds a container for actions to an [Alert] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.AlertSample.actions
- */
-public fun Alert.alertActions(
-    id: String? = null,
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(
-    div(id = id, baseClass = classes("alert".component("action-group"), baseClass)) {
-        content()
-    },
-    {}
-)
-
-// ------------------------------------------------------ tag
+    internal abstract fun renderAlerts(context: RenderContext)
+}
 
 /**
  * PatternFly [alert group](https://www.patternfly.org/v4/components/alert-group/design-guidelines) component.
  *
- * An alert group is used to stack and position [Alert]s. Besides the singleton toast alert group,
- * alert groups are most often used to group inline alerts.
+ * This alert group is used to stack and position inline [Alert]s.
  *
- * @sample org.patternfly.sample.AlertSample.inlineAlertGroup
+ * @sample org.patternfly.sample.AlertSample.staticAlertGroup
  */
-public class AlertGroup internal constructor(toast: Boolean, id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLUListElement>,
-    Ul(
-        id = id,
-        baseClass = classes {
-            +ComponentType.AlertGroup
-            +("toast".modifier() `when` toast)
-            +baseClass
-        },
-        job = job,
-        scope = Scope()
+public class StaticAlertGroup : BaseAlertGroup(false) {
+
+    private val alerts: MutableList<StaticAlertContext> = mutableListOf()
+
+    public fun alert(
+        baseClass: String? = null,
+        id: String? = null,
+        build: Alert.() -> Unit
     ) {
+        alerts.add(StaticAlertContext(baseClass, id, build))
+    }
 
-    private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
-
-    init {
-        markAs(ComponentType.AlertGroup)
-        if (toast) {
-            (MainScope() + job).launch {
-                NotificationStore.latest.collect { notification ->
-                    val alertId = Id.unique("alert")
-                    val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
-                    with(li) {
-                        alert(id = alertId) {
-                            severity(notification.severity)
-                            title(notification.text)
-                            closable(true)
-                            element {
-                                with(domNode) {
-                                    onmouseover = { this@AlertGroup.stopTimeout(alertId) }
-                                    onmouseout = { this@AlertGroup.startTimeout(alertId, li.domNode) }
-                                    this@AlertGroup.startTimeout(alertId, li.domNode)
-                                }
-                            }
-                        }
+    override fun renderAlerts(context: RenderContext) {
+        with(context) {
+            alerts.forEach { sac ->
+                li(baseClass = "alert-group".component("item")) {
+                    alert(sac.baseClass, sac.id) {
+                        sac.build(this)
+                        inline(true) // force alerts to be inline
                     }
-                    domNode.prepend(li.domNode)
                 }
             }
         }
     }
-
-    private fun startTimeout(id: String, element: HTMLElement) {
-        val handle = window.setTimeout({ element.removeFromParent() }, Settings.NOTIFICATION_TIMEOUT)
-        timeoutHandles[id] = handle
-    }
-
-    private fun stopTimeout(id: String) {
-        timeoutHandles[id]?.let { window.clearTimeout(it) }
-    }
-
-    public companion object {
-
-        /**
-         * Creates the singleton toast [AlertGroup] component and [prepends][org.w3c.dom.ParentNode.prepend] it to the body of this document. If the toast alert group is already present in the DOM, this function does nothing.
-         *
-         * @param baseClass optional CSS class that should be applied to the element
-         *
-         * @sample org.patternfly.sample.AlertSample.toastAlertGroup
-         */
-        public fun addToastAlertGroup(baseClass: String? = null) {
-            if (document.querySelector(By.id(TOAST_ALERT_GROUP)) == null) {
-                document.body?.prepend(
-                    AlertGroup(toast = true, id = TOAST_ALERT_GROUP, baseClass = baseClass, job = Job()).domNode
-                )
-            }
-        }
-    }
 }
+
+internal class StaticAlertContext(
+    val baseClass: String? = null,
+    val id: String? = null,
+    val build: Alert.() -> Unit
+)
 
 /**
  * PatternFly [alert](https://www.patternfly.org/v4/components/alert/design-guidelines) component.
@@ -226,28 +119,20 @@ public class AlertGroup internal constructor(toast: Boolean, id: String?, baseCl
  *
  * @sample org.patternfly.sample.AlertSample.standaloneAlert
  */
-public class Alert internal constructor(
-    private val severity: Severity,
-    private val text: String,
-    closable: Boolean = false,
-    inline: Boolean = false,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLDivElement>,
-    Div(
-        id = id,
-        baseClass = classes {
-            +ComponentType.Alert
-            +severity.modifier
-            +("inline".modifier() `when` inline)
-            +baseClass
-        },
-        job = job,
-        scope = Scope()
-    ) {
+public class Alert :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithTitle by TitleMixin(),
+    WithContent<Div, HTMLDivElement> by ContentMixin(),
+    WithElement<Div, HTMLDivElement> by ElementMixin(),
+    WithEvents<HTMLDivElement> by EventMixin() {
 
-    private var closeButton: PushButton? = null
+    private lateinit var root: Tag<HTMLElement>
+    private var severity: Severity = Severity.INFO
+    private var closable: Boolean = false
+    private var inline: Boolean = false
+    private var closeAction: (EventContext<HTMLButtonElement>.() -> Unit)? = null
+    private val actions: MutableMap<String, EventContext<HTMLButtonElement>.() -> Unit> = mutableMapOf()
     private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
         Severity.INFO -> "Info alert" to "Close info alert"
@@ -256,42 +141,100 @@ public class Alert internal constructor(
         Severity.DANGER -> "Error alert" to "Close error alert"
     }
 
+    public fun severity(severity: Severity) {
+        this.severity = severity
+    }
+
     /**
-     * Listener for the close button (if any).
+     * Whether this alert has a close button. Use [action] to handle close events.
+     *
+     * @param closable whether this action has a close button
+     * @param action a lambda which provides event listeners of the close button
      *
      * @sample org.patternfly.sample.AlertSample.closes
      */
-    public val closes: DomListener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
+    public fun closable(closable: Boolean, action: (EventContext<HTMLButtonElement>.() -> Unit)? = null) {
+        this.closable = closable
+        this.closeAction = action
+    }
 
-    init {
-        markAs(ComponentType.Alert)
-        aria["label"] = ariaLabels.first
-        div(baseClass = "alert".component("icon")) {
-            icon(this@Alert.severity.iconClass)
-        }
-        h4(baseClass = "alert".component("title")) {
-            span(baseClass = "pf-screen-reader") {
-                +this@Alert.ariaLabels.first
-            }
-            +this@Alert.text
-        }
-        if (closable) {
-            div(baseClass = "alert".component("action")) {
-                this@Alert.closeButton = pushButton(plain) {
-                    icon("times".fas())
-                    aria["label"] = this@Alert.ariaLabels.second
-                    domNode.addEventListener(Events.click.name, this@Alert::close)
+    public fun inline(inline: Boolean) {
+        this.inline = inline
+    }
+
+    /**
+     * Adds an actions to this [Alert].
+     *
+     * @param title the title of the action
+     * @param action a lambda which provides event listeners of the action
+     *
+     * @sample org.patternfly.sample.AlertSample.actions
+     */
+    public fun action(title: String, action: EventContext<HTMLButtonElement>.() -> Unit = {}) {
+        actions[title] = action
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            root = div(
+                baseClass = classes {
+                    +ComponentType.Alert
+                    +severity.modifier
+                    +("inline".modifier() `when` inline)
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Alert)
+                aria["label"] = ariaLabels.first
+                ariaContext.applyTo(this)
+                events(this)
+                element(this)
+
+                div(baseClass = "alert".component("icon")) {
+                    icon(severity.iconClass)
+                }
+                h4(baseClass = "alert".component("title")) {
+                    span(baseClass = "pf-screen-reader") {
+                        +ariaLabels.first
+                    }
+                    +title
+                }
+                if (closable) {
+                    div(baseClass = "alert".component("action")) {
+                        pushButton(ButtonVariation.plain) {
+                            icon("times".fas())
+                            aria["label"] = ariaLabels.second
+                            domNode.addEventListener(Events.click.name, this@Alert::close)
+                            closeAction?.invoke(this)
+                        }
+                    }
+                }
+                content?.let { content ->
+                    div(baseClass = "alert".component("description")) {
+                        content(this)
+                    }
+                }
+                if (actions.isNotEmpty()) {
+                    div(baseClass = "alert".component("action-group")) {
+                        actions.forEach { (action, events) ->
+                            pushButton(ButtonVariation.inline, ButtonVariation.link) {
+                                +action
+                                events(this)
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun close(@Suppress("UNUSED_PARAMETER") ignore: Event) {
-        closeButton?.domNode?.removeEventListener(Events.click.name, ::close)
-        if (domNode.parentElement?.matches(By.classname("alert-group".component("item"))) == true) {
-            domNode.parentElement.removeFromParent()
+    private fun close(event: Event) {
+        (event.target as Element).removeEventListener(Events.click.name, ::close)
+        if (root.domNode.parentElement?.matches(By.classname("alert-group".component("item"))) == true) {
+            root.domNode.parentElement.removeFromParent()
         } else {
-            domNode.removeFromParent()
+            root.domNode.removeFromParent()
         }
     }
 }

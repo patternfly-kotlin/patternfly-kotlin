@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.ItemsStore
 import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.dataList
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
@@ -17,6 +18,7 @@ import org.patternfly.drawerContent
 import org.patternfly.drawerHead
 import org.patternfly.drawerPanel
 import org.patternfly.drawerSection
+import org.patternfly.notification
 
 internal interface DrawerSample {
 
@@ -57,8 +59,9 @@ internal interface DrawerSample {
     fun expanded() {
         render {
             drawer {
-                expanded.data handledBy Notification.add { expanded ->
-                    info("Expanded state of drawer: $expanded.")
+                expanded.data handledBy notification { expanded ->
+                    severity(Severity.INFO)
+                    title("Expanded state of drawer: $expanded.")
                 }
                 drawerContent {
                     drawerBody { +"Drawer content" }

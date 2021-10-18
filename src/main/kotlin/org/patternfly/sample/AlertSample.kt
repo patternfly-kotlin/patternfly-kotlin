@@ -1,72 +1,63 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.AlertGroup
-import org.patternfly.ButtonVariation.inline
-import org.patternfly.ButtonVariation.link
 import org.patternfly.Notification
 import org.patternfly.Severity.DANGER
 import org.patternfly.Severity.INFO
 import org.patternfly.Severity.SUCCESS
 import org.patternfly.Severity.WARNING
 import org.patternfly.alert
-import org.patternfly.alertActions
-import org.patternfly.alertDescription
 import org.patternfly.alertGroup
-import org.patternfly.pushButton
-import org.patternfly.title
 
 internal interface AlertSample {
 
-    fun toastAlertGroup() {
-        AlertGroup.addToastAlertGroup()
+    fun staticAlertGroup() {
+        render {
+            alertGroup {
+                alert {
+                    severity(INFO)
+                    title("Just saying.")
+                }
+                alert {
+                    severity(SUCCESS)
+                    title("Well done!")
+                }
+                alert {
+                    severity(WARNING)
+                    title("Really?")
+                }
+                alert {
+                    severity(DANGER)
+                    title("You're in trouble!")
+                }
+            }
+        }
     }
 
     fun standaloneAlert() {
         render {
-            alert(INFO, "Alert title") {
-                alertDescription { +"Lorem ipsum dolor sit amet." }
-                alertActions {
-                    pushButton(inline, link) { +"View details" }
-                    pushButton(inline, link) { +"Ignore" }
-                }
-            }
             alert {
-                title {  }
                 severity(INFO)
                 title("Alert title")
-                content { +"Lorem ipsum dolor sit amet."}
-                action("View details")
-                action("Ignore")
-            }
-        }
-    }
-
-    fun inlineAlertGroup() {
-        render {
-            alertGroup {
-                alert(INFO, "Just saying.", inline = true)
-                alert(SUCCESS, "Well done!", inline = true)
-                alert(WARNING, "Really?", inline = true)
-                alert(DANGER, "You're in trouble!", inline = true)
-            }
-        }
-    }
-
-    fun description() {
-        render {
-            alert(INFO, "Alert title") {
-                alertDescription { +"Lorem ipsum dolor sit amet." }
+                content { +"Lorem ipsum dolor sit amet." }
+                action("View details") {
+                    clicks handledBy Notification.info("Not yet implemented")
+                }
+                action("Ignore") {
+                    clicks handledBy Notification.info("Not yet implemented")
+                }
             }
         }
     }
 
     fun actions() {
         render {
-            alert(INFO, "Alert title") {
-                alertActions {
-                    pushButton(inline, link) { +"View details" }
-                    pushButton(inline, link) { +"Ignore" }
+            alert {
+                severity(INFO)
+                title("Alert title")
+                action("View details")
+                action("Ignore") {
+                    clicks handledBy Notification.warning("Are you sure?")
                 }
             }
         }
@@ -74,8 +65,12 @@ internal interface AlertSample {
 
     fun closes() {
         render {
-            alert(INFO, "Close me", closable = true) {
-                closes handledBy Notification.info("You did it!")
+            alert {
+                severity(INFO)
+                title("Close me")
+                closable(true) {
+                    clicks handledBy Notification.info("You did it!")
+                }
             }
         }
     }

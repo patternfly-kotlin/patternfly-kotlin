@@ -2,226 +2,207 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.html.Button
+import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
+import dev.fritz2.dom.html.render
+import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import org.patternfly.NotificationStore.addInternal
-import org.w3c.dom.HTMLButtonElement
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import org.patternfly.dom.By
+import org.patternfly.dom.Id
+import org.patternfly.dom.querySelector
+import org.patternfly.dom.removeFromParent
+import org.w3c.dom.HTMLElement
 import kotlin.js.Date
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
-/**
- * Creates the [NotificationBadge] component.
- *
- * @param withCount whether to show the number of unread notifications
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- */
-public fun RenderContext.notificationBadge(
-    withCount: Boolean = false,
-    id: String? = null,
+public fun <T> notification(
     baseClass: String? = null,
-): NotificationBadge = register(NotificationBadge(withCount, id = id, baseClass = baseClass, job), {})
+    build: Alert.(T) -> Unit
+): Handler<T> {
+    return NotificationStore.addInternal(baseClass, null, build)
+}
 
-// ------------------------------------------------------ tag
+public object Notification {
+    public fun default(title: String, content: String? = null): Handler<Unit> = toast(Severity.DEFAULT, title, content)
+
+    public fun error(title: String, content: String? = null): Handler<Unit> = toast(Severity.DANGER, title, content)
+
+    public fun info(title: String, content: String? = null): Handler<Unit> = toast(Severity.INFO, title, content)
+
+    public fun success(title: String, content: String? = null): Handler<Unit> = toast(Severity.SUCCESS, title, content)
+
+    public fun warning(title: String, content: String? = null): Handler<Unit> = toast(Severity.WARNING, title, content)
+
+    private fun toast(severity: Severity, title: String, content: String? = null): Handler<Unit> =
+        NotificationStore.addInternal(baseClass = null, knownSeverity = severity) {
+            severity(severity)
+            title(title)
+            content?.let { content(it) }
+        }
+}
+
+public fun RenderContext.notificationBadge(
+    baseClass: String? = null,
+    id: String? = null,
+    build: NotificationBadge.() -> Unit = {}
+) {
+    NotificationBadge().apply(build).render(this, baseClass, id)
+}
+
+// ------------------------------------------------------ component
+
+internal class NotificationAlertGroup : BaseAlertGroup(true) {
+
+    private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
+
+    override fun renderAlerts(context: RenderContext) {
+        with(context) {
+            (MainScope() + job).launch {
+                NotificationStore.latest.collect { toastContext ->
+                    val alertId = Id.unique("alert")
+                    val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
+                    with(li) {
+                        alert(id = alertId) {
+                            toastContext.build(this)
+                            // always apply these settings (might override toastContext.build)
+                            closable(true)
+                            element {
+                                with(domNode) {
+                                    onmouseover = { this@NotificationAlertGroup.stopTimeout(alertId) }
+                                    onmouseout = { this@NotificationAlertGroup.startTimeout(alertId, li.domNode) }
+                                    this@NotificationAlertGroup.startTimeout(alertId, li.domNode)
+                                }
+                            }
+                        }
+                    }
+                    domNode.prepend(li.domNode)
+                }
+            }
+        }
+    }
+
+    private fun startTimeout(id: String, element: HTMLElement) {
+        val handle = window.setTimeout({ element.removeFromParent() }, Settings.NOTIFICATION_TIMEOUT)
+        timeoutHandles[id] = handle
+    }
+
+    private fun stopTimeout(id: String) {
+        timeoutHandles[id]?.let { window.clearTimeout(it) }
+    }
+}
 
 /**
  * PatternFly [notification badge](https://www.patternfly.org/v4/components/notification-badge/design-guidelines) component.
  *
- * The notification badge is intended to be used with the notification drawer as a visible indicator to alert the user about incoming notifications. It uses the [NotificationStore] to decide which visible indicator to show.
+ * The notification badge is intended to be used with the notification drawer as a visible indicator to alert the user about incoming notifications.
  *
  * The notification badge is typically part of the [pageHeaderTools].
  */
-public class NotificationBadge internal constructor(withCount: Boolean, id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLButtonElement>,
-    Button(id = id, baseClass = classes(ComponentType.NotificationBadge, baseClass), job, Scope()) {
+public class NotificationBadge : PatternFlyComponent<Unit> {
 
-    init {
-        markAs(ComponentType.NotificationBadge)
-        aria["label"] = NotificationStore.unread.map { unread ->
-            if (unread) "Unread notifications" else "Notifications"
-        }
-        span(baseClass = "notification-badge".component()) {
-            className(
-                NotificationStore.data.map { notifications ->
-                    when {
-                        notifications.isEmpty() -> "read".modifier()
-                        notifications.any { it.severity == Severity.DANGER } -> "attention".modifier()
-                        else -> "unread".modifier()
-                    }
+    private var withCount: Boolean = false
+
+    public fun withCount(value: Boolean) {
+        this.withCount = value
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            button(baseClass = classes(ComponentType.NotificationBadge, baseClass), id = id) {
+                markAs(ComponentType.NotificationBadge)
+                aria["label"] = NotificationStore.unread.map { unread ->
+                    if (unread) "Unread notifications" else "Notifications"
                 }
-            )
-            icon("bell".pfIcon()) {
-                iconClass(
-                    NotificationStore.data.map { notifications ->
-                        if (notifications.any { it.severity == Severity.DANGER })
-                            "attention-bell".pfIcon()
-                        else
-                            "bell".pfIcon()
+                span(baseClass = "notification-badge".component()) {
+                    className(
+                        NotificationStore.data.map { notifications ->
+                            when {
+                                notifications.isEmpty() -> "read".modifier()
+                                notifications.any { it.knownSeverity == Severity.DANGER } -> "attention".modifier()
+                                else -> "unread".modifier()
+                            }
+                        }
+                    )
+                    icon("bell".pfIcon()) {
+                        iconClass(
+                            NotificationStore.data.map { notifications ->
+                                if (notifications.any { it.knownSeverity == Severity.DANGER })
+                                    "attention-bell".pfIcon()
+                                else
+                                    "bell".pfIcon()
+                            }
+                        )
                     }
-                )
-            }
-            if (withCount) {
-                span(baseClass = "notification-badge".component("count")) {
-                    NotificationStore.count.asText()
+                    if (withCount) {
+                        span(baseClass = "notification-badge".component("count")) {
+                            NotificationStore.count.asText()
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-// ------------------------------------------------------ data & store
+// ------------------------------------------------------ store
 
-/**
- * Helper class used by [Notification.add] to quickly create [Notification]s with a given [Severity].
- */
-public class NotificationScope {
+internal val NOTIFICATION_ALERT_GROUP_ID = Id.unique("notification", ComponentType.AlertGroup.id)
 
-    /**
-     * Creates a [Notification] with severity [Severity.DEFAULT].
-     */
-    public fun default(text: String, details: String? = null): Notification =
-        Notification(Severity.DEFAULT, text, details)
+internal object NotificationStore : RootStore<List<NotificationContext>>(listOf()) {
 
-    /**
-     * Creates a [Notification] with severity [Severity.DANGER].
-     */
-    public fun error(text: String, details: String? = null): Notification =
-        Notification(Severity.DANGER, text, details)
+    private var toastAlertGroupPresent: Boolean = false
 
-    /**
-     * Creates a [Notification] with severity [Severity.INFO].
-     */
-    public fun info(text: String, details: String? = null): Notification =
-        Notification(Severity.INFO, text, details)
-
-    /**
-     * Creates a [Notification] with severity [Severity.SUCCESS].
-     */
-    public fun success(text: String, details: String? = null): Notification =
-        Notification(Severity.SUCCESS, text, details)
-
-    /**
-     * Creates a [Notification] with severity [Severity.WARNING].
-     */
-    public fun warning(text: String, details: String? = null): Notification =
-        Notification(Severity.WARNING, text, details)
-}
-
-/**
- * Data class for a notification. Normally you don't need to create notifications yourself. Use one of the helper function defined in the [companion object][Notification.Companion] instead.
- */
-public data class Notification(
-    val severity: Severity,
-    val text: String,
-    val details: String? = null,
-    internal val read: Boolean = false,
-    internal val timestamp: Long = Date.now().toLong()
-) {
-
-    /**
-     * Contains functions to easily add notifications from source [flows][Flow], [emitting handlers][dev.fritz2.binding.EmittingHandler] or [listeners][dev.fritz2.dom.Listener].
-     *
-     * There are two flavours of functions:
-     *
-     * 1. Functions [default], [error], [info], [success] and [warning]: Use these functions, if you want to add static notifications and don't need the payload from the source flow.
-     * 1. Function [add]: Use this function, if you want to use the payload from the source flow to create the notification.
-     *
-     * @sample org.patternfly.sample.ButtonSample.clickButton
-     * @sample org.patternfly.sample.ChipGroupSample.remove
-     */
-    public companion object {
-
-        /**
-         * Creates a handler which adds a static [Notification] with severity [Severity.DEFAULT]
-         */
-        public fun default(text: String, details: String? = null): Handler<Unit> =
-            addInternal { default(text, details) }
-
-        /**
-         * Creates a handler which adds a static [Notification] with severity [Severity.DANGER]
-         */
-        public fun error(text: String, details: String? = null): Handler<Unit> =
-            addInternal { error(text, details) }
-
-        /**
-         * Creates a handler which adds a static [Notification] with severity [Severity.INFO]
-         */
-        public fun info(text: String, details: String? = null): Handler<Unit> =
-            addInternal { info(text, details) }
-
-        /**
-         * Creates a handler which adds a static [Notification] with severity [Severity.SUCCESS]
-         */
-        public fun success(text: String, details: String? = null): Handler<Unit> =
-            addInternal { success(text, details) }
-
-        /**
-         * Creates a handler which adds a static [Notification] with severity [Severity.WARNING]
-         */
-        public fun warning(text: String, details: String? = null): Handler<Unit> =
-            addInternal { warning(text, details) }
-
-        /**
-         * Creates a handler which adds the notification created by the specified function.
-         *
-         * The function uses [NotificationScope] as its receiver and the payload from the source [flow][Flow], [emitting handler][dev.fritz2.binding.EmittingHandler] or [listener][dev.fritz2.dom.Listener].
-         *
-         * @param T the type of the source [Flow]
-         * @param block the function to create the [Notification]
-         *
-         * @sample org.patternfly.sample.NotificationSample.add
-         */
-        public fun <T> add(block: NotificationScope.(T) -> Notification): Handler<T> =
-            addInternal(block)
-    }
-}
-
-/**
- * Store for [Notification]s.
- */
-public object NotificationStore : RootStore<List<Notification>>(listOf()) {
-
-    /**
-     * The latest notification added to this store.
-     */
-    public val latest: Flow<Notification> = data
+    val latest: Flow<NotificationContext> = data
         .map {
             it.maxByOrNull { n -> n.timestamp }
         }
         .filterNotNull()
         .distinctUntilChanged()
 
-    /**
-     * Whether this store has unread notifications.
-     */
-    public val unread: Flow<Boolean> = data.map { it.any { n -> !n.read } }
+    val unread: Flow<Boolean> = data.map { it.any { n -> !n.read } }
 
-    /**
-     * The number of notifications.
-     */
-    public val count: Flow<Int> = data.map { it.size }
+    val count: Flow<Int> = data.map { it.size }
 
-    /**
-     * Adds the specified notification to the list of notifications.
-     */
-    public val add: Handler<Notification> = handle { notifications, notification ->
-        notifications + notification
-    }
+    val clear: Handler<Unit> = handle { listOf() }
 
-    /**
-     * Removes all notifications from this store.
-     */
-    public val clear: Handler<Unit> = handle { listOf() }
-
-    internal fun <T> addInternal(block: NotificationScope.(T) -> Notification): Handler<T> =
-        handle { notifications, notification ->
-            notifications + block(NotificationScope(), notification)
+    fun <T> addInternal(
+        baseClass: String?,
+        knownSeverity: Severity?,
+        build: Alert.(T) -> Unit
+    ): Handler<T> {
+        if (!toastAlertGroupPresent) {
+            if (document.querySelector(By.id(NOTIFICATION_ALERT_GROUP_ID)) == null) {
+                render(override = false) {
+                    NotificationAlertGroup().render(context = this, baseClass = null, id = NOTIFICATION_ALERT_GROUP_ID)
+                }
+                toastAlertGroupPresent = true
+            }
         }
+
+        return handle { items, payload ->
+            items + NotificationContext(baseClass, knownSeverity) {
+                build(this, payload)
+            }
+        }
+    }
+}
+
+internal class NotificationContext(
+    val baseClass: String?,
+    val knownSeverity: Severity?,
+    val build: Alert.() -> Unit
+) {
+    val read: Boolean = false
+    val timestamp: Long = Date.now().toLong()
 }

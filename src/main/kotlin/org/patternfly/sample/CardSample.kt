@@ -4,7 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
-import org.patternfly.Notification
+import org.patternfly.Severity
 import org.patternfly.card
 import org.patternfly.cardAction
 import org.patternfly.cardBody
@@ -18,6 +18,7 @@ import org.patternfly.dropdown
 import org.patternfly.item
 import org.patternfly.items
 import org.patternfly.kebabToggle
+import org.patternfly.notification
 import org.patternfly.separator
 
 internal interface CardSample {
@@ -97,8 +98,9 @@ internal interface CardSample {
     fun expandable() {
         render {
             card {
-                expanded.data handledBy Notification.add { expanded ->
-                    info("Expanded state of card: $expanded.")
+                expanded.data handledBy notification { expanded ->
+                    severity(Severity.INFO)
+                    title("Expanded state of card: $expanded.")
                 }
                 cardHeader {
                     cardToggle()

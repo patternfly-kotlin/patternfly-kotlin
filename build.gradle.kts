@@ -119,10 +119,7 @@ tasks {
                     remoteLineSuffix.set("#L")
                 }
                 externalDocumentationLink {
-                    url.set(URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/"))
-                }
-                externalDocumentationLink {
-                    url.set(URL("https://api.fritz2.dev/core/"))
+                    url.set(URL("https://kotlin.github.io/kotlinx.coroutines/"))
                 }
                 perPackageOption {
                     matchingRegex.set("org\\.patternfly\\.sample")
