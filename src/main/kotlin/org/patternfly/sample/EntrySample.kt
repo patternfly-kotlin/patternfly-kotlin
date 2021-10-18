@@ -2,7 +2,6 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.DropdownStore
-import org.patternfly.Notification
 import org.patternfly.Severity
 import org.patternfly.dropdown
 import org.patternfly.fas

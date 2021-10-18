@@ -6,7 +6,6 @@ import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
 import org.patternfly.ItemsStore
-import org.patternfly.Notification
 import org.patternfly.Severity
 import org.patternfly.dataList
 import org.patternfly.dataListAction

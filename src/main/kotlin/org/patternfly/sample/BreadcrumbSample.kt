@@ -3,7 +3,6 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.Notification
 import org.patternfly.Severity
 import org.patternfly.breadcrumb
 import org.patternfly.item

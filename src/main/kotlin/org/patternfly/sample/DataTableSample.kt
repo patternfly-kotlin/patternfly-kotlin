@@ -6,7 +6,6 @@ import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemsStore
-import org.patternfly.Notification
 import org.patternfly.Severity
 import org.patternfly.SortInfo
 import org.patternfly.dataTable
