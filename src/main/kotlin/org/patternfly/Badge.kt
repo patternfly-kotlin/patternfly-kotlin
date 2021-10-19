@@ -1,38 +1,30 @@
 package org.patternfly
 
-import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.Span
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import org.patternfly.dom.minusAssign
-import org.patternfly.dom.plusAssign
-import org.w3c.dom.HTMLSpanElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates a [Badge] component.
  *
- * @param min the minimum number to show in the badge
- * @param max the maximum number to show in the badge
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param build a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
 public fun RenderContext.badge(
-    min: Int = 0,
-    max: Int = 999,
-    id: String? = null,
     baseClass: String? = null,
-    content: Badge.() -> Unit = {}
-): Badge = register(Badge(min, max, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: Badge.() -> Unit
+) {
+    Badge().apply(build).render(this, baseClass, id)
+}
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [badge](https://www.patternfly.org/v4/components/badge/design-guidelines) component.
@@ -43,72 +35,60 @@ public fun RenderContext.badge(
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
-public class Badge internal constructor(
-    private val min: Int,
-    private val max: Int,
-    id: String? = null,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLSpanElement>, Span(
-    id = id,
-    baseClass = classes(ComponentType.Badge, baseClass),
-    job = job,
-    scope = Scope()
-) {
+public class Badge : PatternFlyComponent<Unit> {
 
-    init {
-        markAs(ComponentType.Badge)
+    private var min: Int = BADGE_MIN
+    private var max: Int = BADGE_MAX
+    private var read: Flow<Boolean> = flowOf(false)
+    private var count: Flow<Int> = flowOf(0)
+
+    public fun min(min: Int) {
+        this.min = min
     }
 
-    /** Marks the badge as (un)read. */
-    public fun read(value: Boolean) {
-        if (value) {
-            domNode.classList += "read".modifier()
-            domNode.classList -= "unread".modifier()
-        } else {
-            domNode.classList += "unread".modifier()
-            domNode.classList -= "read".modifier()
+    public fun max(max: Int) {
+        this.max = max
+    }
+
+    public fun bounds(min: Int, max: Int) {
+        this.min = min
+        this.max = max
+    }
+
+    public fun read(read: Boolean) {
+        this.read = flowOf(read)
+    }
+
+    public fun read(read: Flow<Boolean>) {
+        this.read = read
+    }
+
+    public fun count(count: Int) {
+        this.count = flowOf(count)
+    }
+
+    public fun count(count: Flow<Int>) {
+        this.count = count
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            span(baseClass = classes(ComponentType.Badge, baseClass), id = id) {
+                markAs(ComponentType.Badge)
+                classMap(read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
+                count.map { applyBounds(it) }.asText()
+            }
         }
-    }
-
-    /** Marks the badge as (un)read. */
-    public fun read(value: Flow<Boolean>) {
-        classMap(value.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
-    }
-
-    /**
-     * Sets the value of this badge. If the value is numeric, it is adjusted so that it is within the bounds of
-     * [min] and [max].
-     */
-    public fun value(value: Flow<String>) {
-        mountSingle(job, value) { v, _ -> value(v) }
-    }
-
-    /**
-     * Sets the value of this badge. If the value is numeric, it is adjusted so that it is within the bounds of
-     * [min] and [max].
-     */
-    public fun value(value: String) {
-        val numeric = value.toIntOrNull()
-        val text = if (numeric != null) {
-            applyBounds(numeric)
-        } else value
-        this.domNode.textContent = text
-    }
-
-    /** Sets the value of this badge. The value is adjusted so that it is within the bounds of [min] and [max]. */
-    public fun value(value: Flow<Int>) {
-        mountSingle(job, value) { v, _ -> value(v) }
-    }
-
-    /** Sets the value of this badge. The value is adjusted so that it is within the bounds of [min] and [max]. */
-    public fun value(value: Int) {
-        this.domNode.textContent = applyBounds(value)
     }
 
     private fun applyBounds(value: Int): String = when {
         value < min -> "<$min"
         value > max -> "$max+"
         else -> value.toString()
+    }
+
+    public companion object {
+        public const val BADGE_MIN: Int = 0
+        public const val BADGE_MAX: Int = 999
     }
 }

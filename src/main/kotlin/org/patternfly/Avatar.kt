@@ -10,6 +10,8 @@ import dev.fritz2.dom.html.RenderContext
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param build a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.AvatarSample.avatar
  */
 public fun RenderContext.avatar(
     baseClass: String? = null,

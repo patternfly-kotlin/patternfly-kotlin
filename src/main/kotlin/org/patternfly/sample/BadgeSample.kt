@@ -8,16 +8,14 @@ internal interface BadgeSample {
 
     fun badge() {
         render {
-            val values = flowOf(1, 2, 3)
-            badge { +"Label" }
             badge {
-                value("Label")
+                read(true)
+                count(23)
             }
+            val values = flowOf(10, 200, 3000)
             badge {
-                value(23)
-            }
-            badge {
-                value(values)
+                max(200)
+                count(values)
             }
         }
     }
