@@ -43,7 +43,7 @@ public interface WithAria {
     public fun aria(build: AriaContext.() -> Unit)
 }
 
-public class AriaMixin : WithAria {
+internal class AriaMixin : WithAria {
     override val ariaContext: AriaContext = AriaContext()
 
     override fun aria(build: AriaContext.() -> Unit) {

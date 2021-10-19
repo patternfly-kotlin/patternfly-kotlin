@@ -1,11 +1,15 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.Div
+import dev.fritz2.dom.html.Dl
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLDListElement
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ factory
 
@@ -35,7 +39,12 @@ public fun RenderContext.accordion(
  *
  * @sample org.patternfly.sample.AccordionSample.accordion
  */
-public class Accordion : PatternFlyComponent<Unit> {
+public class Accordion :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<Dl, HTMLDListElement> by ElementMixin(),
+    WithEvents<HTMLDListElement> by EventMixin() {
+
     private var fixed: Boolean = false
     private var singleExpand: Boolean = false
     private var bordered: Boolean = false
@@ -84,6 +93,10 @@ public class Accordion : PatternFlyComponent<Unit> {
                 id = id
             ) {
                 markAs(ComponentType.Accordion)
+                ariaContext.applyTo(this)
+                element(this)
+                events(this)
+
                 items.forEach { item ->
                     renderItem(this, item)
                     if (item.initiallyExpanded) {
@@ -112,7 +125,7 @@ public class Accordion : PatternFlyComponent<Unit> {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
                     }
                     span(baseClass = "accordion".component("toggle", "text")) {
-                        +item.title
+                        item.unsafeCast<TitleMixin<Span, HTMLSpanElement>>().title.asText()
                     }
                     span(baseClass = "accordion".component("toggle", "icon")) {
                         icon("angle-right".fas())
@@ -146,7 +159,7 @@ public class Accordion : PatternFlyComponent<Unit> {
  */
 public class AccordionItem :
     Expandable by ExpandedMixin(),
-    WithTitle by TitleMixin(),
+    WithTitle<Span, HTMLSpanElement> by TitleMixin(),
     WithContent<Div, HTMLDivElement> by ContentMixin() {
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")

@@ -156,7 +156,7 @@ public class ChipGroup<T> internal constructor(
     ) {
 
     private val expanded = ExpandedStore()
-    private var display: (T) -> Chip = { chip { +it.toString() } }
+    private var display: Chip.(T) -> Unit = { chip { +it.toString() } }
     private var textElement: Span? = null
     private var closeButton: PushButton? = null
 
@@ -177,10 +177,12 @@ public class ChipGroup<T> internal constructor(
                     val visibleItems = if (expanded) items else items.take(this@ChipGroup.limit)
                     visibleItems.forEach { item ->
                         li(baseClass = "chip-group".component("list-item")) {
-                            val chip = this@ChipGroup.display.invoke(item)
-                            register(chip) {
+                            chip {
                                 val chipId = this@ChipGroup.itemId(item)
-                                it.closes.map { chipId } handledBy this@ChipGroup.store.removeHandler
+                                this@ChipGroup.display.invoke(this, item)
+                                closable {
+                                    clicks.map { chipId } handledBy this@ChipGroup.store.removeHandler
+                                }
                             }
                         }
                     }
@@ -227,7 +229,7 @@ public class ChipGroup<T> internal constructor(
      *
      * @sample org.patternfly.sample.ChipGroupSample.display
      */
-    public fun display(display: (T) -> Chip) {
+    public fun display(display: Chip.(T) -> Unit) {
         this.display = display
     }
 

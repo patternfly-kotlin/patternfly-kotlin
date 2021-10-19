@@ -76,7 +76,7 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
                         alert(id = alertId) {
                             toastContext.build(this)
                             // always apply these settings (might override toastContext.build)
-                            closable(true)
+                            closable()
                             element {
                                 with(domNode) {
                                     onmouseover = { this@NotificationAlertGroup.stopTimeout(alertId) }

@@ -59,7 +59,9 @@ internal interface PageSample {
                         pageHeaderToolsItem {
                             notificationBadge()
                         }
-                        avatar("/assets/images/img_avatar.svg")
+                        avatar {
+                            src("/assets/images/img_avatar.svg")
+                        }
                     }
                 }
                 pageSidebar {

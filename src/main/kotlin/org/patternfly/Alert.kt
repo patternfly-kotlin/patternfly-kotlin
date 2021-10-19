@@ -4,7 +4,9 @@ import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
+import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
+import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.By
 import org.patternfly.dom.matches
 import org.patternfly.dom.removeFromParent
@@ -12,6 +14,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
@@ -122,16 +125,15 @@ internal class StaticAlertContext(
 public class Alert :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithTitle by TitleMixin(),
-    WithContent<Div, HTMLDivElement> by ContentMixin(),
     WithElement<Div, HTMLDivElement> by ElementMixin(),
-    WithEvents<HTMLDivElement> by EventMixin() {
+    WithEvents<HTMLDivElement> by EventMixin(),
+    WithTitle<H, HTMLHeadingElement> by TitleMixin(),
+    WithContent<Div, HTMLDivElement> by ContentMixin(),
+    WithClosable<HTMLButtonElement> by ClosableMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var severity: Severity = Severity.INFO
-    private var closable: Boolean = false
     private var inline: Boolean = false
-    private var closeAction: (EventContext<HTMLButtonElement>.() -> Unit)? = null
     private val actions: MutableMap<String, EventContext<HTMLButtonElement>.() -> Unit> = mutableMapOf()
     private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
@@ -143,19 +145,6 @@ public class Alert :
 
     public fun severity(severity: Severity) {
         this.severity = severity
-    }
-
-    /**
-     * Whether this alert has a close button. Use [action] to handle close events.
-     *
-     * @param closable whether this action has a close button
-     * @param action a lambda which provides event listeners of the close button
-     *
-     * @sample org.patternfly.sample.AlertSample.closes
-     */
-    public fun closable(closable: Boolean, action: (EventContext<HTMLButtonElement>.() -> Unit)? = null) {
-        this.closable = closable
-        this.closeAction = action
     }
 
     public fun inline(inline: Boolean) {
@@ -188,8 +177,8 @@ public class Alert :
                 markAs(ComponentType.Alert)
                 aria["label"] = ariaLabels.first
                 ariaContext.applyTo(this)
-                events(this)
                 element(this)
+                events(this)
 
                 div(baseClass = "alert".component("icon")) {
                     icon(severity.iconClass)
@@ -198,11 +187,11 @@ public class Alert :
                     span(baseClass = "pf-screen-reader") {
                         +ariaLabels.first
                     }
-                    +title
+                    title.asText()
                 }
                 if (closable) {
                     div(baseClass = "alert".component("action")) {
-                        pushButton(ButtonVariation.plain) {
+                        pushButton(plain) {
                             icon("times".fas())
                             aria["label"] = ariaLabels.second
                             domNode.addEventListener(Events.click.name, this@Alert::close)
@@ -210,9 +199,9 @@ public class Alert :
                         }
                     }
                 }
-                content?.let { content ->
+                content?.let { cnt ->
                     div(baseClass = "alert".component("description")) {
-                        content(this)
+                        cnt(this)
                     }
                 }
                 if (actions.isNotEmpty()) {

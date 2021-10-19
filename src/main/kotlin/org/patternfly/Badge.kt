@@ -1,9 +1,11 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ factory
 
@@ -35,7 +37,11 @@ public fun RenderContext.badge(
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
-public class Badge : PatternFlyComponent<Unit> {
+public class Badge :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<Span, HTMLSpanElement> by ElementMixin(),
+    WithEvents<HTMLSpanElement> by EventMixin() {
 
     private var min: Int = BADGE_MIN
     private var max: Int = BADGE_MAX
@@ -75,6 +81,10 @@ public class Badge : PatternFlyComponent<Unit> {
         with(context) {
             span(baseClass = classes(ComponentType.Badge, baseClass), id = id) {
                 markAs(ComponentType.Badge)
+                ariaContext.applyTo(this)
+                element(this)
+                events(this)
+
                 classMap(read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
                 count.map { applyBounds(it) }.asText()
             }

@@ -1,6 +1,8 @@
 package org.patternfly
 
+import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
+import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ factory
 
@@ -30,7 +32,11 @@ public fun RenderContext.avatar(
  *
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
-public class Avatar : PatternFlyComponent<Unit> {
+public class Avatar :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<Img, HTMLImageElement> by ElementMixin(),
+    WithEvents<HTMLImageElement> by EventMixin() {
 
     private var src: String = ""
 
@@ -48,6 +54,10 @@ public class Avatar : PatternFlyComponent<Unit> {
                 id = id
             ) {
                 markAs(ComponentType.Avatar)
+                ariaContext.applyTo(this)
+                element(this)
+                events(this)
+
                 src(this@Avatar.src)
             }
         }
