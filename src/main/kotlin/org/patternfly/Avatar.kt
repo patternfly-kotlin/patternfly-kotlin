@@ -1,29 +1,25 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import kotlinx.coroutines.Job
-import org.w3c.dom.HTMLImageElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates an [Avatar] component.
  *
- * @param src specifies the URL of the image for the avatar
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param build a lambda expression for setting up the component itself
  */
 public fun RenderContext.avatar(
-    src: String,
-    id: String? = null,
     baseClass: String? = null,
-    content: Avatar.() -> Unit = {}
-): Avatar = register(Avatar(src, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: Avatar.() -> Unit
+) {
+    Avatar().apply(build).render(this, baseClass, id)
+}
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [avatar](https://www.patternfly.org/v4/components/avatar/design-guidelines) component.
@@ -32,20 +28,26 @@ public fun RenderContext.avatar(
  *
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
-public class Avatar internal constructor(src: String, id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLImageElement>,
-    Img(
-        id = id,
-        baseClass = classes {
-            +ComponentType.Avatar
-            +baseClass
-        },
-        job = job,
-        scope = Scope()
-    ) {
+public class Avatar : PatternFlyComponent<Unit> {
 
-    init {
-        markAs(ComponentType.Avatar)
-        src(src)
+    private var src: String = ""
+
+    public fun src(src: String) {
+        this.src = src
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            img(
+                baseClass = classes {
+                    +ComponentType.Avatar
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Avatar)
+                src(this@Avatar.src)
+            }
+        }
     }
 }

@@ -19,8 +19,8 @@ public interface Expandable {
     public val expanded: ExpandedStore
 }
 
-public class ExpandedMixin : Expandable {
-    override val expanded: ExpandedStore = ExpandedStore()
+public class ExpandedMixin(collapsePredicate: CollapsePredicate? = null) : Expandable {
+    override val expanded: ExpandedStore = ExpandedStore(collapsePredicate)
 }
 
 /**
