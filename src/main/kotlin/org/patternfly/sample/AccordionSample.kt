@@ -4,6 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.accordion
 import org.patternfly.notification
 
@@ -11,7 +12,7 @@ internal interface AccordionSample {
 
     fun accordion() {
         render {
-            accordion {
+            accordion(singleExpand = true) {
                 item {
                     +"Item one"
                     content {
@@ -24,8 +25,7 @@ internal interface AccordionSample {
                     content {
                         p { +"Phasellus pretium est a porttitor vehicula." }
                     }
-                    expanded.data handledBy notification { expanded ->
-                        severity(Severity.INFO)
+                    expanded.data handledBy notification(INFO) { expanded ->
                         +"Expanded: $expanded"
                     }
                 }

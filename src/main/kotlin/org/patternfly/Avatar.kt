@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLImageElement
 /**
  * Creates an [Avatar] component.
  *
+ * @param src the source of the avatar image
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param build a lambda expression for setting up the component itself
@@ -16,11 +17,12 @@ import org.w3c.dom.HTMLImageElement
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
 public fun RenderContext.avatar(
+    src: String = "",
     baseClass: String? = null,
     id: String? = null,
-    build: Avatar.() -> Unit
+    build: Avatar.() -> Unit = {}
 ) {
-    Avatar().apply(build).render(this, baseClass, id)
+    Avatar(src).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -32,13 +34,11 @@ public fun RenderContext.avatar(
  *
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
-public class Avatar :
+public class Avatar internal constructor(private var src: String) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement<Img, HTMLImageElement> by ElementMixin(),
     WithEvents<HTMLImageElement> by EventMixin() {
-
-    private var src: String = ""
 
     public fun src(src: String) {
         this.src = src
@@ -58,7 +58,7 @@ public class Avatar :
                 element(this)
                 events(this)
 
-                src(this@Avatar.src)
+                src(src)
             }
         }
     }

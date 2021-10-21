@@ -8,13 +8,10 @@ internal interface BadgeSample {
 
     fun badge() {
         render {
-            badge {
-                read(true)
-                count(23)
-            }
+            badge(23)
+
             val values = flowOf(10, 200, 3000)
-            badge {
-                max(200)
+            badge(max = 200) {
                 count(values)
             }
         }

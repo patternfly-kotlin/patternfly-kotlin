@@ -1,11 +1,9 @@
 package org.patternfly
 
-import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ factory
@@ -14,16 +12,20 @@ import org.w3c.dom.HTMLElement
  * Creates an [Icon] component.
  *
  * @param iconClass the CSS icon class. Use one of the string extension methods [String.far], [String.fas] or [String.pfIcon] to create a valid CSS class.
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param build a lambda expression for setting up the component itself
+ *
+ * @sample org.patternfly.sample.IconSample.icons
  */
 public fun RenderContext.icon(
-    iconClass: String,
-    id: String? = null,
+    iconClass: String = "",
     baseClass: String? = null,
-    content: Icon.() -> Unit = {}
-): Icon = register(Icon(iconClass, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: Icon.() -> Unit = {}
+) {
+    Icon(iconClass).apply(build).render(this, baseClass, id)
+}
 
 // ------------------------------------------------------ component
 
@@ -36,45 +38,45 @@ public fun RenderContext.icon(
  *
  * @sample org.patternfly.sample.IconSample.icons
  */
-public class Icon internal constructor(iconClass: String, id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLElement>,
-    TextElement(
-        "i",
-        id = id,
-        baseClass = classes {
-            +ComponentType.Icon
-            +iconClass
-            +baseClass
-        },
-        job,
-        scope = Scope()
-    ) {
+public class Icon internal constructor(iconClass: String) :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<TextElement, HTMLElement> by ElementMixin(),
+    WithEvents<HTMLElement> by EventMixin() {
 
-    init {
-        markAs(ComponentType.Icon)
-        aria["hidden"] = true
+    private var classes: Flow<String> = flowOf(iconClass)
+
+    /**
+     * Changes the icon class.
+     */
+    public fun iconClass(iconClass: String) {
+        iconClass(flowOf(iconClass))
     }
 
     /**
      * Changes the icon class.
      */
     public fun iconClass(iconClass: Flow<String>) {
-        mountSingle(job, iconClass) { v, _ ->
-            iconClass(v)
-        }
+        this.classes = iconClass
     }
 
-    /**
-     * Changes the icon class.
-     */
-    public fun iconClass(iconClass: String) {
-        attr(
-            "class",
-            classes {
-                +ComponentType.Icon
-                +iconClass
-                +baseClass
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            i(
+                baseClass = classes {
+                    +ComponentType.Icon
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Icon)
+                aria(this)
+                element(this)
+                events(this)
+
+                aria["hidden"] = true
+                className(classes)
             }
-        )
+        }
     }
 }

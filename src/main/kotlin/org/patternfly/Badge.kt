@@ -12,6 +12,10 @@ import org.w3c.dom.HTMLSpanElement
 /**
  * Creates a [Badge] component.
  *
+ * @param count the number displayed on this badge
+ * @param min the minimum number displayed on this badge
+ * @param max the maximum number displayed on this badge
+ * @param read whether this badge is marked read or unread
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param build a lambda expression for setting up the component itself
@@ -19,11 +23,15 @@ import org.w3c.dom.HTMLSpanElement
  * @sample org.patternfly.sample.BadgeSample.badge
  */
 public fun RenderContext.badge(
+    count: Int = 0,
+    min: Int = Badge.BADGE_MIN,
+    max: Int = Badge.BADGE_MAX,
+    read: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: Badge.() -> Unit
+    build: Badge.() -> Unit = {}
 ) {
-    Badge().apply(build).render(this, baseClass, id)
+    Badge(count, min, max, read).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -37,16 +45,14 @@ public fun RenderContext.badge(
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
-public class Badge :
+public class Badge internal constructor(count: Int, private var min: Int, private var max: Int, read: Boolean) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement<Span, HTMLSpanElement> by ElementMixin(),
     WithEvents<HTMLSpanElement> by EventMixin() {
 
-    private var min: Int = BADGE_MIN
-    private var max: Int = BADGE_MAX
-    private var read: Flow<Boolean> = flowOf(false)
-    private var count: Flow<Int> = flowOf(0)
+    private var read: Flow<Boolean> = flowOf(read)
+    private var count: Flow<Int> = flowOf(count)
 
     public fun min(min: Int) {
         this.min = min
@@ -59,6 +65,11 @@ public class Badge :
     public fun bounds(min: Int, max: Int) {
         this.min = min
         this.max = max
+    }
+
+    public fun bounds(bounds: IntRange) {
+        this.min = bounds.first
+        this.max = bounds.last
     }
 
     public fun read(read: Boolean) {

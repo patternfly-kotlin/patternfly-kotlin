@@ -9,16 +9,20 @@ import org.w3c.dom.HTMLImageElement
 /**
  * Creates the [Brand] component.
  *
+ * @param src the source of the brand image
+ * @param alt the alternative text of the brand image
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param build a lambda expression for setting up the component itself
  */
 public fun RenderContext.brand(
+    src: String = "",
+    alt: String = "",
     baseClass: String? = null,
     id: String? = null,
     build: Brand.() -> Unit = {}
 ) {
-    Brand().apply(build).render(this, baseClass, id)
+    Brand(src, alt).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -28,14 +32,11 @@ public fun RenderContext.brand(
  *
  * A brand is used to place a product logotype on a screen.
  */
-public class Brand :
+public class Brand internal constructor(private var alt: String, private var src: String) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement<Img, HTMLImageElement> by ElementMixin(),
     WithEvents<HTMLImageElement> by EventMixin() {
-
-    private var alt: String = ""
-    private var src: String = ""
 
     public fun alt(alt: String) {
         this.alt = alt
