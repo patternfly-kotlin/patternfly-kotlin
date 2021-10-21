@@ -18,7 +18,7 @@ internal interface ChipSample {
                 badge {
                     count(42)
                 }
-                closable {
+                closeButton {
                     clicks handledBy Notification.info("Bye, bye!")
                 }
             }

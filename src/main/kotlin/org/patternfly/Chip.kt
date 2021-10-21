@@ -75,7 +75,7 @@ public class Chip :
                 id = id
             ) {
                 markAs(ComponentType.Chip)
-                ariaContext.applyTo(this)
+                aria(this)
                 element(this)
                 events(this)
 
@@ -89,21 +89,21 @@ public class Chip :
                         bdg(this)
                     }
                 }
-                if (!readOnly) {
+                if (!readOnly && closable) {
                     pushButton(plain) {
                         icon("times".fas())
                         aria["label"] = "Remove"
                         aria["labelledby"] = textId
-                        domNode.addEventListener(Events.click.name, this@Chip::close)
-                        closeAction?.invoke(this)
+                        domNode.addEventListener(Events.click.name, this@Chip::removeFromParent)
+                        closeEvents?.invoke(this)
                     }
                 }
             }
         }
     }
 
-    private fun close(event: Event) {
-        (event.target as Element).removeEventListener(Events.click.name, ::close)
+    private fun removeFromParent(event: Event) {
+        (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
         root.domNode.removeFromParent()
     }
 }

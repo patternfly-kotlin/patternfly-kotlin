@@ -81,7 +81,7 @@ public class Badge :
         with(context) {
             span(baseClass = classes(ComponentType.Badge, baseClass), id = id) {
                 markAs(ComponentType.Badge)
-                ariaContext.applyTo(this)
+                aria(this)
                 element(this)
                 events(this)
 

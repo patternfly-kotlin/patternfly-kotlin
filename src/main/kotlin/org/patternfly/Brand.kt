@@ -1,77 +1,55 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.A
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
-import dev.fritz2.dom.html.Scope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.By
-import org.patternfly.dom.querySelector
-import org.patternfly.dom.removeFromParent
+import dev.fritz2.dom.html.RenderContext
+import org.w3c.dom.HTMLImageElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
- * Creates the [Brand] component inside the [PageHeader] component.
+ * Creates the [Brand] component.
  *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param build a lambda expression for setting up the component itself
  */
-public fun PageHeader.brand(
-    id: String? = null,
+public fun RenderContext.brand(
     baseClass: String? = null,
-    content: Brand.() -> Unit = {}
-): Brand = register(Brand(this.page.sidebarStore, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    build: Brand.() -> Unit = {}
+) {
+    Brand().apply(build).render(this, baseClass, id)
+}
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * [PatternFly brand](https://www.patternfly.org/v4/components/page/design-guidelines) component.
  *
  * A brand is used to place a product logotype on a screen.
  */
-public class Brand internal constructor(sidebarStore: SidebarStore, id: String?, baseClass: String?, job: Job) :
-    Div(
-        id = id,
-        baseClass = classes("page".component("header", "brand"), baseClass),
-        job = job,
-        scope = Scope()
-    ) {
+public class Brand :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<Img, HTMLImageElement> by ElementMixin(),
+    WithEvents<HTMLImageElement> by EventMixin() {
 
-    private var link: A
+    private var alt: String = ""
+    private var src: String = ""
 
-    init {
-        div(baseClass = "page".component("header", "brand", "toggle")) {
-            attr("hidden", sidebarStore.data.map { !it.visible })
-            classMap(sidebarStore.data.map { mapOf("display-none".util() to !it.visible) })
-            clickButton(plain) {
-                aria["expanded"] = sidebarStore.data.map { it.expanded.toString() }
-                icon("bars".fas())
-            } handledBy sidebarStore.toggle
-        }
-        link = a(baseClass = "page".component("header", "brand", "link")) {}
+    public fun alt(alt: String) {
+        this.alt = alt
     }
 
-    /**
-     * Sets the link to the homepage of the application.
-     */
-    public fun link(content: A.() -> Unit = {}) {
-        with(link) {
-            content(this)
-        }
+    public fun src(src: String) {
+        this.src = src
     }
 
-    /**
-     * Sets the image for the brand.
-     */
-    public fun img(content: Img.() -> Unit = {}) {
-        with(link) {
-            domNode.querySelector(By.classname("brand".component()))?.removeFromParent()
-            img(baseClass = "brand".component()) {
-                content(this)
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            img(baseClass = classes("brand".component(), baseClass), id = id) {
+                alt(alt)
+                src(src)
             }
         }
     }

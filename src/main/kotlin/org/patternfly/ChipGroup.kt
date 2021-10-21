@@ -180,7 +180,7 @@ public class ChipGroup<T> internal constructor(
                             chip {
                                 val chipId = this@ChipGroup.itemId(item)
                                 this@ChipGroup.display.invoke(this, item)
-                                closable {
+                                closeButton {
                                     clicks.map { chipId } handledBy this@ChipGroup.store.removeHandler
                                 }
                             }

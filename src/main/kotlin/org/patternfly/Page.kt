@@ -5,6 +5,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.TextElement
+import dev.fritz2.dom.html.keyOf
 import kotlinx.coroutines.Job
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -222,6 +223,10 @@ public class Page internal constructor(id: String?, baseClass: String?, job: Job
 
     init {
         markAs(ComponentType.Page)
+    }
+
+    internal companion object {
+        val SIDEBAR_STORE_KEY: Scope.Key<SidebarStore> = keyOf()
     }
 }
 

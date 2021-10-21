@@ -15,6 +15,10 @@ public interface WithTitle<E : WithText<N>, N : Node> {
 
     public fun title(title: String)
 
+    public fun title(title: Flow<String>)
+
+    public fun <T> title(title: Flow<T>)
+
     public fun Flow<String>.asText()
 
     public fun <T> Flow<T>.asText()
@@ -26,19 +30,31 @@ internal class TitleMixin<E : WithText<N>, N : Node> : WithTitle<E, N> {
     override var title: Flow<String> = emptyFlow()
 
     override fun title(title: String) {
-        this.title = flowOf(title)
+        assign(flowOf(title))
+    }
+
+    override fun title(title: Flow<String>) {
+        assign(title)
+    }
+
+    override fun <T> title(title: Flow<T>) {
+        assign(title.map { it.toString() })
     }
 
     override fun Flow<String>.asText() {
-        this@TitleMixin.title = this
+        assign(this)
     }
 
     override fun <T> Flow<T>.asText() {
-        this@TitleMixin.title = this.map { it.toString() }
+        assign(this.map { it.toString() })
     }
 
     override fun String.unaryPlus() {
-        this@TitleMixin.title = flowOf(this)
+        assign(flowOf(this))
+    }
+
+    internal fun assign(title: Flow<String>) {
+        this.title = title
     }
 }
 
@@ -46,7 +62,9 @@ public interface WithContent<E : WithText<N>, N : Node> {
     public var content: (E.() -> Unit)?
 
     public fun content(content: String)
+
     public fun content(content: Flow<String>)
+
     public fun content(content: E.() -> Unit)
 }
 
@@ -96,17 +114,22 @@ internal class EventMixin<T : HTMLElement> : WithEvents<T> {
 
 public interface WithClosable<T : HTMLElement> {
     public var closable: Boolean
-    public var closeAction: (EventContext<T>.() -> Unit)?
+    public var closeEvents: (EventContext<T>.() -> Unit)?
 
-    public fun closable(action: (EventContext<T>.() -> Unit)? = null)
+    public fun closable(closable: Boolean)
+
+    public fun closeButton(events: EventContext<T>.() -> Unit)
 }
 
 internal class ClosableMixin<T : HTMLElement> : WithClosable<T> {
-    override var closable: Boolean = false
-    override var closeAction: (EventContext<T>.() -> Unit)? = null
+    override var closable: Boolean = true
+    override var closeEvents: (EventContext<T>.() -> Unit)? = null
 
-    override fun closable(action: (EventContext<T>.() -> Unit)?) {
-        this.closable = true
-        this.closeAction = action
+    override fun closable(closable: Boolean) {
+        this.closable = closable
+    }
+
+    override fun closeButton(events: EventContext<T>.() -> Unit) {
+        this.closeEvents = events
     }
 }

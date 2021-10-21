@@ -16,6 +16,9 @@ import org.w3c.dom.HTMLSpanElement
 /**
  * Creates an [Accordion] component.
  *
+ * @param singleExpand whether only one item can be expanded at a time
+ * @param fixed whether the AccordionItems use a fixed height
+ * @param bordered whether to draw a border between the [AccordionItem]s
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param build a lambda expression for setting up the component itself
@@ -23,11 +26,18 @@ import org.w3c.dom.HTMLSpanElement
  * @sample org.patternfly.sample.AccordionSample.accordion
  */
 public fun RenderContext.accordion(
+    singleExpand: Boolean = false,
+    fixed: Boolean = false,
+    bordered: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     build: Accordion.() -> Unit
 ) {
-    Accordion().apply(build).render(this, baseClass, id)
+    Accordion(
+        singleExpand = singleExpand,
+        fixed = fixed,
+        bordered = bordered
+    ).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -39,29 +49,29 @@ public fun RenderContext.accordion(
  *
  * @sample org.patternfly.sample.AccordionSample.accordion
  */
-public class Accordion :
-    PatternFlyComponent<Unit>,
+public class Accordion internal constructor(
+    private var singleExpand: Boolean,
+    private var fixed: Boolean,
+    private var bordered: Boolean = false
+) : PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement<Dl, HTMLDListElement> by ElementMixin(),
     WithEvents<HTMLDListElement> by EventMixin() {
 
-    private var fixed: Boolean = false
-    private var singleExpand: Boolean = false
-    private var bordered: Boolean = false
     private val items: MutableList<AccordionItem> = mutableListOf()
-
-    /**
-     * whether the [AccordionItem]s use a fixed height
-     */
-    public fun fixed(fixed: Boolean) {
-        this.fixed = fixed
-    }
 
     /**
      * whether only one [AccordionItem] can be expanded at a time
      */
     public fun singleExpand(singleExpand: Boolean) {
         this.singleExpand = singleExpand
+    }
+
+    /**
+     * whether the [AccordionItem]s use a fixed height
+     */
+    public fun fixed(fixed: Boolean) {
+        this.fixed = fixed
     }
 
     /**
@@ -93,7 +103,7 @@ public class Accordion :
                 id = id
             ) {
                 markAs(ComponentType.Accordion)
-                ariaContext.applyTo(this)
+                aria(this)
                 element(this)
                 events(this)
 
@@ -125,7 +135,7 @@ public class Accordion :
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
                     }
                     span(baseClass = "accordion".component("toggle", "text")) {
-                        item.unsafeCast<TitleMixin<Span, HTMLSpanElement>>().title.asText()
+                        item.title.asText()
                     }
                     span(baseClass = "accordion".component("toggle", "icon")) {
                         icon("angle-right".fas())
@@ -140,9 +150,9 @@ public class Accordion :
             ) {
                 attr("hidden", item.expanded.data.map { !it })
                 classMap(item.expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
-                item.content?.let { content ->
+                item.content?.let { cnt ->
                     div(baseClass = "accordion".component("expanded", "content", "body")) {
-                        content(this)
+                        cnt(this)
                     }
                 }
             }

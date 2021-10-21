@@ -1,3 +1,5 @@
+@file:Suppress("DuplicatedCode")
+
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
@@ -11,40 +13,28 @@ import org.patternfly.alertGroup
 
 internal interface AlertSample {
 
-    fun staticAlertGroup() {
+    fun alertGroup() {
         render {
             alertGroup {
-                alert {
-                    severity(INFO)
-                    +"Just saying."
-                }
-                alert {
-                    severity(SUCCESS)
-                    +"Well done!"
-                }
-                alert {
-                    severity(WARNING)
-                    +"Really?"
-                }
-                alert {
-                    severity(DANGER)
-                    +"You're in trouble!"
-                }
+                alert(INFO, "Just saying.")
+                alert(SUCCESS, "Well done!")
+                alert(WARNING, "Really?")
+                alert(DANGER, "You're in trouble!")
             }
         }
     }
 
-    fun standaloneAlert() {
+    fun alert() {
         render {
-            alert {
-                severity(INFO)
-                +"Alert title"
-                content { +"Lorem ipsum dolor sit amet." }
-                action("View details") {
-                    clicks handledBy Notification.info("Not yet implemented")
-                }
-                action("Ignore") {
-                    clicks handledBy Notification.info("Not yet implemented")
+            alert(INFO, "Alert title") {
+                content {
+                    p {
+                        +"Alert title. "
+                        a {
+                            href("#")
+                            +"This is a link."
+                        }
+                    }
                 }
             }
         }
@@ -52,13 +42,14 @@ internal interface AlertSample {
 
     fun actions() {
         render {
-            alert {
-                severity(INFO)
-                +"Alert title"
-                action("View details")
-                action("Ignore") {
-                    clicks handledBy Notification.warning("Are you sure?")
+            alert(INFO, "Alert title") {
+                action("View details") {
+                    clicks handledBy Notification.info("Here are the details...")
                 }
+                action({
+                    +"Ignore"
+                    className("your-css-class")
+                }, { clicks handledBy Notification.warning("Are you sure?") })
             }
         }
     }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.HTMLElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates an [Icon] component.
@@ -25,7 +25,7 @@ public fun RenderContext.icon(
     content: Icon.() -> Unit = {}
 ): Icon = register(Icon(iconClass, id = id, baseClass = baseClass, job), content)
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [icon](https://www.patternfly.org/v4/guidelines/icons/) component.

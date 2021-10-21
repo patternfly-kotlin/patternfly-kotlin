@@ -6,7 +6,6 @@ import dev.fritz2.routing.StringRoute
 import org.patternfly.ItemsStore
 import org.patternfly.Sticky
 import org.patternfly.avatar
-import org.patternfly.brand
 import org.patternfly.breadcrumb
 import org.patternfly.card
 import org.patternfly.cardBody
@@ -41,14 +40,14 @@ internal interface PageSample {
         render {
             page {
                 pageHeader {
-                    brand {
-                        link {
-                            href("#home")
-                        }
-                        img {
-                            src("/assets/logo.svg")
-                        }
-                    }
+//                    brand {
+//                        link {
+//                            href("#home")
+//                        }
+//                        img {
+//                            src("/assets/logo.svg")
+//                        }
+//                    }
                     horizontalNavigation(router) {
                         items {
                             item("item1", "Item 1")

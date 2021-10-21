@@ -54,7 +54,7 @@ public class Avatar :
                 id = id
             ) {
                 markAs(ComponentType.Avatar)
-                ariaContext.applyTo(this)
+                aria(this)
                 element(this)
                 events(this)
 

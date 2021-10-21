@@ -27,10 +27,12 @@ import kotlin.js.Date
 // ------------------------------------------------------ factory
 
 public fun <T> notification(
+    severity: Severity = Severity.INFO,
+    title: String = "",
     baseClass: String? = null,
     build: Alert.(T) -> Unit
 ): Handler<T> {
-    return NotificationStore.addInternal(baseClass, null, build)
+    return NotificationStore.addInternal(severity, title, baseClass, build)
 }
 
 public object Notification {
@@ -45,7 +47,7 @@ public object Notification {
     public fun warning(title: String, content: String? = null): Handler<Unit> = toast(Severity.WARNING, title, content)
 
     private fun toast(severity: Severity, title: String, content: String? = null): Handler<Unit> =
-        NotificationStore.addInternal(baseClass = null, knownSeverity = severity) {
+        NotificationStore.addInternal(severity, title, baseClass = null) {
             severity(severity)
             title(title)
             content?.let { content(it) }
@@ -69,14 +71,19 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
     override fun renderAlerts(context: RenderContext) {
         with(context) {
             (MainScope() + job).launch {
-                NotificationStore.latest.collect { toastContext ->
+                NotificationStore.latest.collect { alertBuilder ->
                     val alertId = Id.unique("alert")
                     val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
                     with(li) {
-                        alert(id = alertId) {
-                            toastContext.build(this)
+                        alert(
+                            severity = alertBuilder.severity,
+                            title = alertBuilder.title,
+                            baseClass = alertBuilder.baseClass,
+                            id = alertId
+                        ) {
+                            alertBuilder.build(this)
                             // always apply these settings (might override toastContext.build)
-                            closable()
+                            closable(true)
                             element {
                                 with(domNode) {
                                     onmouseover = { this@NotificationAlertGroup.stopTimeout(alertId) }
@@ -129,7 +136,7 @@ public class NotificationBadge : PatternFlyComponent<Unit> {
                         NotificationStore.data.map { notifications ->
                             when {
                                 notifications.isEmpty() -> "read".modifier()
-                                notifications.any { it.knownSeverity == Severity.DANGER } -> "attention".modifier()
+                                notifications.any { it.severity == Severity.DANGER } -> "attention".modifier()
                                 else -> "unread".modifier()
                             }
                         }
@@ -137,7 +144,7 @@ public class NotificationBadge : PatternFlyComponent<Unit> {
                     icon("bell".pfIcon()) {
                         iconClass(
                             NotificationStore.data.map { notifications ->
-                                if (notifications.any { it.knownSeverity == Severity.DANGER })
+                                if (notifications.any { it.severity == Severity.DANGER })
                                     "attention-bell".pfIcon()
                                 else
                                     "bell".pfIcon()
@@ -159,11 +166,11 @@ public class NotificationBadge : PatternFlyComponent<Unit> {
 
 internal val NOTIFICATION_ALERT_GROUP_ID = Id.unique("notification", ComponentType.AlertGroup.id)
 
-internal object NotificationStore : RootStore<List<NotificationContext>>(listOf()) {
+internal object NotificationStore : RootStore<List<NotificationAlertBuilder>>(listOf()) {
 
     private var toastAlertGroupPresent: Boolean = false
 
-    val latest: Flow<NotificationContext> = data
+    val latest: Flow<NotificationAlertBuilder> = data
         .map {
             it.maxByOrNull { n -> n.timestamp }
         }
@@ -177,8 +184,9 @@ internal object NotificationStore : RootStore<List<NotificationContext>>(listOf(
     val clear: Handler<Unit> = handle { listOf() }
 
     fun <T> addInternal(
+        severity: Severity,
+        title: String,
         baseClass: String?,
-        knownSeverity: Severity?,
         build: Alert.(T) -> Unit
     ): Handler<T> {
         if (!toastAlertGroupPresent) {
@@ -191,16 +199,17 @@ internal object NotificationStore : RootStore<List<NotificationContext>>(listOf(
         }
 
         return handle { items, payload ->
-            items + NotificationContext(baseClass, knownSeverity) {
+            items + NotificationAlertBuilder(severity, title, baseClass) {
                 build(this, payload)
             }
         }
     }
 }
 
-internal class NotificationContext(
+internal class NotificationAlertBuilder(
+    val severity: Severity,
+    val title: String,
     val baseClass: String?,
-    val knownSeverity: Severity?,
     val build: Alert.() -> Unit
 ) {
     val read: Boolean = false

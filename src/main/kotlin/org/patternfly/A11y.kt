@@ -29,7 +29,7 @@ public class AriaContext {
         properties[name] = value
     }
 
-    internal fun <T : Tag<HTMLElement>> applyTo(tag: T) {
+    internal operator fun <T : Tag<HTMLElement>> invoke(tag: T) {
         role?.let {
             tag.aria["role"] = it
         }
@@ -38,16 +38,16 @@ public class AriaContext {
 }
 
 public interface WithAria {
-    public val ariaContext: AriaContext
+    public val aria: AriaContext
 
     public fun aria(build: AriaContext.() -> Unit)
 }
 
 internal class AriaMixin : WithAria {
-    override val ariaContext: AriaContext = AriaContext()
+    override val aria: AriaContext = AriaContext()
 
     override fun aria(build: AriaContext.() -> Unit) {
-        ariaContext.apply(build)
+        aria.apply(build)
     }
 }
 

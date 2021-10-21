@@ -6,9 +6,9 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.Scope
+import dev.fritz2.dom.html.keyOf
 import org.patternfly.ButtonVariation.plain
-import org.patternfly.dom.By
-import org.patternfly.dom.matches
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
@@ -26,7 +26,7 @@ import org.w3c.dom.events.Event
  * @param id the ID of the element
  * @param build a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.sample.AlertSample.staticAlertGroup
+ * @sample org.patternfly.sample.AlertSample.alertGroup
  */
 public fun RenderContext.alertGroup(
     baseClass: String? = null,
@@ -39,18 +39,22 @@ public fun RenderContext.alertGroup(
 /**
  * Creates an [Alert] component.
  *
+ * @param severity the severity level
+ * @param title the title of the alert
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param build a lambda expression for setting up the component itself
  *
- * @sample org.patternfly.sample.AlertSample.standaloneAlert
+ * @sample org.patternfly.sample.AlertSample.alert
  */
 public fun RenderContext.alert(
+    severity: Severity = Severity.INFO,
+    title: String = "",
     baseClass: String? = null,
     id: String? = null,
-    build: Alert.() -> Unit
+    build: Alert.() -> Unit = {}
 ) {
-    Alert().apply(build).render(this, baseClass, id)
+    Alert(severity, title).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -65,7 +69,10 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
                     +("toast".modifier() `when` toast)
                     +baseClass
                 },
-                id = id
+                id = id,
+                scope = {
+                    set(ALERT_GROUP_KEY, true)
+                }
             ) {
                 markAs(ComponentType.AlertGroup)
                 renderAlerts(this)
@@ -74,6 +81,10 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
     }
 
     internal abstract fun renderAlerts(context: RenderContext)
+
+    internal companion object {
+        val ALERT_GROUP_KEY: Scope.Key<Boolean> = keyOf(ComponentType.AlertGroup.id)
+    }
 }
 
 /**
@@ -81,26 +92,33 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
  *
  * This alert group is used to stack and position inline [Alert]s.
  *
- * @sample org.patternfly.sample.AlertSample.staticAlertGroup
+ * @sample org.patternfly.sample.AlertSample.alertGroup
  */
 public class StaticAlertGroup : BaseAlertGroup(false) {
 
-    private val alerts: MutableList<StaticAlertContext> = mutableListOf()
+    private val alerts: MutableList<StaticAlertBuilder> = mutableListOf()
 
     public fun alert(
+        severity: Severity = Severity.INFO,
+        title: String = "",
         baseClass: String? = null,
         id: String? = null,
-        build: Alert.() -> Unit
+        build: Alert.() -> Unit = {}
     ) {
-        alerts.add(StaticAlertContext(baseClass, id, build))
+        alerts.add(StaticAlertBuilder(severity, title, baseClass, id, build))
     }
 
     override fun renderAlerts(context: RenderContext) {
         with(context) {
-            alerts.forEach { sac ->
+            alerts.forEach { alertBuilder ->
                 li(baseClass = "alert-group".component("item")) {
-                    alert(sac.baseClass, sac.id) {
-                        sac.build(this)
+                    alert(
+                        severity = alertBuilder.severity,
+                        title = alertBuilder.title,
+                        baseClass = alertBuilder.baseClass,
+                        id = alertBuilder.id
+                    ) {
+                        alertBuilder.build(this)
                         inline(true) // force alerts to be inline
                     }
                 }
@@ -109,9 +127,11 @@ public class StaticAlertGroup : BaseAlertGroup(false) {
     }
 }
 
-internal class StaticAlertContext(
-    val baseClass: String? = null,
-    val id: String? = null,
+internal class StaticAlertBuilder(
+    val severity: Severity,
+    val title: String,
+    val baseClass: String?,
+    val id: String?,
     val build: Alert.() -> Unit
 )
 
@@ -120,9 +140,9 @@ internal class StaticAlertContext(
  *
  * Alerts are used to notify the user about a change in status or other event.
  *
- * @sample org.patternfly.sample.AlertSample.standaloneAlert
+ * @sample org.patternfly.sample.AlertSample.alert
  */
-public class Alert :
+public class Alert internal constructor(private var severity: Severity, title: String) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement<Div, HTMLDivElement> by ElementMixin(),
@@ -132,15 +152,18 @@ public class Alert :
     WithClosable<HTMLButtonElement> by ClosableMixin() {
 
     private lateinit var root: Tag<HTMLElement>
-    private var severity: Severity = Severity.INFO
     private var inline: Boolean = false
-    private val actions: MutableMap<String, EventContext<HTMLButtonElement>.() -> Unit> = mutableMapOf()
+    private val actions: MutableList<AlertAction> = mutableListOf()
     private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
         Severity.INFO -> "Info alert" to "Close info alert"
         Severity.SUCCESS -> "Success alert" to "Close success alert"
         Severity.WARNING -> "Warning alert" to "Close warning alert"
         Severity.DANGER -> "Error alert" to "Close error alert"
+    }
+
+    init {
+        this.title(title)
     }
 
     public fun severity(severity: Severity) {
@@ -155,12 +178,24 @@ public class Alert :
      * Adds an actions to this [Alert].
      *
      * @param title the title of the action
-     * @param action a lambda which provides event listeners of the action
+     * @param events a lambda expression for setting up the events of the action
      *
      * @sample org.patternfly.sample.AlertSample.actions
      */
-    public fun action(title: String, action: EventContext<HTMLButtonElement>.() -> Unit = {}) {
-        actions[title] = action
+    public fun action(title: String, events: EventContext<HTMLButtonElement>.() -> Unit) {
+        actions.add(AlertAction({ +title }, events))
+    }
+
+    /**
+     * Adds an actions to this [Alert].
+     *
+     * @param build a lambda expression for setting up the action
+     * @param events a lambda expression for setting up the events of the action
+     *
+     * @sample org.patternfly.sample.AlertSample.actions
+     */
+    public fun action(build: PushButton.() -> Unit, events: EventContext<HTMLButtonElement>.() -> Unit) {
+        actions.add(AlertAction(build, events))
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -176,7 +211,7 @@ public class Alert :
             ) {
                 markAs(ComponentType.Alert)
                 aria["label"] = ariaLabels.first
-                ariaContext.applyTo(this)
+                aria(this)
                 element(this)
                 events(this)
 
@@ -194,8 +229,8 @@ public class Alert :
                         pushButton(plain) {
                             icon("times".fas())
                             aria["label"] = ariaLabels.second
-                            domNode.addEventListener(Events.click.name, this@Alert::close)
-                            closeAction?.invoke(this)
+                            domNode.addEventListener(Events.click.name, this@Alert::removeFromParent)
+                            closeEvents?.invoke(this)
                         }
                     }
                 }
@@ -206,10 +241,10 @@ public class Alert :
                 }
                 if (actions.isNotEmpty()) {
                     div(baseClass = "alert".component("action-group")) {
-                        actions.forEach { (action, events) ->
+                        actions.forEach { alertAction ->
                             pushButton(ButtonVariation.inline, ButtonVariation.link) {
-                                +action
-                                events(this)
+                                alertAction.build(this)
+                                alertAction.events(this)
                             }
                         }
                     }
@@ -218,12 +253,17 @@ public class Alert :
         }
     }
 
-    private fun close(event: Event) {
-        (event.target as Element).removeEventListener(Events.click.name, ::close)
-        if (root.domNode.parentElement?.matches(By.classname("alert-group".component("item"))) == true) {
+    private fun removeFromParent(event: Event) {
+        (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
+        if (root.scope.contains(BaseAlertGroup.ALERT_GROUP_KEY)) {
             root.domNode.parentElement.removeFromParent()
         } else {
             root.domNode.removeFromParent()
         }
     }
 }
+
+internal class AlertAction(
+    val build: PushButton.() -> Unit,
+    val events: (EventContext<HTMLButtonElement>.() -> Unit)
+)
