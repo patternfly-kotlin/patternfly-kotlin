@@ -13,6 +13,9 @@ import org.w3c.dom.set
 
 private const val COMPONENT_TYPE: String = "pfct"
 
+@DslMarker
+public annotation class ComponentMarker
+
 internal fun Tag<HTMLElement>.markAs(componentType: ComponentType) {
     domNode.dataset[COMPONENT_TYPE] = componentType.id
     if (window.localStorage["ouia"].toString() == "true") {
@@ -46,14 +49,13 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Form("frm", "form".component()),
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
+    Masthead("mh", "masthead".component()),
     Menu("mu", "menu".component()),
     Navigation("nav", "nav".component()),
     NotificationBadge("nb", "button".component()),
     OptionsMenu("opt", "options-menu".component()),
     Page("pg", "page".component()),
     PageHeader("pgh", "page".component("header")),
-    PageMain("mn", "page".component("main")),
-    PageSidebar("pgs", "page".component("sidebar")),
     Pagination("pgn", "pagination".component()),
     Select("sel", "select".component()),
     Skeleton("sk", "skeleton".component()),
@@ -69,6 +71,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
 /**
  * Marker interface for PatternFly components.
  */
+@ComponentMarker
 internal interface PatternFlyComponent<T> {
     fun render(
         context: RenderContext,

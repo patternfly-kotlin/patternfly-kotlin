@@ -1,162 +1,35 @@
 package org.patternfly
 
-import dev.fritz2.dom.Tag
+import dev.fritz2.binding.Handler
+import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.keyOf
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariation.primary
+import org.patternfly.SidebarStore.Companion.SIDEBAR_STORE_KEY
+import org.patternfly.dom.Id
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates the [Page] component.
  *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param build a lambda expression for setting up the component itself
  */
 public fun RenderContext.page(
-    id: String? = null,
     baseClass: String? = null,
-    content: Page.() -> Unit = {}
-): Page = register(Page(id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [PageMain] component inside the [Page] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun Page.pageMain(
     id: String? = null,
-    baseClass: String? = null,
-    content: PageMain.() -> Unit = {}
-): PageMain = register(PageMain(id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates a [PageGroup] component inside the [PageMain] component.
- *
- * @param sticky whether the component should be sticky
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the sidebar body
- */
-public fun RenderContext.pageGroup(
-    sticky: Sticky? = null,
-    id: String? = null,
-    baseClass: String? = null,
-    content: PageGroup.() -> Unit = {}
-): PageGroup = register(PageGroup(sticky, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates a [PageSection] component for adding a page navigation component.
- *
- * @param sticky whether the component should be sticky
- * @param limitWidth whether the page section limits the `max-width` of the content inside.
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the content
- */
-public fun RenderContext.pageNavigation(
-    sticky: Sticky? = null,
-    limitWidth: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Tag<HTMLElement>.() -> Unit = {}
-): PageSection = genericPageSection(
-    sticky,
-    limitWidth,
-    "page".component("main", "nav"),
-    id,
-    baseClass,
-    content
-)
-
-/**
- * Creates a [PageSection] component for adding a page breadcrumb component.
- *
- * @param sticky whether the component should be sticky
- * @param limitWidth whether the page section limits the `max-width` of the content inside.
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the content
- */
-public fun RenderContext.pageBreadcrumb(
-    sticky: Sticky? = null,
-    limitWidth: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Tag<HTMLElement>.() -> Unit = {}
-): PageSection = genericPageSection(
-    sticky,
-    limitWidth,
-    "page".component("main", "breadcrumb"),
-    id,
-    baseClass,
-    content
-)
-
-/**
- * Creates a [PageSection] component.
- *
- * @param sticky whether the component should be sticky
- * @param limitWidth whether the page section limits the `max-width` of the content inside.
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the content
- */
-public fun RenderContext.pageSection(
-    sticky: Sticky? = null,
-    limitWidth: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Tag<HTMLElement>.() -> Unit = {}
-): PageSection = genericPageSection(
-    sticky,
-    limitWidth,
-    "page".component("main", "section"),
-    id,
-    baseClass,
-    content
-)
-
-private fun RenderContext.genericPageSection(
-    sticky: Sticky?,
-    limitWidth: Boolean,
-    pageSectionClass: String,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Tag<HTMLElement>.() -> Unit = {}
-): PageSection = if (limitWidth) {
-    register(
-        PageSection(
-            sticky,
-            id = id,
-            baseClass = classes {
-                +pageSectionClass
-                +("limit-width".modifier() `when` limitWidth)
-                +baseClass
-            },
-            job
-        ),
-        {
-            with(it) {
-                div(baseClass = "page".component("main", "body")) {
-                    content(this)
-                }
-            }
-        }
-    )
-} else {
-    register(PageSection(sticky, id = id, baseClass = classes(pageSectionClass, baseClass), job), content)
+    build: Page.() -> Unit = {}
+) {
+    Page().apply(build).render(this, baseClass, id)
 }
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [page](https://www.patternfly.org/v4/components/page/design-guidelines) component.
@@ -215,56 +88,113 @@ private fun RenderContext.genericPageSection(
  *
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
-public class Page internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.Page, baseClass), job, Scope()) {
+public class Page :
+    PatternFlyComponent<Unit>,
+    WithAria by AriaMixin(),
+    WithElement<Div, HTMLDivElement> by ElementMixin(),
+    WithEvents<HTMLDivElement> by EventMixin() {
 
-    internal val sidebarStore: SidebarStore = SidebarStore()
+    private val sidebarStore: SidebarStore = SidebarStore()
+    private var masthead: SubComponent<Masthead>? = null
+    private var sidebar: SubComponent<RenderContext>? = null
+    private var main: SubComponent<RenderContext>? = null
 
-    init {
-        markAs(ComponentType.Page)
+    public fun masthead(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Masthead.() -> Unit = {}
+    ) {
+        masthead = SubComponent(baseClass, id, context)
     }
 
-    internal companion object {
+    public fun sidebar(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit = {}
+    ) {
+        sidebar = SubComponent(baseClass, id, context)
+    }
+
+    public fun main(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit = {}
+    ) {
+        main = SubComponent(baseClass, id, context)
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(
+                baseClass = classes(ComponentType.Page, baseClass),
+                id = id,
+                scope = {
+                    set(SIDEBAR_STORE_KEY, sidebarStore)
+                }
+            ) {
+                markAs(ComponentType.Page)
+                aria(this)
+                element(this)
+                events(this)
+
+                val mainId = main?.id ?: Id.unique("page", "main")
+                if (main != null) {
+                    linkButton(primary, baseClass = classes("skip-to-content".component())) {
+                        href("#$mainId")
+                    }
+                }
+
+                masthead?.let { component ->
+                    Masthead().apply(component.context).render(this, component.baseClass, component.id)
+                }
+
+                sidebar?.let { component ->
+                    div(
+                        baseClass = classes("page".component("sidebar"), component.baseClass),
+                        id = component.id
+                    ) {
+                        attr("hidden", sidebarStore.data.map { !it.visible })
+                        classMap(
+                            sidebarStore.data.map {
+                                mapOf(
+                                    "display-none".util() to !it.visible,
+                                    "collapsed".modifier() to !it.expanded,
+                                    "expanded".modifier() to it.expanded
+                                )
+                            }
+                        )
+                        div(baseClass = "page".component("sidebar", "body")) {
+                            component.context(this)
+                        }
+                    }
+                }
+
+                main?.let { component ->
+                    main(
+                        baseClass = classes("page".component("main"), component.baseClass),
+                        id = component.id
+                    ) {
+                        attr("role", "main")
+                        attr("tabindex", "-1")
+                        component.context(this)
+                    }
+                }
+            }
+        }
+    }
+}
+
+internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
+
+internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
+
+    val visible: Handler<Boolean> = handle { status, visible ->
+        status.copy(visible = visible)
+    }
+
+    val toggle: Handler<Unit> = handle { it.copy(expanded = !it.expanded) }
+
+    companion object {
         val SIDEBAR_STORE_KEY: Scope.Key<SidebarStore> = keyOf()
     }
 }
-
-/**
- * Main component inside the [Page] component.
- */
-public class PageMain internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLElement>,
-    TextElement("main", id = id, baseClass = classes(ComponentType.PageMain, baseClass), job, Scope()) {
-
-    init {
-        markAs(ComponentType.PageMain)
-        attr("role", "main")
-        attr("tabindex", "-1")
-    }
-}
-
-/**
- * Page group component.
- */
-public class PageGroup internal constructor(sticky: Sticky?, id: String?, baseClass: String?, job: Job) :
-    Div(
-        id = id,
-        baseClass = classes {
-            +"page".component("main-group")
-            +sticky?.modifier
-            +baseClass
-        },
-        job,
-        scope = Scope()
-    )
-
-/**
- * Page section component.
- */
-public class PageSection internal constructor(
-    sticky: Sticky?,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : TextElement("section", id = id, baseClass = classes(sticky?.modifier, baseClass), job, Scope())

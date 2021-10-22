@@ -25,6 +25,12 @@ public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
 
+internal class SubComponent<T>(
+    val baseClass: String? = null,
+    val id: String? = null,
+    val context: T.() -> Unit = {}
+)
+
 /**
  * Marker interface implemented by all PatternFly components.
  */

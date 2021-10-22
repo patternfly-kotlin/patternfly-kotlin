@@ -148,11 +148,11 @@ public class Alert internal constructor(private var severity: Severity, title: S
     WithElement<Div, HTMLDivElement> by ElementMixin(),
     WithEvents<HTMLDivElement> by EventMixin(),
     WithTitle<H, HTMLHeadingElement> by TitleMixin(),
-    WithContent<Div, HTMLDivElement> by ContentMixin(),
     WithClosable<HTMLButtonElement> by ClosableMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var inline: Boolean = false
+    private var content: SubComponent<RenderContext>? = null
     private val actions: MutableList<AlertAction> = mutableListOf()
     private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
@@ -172,6 +172,14 @@ public class Alert internal constructor(private var severity: Severity, title: S
 
     public fun inline(inline: Boolean) {
         this.inline = inline
+    }
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit = {}
+    ) {
+        this.content = SubComponent(baseClass, id, context)
     }
 
     /**
@@ -235,8 +243,11 @@ public class Alert internal constructor(private var severity: Severity, title: S
                     }
                 }
                 content?.let { cnt ->
-                    div(baseClass = "alert".component("description")) {
-                        cnt(this)
+                    div(
+                        baseClass = classes("alert".component("description"), cnt.baseClass),
+                        id = cnt.id
+                    ) {
+                        cnt.context(this)
                     }
                 }
                 if (actions.isNotEmpty()) {

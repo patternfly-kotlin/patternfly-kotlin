@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Dl
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
@@ -8,7 +7,6 @@ import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLDListElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ factory
@@ -151,8 +149,14 @@ public class Accordion internal constructor(
                 attr("hidden", item.expanded.data.map { !it })
                 classMap(item.expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
                 item.content?.let { cnt ->
-                    div(baseClass = "accordion".component("expanded", "content", "body")) {
-                        cnt(this)
+                    div(
+                        baseClass = classes(
+                            "accordion".component("expanded", "content", "body"),
+                            cnt.baseClass
+                        ),
+                        id = cnt.id
+                    ) {
+                        cnt.context(this)
                     }
                 }
             }
@@ -169,11 +173,19 @@ public class Accordion internal constructor(
  */
 public class AccordionItem :
     Expandable by ExpandedMixin(),
-    WithTitle<Span, HTMLSpanElement> by TitleMixin(),
-    WithContent<Div, HTMLDivElement> by ContentMixin() {
+    WithTitle<Span, HTMLSpanElement> by TitleMixin() {
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal var initiallyExpanded: Boolean = false
+    internal var content: SubComponent<RenderContext>? = null
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit = {}
+    ) {
+        this.content = SubComponent(baseClass, id, context)
+    }
 
     /**
      * Whether the item is initially expanded
