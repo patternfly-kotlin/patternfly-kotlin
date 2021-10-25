@@ -2,12 +2,12 @@ package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
+import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
@@ -279,10 +279,10 @@ public typealias FetchItems<T> = suspend (TreeItem<T>) -> List<TreeItem<T>>
 public typealias TreeIconProvider<T> = (T) -> TreeIcon
 
 public sealed class TreeIcon
-public class SingleIcon(public val icon: RenderContext.() -> Tag<HTMLElement>) : TreeIcon()
+public class SingleIcon(public val icon: RenderContext.() -> Unit) : TreeIcon()
 public class DoubleIcon(
-    public val collapsed: RenderContext.() -> Tag<HTMLElement>,
-    public val expanded: RenderContext.() -> Tag<HTMLElement>
+    public val collapsed: RenderContext.() -> TextElement,
+    public val expanded: RenderContext.() -> TextElement
 ) : TreeIcon()
 
 // ------------------------------------------------------ store

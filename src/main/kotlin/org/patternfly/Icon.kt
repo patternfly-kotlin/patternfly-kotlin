@@ -23,9 +23,8 @@ public fun RenderContext.icon(
     baseClass: String? = null,
     id: String? = null,
     build: Icon.() -> Unit = {}
-) {
-    Icon(iconClass).apply(build).render(this, baseClass, id)
-}
+): TextElement = Icon(iconClass).apply(build).render(this, baseClass, id)
+
 
 // ------------------------------------------------------ component
 
@@ -39,7 +38,7 @@ public fun RenderContext.icon(
  * @sample org.patternfly.sample.IconSample.icons
  */
 public class Icon internal constructor(iconClass: String) :
-    PatternFlyComponent<Unit>,
+    PatternFlyComponent<TextElement>,
     WithAria by AriaMixin(),
     WithElement<TextElement, HTMLElement> by ElementMixin(),
     WithEvents<HTMLElement> by EventMixin() {
@@ -60,8 +59,8 @@ public class Icon internal constructor(iconClass: String) :
         this.classes = iconClass
     }
 
-    override fun render(context: RenderContext, baseClass: String?, id: String?) {
-        with(context) {
+    override fun render(context: RenderContext, baseClass: String?, id: String?): TextElement {
+        return with(context) {
             i(
                 baseClass = classes {
                     +ComponentType.Icon
