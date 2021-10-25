@@ -29,6 +29,75 @@ public fun RenderContext.page(
     Page().apply(build).render(this, baseClass, id)
 }
 
+public fun RenderContext.pageGroup(
+    baseClass: String? = null,
+    id: String? = null,
+    build: RenderContext.() -> Unit = {}
+) {
+    div(baseClass = classes("page".component("main-group"), baseClass), id = id) {
+        build(this)
+    }
+}
+
+public fun RenderContext.pageSection(
+    limitWidth: Boolean = false,
+    baseClass: String? = null,
+    id: String? = null,
+    build: RenderContext.() -> Unit = {}
+) {
+    genericPageSection(
+        limitWidth = limitWidth,
+        baseClass = classes("page".component("main-section"), baseClass),
+        id = id,
+        build = build
+    )
+}
+
+public fun RenderContext.pageNav(
+    limitWidth: Boolean = false,
+    baseClass: String? = null,
+    id: String? = null,
+    build: RenderContext.() -> Unit = {}
+) {
+    genericPageSection(
+        limitWidth = limitWidth,
+        baseClass = classes("page".component("main-nav"), baseClass),
+        id = id,
+        build = build
+    )
+}
+
+public fun RenderContext.pageBreadcrumb(
+    limitWidth: Boolean = false,
+    baseClass: String? = null,
+    id: String? = null,
+    build: RenderContext.() -> Unit = {}
+) {
+    genericPageSection(
+        limitWidth = limitWidth,
+        baseClass = classes("page".component("main-breadcrumb"), baseClass),
+        id = id,
+        build = build
+    )
+}
+
+internal fun RenderContext.genericPageSection(
+    limitWidth: Boolean,
+    baseClass: String?,
+    id: String?,
+    build: RenderContext.() -> Unit
+) {
+    section(baseClass = baseClass, id = id) {
+        if (limitWidth) {
+            div(baseClass = "page".component("main-body")) {
+                build(this)
+            }
+        } else {
+            build(this)
+        }
+    }
+}
+
 // ------------------------------------------------------ component
 
 /**
@@ -183,6 +252,8 @@ public class Page :
         }
     }
 }
+
+// ------------------------------------------------------ store
 
 internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 

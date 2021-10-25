@@ -5,7 +5,11 @@ import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import org.patternfly.ItemsStore
 import org.patternfly.dom.Id
+import org.patternfly.modifier
 import org.patternfly.page
+import org.patternfly.pageGroup
+import org.patternfly.pageNav
+import org.patternfly.pageSection
 
 internal interface PageSample {
 
@@ -17,16 +21,27 @@ internal interface PageSample {
             page {
                 masthead {
                     toggle()
-                    brand {
+                    brand("#") {
+                        src("/assets/logo.svg")
                     }
                     content {
+                        // TODO
+                        //  horizontalNavigation
+                        //  toolbar
                     }
                 }
                 sidebar {
-
+                    // TODO verticalNavigation
                 }
                 main {
+                    pageGroup(baseClass = "sticky-top".modifier()) {
+                        pageNav {
 
+                        }
+                    }
+                    pageSection {
+
+                    }
                 }
 
 //                pageHeader {
