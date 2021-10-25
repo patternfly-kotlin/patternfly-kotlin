@@ -257,7 +257,7 @@ public class Page :
 
 internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 
-internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = false, expanded = true)) {
+internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = true, expanded = true)) {
 
     val visible: Handler<Boolean> = handle { status, visible ->
         status.copy(visible = visible)
