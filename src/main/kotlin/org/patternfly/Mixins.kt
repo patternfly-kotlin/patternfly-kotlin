@@ -58,32 +58,6 @@ internal class TitleMixin<E : WithText<N>, N : Node> : WithTitle<E, N> {
     }
 }
 
-public interface WithContent<E : WithText<N>, N : Node> {
-    public var content: (E.() -> Unit)?
-
-    public fun content(content: String)
-
-    public fun content(content: Flow<String>)
-
-    public fun content(content: E.() -> Unit)
-}
-
-internal class ContentMixin<E : WithText<N>, N : Node> : WithContent<E, N> {
-    override var content: (E.() -> Unit)? = null
-
-    override fun content(content: String) {
-        content { +content }
-    }
-
-    override fun content(content: Flow<String>) {
-        content { content.asText() }
-    }
-
-    override fun content(content: E.() -> Unit) {
-        this.content = content
-    }
-}
-
 public interface WithElement<T : Tag<E>, E : HTMLElement> {
     public var element: T.() -> Unit
 

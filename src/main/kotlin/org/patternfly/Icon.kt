@@ -25,7 +25,6 @@ public fun RenderContext.icon(
     build: Icon.() -> Unit = {}
 ): TextElement = Icon(iconClass).apply(build).render(this, baseClass, id)
 
-
 // ------------------------------------------------------ component
 
 /**

@@ -4,11 +4,9 @@ import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.keyOf
+import dev.fritz2.dom.html.ScopeContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.primary
-import org.patternfly.SidebarStore.Companion.SIDEBAR_STORE_KEY
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLDivElement
 
@@ -49,6 +47,7 @@ public fun RenderContext.pageSection(
         limitWidth = limitWidth,
         baseClass = classes("page".component("main-section"), baseClass),
         id = id,
+        scope = {},
         build = build
     )
 }
@@ -61,8 +60,26 @@ public fun RenderContext.pageNav(
 ) {
     genericPageSection(
         limitWidth = limitWidth,
-        baseClass = classes("page".component("main-nav"), baseClass),
+        baseClass = classes("page".component("main", "nav"), baseClass),
         id = id,
+        scope = {},
+        build = build
+    )
+}
+
+public fun RenderContext.pageSubNav(
+    limitWidth: Boolean = false,
+    baseClass: String? = null,
+    id: String? = null,
+    build: RenderContext.() -> Unit = {}
+) {
+    genericPageSection(
+        limitWidth = limitWidth,
+        baseClass = classes("page".component("main", "subnav"), baseClass),
+        id = id,
+        scope = {
+            set(Scopes.PAGE_SUBNAV, true)
+        },
         build = build
     )
 }
@@ -75,8 +92,9 @@ public fun RenderContext.pageBreadcrumb(
 ) {
     genericPageSection(
         limitWidth = limitWidth,
-        baseClass = classes("page".component("main-breadcrumb"), baseClass),
+        baseClass = classes("page".component("main", "breadcrumb"), baseClass),
         id = id,
+        scope = {},
         build = build
     )
 }
@@ -85,9 +103,10 @@ internal fun RenderContext.genericPageSection(
     limitWidth: Boolean,
     baseClass: String?,
     id: String?,
+    scope: (ScopeContext.() -> Unit),
     build: RenderContext.() -> Unit
 ) {
-    section(baseClass = baseClass, id = id) {
+    section(baseClass = baseClass, id = id, scope = scope) {
         if (limitWidth) {
             div(baseClass = "page".component("main-body")) {
                 build(this)
@@ -196,10 +215,7 @@ public class Page :
         with(context) {
             div(
                 baseClass = classes(ComponentType.Page, baseClass),
-                id = id,
-                scope = {
-                    set(SIDEBAR_STORE_KEY, sidebarStore)
-                }
+                id = id
             ) {
                 markAs(ComponentType.Page)
                 aria(this)
@@ -219,9 +235,14 @@ public class Page :
 
                 sidebar?.let { component ->
                     div(
-                        baseClass = classes("page".component("sidebar"), component.baseClass),
-                        id = component.id
+                        baseClass = classes(ComponentType.Sidebar, component.baseClass),
+                        id = component.id,
+                        scope = {
+                            set(Scopes.SIDEBAR, true)
+                            set(Scopes.SIDEBAR_STORE, sidebarStore)
+                        }
                     ) {
+                        markAs(ComponentType.Sidebar)
                         attr("hidden", sidebarStore.data.map { !it.visible })
                         classMap(
                             sidebarStore.data.map {
@@ -258,14 +279,5 @@ public class Page :
 internal data class SidebarStatus(val visible: Boolean, val expanded: Boolean)
 
 internal class SidebarStore : RootStore<SidebarStatus>(SidebarStatus(visible = true, expanded = true)) {
-
-    val visible: Handler<Boolean> = handle { status, visible ->
-        status.copy(visible = visible)
-    }
-
     val toggle: Handler<Unit> = handle { it.copy(expanded = !it.expanded) }
-
-    companion object {
-        val SIDEBAR_STORE_KEY: Scope.Key<SidebarStore> = keyOf()
-    }
 }

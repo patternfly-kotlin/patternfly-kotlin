@@ -6,8 +6,6 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.keyOf
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
@@ -71,7 +69,7 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
                 },
                 id = id,
                 scope = {
-                    set(ALERT_GROUP_KEY, true)
+                    set(Scopes.ALERT_GROUP, true)
                 }
             ) {
                 markAs(ComponentType.AlertGroup)
@@ -81,10 +79,6 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
     }
 
     internal abstract fun renderAlerts(context: RenderContext)
-
-    internal companion object {
-        val ALERT_GROUP_KEY: Scope.Key<Boolean> = keyOf(ComponentType.AlertGroup.id)
-    }
 }
 
 /**
@@ -266,7 +260,7 @@ public class Alert internal constructor(private var severity: Severity, title: S
 
     private fun removeFromParent(event: Event) {
         (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
-        if (root.scope.contains(BaseAlertGroup.ALERT_GROUP_KEY)) {
+        if (root.scope.contains(Scopes.ALERT_GROUP)) {
             root.domNode.parentElement.removeFromParent()
         } else {
             root.domNode.removeFromParent()

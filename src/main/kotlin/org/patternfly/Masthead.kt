@@ -43,12 +43,15 @@ public class Masthead : PatternFlyComponent<Unit> {
         with(context) {
             header(
                 baseClass = classes(ComponentType.Masthead, baseClass),
-                id = id
+                id = id,
+                scope = {
+                    set(Scopes.MASTHEAD, true)
+                }
             ) {
                 markAs(ComponentType.Masthead)
                 if (this@Masthead.toggle) {
                     div(baseClass = "masthead".component("toggle")) {
-                        scope[SidebarStore.SIDEBAR_STORE_KEY]?.let { sidebarStore ->
+                        scope[Scopes.SIDEBAR_STORE]?.let { sidebarStore ->
                             clickButton(plain) {
                                 aria["label"] = "Global navigation"
                                 aria["expanded"] = sidebarStore.data.map { it.expanded.toString() }

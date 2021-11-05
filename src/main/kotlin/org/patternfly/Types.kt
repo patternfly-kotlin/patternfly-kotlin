@@ -199,7 +199,7 @@ public enum class Level(public val level: Int, public val size: Size) {
 }
 
 /**
- * Flag used for [Navigation] component.
+ * Flag used for various components.
  */
 public enum class Orientation {
     HORIZONTAL, VERTICAL
