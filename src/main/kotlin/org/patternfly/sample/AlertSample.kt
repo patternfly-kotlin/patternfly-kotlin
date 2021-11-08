@@ -3,13 +3,13 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.Notification
 import org.patternfly.Severity.DANGER
 import org.patternfly.Severity.INFO
 import org.patternfly.Severity.SUCCESS
 import org.patternfly.Severity.WARNING
 import org.patternfly.alert
 import org.patternfly.alertGroup
+import org.patternfly.notification
 
 internal interface AlertSample {
 
@@ -44,12 +44,17 @@ internal interface AlertSample {
         render {
             alert(INFO, "Alert title") {
                 action("View details") {
-                    clicks handledBy Notification.info("Here are the details...")
+                    clicks handledBy notification(INFO, "Here are the details...")
                 }
-                action({
-                    +"Ignore"
-                    className("your-css-class")
-                }, { clicks handledBy Notification.warning("Are you sure?") })
+                action(
+                    {
+                        +"Ignore"
+                        className("your-css-class")
+                    },
+                    {
+                        clicks handledBy notification(WARNING, "Are you sure?")
+                    }
+                )
             }
         }
     }

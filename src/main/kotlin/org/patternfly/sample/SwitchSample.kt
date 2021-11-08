@@ -2,7 +2,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import dev.fritz2.dom.states
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.notification
 import org.patternfly.switch
 
@@ -24,8 +24,7 @@ internal interface SwitchSample {
             switch {
                 label("Message when on")
                 labelOff("Message when off")
-                input.changes.states() handledBy notification {
-                    severity(Severity.INFO)
+                input.changes.states() handledBy notification(INFO) {
                     title("Switch is ${if (it) "" else "not"} checked")
                 }
             }

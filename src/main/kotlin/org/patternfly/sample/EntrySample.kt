@@ -2,7 +2,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.DropdownStore
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.dropdown
 import org.patternfly.fas
 import org.patternfly.icon
@@ -44,8 +44,7 @@ internal interface EntrySample {
     fun unwrap() {
         render {
             dropdown<String> {
-                store.clicked.unwrap() handledBy notification { item ->
-                    severity(Severity.INFO)
+                store.clicked.unwrap() handledBy notification(INFO) { item ->
                     title("You clicked on $item")
                 }
                 textToggle { +"Text" }

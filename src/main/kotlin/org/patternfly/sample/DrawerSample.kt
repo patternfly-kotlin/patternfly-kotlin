@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.patternfly.ItemsStore
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.dataList
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
@@ -58,8 +58,7 @@ internal interface DrawerSample {
     fun expanded() {
         render {
             drawer {
-                expanded.data handledBy notification { expanded ->
-                    severity(Severity.INFO)
+                expanded.data handledBy notification(INFO) { expanded ->
                     title("Expanded state of drawer: $expanded.")
                 }
                 drawerContent {

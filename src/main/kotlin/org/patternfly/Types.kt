@@ -206,7 +206,7 @@ public enum class Orientation {
 }
 
 /**
- * Enum for the level in [Alert]s and [Notification]s.
+ * Enum for the level in [Alert]s and [NotificationAlert]s.
  */
 public enum class Severity(
     public val modifier: String?,

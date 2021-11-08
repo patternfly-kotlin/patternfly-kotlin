@@ -4,18 +4,22 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import dev.fritz2.routing.router
+import org.patternfly.NavigationGroup
+import org.patternfly.NavigationItem
+import org.patternfly.NavigationStore
+import org.patternfly.Severity.INFO
 import org.patternfly.navigation
+import org.patternfly.notification
 import org.patternfly.page
 import org.patternfly.pageSubNav
 
-internal interface NavigationSample {
+internal class NavigationSample {
 
     fun horizontal() {
-        val router = router("home")
         render {
             page {
                 masthead {
-                    navigation(router) {
+                    navigation(router("home")) {
                         item("get-started", "Get Started")
                         item("get-in-touch", "Get in Touch")
                     }
@@ -25,12 +29,11 @@ internal interface NavigationSample {
     }
 
     fun horizontalSubNav() {
-        val router = router("home")
         render {
             page {
                 main {
                     pageSubNav {
-                        navigation(router) {
+                        navigation(router("home")) {
                             item("get-started", "Get Started")
                             item("get-in-touch", "Get in Touch")
                         }
@@ -41,11 +44,10 @@ internal interface NavigationSample {
     }
 
     fun vertical() {
-        val router = router("home")
         render {
             page {
                 sidebar {
-                    navigation(router, expandable = true) {
+                    navigation(router("home"), expandable = true) {
                         item("get-started", "Get Started")
                         item("get-in-touch", "Get in Touch")
                         group("Components") {
@@ -55,6 +57,29 @@ internal interface NavigationSample {
                             item("demo", "Some demo")
                         }
                     }
+                }
+            }
+        }
+    }
+
+    fun store() {
+        render {
+            navigation(
+                router("home"),
+                NavigationStore(
+                    listOf(
+                        NavigationItem("get-started", "Get Started"),
+                        NavigationItem("get-in-touch", "Get in Touch"),
+                        NavigationGroup(
+                            "Components", listOf(
+                                NavigationItem("component", "Some component")
+                            )
+                        )
+                    )
+                )
+            ) {
+                store.clicks handledBy notification(INFO) { item ->
+                    title("Clicked on ${item.title}, going to ${item.route}")
                 }
             }
         }

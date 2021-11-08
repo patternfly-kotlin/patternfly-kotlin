@@ -2,8 +2,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.ChipGroupStore
-import org.patternfly.Notification
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.chip
 import org.patternfly.chipGroup
 import org.patternfly.chips
@@ -79,7 +78,7 @@ internal interface ChipGroupSample {
             chipGroup<String>(closable = true) {
                 +"Close me"
                 chips("Foo", "Bar")
-                closes handledBy Notification.info("You did it!")
+                closes handledBy notification(INFO, "You did it!")
             }
         }
     }
@@ -89,8 +88,7 @@ internal interface ChipGroupSample {
             chipGroup<String> {
                 +"Remove one"
                 chips("Foo", "Bar")
-                store.removes handledBy notification { chip ->
-                    severity(Severity.INFO)
+                store.removes handledBy notification(INFO) { chip ->
                     title("You removed $chip.")
                 }
             }

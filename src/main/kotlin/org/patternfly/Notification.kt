@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
@@ -22,6 +23,7 @@ import org.patternfly.dom.Id
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLHeadingElement
 import kotlin.js.Date
 
 // ------------------------------------------------------ factory
@@ -29,30 +31,8 @@ import kotlin.js.Date
 public fun <T> notification(
     severity: Severity = Severity.INFO,
     title: String = "",
-    baseClass: String? = null,
-    build: Alert.(T) -> Unit
-): Handler<T> {
-    return NotificationStore.addInternal(severity, title, baseClass, build)
-}
-
-public object Notification {
-    public fun default(title: String, content: String? = null): Handler<Unit> = toast(Severity.DEFAULT, title, content)
-
-    public fun error(title: String, content: String? = null): Handler<Unit> = toast(Severity.DANGER, title, content)
-
-    public fun info(title: String, content: String? = null): Handler<Unit> = toast(Severity.INFO, title, content)
-
-    public fun success(title: String, content: String? = null): Handler<Unit> = toast(Severity.SUCCESS, title, content)
-
-    public fun warning(title: String, content: String? = null): Handler<Unit> = toast(Severity.WARNING, title, content)
-
-    private fun toast(severity: Severity, title: String, content: String? = null): Handler<Unit> =
-        NotificationStore.addInternal(severity, title, baseClass = null) {
-            severity(severity)
-            title(title)
-            content?.let { content(it) }
-        }
-}
+    build: NotificationAlert.(T) -> Unit = {}
+): Handler<T> = NotificationStore.addInternal(severity, title, build)
 
 public fun RenderContext.notificationBadge(
     baseClass: String? = null,
@@ -71,18 +51,21 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
     override fun renderAlerts(context: RenderContext) {
         with(context) {
             (MainScope() + job).launch {
-                NotificationStore.latest.collect { alertBuilder ->
+                NotificationStore.latest.collect { notificationAlert ->
                     val alertId = Id.unique("alert")
                     val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())
                     with(li) {
                         alert(
-                            severity = alertBuilder.severity,
-                            title = alertBuilder.title,
-                            baseClass = alertBuilder.baseClass,
+                            severity = notificationAlert.severity,
                             id = alertId
                         ) {
-                            alertBuilder.build(this)
-                            // always apply these settings (might override toastContext.build)
+                            severity(notificationAlert.severity)
+                            title(notificationAlert.title)
+                            notificationAlert.content?.let {
+                                content {
+                                    it.context(this)
+                                }
+                            }
                             closable(true)
                             element {
                                 with(domNode) {
@@ -114,7 +97,7 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
  *
  * The notification badge is intended to be used with the notification drawer as a visible indicator to alert the user about incoming notifications.
  *
- * The notification badge is typically part of the [pageHeaderTools].
+ * The notification badge is typically part of the content area inside [Page.masthead].
  */
 public class NotificationBadge : PatternFlyComponent<Unit> {
 
@@ -166,11 +149,11 @@ public class NotificationBadge : PatternFlyComponent<Unit> {
 
 internal val NOTIFICATION_ALERT_GROUP_ID = Id.unique("notification", ComponentType.AlertGroup.id)
 
-internal object NotificationStore : RootStore<List<NotificationAlertBuilder>>(listOf()) {
+internal object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
 
     private var toastAlertGroupPresent: Boolean = false
 
-    val latest: Flow<NotificationAlertBuilder> = data
+    val latest: Flow<NotificationAlert> = data
         .map {
             it.maxByOrNull { n -> n.timestamp }
         }
@@ -183,12 +166,7 @@ internal object NotificationStore : RootStore<List<NotificationAlertBuilder>>(li
 
     val clear: Handler<Unit> = handle { listOf() }
 
-    fun <T> addInternal(
-        severity: Severity,
-        title: String,
-        baseClass: String?,
-        build: Alert.(T) -> Unit
-    ): Handler<T> {
+    fun <T> addInternal(severity: Severity, title: String, build: NotificationAlert.(T) -> Unit): Handler<T> {
         if (!toastAlertGroupPresent) {
             if (document.querySelector(By.id(NOTIFICATION_ALERT_GROUP_ID)) == null) {
                 render(override = false) {
@@ -199,19 +177,33 @@ internal object NotificationStore : RootStore<List<NotificationAlertBuilder>>(li
         }
 
         return handle { items, payload ->
-            items + NotificationAlertBuilder(severity, title, baseClass) {
+            items + NotificationAlert(severity, title).apply {
                 build(this, payload)
             }
         }
     }
 }
 
-internal class NotificationAlertBuilder(
-    val severity: Severity,
-    val title: String,
-    val baseClass: String?,
-    val build: Alert.() -> Unit
-) {
-    val read: Boolean = false
-    val timestamp: Long = Date.now().toLong()
+public class NotificationAlert(internal var severity: Severity, title: String) :
+    WithTitle<H, HTMLHeadingElement> by TitleMixin() {
+
+    internal val read: Boolean = false
+    internal val timestamp: Long = Date.now().toLong()
+    internal var content: SubComponent<RenderContext>? = null
+
+    init {
+        this.title(title)
+    }
+
+    public fun severity(severity: Severity) {
+        this.severity = severity
+    }
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit = {}
+    ) {
+        this.content = SubComponent(baseClass, id, context)
+    }
 }

@@ -4,12 +4,13 @@ import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.IconPosition
-import org.patternfly.Notification
+import org.patternfly.Severity.INFO
 import org.patternfly.buttonIcon
 import org.patternfly.clickButton
 import org.patternfly.fas
 import org.patternfly.icon
 import org.patternfly.linkButton
+import org.patternfly.notification
 import org.patternfly.pushButton
 import org.patternfly.util
 
@@ -35,7 +36,7 @@ internal interface ButtonSample {
             div {
                 clickButton(primary) {
                     +"Click me"
-                } handledBy Notification.info("Score!")
+                } handledBy notification(INFO, "Score!")
             }
         }
     }

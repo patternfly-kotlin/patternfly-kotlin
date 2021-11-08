@@ -3,7 +3,7 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.breadcrumb
 import org.patternfly.item
 import org.patternfly.items
@@ -15,8 +15,7 @@ internal interface BreadcrumbSample {
     fun breadcrumb() {
         render {
             breadcrumb<String> {
-                store.singleSelection handledBy notification { item ->
-                    severity(Severity.INFO)
+                store.singleSelection handledBy notification(INFO) { item ->
                     title("You are here: ${item.unwrap()}")
                 }
                 items {

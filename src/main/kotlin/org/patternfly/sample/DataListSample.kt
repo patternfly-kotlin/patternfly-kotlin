@@ -6,7 +6,8 @@ import dev.fritz2.dom.html.render
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.ButtonVariation.secondary
 import org.patternfly.ItemsStore
-import org.patternfly.Severity
+import org.patternfly.Severity.DEFAULT
+import org.patternfly.Severity.INFO
 import org.patternfly.dataList
 import org.patternfly.dataListAction
 import org.patternfly.dataListCell
@@ -66,8 +67,7 @@ internal interface DataListSample {
             dataList<String> {
                 display { item ->
                     dataListItem(item) {
-                        expanded.data handledBy notification { expanded ->
-                            severity(Severity.INFO)
+                        expanded.data handledBy notification(INFO) { expanded ->
                             title("Expanded state of $item: $expanded.")
                         }
                         dataListRow {
@@ -88,8 +88,7 @@ internal interface DataListSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemsStore<Demo> { it.id }
-            store.selection handledBy notification { selection ->
-                severity(Severity.DEFAULT)
+            store.selection handledBy notification(DEFAULT) { selection ->
                 title("Selection: $selection.")
             }
 

@@ -6,7 +6,7 @@ import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemsStore
-import org.patternfly.Severity
+import org.patternfly.Severity.DEFAULT
 import org.patternfly.SortInfo
 import org.patternfly.dataTable
 import org.patternfly.dataTableActionColumn
@@ -98,8 +98,7 @@ internal interface DataTableSample {
             data class Demo(val id: String, val name: String)
 
             val store = ItemsStore<Demo> { it.id }
-            store.selection handledBy notification { selection ->
-                severity(Severity.DEFAULT)
+            store.selection handledBy notification(DEFAULT) { selection ->
                 title("Selection: $selection.")
             }
 

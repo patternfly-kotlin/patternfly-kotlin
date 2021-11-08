@@ -4,7 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
-import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.card
 import org.patternfly.cardAction
 import org.patternfly.cardBody
@@ -98,8 +98,7 @@ internal interface CardSample {
     fun expandable() {
         render {
             card {
-                expanded.data handledBy notification { expanded ->
-                    severity(Severity.INFO)
+                expanded.data handledBy notification(INFO) { expanded ->
                     title("Expanded state of card: $expanded.")
                 }
                 cardHeader {

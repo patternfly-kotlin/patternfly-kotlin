@@ -1,8 +1,9 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.Notification
+import org.patternfly.Severity.INFO
 import org.patternfly.chip
+import org.patternfly.notification
 
 internal interface ChipSample {
 
@@ -19,7 +20,7 @@ internal interface ChipSample {
                     count(42)
                 }
                 closeButton {
-                    clicks handledBy Notification.info("Bye, bye!")
+                    clicks handledBy notification(INFO,"Bye, bye!")
                 }
             }
         }
