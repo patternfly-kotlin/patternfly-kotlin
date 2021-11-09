@@ -24,7 +24,7 @@ internal interface AccordionSample {
                     content {
                         p { +"Phasellus pretium est a porttitor vehicula." }
                     }
-                    expanded.data handledBy notification(INFO) { expanded ->
+                    expandedStore.data handledBy notification(INFO) { expanded ->
                         +"Expanded: $expanded"
                     }
                 }
@@ -32,6 +32,12 @@ internal interface AccordionSample {
                     +"Item three"
                     content {
                         p { +"Quisque vel commodo urna." }
+                    }
+                    events {
+                        clicks handledBy notification(INFO, "Clicked!")
+                        coexs handledBy notification(INFO) { expanded ->
+                            +"Expanded: $expanded"
+                        }
                     }
                 }
             }

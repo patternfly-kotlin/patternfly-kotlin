@@ -2,17 +2,13 @@ package org.patternfly
 
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
-import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
@@ -139,10 +135,10 @@ internal class StaticAlertBuilder(
 public class Alert internal constructor(private var severity: Severity, title: String) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Div, HTMLDivElement> by ElementMixin(),
-    WithEvents<HTMLDivElement> by EventMixin(),
-    WithTitle<H, HTMLHeadingElement> by TitleMixin(),
-    WithClosable<HTMLButtonElement> by ClosableMixin() {
+    WithClosable by ClosableMixin(),
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var inline: Boolean = false

@@ -1,13 +1,9 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Dl
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
-import org.w3c.dom.HTMLDListElement
-import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ factory
 
@@ -53,8 +49,8 @@ public class Accordion internal constructor(
     private var bordered: Boolean = false
 ) : PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Dl, HTMLDListElement> by ElementMixin(),
-    WithEvents<HTMLDListElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private val items: MutableList<AccordionItem> = mutableListOf()
 
@@ -108,7 +104,7 @@ public class Accordion internal constructor(
                 items.forEach { item ->
                     renderItem(this, item)
                     if (item.initiallyExpanded) {
-                        item.expanded.expand(Unit)
+                        item.expandedStore.expand(Unit)
                         if (singleExpand) {
                             collapseAllBut(item)
                         }
@@ -122,16 +118,17 @@ public class Accordion internal constructor(
         with(context) {
             dt {
                 button(baseClass = "accordion".component("toggle")) {
-                    attr("aria-expanded", item.expanded.data.map { it.toString() })
+                    attr("aria-expanded", item.expandedStore.data.map { it.toString() })
                     classMap(
-                        item.expanded.data.map { expanded ->
+                        item.expandedStore.data.map { expanded ->
                             mapOf("expanded".modifier() to expanded)
                         }
                     )
-                    clicks handledBy item.expanded.toggle
+                    clicks handledBy item.expandedStore.toggle
                     if (singleExpand) {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
                     }
+                    item.events(this)
                     span(baseClass = "accordion".component("toggle", "text")) {
                         item.title.asText()
                     }
@@ -146,8 +143,8 @@ public class Accordion internal constructor(
                     +("fixed".modifier() `when` fixed)
                 }
             ) {
-                attr("hidden", item.expanded.data.map { !it })
-                classMap(item.expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+                attr("hidden", item.expandedStore.data.map { !it })
+                classMap(item.expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
                 item.content?.let { cnt ->
                     div(
                         baseClass = classes(
@@ -164,7 +161,7 @@ public class Accordion internal constructor(
     }
 
     private fun collapseAllBut(item: AccordionItem) {
-        items.filter { it.id != item.id }.forEach { it.expanded.collapse(Unit) }
+        items.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
     }
 }
 
@@ -172,8 +169,9 @@ public class Accordion internal constructor(
  * An item in an [Accordion] component. The item consists of a title and a content.
  */
 public class AccordionItem :
-    Expandable by ExpandedMixin(),
-    WithTitle<Span, HTMLSpanElement> by TitleMixin() {
+    WithExpandedStore by ExpandedStoreMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal var initiallyExpanded: Boolean = false

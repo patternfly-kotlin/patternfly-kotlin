@@ -4,7 +4,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ factory
 
@@ -39,8 +38,8 @@ public fun RenderContext.icon(
 public class Icon internal constructor(iconClass: String) :
     PatternFlyComponent<TextElement>,
     WithAria by AriaMixin(),
-    WithElement<TextElement, HTMLElement> by ElementMixin(),
-    WithEvents<HTMLElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private var classes: Flow<String> = flowOf(iconClass)
 

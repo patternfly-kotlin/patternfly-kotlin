@@ -2,13 +2,11 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.ScopeContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.primary
 import org.patternfly.dom.Id
-import org.w3c.dom.HTMLDivElement
 
 // ------------------------------------------------------ factory
 
@@ -179,8 +177,8 @@ internal fun RenderContext.genericPageSection(
 public class Page :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Div, HTMLDivElement> by ElementMixin(),
-    WithEvents<HTMLDivElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private val sidebarStore: SidebarStore = SidebarStore()
     private var masthead: SubComponent<Masthead>? = null

@@ -2,7 +2,6 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
@@ -23,7 +22,6 @@ import org.patternfly.dom.Id
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLHeadingElement
 import kotlin.js.Date
 
 // ------------------------------------------------------ factory
@@ -149,24 +147,47 @@ public class NotificationBadge : PatternFlyComponent<Unit> {
 
 internal val NOTIFICATION_ALERT_GROUP_ID = Id.unique("notification", ComponentType.AlertGroup.id)
 
-internal object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
+/**
+ * Store for [NotificationAlert]s.
+ */
+public object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
 
     private var toastAlertGroupPresent: Boolean = false
 
-    val latest: Flow<NotificationAlert> = data
+    /**
+     * The latest notification added to this store.
+     */
+    public val latest: Flow<NotificationAlert> = data
         .map {
             it.maxByOrNull { n -> n.timestamp }
         }
         .filterNotNull()
         .distinctUntilChanged()
 
-    val unread: Flow<Boolean> = data.map { it.any { n -> !n.read } }
+    /**
+     * Whether this store has unread notifications.
+     */
+    public val unread: Flow<Boolean> = data.map { it.any { n -> !n.read } }
 
-    val count: Flow<Int> = data.map { it.size }
+    /**
+     * The number of notifications.
+     */
+    public val count: Flow<Int> = data.map { it.size }
 
-    val clear: Handler<Unit> = handle { listOf() }
+    /**
+     * Adds the specified notification to the list of notifications.
+     */
+    public val add: Handler<NotificationAlert> =
+        handle { notifications, notification ->
+            notifications + notification
+        }
 
-    fun <T> addInternal(severity: Severity, title: String, build: NotificationAlert.(T) -> Unit): Handler<T> {
+    /**
+     * Removes all notifications from this store.
+     */
+    public val clear: Handler<Unit> = handle { listOf() }
+
+    internal fun <T> addInternal(severity: Severity, title: String, build: NotificationAlert.(T) -> Unit): Handler<T> {
         if (!toastAlertGroupPresent) {
             if (document.querySelector(By.id(NOTIFICATION_ALERT_GROUP_ID)) == null) {
                 render(override = false) {
@@ -185,7 +206,7 @@ internal object NotificationStore : RootStore<List<NotificationAlert>>(listOf())
 }
 
 public class NotificationAlert(internal var severity: Severity, title: String) :
-    WithTitle<H, HTMLHeadingElement> by TitleMixin() {
+    WithTitle by TitleMixin() {
 
     internal val read: Boolean = false
     internal val timestamp: Long = Date.now().toLong()

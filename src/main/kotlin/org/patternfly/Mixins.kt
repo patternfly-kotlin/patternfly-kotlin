@@ -2,15 +2,14 @@ package org.patternfly
 
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.WithText
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.Node
 
-public interface WithTitle<E : WithText<N>, N : Node> {
+public interface WithTitle {
     public var title: Flow<String>
 
     public fun title(title: String)
@@ -26,7 +25,7 @@ public interface WithTitle<E : WithText<N>, N : Node> {
     public operator fun String.unaryPlus()
 }
 
-internal class TitleMixin<E : WithText<N>, N : Node> : WithTitle<E, N> {
+internal class TitleMixin : WithTitle {
     override var title: Flow<String> = emptyFlow()
 
     override fun title(title: String) {
@@ -58,52 +57,68 @@ internal class TitleMixin<E : WithText<N>, N : Node> : WithTitle<E, N> {
     }
 }
 
-public interface WithElement<T : Tag<E>, E : HTMLElement> {
-    public var element: T.() -> Unit
+public interface WithElement {
+    public var element: Tag<HTMLElement>.() -> Unit
 
-    public fun element(build: T.() -> Unit)
+    public fun element(build: Tag<HTMLElement>.() -> Unit)
 }
 
-internal class ElementMixin<T : Tag<E>, E : HTMLElement> : WithElement<T, E> {
-    override var element: T.() -> Unit = {}
+internal class ElementMixin : WithElement {
+    override var element: Tag<HTMLElement>.() -> Unit = {}
 
-    override fun element(build: T.() -> Unit) {
+    override fun element(build: Tag<HTMLElement>.() -> Unit) {
         this.element = build
     }
 }
 
-public interface WithEvents<T : HTMLElement> {
-    public var events: EventContext<T>.() -> Unit
+internal val EMPTY_EVENT_CONTEXT: EventContext<HTMLElement>.() -> Unit = {}
 
-    public fun events(build: EventContext<T>.() -> Unit)
+public interface WithEvents {
+    public var events: EventContext<HTMLElement>.() -> Unit
+
+    public fun events(build: EventContext<HTMLElement>.() -> Unit)
 }
 
-internal class EventMixin<T : HTMLElement> : WithEvents<T> {
-    override var events: EventContext<T>.() -> Unit = {}
+internal class EventMixin : WithEvents {
+    override var events: EventContext<HTMLElement>.() -> Unit = EMPTY_EVENT_CONTEXT
 
-    override fun events(build: EventContext<T>.() -> Unit) {
+    override fun events(build: EventContext<HTMLElement>.() -> Unit) {
         this.events = build
     }
 }
 
-public interface WithClosable<T : HTMLElement> {
+public interface WithClosable {
     public var closable: Boolean
-    public var closeEvents: (EventContext<T>.() -> Unit)?
+    public var closeEvents: (EventContext<HTMLElement>.() -> Unit)?
 
     public fun closable(closable: Boolean)
 
-    public fun closeButton(events: EventContext<T>.() -> Unit)
+    public fun closeButton(events: EventContext<HTMLElement>.() -> Unit)
 }
 
-internal class ClosableMixin<T : HTMLElement> : WithClosable<T> {
+internal class ClosableMixin : WithClosable {
     override var closable: Boolean = true
-    override var closeEvents: (EventContext<T>.() -> Unit)? = null
+    override var closeEvents: (EventContext<HTMLElement>.() -> Unit)? = null
 
     override fun closable(closable: Boolean) {
         this.closable = closable
     }
 
-    override fun closeButton(events: EventContext<T>.() -> Unit) {
+    override fun closeButton(events: EventContext<HTMLElement>.() -> Unit) {
         this.closeEvents = events
     }
+}
+
+public interface WithExpandedStore {
+
+    public val expandedStore: ExpandedStore
+
+    public val coexs: Flow<Boolean>
+}
+
+public class ExpandedStoreMixin(collapsePredicate: CollapsePredicate? = null) : WithExpandedStore {
+
+    override val expandedStore: ExpandedStore = ExpandedStore(collapsePredicate)
+
+    override val coexs: Flow<Boolean> = expandedStore.data.drop(1)
 }

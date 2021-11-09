@@ -1,11 +1,9 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import org.w3c.dom.HTMLSpanElement
 
 // ------------------------------------------------------ factory
 
@@ -48,8 +46,8 @@ public fun RenderContext.badge(
 public class Badge internal constructor(count: Int, private var min: Int, private var max: Int, read: Boolean) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Span, HTMLSpanElement> by ElementMixin(),
-    WithEvents<HTMLSpanElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private var read: Flow<Boolean> = flowOf(read)
     private var count: Flow<Int> = flowOf(count)

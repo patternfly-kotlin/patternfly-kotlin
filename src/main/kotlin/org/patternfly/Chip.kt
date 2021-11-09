@@ -1,18 +1,13 @@
 package org.patternfly
 
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Span
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.Id
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 
 // TODO Implement overflow and draggable chips
@@ -47,10 +42,10 @@ public fun RenderContext.chip(
 public class Chip :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Div, HTMLDivElement> by ElementMixin(),
-    WithEvents<HTMLDivElement> by EventMixin(),
-    WithTitle<Span, HTMLSpanElement> by TitleMixin(),
-    WithClosable<HTMLButtonElement> by ClosableMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin(),
+    WithClosable by ClosableMixin() {
 
     private var readOnly: Boolean = false
     private var badge: (Badge.() -> Unit)? = null

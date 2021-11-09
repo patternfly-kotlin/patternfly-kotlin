@@ -4,9 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import dev.fritz2.routing.router
-import org.patternfly.NavigationGroup
-import org.patternfly.NavigationItem
-import org.patternfly.NavigationStore
+import org.patternfly.Severity
 import org.patternfly.Severity.INFO
 import org.patternfly.navigation
 import org.patternfly.notification
@@ -21,7 +19,11 @@ internal class NavigationSample {
                 masthead {
                     navigation(router("home")) {
                         item("get-started", "Get Started")
-                        item("get-in-touch", "Get in Touch")
+                        item("get-in-touch", "Get in Touch") {
+                            events {
+                                clicks handledBy notification(INFO, "Custom navigation!")
+                            }
+                        }
                     }
                 }
             }
@@ -57,29 +59,6 @@ internal class NavigationSample {
                             item("demo", "Some demo")
                         }
                     }
-                }
-            }
-        }
-    }
-
-    fun store() {
-        render {
-            navigation(
-                router("home"),
-                NavigationStore(
-                    listOf(
-                        NavigationItem("get-started", "Get Started"),
-                        NavigationItem("get-in-touch", "Get in Touch"),
-                        NavigationGroup(
-                            "Components", listOf(
-                                NavigationItem("component", "Some component")
-                            )
-                        )
-                    )
-                )
-            ) {
-                store.clicks handledBy notification(INFO) { item ->
-                    title("Clicked on ${item.title}, going to ${item.route}")
                 }
             }
         }

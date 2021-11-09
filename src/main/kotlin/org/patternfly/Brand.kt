@@ -1,8 +1,6 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.RenderContext
-import org.w3c.dom.HTMLImageElement
 
 // ------------------------------------------------------ factory
 
@@ -35,8 +33,8 @@ public fun RenderContext.brand(
 public class Brand internal constructor(private var alt: String, private var src: String) :
     PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<Img, HTMLImageElement> by ElementMixin(),
-    WithEvents<HTMLImageElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     public fun alt(alt: String) {
         this.alt = alt

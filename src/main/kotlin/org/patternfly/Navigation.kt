@@ -2,31 +2,25 @@
 
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
-import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.lenses.IdProvider
 import dev.fritz2.routing.Router
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import org.patternfly.NotificationStore.handledBy
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.debug
 import org.patternfly.dom.querySelector
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
@@ -35,7 +29,6 @@ import org.w3c.dom.events.Event
  * Creates an [Navigation] component.
  *
  * @param router the router instance
- * @param store the store used to manage [NavigationEntry]
  * @param expandable whether groups are expandable (only applies to vertical variant)
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
@@ -43,13 +36,12 @@ import org.w3c.dom.events.Event
  */
 public fun <T> RenderContext.navigation(
     router: Router<T>,
-    store: NavigationStore<T> = NavigationStore(),
     expandable: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     build: Navigation<T>.() -> Unit = {}
 ) {
-    Navigation(router, store, expandable).apply(build).render(this, baseClass, id)
+    Navigation(router, expandable).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -71,37 +63,27 @@ public fun <T> RenderContext.navigation(
  * - if added to [Masthead], horizontal navigation will be used
  * - if added to [Page.sidebar], vertical navigation will be used
  *
- * ### Entries
- *
- * The entries of the navigation can be added directly using [item], [group] and [separator] methods or by using a store. See the samples for more details.
- *
  * ### Routing
  *
- * The passed [Router] is used for the actual navigation (updates the location & history).
+ * The passed [Router] is used for navigation (updates the location & history) unless custom events are used for a [NavigationItem].
  *
  * @sample org.patternfly.sample.NavigationSample.horizontal
  * @sample org.patternfly.sample.NavigationSample.horizontalSubNav
  * @sample org.patternfly.sample.NavigationSample.vertical
- * @sample org.patternfly.sample.NavigationSample.store
  */
 @Suppress("TooManyFunctions")
 public class Navigation<T> internal constructor(
     private val router: Router<T>,
-    public val store: NavigationStore<T>,
     private var expandable: Boolean
 ) : PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
-    WithElement<TextElement, HTMLElement> by ElementMixin(),
-    WithEvents<HTMLElement> by EventMixin() {
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private lateinit var root: TextElement
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
     private val entries: MutableList<NavigationEntry<T>> = mutableListOf()
-
-    init {
-        store.handleClicks.map { item -> item.route } handledBy router.navTo
-    }
 
     /**
      * Modifies the [expandable] flag.
@@ -120,8 +102,8 @@ public class Navigation<T> internal constructor(
     /**
      * Adds an item.
      */
-    public fun item(route: T, title: String) {
-        entries.add(NavigationItem(route, title))
+    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
+        entries.add(NavigationItem(route, title).apply(context))
     }
 
     /**
@@ -152,11 +134,14 @@ public class Navigation<T> internal constructor(
                 if (variant != NavigationVariant.SUBNAV) {
                     aria["label"] = "Global"
                 }
+                aria(this)
+                element(this)
+                events(this)
 
                 if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
                     classMap(scrollStore.data.map { mapOf("scrollable".modifier() to (it.showButtons)) })
-                    // update scroll buttons, when navigation entries have been updated
-                    store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
+                    horizontal(this)
+
                     // update scroll buttons, when window has been resized
                     callbackFlow {
                         val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
@@ -165,32 +150,30 @@ public class Navigation<T> internal constructor(
                     }.map {
                         ul.domNode.updateScrollButtons()
                     }.filterNotNull() handledBy scrollStore.update
-                }
 
-                store.data.render { entries ->
-                    if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
-                        horizontal(this, entries)
+                    // initial update of scroll buttons
+                    (MainScope() + job).launch {
+                        delay(Settings.UI_TIMEOUT)
+                        ul.domNode.updateScrollButtons()?.let {
+                            scrollStore.update(it)
+                        }
+                    }
+                } else {
+                    if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
+                        flat(this, false)
                     } else {
-                        if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
-                            flat(this, entries, false)
+                        if (expandable) {
+                            verticalExpandable(this)
                         } else {
-                            if (expandable) {
-                                verticalExpandable(this, entries)
-                            } else {
-                                verticalGrouped(this, entries)
-                            }
+                            verticalGrouped(this)
                         }
                     }
                 }
             }
         }
-
-        if (entries.isNotEmpty()) {
-            store.update(entries)
-        }
     }
 
-    private fun horizontal(context: RenderContext, entries: List<NavigationEntry<T>>) {
+    private fun horizontal(context: RenderContext) {
         with(context) {
             button(baseClass = "nav".component("scroll", "button")) {
                 aria["label"] = "Scroll left"
@@ -199,7 +182,7 @@ public class Navigation<T> internal constructor(
                 domNode.onclick = { ul.domNode.scrollLeft() }
                 icon("angle-left".fas())
             }
-            flat(this, entries, true)
+            flat(this, true)
             button(baseClass = "nav".component("scroll", "button")) {
                 aria["label"] = "Scroll right"
                 disabled(scrollStore.data.map { it.disableRight })
@@ -210,7 +193,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalGrouped(context: RenderContext, entries: List<NavigationEntry<T>>) {
+    private fun verticalGrouped(context: RenderContext) {
         with(context) {
             entries.forEach { entry ->
                 when (entry) {
@@ -219,8 +202,9 @@ public class Navigation<T> internal constructor(
                         section(baseClass = "nav".component("section")) {
                             aria["lebelledby"] = headerId
                             h2("nav".component("section", "title"), headerId) {
-                                +entry.title
+                                entry.title.asText()
                             }
+                            entry.events(this)
                             group(this, entry)
                         }
                     }
@@ -234,7 +218,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalExpandable(context: RenderContext, entries: List<NavigationEntry<T>>) {
+    private fun verticalExpandable(context: RenderContext) {
         with(context) {
             ul(baseClass = "nav".component("list")) {
                 entries.forEach { entry ->
@@ -248,7 +232,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun flat(context: RenderContext, entries: List<NavigationEntry<T>>, scroll: Boolean) {
+    private fun flat(context: RenderContext, scroll: Boolean) {
         with(context) {
             ul = ul(baseClass = "nav".component("list")) {
                 if (scroll) {
@@ -301,9 +285,11 @@ public class Navigation<T> internal constructor(
     private fun expandableGroup(context: RenderContext, group: NavigationGroup<T>) {
         with(context) {
             li(baseClass = classes("nav".component("item"), "expandable".modifier())) {
-                (MainScope() + job).launch {
-                    group.expanded.data.collect { domNode.classList.toggle("expanded".modifier(), it) }
-                }
+                classMap(
+                    group.expandedStore.data.map { expanded ->
+                        mapOf("expanded".modifier() to expanded)
+                    }
+                )
                 (MainScope() + job).launch {
                     router.data.collect {
                         delay(Settings.UI_TIMEOUT) // wait a bit before testing for the current modifier
@@ -314,9 +300,9 @@ public class Navigation<T> internal constructor(
                 }
                 val buttonId = Id.unique(ComponentType.Navigation.id, "eg")
                 button("nav".component("link"), buttonId) {
-                    +group.title
-                    clicks handledBy group.expanded.toggle
-                    aria["expanded"] = group.expanded.data.map { it.toString() }
+                    group.title.asText()
+                    clicks handledBy group.expandedStore.toggle
+                    aria["expanded"] = group.expandedStore.data.map { it.toString() }
                     span("nav".component("toggle")) {
                         span("nav".component("toggle", "icon")) {
                             icon("angle-right".fas())
@@ -325,7 +311,8 @@ public class Navigation<T> internal constructor(
                 }
                 section("nav".component("subnav")) {
                     aria["labelledby"] = buttonId
-                    attr("hidden", group.expanded.data.map { !it })
+                    attr("hidden", group.expandedStore.data.map { !it })
+                    group.events(this)
                     group(this, group)
                 }
             }
@@ -336,7 +323,12 @@ public class Navigation<T> internal constructor(
         with(context) {
             li(baseClass = "nav".component("item")) {
                 a("nav".component("link")) {
-                    clicks.map { item } handledBy store.handleClicks
+                    if (item.events === EMPTY_EVENT_CONTEXT) {
+                        clicks.map { item.route } handledBy router.navTo
+                    } else {
+                        // It's assumed that the user takes care of the navigation herself.
+                        item.events(this)
+                    }
                     classMap(
                         router.data.map { route ->
                             mapOf("current".modifier() to (route == item.route))
@@ -345,7 +337,7 @@ public class Navigation<T> internal constructor(
                     aria["current"] = router.data.map { route ->
                         if (route == item.route) "page" else ""
                     }
-                    +item.title
+                    item.title.asText()
                 }
             }
         }
@@ -377,23 +369,32 @@ public sealed class NavigationEntry<T>
  *
  * Please note that nested groups are *not* supported!
  */
-public class NavigationGroup<T>(public val title: String, initialEntries: List<NavigationEntry<T>> = emptyList()) :
+public class NavigationGroup<T>(title: String, initialEntries: List<NavigationEntry<T>> = emptyList()) :
     NavigationEntry<T>(),
-    Expandable by ExpandedMixin() {
+    WithExpandedStore by ExpandedStoreMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
     internal val id: String = Id.unique(ComponentType.Navigation.id, "grp")
     internal val mutableEntries: MutableList<NavigationEntry<T>> = mutableListOf()
     public val entries: List<NavigationEntry<T>> get() = mutableEntries
 
     init {
-        mutableEntries.addAll(initialEntries)
+        this.title(title)
+        this.mutableEntries.addAll(initialEntries)
     }
 
     /**
      * Adds an item to this group.
      */
-    public fun item(route: T, title: String) {
-        mutableEntries.add(NavigationItem(route, title).apply { group = this@NavigationGroup })
+    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
+        mutableEntries.add(
+            NavigationItem(route, title)
+                .apply(context)
+                .also { item ->
+                    item.group = this
+                }
+        )
     }
 
     /**
@@ -407,40 +408,20 @@ public class NavigationGroup<T>(public val title: String, initialEntries: List<N
 /**
  * A navigation item with a route and a title.
  */
-public class NavigationItem<T>(public val route: T, public val title: String) :
-    NavigationEntry<T>() {
+public class NavigationItem<T>(public val route: T, title: String) :
+    NavigationEntry<T>(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
     internal val id: String = Id.unique(ComponentType.Navigation.id, "itm")
     internal var group: NavigationGroup<T>? = null
+
+    init {
+        this.title(title)
+    }
 }
 
 /**
  * A navigation separator.
  */
 public class NavigationSeparator<T> : NavigationEntry<T>()
-
-// ------------------------------------------------------ store
-
-public class NavigationStore<T>(
-    initialData: List<NavigationEntry<T>> = emptyList(),
-    override val idProvider: IdProvider<T, String> = { Id.build(it.toString()) }
-) : RootStore<List<NavigationEntry<T>>>(initialData), WithIdProvider<T> {
-
-    internal val handleClicks: EmittingHandler<NavigationItem<T>, NavigationItem<T>> =
-        handleAndEmit { entries, item ->
-            entries
-                .map {
-                    when (it) {
-                        is NavigationGroup -> it.entries
-                        is NavigationItem -> listOf(it)
-                        is NavigationSeparator -> emptyList()
-                    }
-                }
-                .flatten()
-                .filterIsInstance<NavigationItem<T>>()
-                .find { idProvider(item.route) == idProvider(it.route) }?.let { emit(it) }
-            entries
-        }
-
-    public val clicks: Flow<NavigationItem<T>> = handleClicks
-}

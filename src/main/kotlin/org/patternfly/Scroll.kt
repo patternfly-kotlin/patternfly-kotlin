@@ -19,7 +19,7 @@ internal fun Element.updateScrollButtons(): ScrollButton? {
     } else null
 }
 
-// find first Element that is fully in view on the left, then scroll to the element before it
+// find first element that is fully in view on the left, then scroll to the element before it
 internal fun Element.scrollLeft() {
     var firstElementInView: HTMLElement? = null
     var lastElementOutOfView: HTMLElement? = null
