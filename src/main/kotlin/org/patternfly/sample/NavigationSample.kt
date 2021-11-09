@@ -4,7 +4,6 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import dev.fritz2.routing.router
-import org.patternfly.Severity
 import org.patternfly.Severity.INFO
 import org.patternfly.navigation
 import org.patternfly.notification
