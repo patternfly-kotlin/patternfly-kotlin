@@ -2,6 +2,7 @@
 
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
@@ -29,6 +30,7 @@ import org.w3c.dom.events.Event
  * Creates an [Navigation] component.
  *
  * @param router the router instance
+ * @param store the store for the [NavigationEntry]
  * @param expandable whether groups are expandable (only applies to vertical variant)
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
@@ -36,12 +38,13 @@ import org.w3c.dom.events.Event
  */
 public fun <T> RenderContext.navigation(
     router: Router<T>,
+    store: NavigationStore<T> = NavigationStore(),
     expandable: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     build: Navigation<T>.() -> Unit = {}
 ) {
-    Navigation(router, expandable).apply(build).render(this, baseClass, id)
+    Navigation(router, store, expandable).apply(build).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -63,6 +66,10 @@ public fun <T> RenderContext.navigation(
  * - if added to [Masthead], horizontal navigation will be used
  * - if added to [Page.sidebar], vertical navigation will be used
  *
+ * ### Entries
+ *
+ * Entries can be added to the navigation using this class or by using a [NavigationStore]. See the samples for more details.
+ *
  * ### Routing
  *
  * The passed [Router] is used for navigation (updates the location & history) unless custom events are used for a [NavigationItem].
@@ -70,12 +77,15 @@ public fun <T> RenderContext.navigation(
  * @sample org.patternfly.sample.NavigationSample.horizontal
  * @sample org.patternfly.sample.NavigationSample.horizontalSubNav
  * @sample org.patternfly.sample.NavigationSample.vertical
+ * @sample org.patternfly.sample.NavigationSample.store
  */
 @Suppress("TooManyFunctions")
 public class Navigation<T> internal constructor(
     private val router: Router<T>,
+    public val store: NavigationStore<T>,
     private var expandable: Boolean
 ) : PatternFlyComponent<Unit>,
+    NavigationEntryScope<T>,
     WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -83,34 +93,13 @@ public class Navigation<T> internal constructor(
     private lateinit var root: TextElement
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
-    private val entries: MutableList<NavigationEntry<T>> = mutableListOf()
+    override val entries: MutableList<NavigationEntry<T>> = mutableListOf()
 
     /**
      * Modifies the [expandable] flag.
      */
     public fun expandable(expandable: Boolean) {
         this.expandable = expandable
-    }
-
-    /**
-     * Adds a group and items;
-     */
-    public fun group(title: String, context: NavigationGroup<T>.() -> Unit) {
-        entries.add(NavigationGroup<T>(title).apply(context))
-    }
-
-    /**
-     * Adds an item.
-     */
-    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
-        entries.add(NavigationItem(route, title).apply(context))
-    }
-
-    /**
-     * Adds a separator.
-     */
-    public fun separator() {
-        entries.add(NavigationSeparator())
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -140,7 +129,6 @@ public class Navigation<T> internal constructor(
 
                 if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
                     classMap(scrollStore.data.map { mapOf("scrollable".modifier() to (it.showButtons)) })
-                    horizontal(this)
 
                     // update scroll buttons, when window has been resized
                     callbackFlow {
@@ -151,29 +139,33 @@ public class Navigation<T> internal constructor(
                         ul.domNode.updateScrollButtons()
                     }.filterNotNull() handledBy scrollStore.update
 
-                    // initial update of scroll buttons
-                    (MainScope() + job).launch {
-                        delay(Settings.UI_TIMEOUT)
-                        ul.domNode.updateScrollButtons()?.let {
-                            scrollStore.update(it)
-                        }
-                    }
-                } else {
-                    if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
-                        flat(this, false)
+                    // update scroll buttons, when navigation entries have been updated
+                    store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
+                }
+
+                store.data.render { entries ->
+                    if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
+                        horizontal(this, entries)
                     } else {
-                        if (expandable) {
-                            verticalExpandable(this)
+                        if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
+                            flat(this, entries, false)
                         } else {
-                            verticalGrouped(this)
+                            if (expandable) {
+                                verticalExpandable(this, entries)
+                            } else {
+                                verticalGrouped(this, entries)
+                            }
                         }
                     }
                 }
             }
         }
+        if (entries.isNotEmpty()) {
+            store.update(entries)
+        }
     }
 
-    private fun horizontal(context: RenderContext) {
+    private fun horizontal(context: RenderContext, entries: List<NavigationEntry<T>>) {
         with(context) {
             button(baseClass = "nav".component("scroll", "button")) {
                 aria["label"] = "Scroll left"
@@ -182,7 +174,7 @@ public class Navigation<T> internal constructor(
                 domNode.onclick = { ul.domNode.scrollLeft() }
                 icon("angle-left".fas())
             }
-            flat(this, true)
+            flat(this, entries, true)
             button(baseClass = "nav".component("scroll", "button")) {
                 aria["label"] = "Scroll right"
                 disabled(scrollStore.data.map { it.disableRight })
@@ -193,7 +185,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalGrouped(context: RenderContext) {
+    private fun verticalGrouped(context: RenderContext, entries: List<NavigationEntry<T>>) {
         with(context) {
             entries.forEach { entry ->
                 when (entry) {
@@ -218,7 +210,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun verticalExpandable(context: RenderContext) {
+    private fun verticalExpandable(context: RenderContext, entries: List<NavigationEntry<T>>) {
         with(context) {
             ul(baseClass = "nav".component("list")) {
                 entries.forEach { entry ->
@@ -232,7 +224,7 @@ public class Navigation<T> internal constructor(
         }
     }
 
-    private fun flat(context: RenderContext, scroll: Boolean) {
+    private fun flat(context: RenderContext, entries: List<NavigationEntry<T>>, scroll: Boolean) {
         with(context) {
             ul = ul(baseClass = "nav".component("list")) {
                 if (scroll) {
@@ -359,6 +351,31 @@ internal enum class NavigationVariant(val modifier: String?) {
 
 // ------------------------------------------------------ navigation entry
 
+public interface NavigationEntryScope<T> {
+    public val entries: MutableList<NavigationEntry<T>>
+
+    /**
+     * Adds a group and items.
+     */
+    public fun group(title: String, context: NavigationGroup<T>.() -> Unit) {
+        entries.add(NavigationGroup<T>(title).apply(context))
+    }
+
+    /**
+     * Adds an item.
+     */
+    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
+        entries.add(NavigationItem(route, title).apply(context))
+    }
+
+    /**
+     * Adds a separator.
+     */
+    public fun separator() {
+        entries.add(NavigationSeparator())
+    }
+}
+
 /**
  * Base class for groups and items.
  */
@@ -369,8 +386,10 @@ public sealed class NavigationEntry<T>
  *
  * Please note that nested groups are *not* supported!
  */
-public class NavigationGroup<T>(title: String, initialEntries: List<NavigationEntry<T>> = emptyList()) :
-    NavigationEntry<T>(),
+public class NavigationGroup<T> internal constructor(
+    title: String,
+    initialEntries: List<NavigationEntry<T>> = emptyList()
+) : NavigationEntry<T>(),
     WithExpandedStore by ExpandedStoreMixin(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
@@ -408,7 +427,7 @@ public class NavigationGroup<T>(title: String, initialEntries: List<NavigationEn
 /**
  * A navigation item with a route and a title.
  */
-public class NavigationItem<T>(public val route: T, title: String) :
+public class NavigationItem<T> internal constructor(public val route: T, title: String) :
     NavigationEntry<T>(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
@@ -424,4 +443,15 @@ public class NavigationItem<T>(public val route: T, title: String) :
 /**
  * A navigation separator.
  */
-public class NavigationSeparator<T> : NavigationEntry<T>()
+public class NavigationSeparator<T> internal constructor() : NavigationEntry<T>()
+
+// ------------------------------------------------------ store
+
+internal class StoreNavigationEntryScope<T>(override val entries: MutableList<NavigationEntry<T>> = mutableListOf()) :
+    NavigationEntryScope<T>
+
+public fun <T> navigationStore(context: NavigationEntryScope<T>.() -> Unit): NavigationStore<T> =
+    NavigationStore(StoreNavigationEntryScope<T>().apply(context).entries)
+
+public class NavigationStore<T> internal constructor(initialData: List<NavigationEntry<T>> = emptyList()) :
+    RootStore<List<NavigationEntry<T>>>(initialData)

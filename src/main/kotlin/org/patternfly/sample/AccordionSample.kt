@@ -5,31 +5,26 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Severity.INFO
 import org.patternfly.accordion
+import org.patternfly.accordionStore
 import org.patternfly.notification
 
-internal interface AccordionSample {
+internal class AccordionSample {
 
     fun accordion() {
         render {
             accordion(singleExpand = true) {
-                item {
-                    +"Item one"
+                item("Item one") {
                     content {
                         p { +"Lorem ipsum dolor sit amet." }
                     }
                 }
-                item {
+                item("Item two") {
                     expanded(true)
-                    +"Item two"
                     content {
                         p { +"Phasellus pretium est a porttitor vehicula." }
                     }
-                    expandedStore.data handledBy notification(INFO) { expanded ->
-                        +"Expanded: $expanded"
-                    }
                 }
-                item {
-                    +"Item three"
+                item("Item three") {
                     content {
                         p { +"Quisque vel commodo urna." }
                     }
@@ -41,6 +36,31 @@ internal interface AccordionSample {
                     }
                 }
             }
+        }
+    }
+
+    fun store() {
+        val store = accordionStore {
+            item("Item one") {
+                content {
+                    p { +"Lorem ipsum dolor sit amet." }
+                }
+            }
+            item("Item two") {
+                expanded(true)
+                content {
+                    p { +"Phasellus pretium est a porttitor vehicula." }
+                }
+            }
+            item("Item three") {
+                content {
+                    p { +"Quisque vel commodo urna." }
+                }
+            }
+        }
+
+        render {
+            accordion(store)
         }
     }
 }
