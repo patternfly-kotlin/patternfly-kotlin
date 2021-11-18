@@ -11,16 +11,16 @@ import dev.fritz2.dom.html.RenderContext
  * @param alt the alternative text of the brand image
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.brand(
     src: String = "",
     alt: String = "",
     baseClass: String? = null,
     id: String? = null,
-    build: Brand.() -> Unit = {}
+    context: Brand.() -> Unit = {}
 ) {
-    Brand(src, alt).apply(build).render(this, baseClass, id)
+    Brand(src, alt).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component

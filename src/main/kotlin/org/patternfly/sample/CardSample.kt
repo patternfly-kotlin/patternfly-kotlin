@@ -15,11 +15,7 @@ import org.patternfly.cardHeader
 import org.patternfly.cardTitle
 import org.patternfly.cardToggle
 import org.patternfly.dropdown
-import org.patternfly.item
-import org.patternfly.items
-import org.patternfly.kebabToggle
 import org.patternfly.notification
-import org.patternfly.separator
 
 internal interface CardSample {
 
@@ -30,15 +26,13 @@ internal interface CardSample {
                     img { src("./logo.svg") }
                     cardAction {
                         dropdown<String>(align = RIGHT) {
-                            kebabToggle()
-                            items {
-                                item("Item 1")
-                                item("Disabled Item") {
-                                    disabled = true
-                                }
-                                separator()
-                                item("Separated Item")
+                            toggle { kebab() }
+                            item("Item 1")
+                            item("Disabled Item") {
+                                disabled(true)
                             }
+                            separator()
+                            item("Separated Item")
                         }
                         cardCheckbox()
                     }
@@ -56,13 +50,13 @@ internal interface CardSample {
                 cardHeader {
                     cardAction {
                         dropdown<String>(align = RIGHT) {
-                            kebabToggle()
-                            items {
-                                item("Item 1")
-                                item("Disabled Item") { disabled = true }
-                                separator()
-                                item("Separated Item")
+                            toggle { kebab() }
+                            item("Item 1")
+                            item("Disabled Item") {
+                                disabled(true)
                             }
+                            separator()
+                            item("Separated Item")
                         }
                     }
                     cardTitle { +"Title" }

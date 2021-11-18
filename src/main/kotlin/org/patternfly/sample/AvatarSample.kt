@@ -3,7 +3,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.avatar
 
-internal interface AvatarSample {
+internal class AvatarSample {
 
     fun avatar() {
         render {

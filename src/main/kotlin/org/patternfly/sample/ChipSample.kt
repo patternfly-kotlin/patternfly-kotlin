@@ -5,7 +5,7 @@ import org.patternfly.Severity.INFO
 import org.patternfly.chip
 import org.patternfly.notification
 
-internal interface ChipSample {
+internal class ChipSample {
 
     fun basicChips() {
         render {

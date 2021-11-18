@@ -21,7 +21,7 @@ import org.patternfly.dataListToggle
 import org.patternfly.notification
 import org.patternfly.pushButton
 
-internal interface DataListSample {
+internal class DataListSample {
 
     fun dataList() {
         render {

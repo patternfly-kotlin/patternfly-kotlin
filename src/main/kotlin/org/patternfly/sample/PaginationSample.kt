@@ -9,7 +9,7 @@ import org.patternfly.toolbarContent
 import org.patternfly.toolbarContentSection
 import org.patternfly.toolbarItem
 
-internal interface PaginationSample {
+internal class PaginationSample {
 
     fun itemStore() {
         render {

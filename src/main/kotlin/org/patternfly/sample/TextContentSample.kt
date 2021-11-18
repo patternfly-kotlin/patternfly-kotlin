@@ -5,7 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.textContent
 
-internal interface TextContentSample {
+internal class TextContentSample {
 
     fun textContent() {
         render {

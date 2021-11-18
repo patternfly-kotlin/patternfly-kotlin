@@ -2,10 +2,10 @@
 
 package org.patternfly.sample
 
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
 import org.patternfly.Severity.INFO
 import org.patternfly.accordion
-import org.patternfly.accordionStore
 import org.patternfly.notification
 
 internal class AccordionSample {
@@ -13,24 +13,27 @@ internal class AccordionSample {
     fun accordion() {
         render {
             accordion(singleExpand = true) {
-                item("Item one") {
+                item {
+                    title("Item one")
                     content {
                         p { +"Lorem ipsum dolor sit amet." }
                     }
                 }
-                item("Item two") {
-                    expanded(true)
+                item {
+                    title("Item two")
                     content {
                         p { +"Phasellus pretium est a porttitor vehicula." }
                     }
+                    expanded(true)
                 }
-                item("Item three") {
+                item {
+                    title("Item three")
                     content {
                         p { +"Quisque vel commodo urna." }
                     }
                     events {
                         clicks handledBy notification(INFO, "Clicked!")
-                        coexs handledBy notification(INFO) { expanded ->
+                        expos handledBy notification(INFO) { expanded ->
                             +"Expanded: $expanded"
                         }
                     }
@@ -40,27 +43,25 @@ internal class AccordionSample {
     }
 
     fun store() {
-        val store = accordionStore {
-            item("Item one") {
-                content {
-                    p { +"Lorem ipsum dolor sit amet." }
-                }
-            }
-            item("Item two") {
-                expanded(true)
-                content {
-                    p { +"Phasellus pretium est a porttitor vehicula." }
-                }
-            }
-            item("Item three") {
-                content {
-                    p { +"Quisque vel commodo urna." }
-                }
-            }
-        }
+        val store = storeOf(
+            listOf(
+                "Item one" to "Lorem ipsum dolor sit amet.",
+                "Item two" to "Phasellus pretium est a porttitor vehicula.",
+                "Item three" to "Quisque vel commodo urna."
+            )
+        )
 
         render {
-            accordion(store)
+            accordion(store) {
+                display { pair ->
+                    item(pair.first) {
+                        expanded(pair.first == "Item two")
+                        content {
+                            p { +pair.second }
+                        }
+                    }
+                }
+            }
         }
     }
 }

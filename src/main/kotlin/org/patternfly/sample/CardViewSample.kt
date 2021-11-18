@@ -11,9 +11,6 @@ import org.patternfly.cardHeader
 import org.patternfly.cardTitle
 import org.patternfly.cardView
 import org.patternfly.dropdown
-import org.patternfly.item
-import org.patternfly.items
-import org.patternfly.kebabToggle
 
 internal interface CardViewSample {
 
@@ -29,11 +26,9 @@ internal interface CardViewSample {
                             cardTitle { +"Demo" }
                             cardAction {
                                 dropdown<String>(align = RIGHT) {
-                                    kebabToggle()
-                                    items {
-                                        item("Edit")
-                                        item("Remove")
-                                    }
+                                    toggle { kebab() }
+                                    item("Edit")
+                                    item("Remove")
                                 }
                                 cardCheckbox()
                             }

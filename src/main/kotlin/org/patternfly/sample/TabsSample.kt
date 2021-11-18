@@ -8,7 +8,7 @@ import org.patternfly.tabs
 import org.patternfly.textContent
 import org.patternfly.updateItems
 
-internal interface TabsSample {
+internal class TabsSample {
 
     fun tabs() {
         render {

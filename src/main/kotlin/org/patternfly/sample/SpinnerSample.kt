@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.render
 import org.patternfly.Size.MD
 import org.patternfly.spinner
 
-internal interface SpinnerSample {
+internal class SpinnerSample {
 
     fun spinner() {
         render {

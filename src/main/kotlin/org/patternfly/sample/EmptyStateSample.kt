@@ -10,7 +10,7 @@ import org.patternfly.emptyStateSecondary
 import org.patternfly.fas
 import org.patternfly.pushButton
 
-internal interface EmptyStateSample {
+internal class EmptyStateSample {
 
     fun emptyState() {
         render {

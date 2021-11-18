@@ -26,18 +26,23 @@ import kotlin.js.Date
 
 // ------------------------------------------------------ factory
 
+/**
+ * Creates a notification.
+ *
+ * @sample org.patternfly.sample.NotificationSample.add
+ */
 public fun <T> notification(
     severity: Severity = Severity.INFO,
     title: String = "",
-    build: NotificationAlert.(T) -> Unit = {}
-): Handler<T> = NotificationStore.addInternal(severity, title, build)
+    context: NotificationAlert.(T) -> Unit = {}
+): Handler<T> = NotificationStore.addInternal(severity, title, context)
 
 public fun RenderContext.notificationBadge(
     baseClass: String? = null,
     id: String? = null,
-    build: NotificationBadge.() -> Unit = {}
+    context: NotificationBadge.() -> Unit = {}
 ) {
-    NotificationBadge().apply(build).render(this, baseClass, id)
+    NotificationBadge().apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -187,7 +192,11 @@ public object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
      */
     public val clear: Handler<Unit> = handle { listOf() }
 
-    internal fun <T> addInternal(severity: Severity, title: String, build: NotificationAlert.(T) -> Unit): Handler<T> {
+    internal fun <T> addInternal(
+        severity: Severity,
+        title: String,
+        context: NotificationAlert.(T) -> Unit
+    ): Handler<T> {
         if (!toastAlertGroupPresent) {
             if (document.querySelector(By.id(NOTIFICATION_ALERT_GROUP_ID)) == null) {
                 render(override = false) {
@@ -199,7 +208,7 @@ public object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
 
         return handle { items, payload ->
             items + NotificationAlert(severity, title).apply {
-                build(this, payload)
+                context(this, payload)
             }
         }
     }

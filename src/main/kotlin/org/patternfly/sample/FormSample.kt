@@ -1,6 +1,6 @@
 package org.patternfly.sample
 
-internal interface FormSample {
+internal class FormSample {
 
     fun form() {
     }

@@ -2,86 +2,115 @@
 
 package org.patternfly.sample
 
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
-import org.patternfly.DropdownStore
 import org.patternfly.Severity.INFO
-import org.patternfly.actionToggle
-import org.patternfly.checkboxToggle
-import org.patternfly.customToggle
 import org.patternfly.dropdown
 import org.patternfly.fas
-import org.patternfly.group
-import org.patternfly.groups
-import org.patternfly.icon
-import org.patternfly.iconToggle
-import org.patternfly.item
-import org.patternfly.items
-import org.patternfly.kebabToggle
 import org.patternfly.notification
-import org.patternfly.separator
-import org.patternfly.textToggle
-import org.patternfly.toggleIcon
-import org.patternfly.toggleImage
-import org.patternfly.toggleText
-import org.patternfly.updateItems
+import org.patternfly.util
 
-internal interface DropdownSample {
+internal class DropdownSample {
 
-    fun dropdownDsl() {
+    fun staticEntries() {
         render {
             dropdown<String> {
-                textToggle { +"Choose one" }
-                groups {
-                    group { // group w/o title
-                        item("Item 1")
-                        item("Item 2") {
-                            description = "Item description"
-                        }
+                toggle { text("Choose one") }
+                item("Item 1") {
+                    selected(true)
+                }
+                item("Item 2") {
+                    icon("user".fas())
+                    description("Item description")
+                }
+                separator()
+                group("Group 1") {
+                    item("Item 1")
+                    item("Item 2") {
+                        disabled(true)
                     }
-                    separator()
-                    group("Group 1") {
-                        item("Item 1")
-                        item("Item 2") {
-                            disabled = true
+                }
+                separator()
+                group("Group 2") {
+                    item("Item 1")
+                    item("Item 2") {
+                        events {
+                            clicks handledBy notification(INFO, "Click on last item of last group")
                         }
-                    }
-                    separator()
-                    group("Group 2") {
-                        item("Item 1")
-                        item("Item 2")
                     }
                 }
             }
         }
     }
 
-    fun dropdownStore() {
+    fun storeEntries() {
         render {
             data class Demo(val id: String, val name: String)
 
-            val store = DropdownStore<Demo>()
+            val store = storeOf(
+                listOf(
+                    Demo("foo", "Foo"),
+                    Demo("bar", "Bar")
+                )
+            )
             dropdown(store) {
-                textToggle { +"Choose one" }
-                display { demo -> +demo.name }
-            }
-
-            store.updateItems {
-                item(Demo("foo", "Foo"))
-                item(Demo("bar", "Bar"))
+                toggle { text("Choose one") }
+                display { demo ->
+                    item(demo) {
+                        +demo.name
+                    }
+                }
             }
         }
     }
 
-    fun expanded() {
+    fun customEntries() {
         render {
             dropdown<String> {
-                expanded.data handledBy notification(INFO) { expanded ->
-                    title("Expanded state of dropdown: $expanded.")
+                toggle { text("Choose one") }
+                item("Foo") {
+                    description("Description")
                 }
-                textToggle { +"Choose one" }
-                items {
-                    item("Foo")
-                    item("Bar")
+                item("Bar") {
+                    icon("user".fas())
+                    description("Description")
+                }
+                item("") {
+                    custom {
+                        div(id = "custom-id", baseClass = "my-md".util()) {
+                            +"Custom title"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun expos() {
+        render {
+            dropdown<String> {
+                toggle { text("Choose one") }
+                item("Foo")
+                item("Bar")
+                events {
+                    expos handledBy notification(INFO) { expanded ->
+                        +"Expanded state of dropdown: $expanded"
+                    }
+                }
+            }
+        }
+    }
+
+    fun selections() {
+        render {
+            dropdown<String> {
+                toggle { text("Choose one") }
+                item("Foo")
+                item("Bar")
+                events {
+                    selections handledBy notification(INFO) { item ->
+                        +"You've selected $item"
+                    }
                 }
             }
         }
@@ -90,11 +119,9 @@ internal interface DropdownSample {
     fun textToggle() {
         render {
             dropdown<String> {
-                textToggle { +"Text" }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
+                toggle { text("Text") }
+                item("Foo")
+                item("Bar")
             }
         }
     }
@@ -102,11 +129,9 @@ internal interface DropdownSample {
     fun iconToggle() {
         render {
             dropdown<String> {
-                iconToggle { icon("user".fas()) }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
+                toggle { icon("user".fas()) }
+                item("Foo")
+                item("Bar")
             }
         }
     }
@@ -114,11 +139,19 @@ internal interface DropdownSample {
     fun kebabToggle() {
         render {
             dropdown<String> {
-                kebabToggle()
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
+                toggle { kebab() }
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun badgeToggle() {
+        render {
+            dropdown<String> {
+                toggle { badge(5) }
+                item("Foo")
+                item("Bar")
             }
         }
     }
@@ -126,16 +159,9 @@ internal interface DropdownSample {
     fun checkboxToggle() {
         render {
             dropdown<String> {
-                checkboxToggle {
-                    text { +"Text" }
-                    checkbox {
-                        checked(true)
-                    }
-                }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
+                toggle { checkbox("Text") }
+                item("Foo")
+                item("Bar")
             }
         }
     }
@@ -143,70 +169,27 @@ internal interface DropdownSample {
     fun actionToggle() {
         render {
             dropdown<String> {
-                actionToggle {
-                    +"Action"
-                } handledBy notification(INFO, "Action clicked")
-                items {
-                    item("Foo")
-                    item("Bar")
+                toggle {
+                    action("Text") {
+                        events {
+                            clicks handledBy notification(INFO, "Action clicked")
+                        }
+                    }
                 }
-            }
-            dropdown<String> {
-                actionToggle {
-                    icon("cog".fas())
-                }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
+                item("Foo")
+                item("Bar")
             }
         }
     }
 
-    fun customToggle() {
+    fun imgToggle() {
         render {
             dropdown<String> {
-                customToggle {
-                    toggleImage {
-                        img { src("./logo.svg") }
-                    }
-                    toggleText { +"Some text" }
-                    toggleIcon()
+                toggle {
+                    img(title = "Text", src = "./logo.svg")
                 }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
-
-    fun items() {
-        render {
-            dropdown<String> {
-                kebabToggle()
-                items {
-                    item("Item 1")
-                    item("Item 2")
-                }
-            }
-        }
-    }
-
-    fun groups() {
-        render {
-            dropdown<String> {
-                kebabToggle()
-                groups {
-                    group { // group w/o title
-                        item("Item 1")
-                        item("Item 2")
-                    }
-                    group("Group 1") {
-                        item("Item 1")
-                        item("Item 2")
-                    }
-                }
+                item("Foo")
+                item("Bar")
             }
         }
     }

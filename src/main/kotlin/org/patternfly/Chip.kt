@@ -18,14 +18,14 @@ import org.w3c.dom.events.Event
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.chip(
     baseClass: String? = null,
     id: String? = null,
-    build: Chip.() -> Unit
+    context: Chip.() -> Unit
 ) {
-    Chip().apply(build).render(this, baseClass, id)
+    Chip().apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component

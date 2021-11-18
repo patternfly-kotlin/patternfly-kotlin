@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
  * @param read whether this badge is marked read or unread
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
@@ -27,9 +27,9 @@ public fun RenderContext.badge(
     read: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: Badge.() -> Unit = {}
+    context: Badge.() -> Unit = {}
 ) {
-    Badge(count, min, max, read).apply(build).render(this, baseClass, id)
+    Badge(count, min, max, read).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -43,8 +43,13 @@ public fun RenderContext.badge(
  *
  * @sample org.patternfly.sample.BadgeSample.badge
  */
-public class Badge internal constructor(count: Int, private var min: Int, private var max: Int, read: Boolean) :
-    PatternFlyComponent<Unit>,
+@Suppress("TooManyFunctions")
+public open class Badge internal constructor(
+    count: Int,
+    private var min: Int,
+    private var max: Int,
+    read: Boolean
+) : PatternFlyComponent<Unit>,
     WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -96,8 +101,12 @@ public class Badge internal constructor(count: Int, private var min: Int, privat
 
                 classMap(read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
                 count.map { applyBounds(it) }.asText()
+                tail(this)
             }
         }
+    }
+
+    protected open fun tail(context: RenderContext) {
     }
 
     private fun applyBounds(value: Int): String = when {

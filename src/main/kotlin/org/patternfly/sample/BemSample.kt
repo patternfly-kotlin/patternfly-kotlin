@@ -7,7 +7,7 @@ import org.patternfly.component
 import org.patternfly.modifier
 import kotlin.random.Random
 
-internal interface BemSample {
+internal class BemSample {
 
     fun component() {
         "card".component() // pf-c-card

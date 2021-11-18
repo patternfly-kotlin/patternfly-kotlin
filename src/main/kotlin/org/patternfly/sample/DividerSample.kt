@@ -6,7 +6,7 @@ import org.patternfly.DividerVariant.LI
 import org.patternfly.divider
 import org.patternfly.layout
 
-internal interface DividerSample {
+internal class DividerSample {
 
     fun divider() {
         render {

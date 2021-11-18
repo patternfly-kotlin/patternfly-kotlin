@@ -11,7 +11,7 @@ import org.patternfly.alert
 import org.patternfly.alertGroup
 import org.patternfly.notification
 
-internal interface AlertSample {
+internal class AlertSample {
 
     fun alertGroup() {
         render {

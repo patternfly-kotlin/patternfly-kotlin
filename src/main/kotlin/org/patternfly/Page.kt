@@ -15,23 +15,23 @@ import org.patternfly.dom.Id
  *
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.page(
     baseClass: String? = null,
     id: String? = null,
-    build: Page.() -> Unit = {}
+    context: Page.() -> Unit = {}
 ) {
-    Page().apply(build).render(this, baseClass, id)
+    Page().apply(context).render(this, baseClass, id)
 }
 
 public fun RenderContext.pageGroup(
     baseClass: String? = null,
     id: String? = null,
-    build: RenderContext.() -> Unit = {}
+    context: RenderContext.() -> Unit = {}
 ) {
     div(baseClass = classes("page".component("main-group"), baseClass), id = id) {
-        build(this)
+        context(this)
     }
 }
 
@@ -39,14 +39,14 @@ public fun RenderContext.pageSection(
     limitWidth: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: RenderContext.() -> Unit = {}
+    context: RenderContext.() -> Unit = {}
 ) {
     genericPageSection(
         limitWidth = limitWidth,
         baseClass = classes("page".component("main-section"), baseClass),
         id = id,
         scope = {},
-        build = build
+        context = context
     )
 }
 
@@ -54,14 +54,14 @@ public fun RenderContext.pageNav(
     limitWidth: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: RenderContext.() -> Unit = {}
+    context: RenderContext.() -> Unit = {}
 ) {
     genericPageSection(
         limitWidth = limitWidth,
         baseClass = classes("page".component("main", "nav"), baseClass),
         id = id,
         scope = {},
-        build = build
+        context = context
     )
 }
 
@@ -69,7 +69,7 @@ public fun RenderContext.pageSubNav(
     limitWidth: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: RenderContext.() -> Unit = {}
+    context: RenderContext.() -> Unit = {}
 ) {
     genericPageSection(
         limitWidth = limitWidth,
@@ -78,7 +78,7 @@ public fun RenderContext.pageSubNav(
         scope = {
             set(Scopes.PAGE_SUBNAV, true)
         },
-        build = build
+        context = context
     )
 }
 
@@ -86,14 +86,14 @@ public fun RenderContext.pageBreadcrumb(
     limitWidth: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: RenderContext.() -> Unit = {}
+    context: RenderContext.() -> Unit = {}
 ) {
     genericPageSection(
         limitWidth = limitWidth,
         baseClass = classes("page".component("main", "breadcrumb"), baseClass),
         id = id,
         scope = {},
-        build = build
+        context = context
     )
 }
 
@@ -102,15 +102,15 @@ internal fun RenderContext.genericPageSection(
     baseClass: String?,
     id: String?,
     scope: (ScopeContext.() -> Unit),
-    build: RenderContext.() -> Unit
+    context: RenderContext.() -> Unit
 ) {
     section(baseClass = baseClass, id = id, scope = scope) {
         if (limitWidth) {
             div(baseClass = "page".component("main-body")) {
-                build(this)
+                context(this)
             }
         } else {
-            build(this)
+            context(this)
         }
     }
 }

@@ -7,7 +7,7 @@ import org.patternfly.fas
 import org.patternfly.icon
 import org.patternfly.pfIcon
 
-internal interface IconSample {
+internal class IconSample {
 
     fun icons() {
         render {

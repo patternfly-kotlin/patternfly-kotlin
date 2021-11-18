@@ -18,16 +18,16 @@ import org.w3c.dom.events.Event
  *
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.AlertSample.alertGroup
  */
 public fun RenderContext.alertGroup(
     baseClass: String? = null,
     id: String? = null,
-    build: StaticAlertGroup.() -> Unit
+    context: StaticAlertGroup.() -> Unit
 ) {
-    StaticAlertGroup().apply(build).render(this, baseClass, id)
+    StaticAlertGroup().apply(context).render(this, baseClass, id)
 }
 
 /**
@@ -37,7 +37,7 @@ public fun RenderContext.alertGroup(
  * @param title the title of the alert
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.AlertSample.alert
  */
@@ -46,9 +46,9 @@ public fun RenderContext.alert(
     title: String = "",
     baseClass: String? = null,
     id: String? = null,
-    build: Alert.() -> Unit = {}
+    context: Alert.() -> Unit = {}
 ) {
-    Alert(severity, title).apply(build).render(this, baseClass, id)
+    Alert(severity, title).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -93,9 +93,9 @@ public class StaticAlertGroup : BaseAlertGroup(false) {
         title: String = "",
         baseClass: String? = null,
         id: String? = null,
-        build: Alert.() -> Unit = {}
+        context: Alert.() -> Unit = {}
     ) {
-        alerts.add(StaticAlertBuilder(severity, title, baseClass, id, build))
+        alerts.add(StaticAlertBuilder(severity, title, baseClass, id, context))
     }
 
     override fun renderAlerts(context: RenderContext) {
@@ -108,7 +108,7 @@ public class StaticAlertGroup : BaseAlertGroup(false) {
                         baseClass = alertBuilder.baseClass,
                         id = alertBuilder.id
                     ) {
-                        alertBuilder.build(this)
+                        alertBuilder.context(this)
                         inline(true) // force alerts to be inline
                     }
                 }
@@ -122,7 +122,7 @@ internal class StaticAlertBuilder(
     val title: String,
     val baseClass: String?,
     val id: String?,
-    val build: Alert.() -> Unit
+    val context: Alert.() -> Unit
 )
 
 /**
@@ -187,13 +187,13 @@ public class Alert internal constructor(private var severity: Severity, title: S
     /**
      * Adds an actions to this [Alert].
      *
-     * @param build a lambda expression for setting up the action
+     * @param context a lambda expression for setting up the action
      * @param events a lambda expression for setting up the events of the action
      *
      * @sample org.patternfly.sample.AlertSample.actions
      */
-    public fun action(build: PushButton.() -> Unit, events: EventContext<HTMLButtonElement>.() -> Unit) {
-        actions.add(AlertAction(build, events))
+    public fun action(context: PushButton.() -> Unit, events: EventContext<HTMLButtonElement>.() -> Unit) {
+        actions.add(AlertAction(context, events))
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -244,7 +244,7 @@ public class Alert internal constructor(private var severity: Severity, title: S
                     div(baseClass = "alert".component("action-group")) {
                         actions.forEach { alertAction ->
                             pushButton(ButtonVariation.inline, ButtonVariation.link) {
-                                alertAction.build(this)
+                                alertAction.context(this)
                                 alertAction.events(this)
                             }
                         }
@@ -265,6 +265,6 @@ public class Alert internal constructor(private var severity: Severity, title: S
 }
 
 internal class AlertAction(
-    val build: PushButton.() -> Unit,
+    val context: PushButton.() -> Unit,
     val events: (EventContext<HTMLButtonElement>.() -> Unit)
 )

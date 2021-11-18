@@ -3,7 +3,7 @@ package org.patternfly.sample
 import org.patternfly.dom.AttributeOperator
 import org.patternfly.dom.By
 
-internal interface BySample {
+internal class BySample {
 
     fun complex() {
         By.group(

@@ -6,7 +6,7 @@ import dev.fritz2.dom.html.render
 import kotlinx.browser.document
 import org.patternfly.aria
 
-internal interface AriaSample {
+internal class AriaSample {
 
     fun tagAria() {
         render {

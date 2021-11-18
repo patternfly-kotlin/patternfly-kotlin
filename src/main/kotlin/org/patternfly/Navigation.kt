@@ -2,7 +2,6 @@
 
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
@@ -30,21 +29,19 @@ import org.w3c.dom.events.Event
  * Creates an [Navigation] component.
  *
  * @param router the router instance
- * @param store the store for the [NavigationEntry]
  * @param expandable whether groups are expandable (only applies to vertical variant)
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.navigation(
     router: Router<T>,
-    store: NavigationStore<T> = NavigationStore(),
     expandable: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    build: Navigation<T>.() -> Unit = {}
+    context: Navigation<T>.() -> Unit = {}
 ) {
-    Navigation(router, store, expandable).apply(build).render(this, baseClass, id)
+    Navigation(router, expandable).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -66,10 +63,6 @@ public fun <T> RenderContext.navigation(
  * - if added to [Masthead], horizontal navigation will be used
  * - if added to [Page.sidebar], vertical navigation will be used
  *
- * ### Entries
- *
- * Entries can be added to the navigation using this class or by using a [NavigationStore]. See the samples for more details.
- *
  * ### Routing
  *
  * The passed [Router] is used for navigation (updates the location & history) unless custom events are used for a [NavigationItem].
@@ -77,15 +70,12 @@ public fun <T> RenderContext.navigation(
  * @sample org.patternfly.sample.NavigationSample.horizontal
  * @sample org.patternfly.sample.NavigationSample.horizontalSubNav
  * @sample org.patternfly.sample.NavigationSample.vertical
- * @sample org.patternfly.sample.NavigationSample.store
  */
 @Suppress("TooManyFunctions")
 public class Navigation<T> internal constructor(
     private val router: Router<T>,
-    public val store: NavigationStore<T>,
     private var expandable: Boolean
 ) : PatternFlyComponent<Unit>,
-    NavigationEntryScope<T>,
     WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -93,13 +83,34 @@ public class Navigation<T> internal constructor(
     private lateinit var root: TextElement
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
-    override val entries: MutableList<NavigationEntry<T>> = mutableListOf()
+    private val entries: MutableList<NavigationEntry<T>> = mutableListOf()
 
     /**
      * Modifies the [expandable] flag.
      */
     public fun expandable(expandable: Boolean) {
         this.expandable = expandable
+    }
+
+    /**
+     * Adds a group and items.
+     */
+    public fun group(title: String, context: NavigationGroup<T>.() -> Unit) {
+        entries.add(NavigationGroup<T>(title).apply(context))
+    }
+
+    /**
+     * Adds an item.
+     */
+    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
+        entries.add(NavigationItem(route, title).apply(context))
+    }
+
+    /**
+     * Adds a separator.
+     */
+    public fun separator() {
+        entries.add(NavigationSeparator())
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -138,30 +149,22 @@ public class Navigation<T> internal constructor(
                     }.map {
                         ul.domNode.updateScrollButtons()
                     }.filterNotNull() handledBy scrollStore.update
-
-                    // update scroll buttons, when navigation entries have been updated
-                    store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
                 }
 
-                store.data.render { entries ->
-                    if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
-                        horizontal(this, entries)
+                if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
+                    horizontal(this, entries)
+                } else {
+                    if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
+                        flat(this, entries, false)
                     } else {
-                        if (entries.filterIsInstance<NavigationGroup<T>>().isEmpty()) {
-                            flat(this, entries, false)
+                        if (expandable) {
+                            verticalExpandable(this, entries)
                         } else {
-                            if (expandable) {
-                                verticalExpandable(this, entries)
-                            } else {
-                                verticalGrouped(this, entries)
-                            }
+                            verticalGrouped(this, entries)
                         }
                     }
                 }
             }
-        }
-        if (entries.isNotEmpty()) {
-            store.update(entries)
         }
     }
 
@@ -260,7 +263,7 @@ public class Navigation<T> internal constructor(
     private fun group(context: RenderContext, group: NavigationGroup<T>) {
         with(context) {
             ul(baseClass = "nav".component("list")) {
-                group.mutableEntries.forEach { entry ->
+                group.entries.forEach { entry ->
                     when (entry) {
                         is NavigationGroup<T> -> warning(
                             this,
@@ -351,31 +354,6 @@ internal enum class NavigationVariant(val modifier: String?) {
 
 // ------------------------------------------------------ navigation entry
 
-public interface NavigationEntryScope<T> {
-    public val entries: MutableList<NavigationEntry<T>>
-
-    /**
-     * Adds a group and items.
-     */
-    public fun group(title: String, context: NavigationGroup<T>.() -> Unit) {
-        entries.add(NavigationGroup<T>(title).apply(context))
-    }
-
-    /**
-     * Adds an item.
-     */
-    public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
-        entries.add(NavigationItem(route, title).apply(context))
-    }
-
-    /**
-     * Adds a separator.
-     */
-    public fun separator() {
-        entries.add(NavigationSeparator())
-    }
-}
-
 /**
  * Base class for groups and items.
  */
@@ -394,20 +372,18 @@ public class NavigationGroup<T> internal constructor(
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
 
-    internal val id: String = Id.unique(ComponentType.Navigation.id, "grp")
-    internal val mutableEntries: MutableList<NavigationEntry<T>> = mutableListOf()
-    public val entries: List<NavigationEntry<T>> get() = mutableEntries
+    internal val entries: MutableList<NavigationEntry<T>> = mutableListOf()
 
     init {
         this.title(title)
-        this.mutableEntries.addAll(initialEntries)
+        this.entries.addAll(initialEntries)
     }
 
     /**
      * Adds an item to this group.
      */
     public fun item(route: T, title: String, context: NavigationItem<T>.() -> Unit = {}) {
-        mutableEntries.add(
+        entries.add(
             NavigationItem(route, title)
                 .apply(context)
                 .also { item ->
@@ -420,7 +396,7 @@ public class NavigationGroup<T> internal constructor(
      * Adds a separator to this group.
      */
     public fun separator() {
-        mutableEntries.add(NavigationSeparator())
+        entries.add(NavigationSeparator())
     }
 }
 
@@ -444,14 +420,3 @@ public class NavigationItem<T> internal constructor(public val route: T, title: 
  * A navigation separator.
  */
 public class NavigationSeparator<T> internal constructor() : NavigationEntry<T>()
-
-// ------------------------------------------------------ store
-
-internal class StoreNavigationEntryScope<T>(override val entries: MutableList<NavigationEntry<T>> = mutableListOf()) :
-    NavigationEntryScope<T>
-
-public fun <T> navigationStore(context: NavigationEntryScope<T>.() -> Unit): NavigationStore<T> =
-    NavigationStore(StoreNavigationEntryScope<T>().apply(context).entries)
-
-public class NavigationStore<T> internal constructor(initialData: List<NavigationEntry<T>> = emptyList()) :
-    RootStore<List<NavigationEntry<T>>>(initialData)

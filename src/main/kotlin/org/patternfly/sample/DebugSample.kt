@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.render
 import kotlinx.browser.document
 import org.patternfly.dom.debug
 
-internal interface DebugSample {
+internal class DebugSample {
 
     fun debug() {
         render {

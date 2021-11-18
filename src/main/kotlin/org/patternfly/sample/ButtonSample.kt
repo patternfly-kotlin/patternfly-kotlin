@@ -14,7 +14,7 @@ import org.patternfly.notification
 import org.patternfly.pushButton
 import org.patternfly.util
 
-internal interface ButtonSample {
+internal class ButtonSample {
 
     fun pushButton() {
         render {

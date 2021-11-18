@@ -20,7 +20,7 @@ import org.patternfly.pageSection
 import org.patternfly.textContent
 import org.patternfly.title
 
-internal interface PageSample {
+internal class PageSample {
 
     fun typicalSetup() {
         val router = Router(StringRoute("#home"))

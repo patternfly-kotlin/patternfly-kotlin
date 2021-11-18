@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.map
  * @receiver the store to update
  *
  * @param block function executed in the context of an [ItemsBuilder]
- *
- * @sample org.patternfly.sample.EntrySample.storeItems
  */
 public fun <T> EntriesStore<T>.updateItems(block: ItemsBuilder<T>.() -> Unit = {}) {
     update(ItemsBuilder<T>(idProvider, itemSelection).apply(block).build())
@@ -36,8 +34,6 @@ public fun <T> EntriesStore<T>.updateGroups(block: GroupsBuilder<T>.() -> Unit =
  * Abstract store for [Entries].
  *
  * The flows in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
- *
- * @sample org.patternfly.sample.EntrySample.unwrap
  */
 public abstract class EntriesStore<T> internal constructor(
     override val idProvider: IdProvider<T, String>,

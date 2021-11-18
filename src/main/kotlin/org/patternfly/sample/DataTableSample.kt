@@ -18,9 +18,6 @@ import org.patternfly.dataTableToggleColumn
 import org.patternfly.dropdown
 import org.patternfly.fas
 import org.patternfly.icon
-import org.patternfly.item
-import org.patternfly.items
-import org.patternfly.kebabToggle
 import org.patternfly.notification
 import org.patternfly.pushButton
 
@@ -54,12 +51,10 @@ internal interface DataTableSample {
                     }
                     dataTableActionColumn { demo ->
                         dropdown<String>(align = RIGHT) {
-                            kebabToggle()
-                            items {
-                                item("Action 1")
-                                item("Action 2")
-                                item("Remove ${demo.name}")
-                            }
+                            toggle { kebab() }
+                            item("Action 1")
+                            item("Action 2")
+                            item("Remove ${demo.name}")
                         }
                     }
                 }

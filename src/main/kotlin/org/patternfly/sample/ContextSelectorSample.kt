@@ -11,7 +11,7 @@ import org.patternfly.items
 import org.patternfly.notification
 import org.patternfly.updateItems
 
-internal interface ContextSelectorSample {
+internal class ContextSelectorSample {
 
     fun contextSelectorDsl() {
         render {

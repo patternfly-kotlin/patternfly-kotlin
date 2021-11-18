@@ -8,7 +8,7 @@ import org.patternfly.chipGroup
 import org.patternfly.chips
 import org.patternfly.notification
 
-internal interface ChipGroupSample {
+internal class ChipGroupSample {
 
     fun vararg() {
         render {

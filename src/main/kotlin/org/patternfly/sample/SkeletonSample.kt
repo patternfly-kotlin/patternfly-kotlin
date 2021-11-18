@@ -9,7 +9,7 @@ import org.patternfly.Width._33
 import org.patternfly.skeleton
 import org.patternfly.skeleton2
 
-internal interface SkeletonSample {
+internal class SkeletonSample {
 
     fun skeletons() {
         render {

@@ -6,7 +6,7 @@ import org.patternfly.Severity.INFO
 import org.patternfly.notification
 import org.patternfly.switch
 
-internal interface SwitchSample {
+internal class SwitchSample {
 
     fun switch() {
         render {

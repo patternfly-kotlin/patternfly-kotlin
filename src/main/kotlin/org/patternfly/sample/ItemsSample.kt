@@ -5,7 +5,7 @@ package org.patternfly.sample
 import org.patternfly.Items
 import org.patternfly.SortInfo
 
-internal interface ItemsSample {
+internal class ItemsSample {
 
     fun page() {
         val items: Items<Int> = Items({ it.toString() }, (0 until 100).toList())

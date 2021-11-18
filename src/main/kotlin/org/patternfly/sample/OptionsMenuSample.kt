@@ -19,7 +19,7 @@ import org.patternfly.textToggle
 import org.patternfly.unwrapOrNull
 import org.patternfly.updateItems
 
-internal interface OptionsMenuSample {
+internal class OptionsMenuSample {
 
     fun optionsMenuDsl() {
         render {

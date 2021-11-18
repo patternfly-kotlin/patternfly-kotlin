@@ -19,7 +19,7 @@ import org.patternfly.drawerPanel
 import org.patternfly.drawerSection
 import org.patternfly.notification
 
-internal interface DrawerSample {
+internal class DrawerSample {
 
     fun drawerSetup() {
         render {

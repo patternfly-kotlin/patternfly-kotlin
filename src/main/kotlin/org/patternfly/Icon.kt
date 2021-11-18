@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flowOf
  * @param iconClass the CSS icon class. Use one of the string extension methods [String.far], [String.fas] or [String.pfIcon] to create a valid CSS class.
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
- * @param build a lambda expression for setting up the component itself
+ * @param context a lambda expression for setting up the component itself
  *
  * @sample org.patternfly.sample.IconSample.icons
  */
@@ -21,8 +21,8 @@ public fun RenderContext.icon(
     iconClass: String = "",
     baseClass: String? = null,
     id: String? = null,
-    build: Icon.() -> Unit = {}
-): TextElement = Icon(iconClass).apply(build).render(this, baseClass, id)
+    context: Icon.() -> Unit = {}
+): TextElement = Icon(iconClass).apply(context).render(this, baseClass, id)
 
 // ------------------------------------------------------ component
 

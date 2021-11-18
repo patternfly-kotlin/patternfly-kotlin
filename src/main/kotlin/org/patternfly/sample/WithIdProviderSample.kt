@@ -8,7 +8,7 @@ import org.patternfly.dataListItem
 import org.patternfly.dataListRow
 import org.patternfly.dom.Id
 
-internal interface WithIdProviderSample {
+internal class WithIdProviderSample {
 
     fun useItemId() {
         render {

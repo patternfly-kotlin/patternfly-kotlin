@@ -9,7 +9,7 @@ import org.patternfly.Level.H5
 import org.patternfly.Level.H6
 import org.patternfly.title
 
-internal interface TitleSample {
+internal class TitleSample {
 
     fun title() {
         render {

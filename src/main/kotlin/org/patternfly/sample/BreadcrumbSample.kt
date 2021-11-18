@@ -10,7 +10,7 @@ import org.patternfly.items
 import org.patternfly.notification
 import org.patternfly.unwrap
 
-internal interface BreadcrumbSample {
+internal class BreadcrumbSample {
 
     fun breadcrumb() {
         render {

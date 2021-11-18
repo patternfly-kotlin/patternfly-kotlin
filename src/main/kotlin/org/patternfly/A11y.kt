@@ -40,14 +40,14 @@ public class AriaContext {
 public interface WithAria {
     public val aria: AriaContext
 
-    public fun aria(build: AriaContext.() -> Unit)
+    public fun aria(context: AriaContext.() -> Unit)
 }
 
 internal class AriaMixin : WithAria {
     override val aria: AriaContext = AriaContext()
 
-    override fun aria(build: AriaContext.() -> Unit) {
-        aria.apply(build)
+    override fun aria(context: AriaContext.() -> Unit) {
+        aria.apply(context)
     }
 }
 

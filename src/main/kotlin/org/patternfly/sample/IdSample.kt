@@ -2,7 +2,7 @@ package org.patternfly.sample
 
 import org.patternfly.dom.Id
 
-internal interface IdSamples {
+internal class IdSamples {
 
     fun build() {
         Id.build("") // ""
