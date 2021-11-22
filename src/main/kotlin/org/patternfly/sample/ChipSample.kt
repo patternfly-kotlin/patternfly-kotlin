@@ -20,7 +20,7 @@ internal class ChipSample {
                     count(42)
                 }
                 closeButton {
-                    clicks handledBy notification(INFO,"Bye, bye!")
+                    clicks handledBy notification(INFO, "Bye, bye!")
                 }
             }
         }
