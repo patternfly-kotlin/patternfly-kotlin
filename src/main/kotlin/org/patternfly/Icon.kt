@@ -37,7 +37,6 @@ public fun RenderContext.icon(
  */
 public class Icon internal constructor(iconClass: String) :
     PatternFlyComponent<TextElement>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -67,9 +66,8 @@ public class Icon internal constructor(iconClass: String) :
                 id = id
             ) {
                 markAs(ComponentType.Icon)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 aria["hidden"] = true
                 className(classes)

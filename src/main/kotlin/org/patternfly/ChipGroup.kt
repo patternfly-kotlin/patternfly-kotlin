@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -180,8 +181,8 @@ public class ChipGroup<T> internal constructor(
                             chip {
                                 val chipId = this@ChipGroup.itemId(item)
                                 this@ChipGroup.display.invoke(this, item)
-                                closeButton {
-                                    clicks.map { chipId } handledBy this@ChipGroup.store.removeHandler
+                                events {
+                                    closes.map { chipId } handledBy this@ChipGroup.store.removeHandler
                                 }
                             }
                         }

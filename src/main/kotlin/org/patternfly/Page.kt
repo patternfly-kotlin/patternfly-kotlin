@@ -122,7 +122,7 @@ internal fun RenderContext.genericPageSection(
  *
  * The page component is used to define the basic layout of a page with either vertical or horizontal navigation. It should be added directly to the document body.
  *
- * Typically a page contains some but not necessarily all of the following components.
+ * Typically, a page contains some but not necessarily all the following components.
  *
  * ```
  * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ page: Page ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -176,7 +176,6 @@ internal fun RenderContext.genericPageSection(
  */
 public class Page :
     PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -216,9 +215,8 @@ public class Page :
                 id = id
             ) {
                 markAs(ComponentType.Page)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 val mainId = main?.id ?: Id.unique("page", "main")
                 if (main != null) {

@@ -78,7 +78,6 @@ public class Accordion<T> internal constructor(
     private var fixed: Boolean,
     private var bordered: Boolean
 ) : PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -132,9 +131,8 @@ public class Accordion<T> internal constructor(
                 id = id
             ) {
                 markAs(ComponentType.Accordion)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 if (store != null) {
                     store.data.render { list ->
@@ -169,9 +167,9 @@ public class Accordion<T> internal constructor(
                     if (singleExpand) {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
                     }
-                    item.events(this)
+                    item.applyEvents(this)
                     span(baseClass = "accordion".component("toggle", "text")) {
-                        item.title.asText()
+                        item.applyTitle(this)
                     }
                     span(baseClass = "accordion".component("toggle", "icon")) {
                         icon("angle-right".fas())
@@ -186,15 +184,9 @@ public class Accordion<T> internal constructor(
             ) {
                 attr("hidden", item.expandedStore.data.map { !it })
                 classMap(item.expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
-                item.content?.let { cnt ->
-                    div(
-                        baseClass = classes(
-                            "accordion".component("expanded", "content", "body"),
-                            cnt.baseClass
-                        ),
-                        id = cnt.id
-                    ) {
-                        cnt.context(this)
+                item.content?.let { content ->
+                    div(baseClass = "accordion".component("expanded", "content", "body")) {
+                        content(this)
                     }
                 }
             }
@@ -227,18 +219,14 @@ public class AccordionItem internal constructor(title: String) :
 
     internal val id: String = Id.unique(ComponentType.Accordion.id, "itm")
     internal var initiallyExpanded: Boolean = false
-    internal var content: SubComponent<RenderContext>? = null
+    internal var content: (RenderContext.() -> Unit)? = null
 
     init {
         this.title(title)
     }
 
-    public fun content(
-        baseClass: String? = null,
-        id: String? = null,
-        context: RenderContext.() -> Unit = {}
-    ) {
-        this.content = SubComponent(baseClass, id, context)
+    public fun content(content: RenderContext.() -> Unit) {
+        this.content = content
     }
 
     /**

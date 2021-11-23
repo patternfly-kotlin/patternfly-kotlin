@@ -3,7 +3,6 @@ package org.patternfly
 import dev.fritz2.dom.Tag
 import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 
 /**
  * Creates a CSS class for screen-reader
@@ -13,43 +12,6 @@ import org.w3c.dom.HTMLElement
  *     https://www.patternfly.org/v4/utilities/accessibility/#screen-reader-only</a>
  */
 public fun screenReader(): String = "screen-reader".util()
-
-public class AriaContext {
-    private var role: String? = null
-    private val properties: MutableMap<String, String> = mutableMapOf()
-
-    public fun role(role: String) {
-        this.role = role
-    }
-
-    /**
-     * Sets an ARIA property. See https://www.w3.org/TR/wai-aria-1.1/#state_prop_def for all properties and states.
-     */
-    public fun set(name: String, value: String) {
-        properties[name] = value
-    }
-
-    internal operator fun <T : Tag<HTMLElement>> invoke(tag: T) {
-        role?.let {
-            tag.aria["role"] = it
-        }
-        properties.forEach { (key, value) -> tag.aria[key] = value }
-    }
-}
-
-public interface WithAria {
-    public val aria: AriaContext
-
-    public fun aria(context: AriaContext.() -> Unit)
-}
-
-internal class AriaMixin : WithAria {
-    override val aria: AriaContext = AriaContext()
-
-    override fun aria(context: AriaContext.() -> Unit) {
-        aria.apply(context)
-    }
-}
 
 /**
  * Getter for the [aria][TagAria] helper class.

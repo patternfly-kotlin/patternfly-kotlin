@@ -63,11 +63,13 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
                             id = alertId
                         ) {
                             severity(notificationAlert.severity)
-                            title(notificationAlert.title)
+                            if (notificationAlert.staticTitle != null) {
+                                title(notificationAlert.staticTitle!!)
+                            } else if (notificationAlert.flowTitle != null) {
+                                title(notificationAlert.flowTitle!!)
+                            }
                             notificationAlert.content?.let {
-                                content {
-                                    it.context(this)
-                                }
+                                content(it)
                             }
                             closable(true)
                             element {
@@ -214,26 +216,47 @@ public object NotificationStore : RootStore<List<NotificationAlert>>(listOf()) {
     }
 }
 
-public class NotificationAlert(internal var severity: Severity, title: String) :
-    WithTitle by TitleMixin() {
+public class NotificationAlert(internal var severity: Severity, title: String) {
 
     internal val read: Boolean = false
+    internal var flowTitle: Flow<String>? = null
+    internal var staticTitle: String? = null
     internal val timestamp: Long = Date.now().toLong()
-    internal var content: SubComponent<RenderContext>? = null
+    internal var content: (RenderContext.() -> Unit)? = null
 
     init {
         this.title(title)
+    }
+
+    public operator fun String.unaryPlus() {
+        staticTitle = this
+    }
+
+    public fun title(title: String) {
+        staticTitle = title
+    }
+
+    public fun title(title: Flow<String>) {
+        flowTitle = title
+    }
+
+    public fun <T> title(title: Flow<T>) {
+        flowTitle = title.map { it.toString() }
+    }
+
+    public fun Flow<String>.asText() {
+        flowTitle = this
+    }
+
+    public fun <T> Flow<T>.asText() {
+        flowTitle = this.map { it.toString() }
     }
 
     public fun severity(severity: Severity) {
         this.severity = severity
     }
 
-    public fun content(
-        baseClass: String? = null,
-        id: String? = null,
-        context: RenderContext.() -> Unit = {}
-    ) {
-        this.content = SubComponent(baseClass, id, context)
+    public fun content(content: RenderContext.() -> Unit) {
+        this.content = content
     }
 }

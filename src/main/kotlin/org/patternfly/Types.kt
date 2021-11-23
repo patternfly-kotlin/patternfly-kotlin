@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.WithText
@@ -14,6 +15,7 @@ import org.patternfly.Size.XL
 import org.patternfly.Size.XL_2
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.MouseEvent
 
 /**
  * Generic display function for components.
@@ -30,6 +32,8 @@ internal class SubComponent<T>(
     val id: String? = null,
     val context: T.() -> Unit = {}
 )
+
+internal class CloseStore : RootStore<MouseEvent?>(null)
 
 /**
  * Marker interface implemented by all PatternFly components.

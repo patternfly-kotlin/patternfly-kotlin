@@ -50,7 +50,6 @@ public open class Badge internal constructor(
     private var max: Int,
     read: Boolean
 ) : PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -95,9 +94,8 @@ public open class Badge internal constructor(
         with(context) {
             span(baseClass = classes(ComponentType.Badge, baseClass), id = id) {
                 markAs(ComponentType.Badge)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 classMap(read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
                 count.map { applyBounds(it) }.asText()

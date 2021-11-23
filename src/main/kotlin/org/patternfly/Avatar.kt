@@ -34,7 +34,6 @@ public fun RenderContext.avatar(
  */
 public class Avatar internal constructor(private var src: String) :
     PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -52,9 +51,8 @@ public class Avatar internal constructor(private var src: String) :
                 id = id
             ) {
                 markAs(ComponentType.Avatar)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 src(src)
             }

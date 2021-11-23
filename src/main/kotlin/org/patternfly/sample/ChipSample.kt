@@ -19,8 +19,8 @@ internal class ChipSample {
                 badge {
                     count(42)
                 }
-                closeButton {
-                    clicks handledBy notification(INFO, "Bye, bye!")
+                events {
+                    closes handledBy notification(INFO, "Bye, bye!")
                 }
             }
         }

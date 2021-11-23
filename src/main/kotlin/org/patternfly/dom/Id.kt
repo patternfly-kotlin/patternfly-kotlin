@@ -5,7 +5,7 @@ import kotlinx.browser.document
 /**
  * Generates unique and safe identifiers.
  *
- * @sample org.patternfly.sample.IdSamples.build
+ * @sample org.patternfly.sample.IdSample.build
  */
 public object Id {
 

@@ -4,12 +4,15 @@ import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ factory
 
@@ -134,15 +137,13 @@ internal class StaticAlertBuilder(
  */
 public class Alert internal constructor(private var severity: Severity, title: String) :
     PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
-    WithClosable by ClosableMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
 
     private lateinit var root: Tag<HTMLElement>
     private var inline: Boolean = false
-    private var content: SubComponent<RenderContext>? = null
+    private var content: (RenderContext.() -> Unit)? = null
     private val actions: MutableList<AlertAction> = mutableListOf()
     private val ariaLabels: Pair<String, String> = when (severity) {
         Severity.DEFAULT -> "Default alert" to "Close default alert"
@@ -151,9 +152,16 @@ public class Alert internal constructor(private var severity: Severity, title: S
         Severity.WARNING -> "Warning alert" to "Close warning alert"
         Severity.DANGER -> "Error alert" to "Close error alert"
     }
+    private var closable: Boolean = false
+    private val closeStore: CloseStore = CloseStore()
+    public val closes: Flow<MouseEvent> = closeStore.data.filterNotNull()
 
     init {
         this.title(title)
+    }
+
+    public fun closable(closable: Boolean) {
+        this.closable = closable
     }
 
     public fun severity(severity: Severity) {
@@ -164,12 +172,8 @@ public class Alert internal constructor(private var severity: Severity, title: S
         this.inline = inline
     }
 
-    public fun content(
-        baseClass: String? = null,
-        id: String? = null,
-        context: RenderContext.() -> Unit = {}
-    ) {
-        this.content = SubComponent(baseClass, id, context)
+    public fun content(content: RenderContext.() -> Unit) {
+        this.content = content
     }
 
     /**
@@ -209,9 +213,8 @@ public class Alert internal constructor(private var severity: Severity, title: S
             ) {
                 markAs(ComponentType.Alert)
                 aria["label"] = ariaLabels.first
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 div(baseClass = "alert".component("icon")) {
                     icon(severity.iconClass)
@@ -220,7 +223,7 @@ public class Alert internal constructor(private var severity: Severity, title: S
                     span(baseClass = "pf-screen-reader") {
                         +ariaLabels.first
                     }
-                    title.asText()
+                    this@Alert.applyTitle(this)
                 }
                 if (closable) {
                     div(baseClass = "alert".component("action")) {
@@ -228,16 +231,13 @@ public class Alert internal constructor(private var severity: Severity, title: S
                             icon("times".fas())
                             aria["label"] = ariaLabels.second
                             domNode.addEventListener(Events.click.name, this@Alert::removeFromParent)
-                            closeEvents?.invoke(this)
+                            clicks.map { it } handledBy closeStore.update
                         }
                     }
                 }
-                content?.let { cnt ->
-                    div(
-                        baseClass = classes("alert".component("description"), cnt.baseClass),
-                        id = cnt.id
-                    ) {
-                        cnt.context(this)
+                content?.let { content ->
+                    div(baseClass = "alert".component("description")) {
+                        content(this)
                     }
                 }
                 if (actions.isNotEmpty()) {

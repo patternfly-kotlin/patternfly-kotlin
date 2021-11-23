@@ -76,7 +76,7 @@ internal class DropdownSample {
                     description("Description")
                 }
                 item("") {
-                    custom {
+                    content {
                         div(id = "custom-id", baseClass = "my-md".util()) {
                             +"Custom title"
                         }

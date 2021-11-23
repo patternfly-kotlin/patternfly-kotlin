@@ -76,7 +76,6 @@ public class Navigation<T> internal constructor(
     private val router: Router<T>,
     private var expandable: Boolean
 ) : PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -134,9 +133,8 @@ public class Navigation<T> internal constructor(
                 if (variant != NavigationVariant.SUBNAV) {
                     aria["label"] = "Global"
                 }
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
                     classMap(scrollStore.data.map { mapOf("scrollable".modifier() to (it.showButtons)) })
@@ -197,9 +195,9 @@ public class Navigation<T> internal constructor(
                         section(baseClass = "nav".component("section")) {
                             aria["lebelledby"] = headerId
                             h2("nav".component("section", "title"), headerId) {
-                                entry.title.asText()
+                                entry.applyTitle(this)
                             }
-                            entry.events(this)
+                            entry.applyEvents(this)
                             group(this, entry)
                         }
                     }
@@ -295,7 +293,7 @@ public class Navigation<T> internal constructor(
                 }
                 val buttonId = Id.unique(ComponentType.Navigation.id, "eg")
                 button("nav".component("link"), buttonId) {
-                    group.title.asText()
+                    group.applyTitle(this)
                     clicks handledBy group.expandedStore.toggle
                     aria["expanded"] = group.expandedStore.data.map { it.toString() }
                     span("nav".component("toggle")) {
@@ -307,7 +305,7 @@ public class Navigation<T> internal constructor(
                 section("nav".component("subnav")) {
                     aria["labelledby"] = buttonId
                     attr("hidden", group.expandedStore.data.map { !it })
-                    group.events(this)
+                    group.applyEvents(this)
                     group(this, group)
                 }
             }
@@ -318,11 +316,11 @@ public class Navigation<T> internal constructor(
         with(context) {
             li(baseClass = "nav".component("item")) {
                 a("nav".component("link")) {
-                    if (item.events === EMPTY_EVENT_CONTEXT) {
-                        clicks.map { item.route } handledBy router.navTo
-                    } else {
+                    if (item.hasEvents) {
                         // It's assumed that the user takes care of the navigation herself.
-                        item.events(this)
+                        item.applyEvents(this)
+                    } else {
+                        clicks.map { item.route } handledBy router.navTo
                     }
                     classMap(
                         router.data.map { route ->
@@ -332,7 +330,7 @@ public class Navigation<T> internal constructor(
                     aria["current"] = router.data.map { route ->
                         if (route == item.route) "page" else ""
                     }
-                    item.title.asText()
+                    item.applyTitle(this)
                 }
             }
         }

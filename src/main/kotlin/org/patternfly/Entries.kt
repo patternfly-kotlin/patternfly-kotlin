@@ -6,7 +6,7 @@ import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.ItemSelection.SINGLE_PER_GROUP
 
 /**
- * Immutable collection of [entries][Entry] used in different stores such as [DropdownStore], [MenuStore], [OptionsMenuStore] or [SelectStore]. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
+ * Immutable collection of [entries][Entry] used in different stores such as [MenuStore] or [OptionsMenuStore]. Every modification leads to a new instance with changed properties. Each item has to be uniquely identifiable using the specified [idProvider].
  *
  * This class holds instances of class [Entry]. Each Entry is either an [Item], a [Group] or a [Separator]. A group can contain nested [Item]s or [Separator]s, but must **not** contain nested groups. An [Item] can have additional properties such as an [icon][Item.icon], a [description][Item.description] or a [disabled][Item.disabled] state. A [Separator] has no additional properties and is only used to visually separate groups and items.
  *

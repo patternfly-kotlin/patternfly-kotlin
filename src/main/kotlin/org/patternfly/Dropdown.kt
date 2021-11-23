@@ -91,18 +91,14 @@ public class Dropdown<T> internal constructor(
     private val align: Align? = null,
     private val up: Boolean = false
 ) : PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
     private val entries: MutableList<DropdownEntry<T>> = mutableListOf()
     private var display: ((T) -> DropdownEntry<T>)? = null
-    private var selectStore: SelectStore<T> = SelectStore()
+    private var selectionStore: DropdownSelectionStore<T> = DropdownSelectionStore()
     private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {})
     private lateinit var root: Div
-
-    // custom implementation of WithExpandedStore since we need
-    // to reference root.domNode
 
     /**
      * The store which holds the expanded / collapse state.
@@ -124,7 +120,7 @@ public class Dropdown<T> internal constructor(
      * @sample org.patternfly.sample.DropdownSample.selections
      */
     public val selections: Flow<T>
-        get() = selectStore.data.mapNotNull { it } // don't know why filterNotNull cannot be used here!?
+        get() = selectionStore.data.mapNotNull { it } // don't know why filterNotNull cannot be used here!?
 
     /**
      * Disables or enables the dropdown.
@@ -186,9 +182,8 @@ public class Dropdown<T> internal constructor(
                 id = id
             ) {
                 markAs(ComponentType.Dropdown)
-                aria(this)
-                element(this)
-                events(this)
+                applyElement(this)
+                applyEvents(this)
 
                 classMap(expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
                 renderToggle(this, toggle.kind)
@@ -420,7 +415,7 @@ public class Dropdown<T> internal constructor(
                         } else {
                             if (entry.hasTitle) {
                                 h1(baseClass = "dropdown".component("group", "title")) {
-                                    entry.title.asText()
+                                    entry.applyTitle(this)
                                 }
                             }
                             ul {
@@ -447,7 +442,7 @@ public class Dropdown<T> internal constructor(
             button(
                 baseClass = classes {
                     +"dropdown".component("menu", "item")
-                    +("icon".modifier() `when` (item.icon != null))
+                    +("icon".modifier() `when` (item.iconContext != null))
                     +("description".modifier() `when` (item.description != null))
                     +("disabled".modifier() `when` item.disabled)
                 }
@@ -461,33 +456,33 @@ public class Dropdown<T> internal constructor(
                     domNode.autofocus = true
                 }
                 clicks handledBy expandedStore.collapse
-                clicks.map { item.data } handledBy selectStore.select
-                item.events(this)
+                clicks.map { item.data } handledBy selectionStore.select
+                item.applyEvents(this)
 
-                if (item.custom != null) {
-                    item.custom?.let { content -> content(this) }
+                if (item.content != null) {
+                    item.content?.let { content -> content(this) }
                 } else {
                     if (item.description != null) {
                         div(baseClass = "dropdown".component("menu", "item", "main")) {
-                            item.icon?.let { renderIcon(this, item.iconClass, it) }
-                            item.title.asText()
+                            item.iconContext?.let { renderIcon(this, item.iconClass, it) }
+                            item.applyTitle(this)
                         }
                         div(baseClass = "dropdown".component("menu", "item", "description")) {
                             +item.description!!
                         }
                     } else {
-                        item.icon?.let { renderIcon(this, item.iconClass, it) }
-                        item.title.asText()
+                        item.iconContext?.let { renderIcon(this, item.iconClass, it) }
+                        item.applyTitle(this)
                     }
                 }
             }
         }
 
-    private fun renderIcon(context: RenderContext, iconClass: String, icon: SubComponent<Icon>) {
+    private fun renderIcon(context: RenderContext, iconClass: String, iconContext: Icon.() -> Unit) {
         with(context) {
             span(baseClass = "dropdown".component("menu", "item", "icon")) {
-                icon(iconClass = iconClass, baseClass = icon.baseClass, id = icon.id) {
-                    icon.context(this)
+                icon(iconClass = iconClass) {
+                    iconContext(this)
                 }
             }
         }
@@ -641,7 +636,7 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
     }
 
     /**
-     * A check box toggle.
+     * A checkbox toggle.
      *
      * @sample org.patternfly.sample.DropdownSample.checkboxToggle
      */
@@ -714,7 +709,7 @@ public class DropdownGroup<T> internal constructor(
      * Adds an item to this group.
      */
     public fun item(data: T, context: DropdownItem<T>.() -> Unit = {}) {
-        DropdownItem<T>(data).apply(context).run {
+        DropdownItem(data).apply(context).run {
             group = this@DropdownGroup
             entries.add(this)
         }
@@ -743,9 +738,9 @@ public class DropdownItem<T> internal constructor(public val data: T) :
     internal var disabled: Boolean = false
     internal var selected: Boolean = false
     internal var iconClass: String = ""
-    internal var icon: SubComponent<Icon>? = null
+    internal var iconContext: (Icon.() -> Unit)? = null
     internal var description: String? = null
-    internal var custom: (Button.() -> Unit)? = null
+    internal var content: (RenderContext.() -> Unit)? = null
 
     init {
         this.title(data.toString())
@@ -768,14 +763,9 @@ public class DropdownItem<T> internal constructor(public val data: T) :
     /**
      * An optional icon for the item.
      */
-    public fun icon(
-        iconClass: String = "",
-        baseClass: String? = null,
-        id: String? = null,
-        context: Icon.() -> Unit = {}
-    ) {
+    public fun icon(iconClass: String = "", context: Icon.() -> Unit = {}) {
         this.iconClass = iconClass
-        this.icon = SubComponent(baseClass, id, context)
+        this.iconContext = context
     }
 
     /**
@@ -788,8 +778,8 @@ public class DropdownItem<T> internal constructor(public val data: T) :
     /**
      * Defines a custom layout for the item.
      */
-    public fun custom(context: Button.() -> Unit) {
-        this.custom = context
+    public fun content(context: RenderContext.() -> Unit) {
+        this.content = context
     }
 }
 
@@ -801,6 +791,6 @@ public class DropdownSeparator<T> internal constructor(@Suppress("unused") priva
 
 // ------------------------------------------------------ store
 
-internal class SelectStore<T> : RootStore<T?>(null) {
+internal class DropdownSelectionStore<T> : RootStore<T?>(null) {
     val select: Handler<T> = handle { _, data -> data }
 }

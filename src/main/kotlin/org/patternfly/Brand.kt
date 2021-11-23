@@ -32,7 +32,6 @@ public fun RenderContext.brand(
  */
 public class Brand internal constructor(private var alt: String, private var src: String) :
     PatternFlyComponent<Unit>,
-    WithAria by AriaMixin(),
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
@@ -47,6 +46,10 @@ public class Brand internal constructor(private var alt: String, private var src
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
         with(context) {
             img(baseClass = classes("brand".component(), baseClass), id = id) {
+                markAs(ComponentType.Brand)
+                applyElement(this)
+                applyEvents(this)
+
                 alt(alt)
                 src(src)
             }

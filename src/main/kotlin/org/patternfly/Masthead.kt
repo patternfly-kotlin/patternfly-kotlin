@@ -4,14 +4,14 @@ import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariation.plain
 
-public class Masthead : PatternFlyComponent<Unit> {
+public class Masthead internal constructor() : PatternFlyComponent<Unit> {
 
     private var toggle: Boolean = false
     private var brandHref: String = "#"
     private var brandSrc: String = ""
     private var brandAlt: String = ""
     private var brand: SubComponent<Brand>? = null
-    private var content: SubComponent<RenderContext>? = null
+    private var content: (RenderContext.() -> Unit)? = null
 
     public fun toggle() {
         this.toggle = true
@@ -31,12 +31,8 @@ public class Masthead : PatternFlyComponent<Unit> {
         this.brand = SubComponent(baseClass, id, context)
     }
 
-    public fun content(
-        baseClass: String? = null,
-        id: String? = null,
-        context: RenderContext.() -> Unit = {}
-    ) {
-        this.content = SubComponent(baseClass, id, context)
+    public fun content(content: RenderContext.() -> Unit) {
+        this.content = content
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -76,12 +72,9 @@ public class Masthead : PatternFlyComponent<Unit> {
                         }
                     }
                 }
-                content?.let { component ->
-                    div(
-                        baseClass = classes("masthead".component("content"), component.baseClass),
-                        id = component.id
-                    ) {
-                        component.context(this)
+                content?.let { content ->
+                    div(baseClass = "masthead".component("content")) {
+                        content(this)
                     }
                 }
             }
