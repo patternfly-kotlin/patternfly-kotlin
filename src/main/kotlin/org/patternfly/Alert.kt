@@ -1,11 +1,13 @@
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.drop
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
@@ -153,8 +155,8 @@ public class Alert internal constructor(private var severity: Severity, title: S
         Severity.DANGER -> "Error alert" to "Close error alert"
     }
     private var closable: Boolean = false
-    private val closeStore: CloseStore = CloseStore()
-    public val closes: Flow<MouseEvent> = closeStore.data.filterNotNull()
+    private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+    public val closes: Flow<MouseEvent> = closeStore.data.drop(1)
 
     init {
         this.title(title)

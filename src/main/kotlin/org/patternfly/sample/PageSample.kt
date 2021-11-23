@@ -9,8 +9,6 @@ import org.patternfly.card
 import org.patternfly.cardBody
 import org.patternfly.cardView
 import org.patternfly.dom.Id
-import org.patternfly.item
-import org.patternfly.items
 import org.patternfly.modifier
 import org.patternfly.navigation
 import org.patternfly.page
@@ -55,10 +53,8 @@ internal class PageSample {
                     pageGroup(baseClass = "sticky-top".modifier()) {
                         pageBreadcrumb {
                             breadcrumb<String> {
-                                items {
-                                    item("item1", "Item 1")
-                                    item("item2", "Item 2")
-                                }
+                                item("Item 1")
+                                item("Item 2")
                             }
                         }
                     }

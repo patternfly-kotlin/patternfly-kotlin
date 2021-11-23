@@ -1,8 +1,8 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
@@ -24,28 +24,10 @@ import org.patternfly.dom.matches
 // ------------------------------------------------------ factory
 
 /**
- * Creates a new [Dropdown] component with static [dropdown entries][DropdownEntry].
- *
- * @param align the alignment of the dropdown
- * @param up controls the direction of the dropdown menu
- * @param baseClass optional CSS class that should be applied to the component
- * @param id optional ID of the component
- * @param context a lambda expression for setting up the component itself
- */
-public fun <T> RenderContext.dropdown(
-    align: Align? = null,
-    up: Boolean = false,
-    baseClass: String? = null,
-    id: String? = null,
-    context: Dropdown<T>.() -> Unit = {}
-) {
-    Dropdown<T>(null, null, align, up).apply(context).render(this, baseClass, id)
-}
-
-/**
- * Creates a new [Dropdown] component with [dropdown entries][DropdownEntry] from the specified [store]. Use [Dropdown.display] to specify how to turn the data in the [store] into [dropdown entries][DropdownEntry].
+ * Creates a new [Dropdown] component.
  *
  * @param store the source for the [dropdown entries][DropdownEntry]
+ * @param idProvider identifier for the data in the store
  * @param align the alignment of the dropdown
  * @param up controls the direction of the dropdown menu
  * @param baseClass optional CSS class that should be applied to the component
@@ -53,8 +35,8 @@ public fun <T> RenderContext.dropdown(
  * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.dropdown(
-    store: Store<List<T>>,
-    idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+    store: Store<List<T>>? = null,
+    idProvider: IdProvider<T, String>? = null,
     align: Align? = null,
     up: Boolean = false,
     baseClass: String? = null,
@@ -96,9 +78,16 @@ public class Dropdown<T> internal constructor(
 
     private val entries: MutableList<DropdownEntry<T>> = mutableListOf()
     private var display: ((T) -> DropdownEntry<T>)? = null
-    private var selectionStore: DropdownSelectionStore<T> = DropdownSelectionStore()
+    private var selectionStore: RootStore<T?> = storeOf(null)
     private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {})
     private lateinit var root: Div
+
+    /**
+     * The selections of this dropdown.
+     *
+     * @sample org.patternfly.sample.DropdownSample.selections
+     */
+    public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
 
     /**
      * The store which holds the expanded / collapse state.
@@ -113,14 +102,6 @@ public class Dropdown<T> internal constructor(
      * @sample org.patternfly.sample.DropdownSample.expos
      */
     public val expos: Flow<Boolean> = expandedStore.data.drop(1)
-
-    /**
-     * The selections of this dropdown.
-     *
-     * @sample org.patternfly.sample.DropdownSample.selections
-     */
-    public val selections: Flow<T>
-        get() = selectionStore.data.mapNotNull { it } // don't know why filterNotNull cannot be used here!?
 
     /**
      * Disables or enables the dropdown.
@@ -363,9 +344,9 @@ public class Dropdown<T> internal constructor(
                 attr("hidden", expandedStore.data.map { !it })
                 aria["labelledby"] = toggle.id
 
-                if (store != null && idProvider != null) {
-                    store.data.renderEach(idProvider) { data ->
-                        val display = this@Dropdown.display ?: { item(data) }
+                if (store != null) {
+                    store.data.renderEach(idProvider ?: { Id.build(it.toString()) }) { data ->
+                        val display = display ?: { item(data) }
                         renderEntry(this, display(data), 0)
                     }
                 } else {
@@ -456,7 +437,7 @@ public class Dropdown<T> internal constructor(
                     domNode.autofocus = true
                 }
                 clicks handledBy expandedStore.collapse
-                clicks.map { item.data } handledBy selectionStore.select
+                clicks.map { item.data } handledBy selectionStore.update
                 item.applyEvents(this)
 
                 if (item.content != null) {
@@ -788,9 +769,3 @@ public class DropdownItem<T> internal constructor(public val data: T) :
  */
 public class DropdownSeparator<T> internal constructor(@Suppress("unused") private val id: Int = 23) :
     DropdownEntry<T>()
-
-// ------------------------------------------------------ store
-
-internal class DropdownSelectionStore<T> : RootStore<T?>(null) {
-    val select: Handler<T> = handle { _, data -> data }
-}

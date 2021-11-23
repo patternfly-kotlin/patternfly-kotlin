@@ -1,10 +1,12 @@
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.drop
 import org.patternfly.ButtonVariation.plain
 import org.patternfly.dom.Id
 import org.patternfly.dom.removeFromParent
@@ -52,8 +54,8 @@ public class Chip :
     private var badge: (Badge.() -> Unit)? = null
     private lateinit var root: Tag<HTMLElement>
     private var closable: Boolean = false
-    private val closeStore: CloseStore = CloseStore()
-    public val closes: Flow<MouseEvent> = closeStore.data.filterNotNull()
+    private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+    public val closes: Flow<MouseEvent> = closeStore.data.drop(1)
 
     public fun closable(closable: Boolean) {
         this.closable = closable

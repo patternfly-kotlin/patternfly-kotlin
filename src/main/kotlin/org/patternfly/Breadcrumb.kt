@@ -1,135 +1,110 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.A
+import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.TextElement
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.Job
+import dev.fritz2.routing.Router
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import org.patternfly.dom.Id
-import org.w3c.dom.HTMLElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
- * Creates a [Breadcrumb] component.
+ * Creates a new [Breadcrumb] component.
  *
- * @param store the store for the breadcrumb items
+ * @param store the source for the [items][BreadcrumbItem]
+ * @param idProvider identifier for the data in the store
+ * @param router if given, the specified router is used for navigation
  * @param noHomeLink set to `true`, if the first item should be plain text only
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.breadcrumb(
-    store: BreadcrumbStore<T> = BreadcrumbStore(),
+    store: Store<List<T>>? = null,
+    idProvider: IdProvider<T, String>? = null,
+    router: Router<T>? = null,
     noHomeLink: Boolean = false,
-    id: String? = null,
     baseClass: String? = null,
-    content: Breadcrumb<T>.() -> Unit = {}
-): Breadcrumb<T> = register(Breadcrumb(store, noHomeLink, id = id, baseClass = baseClass, job), content)
-
-/**
- * Starts a block to add navigation items using the DSL.
- *
- * @param block code block for adding the navigation items.
- */
-public fun <T> Breadcrumb<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
-    val entries = ItemsBuilder(store.idProvider, store.itemSelection).apply(block).build()
-    store.update(entries)
+    id: String? = null,
+    context: Breadcrumb<T>.() -> Unit = {}
+) {
+    Breadcrumb(
+        store = store,
+        idProvider = idProvider,
+        router = router,
+        noHomeLink = noHomeLink
+    ).apply(context).render(this, baseClass, id)
 }
 
-/**
- * Starts a block to add navigation items using the DSL.
- *
- * @param block code block for adding the navigation items.
- */
-public fun <T> BreadcrumbStore<T>.updateItems(block: ItemsBuilder<T>.() -> Unit = {}) {
-    val entries = ItemsBuilder(idProvider, itemSelection).apply(block).build()
-    update(entries)
-}
-
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [breadcrumb](https://www.patternfly.org/v4/components/breadcrumb/design-guidelines) component.
  *
  * A breadcrumb provides page context to help users navigate more efficiently and understand where they are in the application hierarchy.
  *
- * The data in the breadcrumb is managed by a [BreadcrumbStore] and is wrapped inside instances of [Item].
+ * The [items][BreadcrumbItem] can be added statically or by using a store. See the samples for more details.
  *
- * ### Adding entries
- *
- * Entries can be added by using the [BreadcrumbStore] or by using the DSL.
- *
- * ### Rendering entries
- *
- * By default the breadcrumb uses a builtin function to render the [Item]s in the [BreadcrumbStore]. This function takes the [Item.text] into account (if specified). If [Item.text] is `null`, the builtin function falls back to `Item.item.toString()`.
- *
- * If you don't want to use the builtin defaults you can specify a custom display function by calling [display]. In this case you have full control over the rendering of the data in the options menu entries.
- *
- * @sample org.patternfly.sample.BreadcrumbSample.breadcrumb
+ * @sample org.patternfly.sample.BreadcrumbSample.staticItems
+ * @sample org.patternfly.sample.BreadcrumbSample.storeItems
+ * @sample org.patternfly.sample.BreadcrumbSample.routerItems
  */
-public class Breadcrumb<T> internal constructor(
-    public val store: BreadcrumbStore<T>,
-    noHomeLink: Boolean,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLElement>,
-    TextElement(
-        "nav",
-        id = id,
-        baseClass = classes {
-            +ComponentType.Breadcrumb
-            +baseClass
-        },
-        job = job,
-        scope = Scope()
-    ) {
+public class Breadcrumb<T>(
+    private val store: Store<List<T>>?,
+    private val idProvider: IdProvider<T, String>?,
+    private val router: Router<T>?,
+    private var noHomeLink: Boolean = false
+) : PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
-    private var customDisplay: ComponentDisplay<A, T>? = null
-    private var defaultDisplay: ComponentDisplay<A, Item<T>> = { item ->
-        +(item.text ?: item.item.toString())
+    private val entries: MutableList<BreadcrumbItem<T>> = mutableListOf()
+    private var display: ((T) -> BreadcrumbItem<T>)? = null
+    private var selectionStore: RootStore<T?> = storeOf(null)
+    public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
+
+    public fun noHomeLink(noHomeLink: Boolean) {
+        this.noHomeLink = noHomeLink
     }
 
-    init {
-        markAs(ComponentType.Breadcrumb)
-        aria["label"] = "breadcrumb"
-        ol(baseClass = "breadcrumb".component("list")) {
-            this@Breadcrumb.store.data.map { it.items.withIndex().toList() }.renderEach { (index, item) ->
-                li(baseClass = "breadcrumb".component("item")) {
-                    if (index == 0 && noHomeLink) {
-                        a(baseClass = "breadcrumb".component("link")) {
-                            inlineStyle(
-                                """
-                                color: var(--pf-c-breadcrumb__link--m-current--Color);
-                                text-decoration: none;
-                                cursor: default;
-                                """.trimIndent()
-                            )
-                            if (this@Breadcrumb.customDisplay != null) {
-                                this@Breadcrumb.customDisplay?.invoke(this, item.item)
-                            } else {
-                                this@Breadcrumb.defaultDisplay.invoke(this, item)
+    public fun item(data: T, context: BreadcrumbItem<T>.() -> Unit = {}): BreadcrumbItem<T> =
+        BreadcrumbItem(data).apply(context).also {
+            entries.add(it)
+        }
+
+    /**
+     * Defines how to render [breadcrumb items][BreadcrumbItem] when using a store.
+     */
+    public fun display(display: (T) -> BreadcrumbItem<T>) {
+        this.display = display
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            nav(baseClass = classes(ComponentType.Breadcrumb, baseClass), id = id) {
+                markAs(ComponentType.Breadcrumb)
+                aria["label"] = "breadcrumb"
+                applyElement(this)
+                applyEvents(this)
+
+                ol(baseClass = "breadcrumb".component("list")) {
+                    if (store != null) {
+                        val idp = idProvider ?: { Id.build(it.toString()) }
+                        store.data.map { it.withIndex().toList() }.renderEach(
+                            idProvider = { idp.invoke(it.value) },
+                            content = { (index, data) ->
+                                val display = this@Breadcrumb.display ?: { item(data) }
+                                renderItem(this, display(data), index)
                             }
-                        }
+                        )
                     } else {
-                        span(baseClass = "breadcrumb".component("item", "divider")) {
-                            icon("angle-right".fas())
-                        }
-                        a(baseClass = "breadcrumb".component("link")) {
-                            classMap(
-                                this@Breadcrumb.store.singleSelection.map {
-                                    mapOf("current".modifier() to item.selected)
-                                }
-                            )
-                            clicks.map { item.unwrap() } handledBy this@Breadcrumb.store.handleClicks
-                            if (this@Breadcrumb.customDisplay != null) {
-                                this@Breadcrumb.customDisplay?.invoke(this, item.item)
-                            } else {
-                                this@Breadcrumb.defaultDisplay.invoke(this, item)
-                            }
+                        entries.forEachIndexed { index, item ->
+                            renderItem(this, item, index)
                         }
                     }
                 }
@@ -137,18 +112,45 @@ public class Breadcrumb<T> internal constructor(
         }
     }
 
-    /**
-     * Sets a custom display function to render the data inside the breadcrumb.
-     */
-    public fun display(display: ComponentDisplay<A, T>) {
-        this.customDisplay = display
-    }
+    private fun renderItem(context: RenderContext, item: BreadcrumbItem<T>, index: Int): RenderContext =
+        with(context) {
+            li(baseClass = "breadcrumb".component("item")) {
+                span(baseClass = "breadcrumb".component("item", "divider")) {
+                    icon("angle-right".fas())
+                }
+                if (index == 0 && noHomeLink) {
+                    item.applyEvents(this)
+                    item.applyTitle(this)
+                } else {
+                    a(baseClass = "breadcrumb".component("link")) {
+                        classMap(
+                            selectionStore.data.map {
+                                mapOf("current".modifier() to (item.data == it))
+                            }
+                        )
+                        router?.let { router ->
+                            aria["current"] = router.data.map { route ->
+                                if (route == item.data) "page" else ""
+                            }
+                            clicks.map { item.data } handledBy router.navTo
+                        }
+                        clicks.map { item.data } handledBy selectionStore.update
+                        item.applyEvents(this)
+                        item.applyTitle(this)
+                    }
+                }
+            }
+        }
 }
 
-// ------------------------------------------------------ store
+// ------------------------------------------------------ item
 
-/**
- * An [EntriesStore] with [ItemSelection.SINGLE] selection mode.
- */
-public class BreadcrumbStore<T>(idProvider: IdProvider<T, String> = { Id.build(it.toString()) }) :
-    EntriesStore<T>(idProvider, ItemSelection.SINGLE)
+public class BreadcrumbItem<T> internal constructor(public val data: T) :
+    WithExpandedStore by ExpandedStoreMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
+
+    init {
+        this.title(data.toString())
+    }
+}
