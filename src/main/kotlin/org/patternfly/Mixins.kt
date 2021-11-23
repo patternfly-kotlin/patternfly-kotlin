@@ -1,16 +1,13 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithText
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.MouseEvent
 
 /**
  * Interface meant to be implemented by components which have a title. The title can be specified either as a static string or as a [flow][Flow] of strings.
