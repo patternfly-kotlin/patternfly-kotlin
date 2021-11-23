@@ -32,7 +32,7 @@ public object Id {
     /**
      * Creates a safe ID separated by '-' by removing white space and anything which is not `[a-zA-Z0-9-_]`. Multiple consecutive '-' are reduced to one '-'
      *
-     * @sample org.patternfly.sample.IdSamples.build
+     * @sample org.patternfly.sample.IdSample.build
      */
     public fun build(id: String, vararg additionalIds: String): String {
         val segments = listOf(id, *additionalIds)
