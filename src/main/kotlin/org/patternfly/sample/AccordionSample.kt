@@ -12,22 +12,19 @@ internal class AccordionSample {
 
     fun accordion() {
         render {
-            accordion(singleExpand = true) {
-                item {
-                    title("Item one")
+            accordion<String>(singleExpand = true) {
+                item("Item one") {
                     content {
                         p { +"Lorem ipsum dolor sit amet." }
                     }
                 }
-                item {
-                    title("Item two")
+                item("Item two") {
                     content {
                         p { +"Phasellus pretium est a porttitor vehicula." }
                     }
                     expanded(true)
                 }
-                item {
-                    title("Item three")
+                item("Item three") {
                     content {
                         p { +"Quisque vel commodo urna." }
                     }
@@ -54,7 +51,8 @@ internal class AccordionSample {
         render {
             accordion(store) {
                 display { pair ->
-                    item(pair.first) {
+                    item(pair) {
+                        title(pair.first)
                         expanded(pair.first == "Item two")
                         content {
                             p { +pair.second }

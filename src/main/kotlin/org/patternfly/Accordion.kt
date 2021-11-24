@@ -1,41 +1,19 @@
 package org.patternfly
 
+import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
 
 /**
- * Creates an [Accordion] component with static [AccordionItem]s.
- *
- * @param singleExpand whether only one item can be expanded at a time
- * @param fixed whether the AccordionItems use a fixed height
- * @param bordered whether to draw a border between the [AccordionItem]s
- * @param baseClass optional CSS class that should be applied to the component
- * @param id optional ID of the component
- * @param context a lambda expression for setting up the component itself
- */
-public fun RenderContext.accordion(
-    singleExpand: Boolean = false,
-    fixed: Boolean = false,
-    bordered: Boolean = false,
-    baseClass: String? = null,
-    id: String? = null,
-    context: Accordion<Unit>.() -> Unit = {}
-) {
-    Accordion<Unit>(
-        store = null,
-        singleExpand = singleExpand,
-        fixed = fixed,
-        bordered = bordered
-    ).apply(context).render(this, baseClass, id)
-}
-
-/**
- * Creates an [Accordion] component with [AccordionItem]s taken from the provided [store].
+ * Creates an [Accordion] component.
  *
  * @param store provides data to create [AccordionItem]s using [Accordion.renderItem]
  * @param singleExpand whether only one item can be expanded at a time
@@ -46,7 +24,7 @@ public fun RenderContext.accordion(
  * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.accordion(
-    store: Store<List<T>>,
+    store: Store<List<T>>? = null,
     singleExpand: Boolean = false,
     fixed: Boolean = false,
     bordered: Boolean = false,
@@ -81,8 +59,10 @@ public class Accordion<T> internal constructor(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private val items: MutableList<AccordionItem> = mutableListOf()
-    private var display: ((T) -> AccordionItem)? = null
+    private val items: MutableList<AccordionItem<T>> = mutableListOf()
+    private var display: ((T) -> AccordionItem<T>)? = null
+    private var selectionStore: RootStore<T?> = storeOf(null)
+    public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
 
     /**
      * whether only one [AccordionItem] can be expanded at a time
@@ -106,17 +86,17 @@ public class Accordion<T> internal constructor(
     }
 
     /**
-     * Adds a static [AccordionItem].
+     * Adds an [AccordionItem].
      */
-    public fun item(title: String = "", context: AccordionItem.() -> Unit = {}): AccordionItem =
-        AccordionItem(title).apply(context).also {
+    public fun item(data: T, context: AccordionItem<T>.() -> Unit = {}): AccordionItem<T> =
+        AccordionItem(data).apply(context).also {
             items.add(it)
         }
 
     /**
      * Defines how to render [AccordionItem]s when using a store.
      */
-    public fun display(display: (T) -> AccordionItem) {
+    public fun display(display: (T) -> AccordionItem<T>) {
         this.display = display
     }
 
@@ -137,8 +117,8 @@ public class Accordion<T> internal constructor(
                 if (store != null) {
                     store.data.render { list ->
                         list.forEach { data ->
-                            val display = this@Accordion.display ?: { AccordionItem(data.toString()) }
-                            val item = display(data)
+                            val dsp = display ?: { item(data) }
+                            val item = dsp(data)
                             renderItem(this, item)
                             expandItem(item)
                         }
@@ -153,7 +133,7 @@ public class Accordion<T> internal constructor(
         }
     }
 
-    private fun renderItem(context: RenderContext, item: AccordionItem) {
+    private fun renderItem(context: RenderContext, item: AccordionItem<T>) {
         with(context) {
             dt {
                 button(baseClass = "accordion".component("toggle")) {
@@ -163,6 +143,7 @@ public class Accordion<T> internal constructor(
                             mapOf("expanded".modifier() to expanded)
                         }
                     )
+                    clicks.map { item.data } handledBy selectionStore.update
                     clicks handledBy item.expandedStore.toggle
                     if (singleExpand) {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
@@ -193,7 +174,7 @@ public class Accordion<T> internal constructor(
         }
     }
 
-    private fun expandItem(item: AccordionItem) {
+    private fun expandItem(item: AccordionItem<T>) {
         if (item.initiallyExpanded) {
             item.expandedStore.expand(Unit)
             if (singleExpand) {
@@ -202,7 +183,7 @@ public class Accordion<T> internal constructor(
         }
     }
 
-    private fun collapseAllBut(item: AccordionItem) {
+    private fun collapseAllBut(item: AccordionItem<T>) {
         items.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
     }
 }
@@ -212,7 +193,7 @@ public class Accordion<T> internal constructor(
 /**
  * An item in an [Accordion] component. The item consists of a title and a content.
  */
-public class AccordionItem internal constructor(title: String) :
+public class AccordionItem<T> internal constructor(public val data: T) :
     WithExpandedStore by ExpandedStoreMixin(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
@@ -222,7 +203,7 @@ public class AccordionItem internal constructor(title: String) :
     internal var content: (RenderContext.() -> Unit)? = null
 
     init {
-        this.title(title)
+        this.title(data.toString())
     }
 
     public fun content(content: RenderContext.() -> Unit) {

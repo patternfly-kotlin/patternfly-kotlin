@@ -63,7 +63,7 @@ public class Breadcrumb<T>(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private val entries: MutableList<BreadcrumbItem<T>> = mutableListOf()
+    private val items: MutableList<BreadcrumbItem<T>> = mutableListOf()
     private var display: ((T) -> BreadcrumbItem<T>)? = null
     private var selectionStore: RootStore<T?> = storeOf(null)
     public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
@@ -74,7 +74,7 @@ public class Breadcrumb<T>(
 
     public fun item(data: T, context: BreadcrumbItem<T>.() -> Unit = {}): BreadcrumbItem<T> =
         BreadcrumbItem(data).apply(context).also {
-            entries.add(it)
+            items.add(it)
         }
 
     /**
@@ -98,12 +98,12 @@ public class Breadcrumb<T>(
                         store.data.map { it.withIndex().toList() }.renderEach(
                             idProvider = { idp.invoke(it.value) },
                             content = { (index, data) ->
-                                val display = this@Breadcrumb.display ?: { item(data) }
-                                renderItem(this, display(data), index)
+                                val dsp = display ?: { item(data) }
+                                renderItem(this, dsp(data), index)
                             }
                         )
                     } else {
-                        entries.forEachIndexed { index, item ->
+                        items.forEachIndexed { index, item ->
                             renderItem(this, item, index)
                         }
                     }
