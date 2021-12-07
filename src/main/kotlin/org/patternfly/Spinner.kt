@@ -1,30 +1,27 @@
 package org.patternfly
 
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.Span
-import kotlinx.coroutines.Job
-import org.patternfly.Size.XL
-import org.w3c.dom.HTMLSpanElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates a [Spinner] component.
  *
  * @param size the size of the spinner. Supported sizes are [Size.SM], [Size.MD], [Size.LG] and [Size.XL].
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.spinner(
-    size: Size = XL,
-    id: String? = null,
+    size: Size = Size.MD,
     baseClass: String? = null,
-    content: Spinner.() -> Unit = {}
-): Spinner = register(Spinner(size, id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    context: Spinner.() -> Unit = {}
+) {
+    Spinner(size).apply(context).render(this, baseClass, id)
+}
 
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [spinner](https://www.patternfly.org/v4/components/spinner/design-guidelines) component.
@@ -33,26 +30,31 @@ public fun RenderContext.spinner(
  *
  * @sample org.patternfly.sample.SpinnerSample.spinner
  */
-public class Spinner internal constructor(size: Size, id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLSpanElement>,
-    Span(
-        id = id,
-        baseClass = classes {
-            +ComponentType.Spinner
-            +size.modifier
-            +baseClass
-        },
-        job,
-        scope = Scope()
-    ) {
+public class Spinner internal constructor(private val size: Size) :
+    PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
-    init {
-        markAs(ComponentType.Spinner)
-        attr("role", "progressbar")
-        aria["valuetext"] = "Loading..."
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            span(
+                baseClass = classes {
+                    +"spinner".component()
+                    +size.modifier
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Spinner)
+                attr("role", "progressbar")
+                aria["valuetext"] = "Loading..."
+                applyElement(this)
+                applyEvents(this)
 
-        span(baseClass = "spinner".component("clipper")) {}
-        span(baseClass = "spinner".component("lead-ball")) {}
-        span(baseClass = "spinner".component("tail-ball")) {}
+                span(baseClass = "spinner".component("clipper")) {}
+                span(baseClass = "spinner".component("lead-ball")) {}
+                span(baseClass = "spinner".component("tail-ball")) {}
+            }
+        }
     }
 }

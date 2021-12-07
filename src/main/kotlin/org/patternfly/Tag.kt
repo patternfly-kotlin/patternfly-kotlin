@@ -1,19 +1,12 @@
 package org.patternfly
 
-import dev.fritz2.binding.Patch
-import dev.fritz2.dom.MultipleRootElementsException
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.mountDomNodePatch
 import dev.fritz2.lenses.IdProvider
-import dev.fritz2.utils.Myer
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.scan
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -25,6 +18,7 @@ internal fun <V, I> Flow<List<V>>.renderShifted(
     content: RenderContext.(V) -> RenderContext
 ) {
     val jobs = mutableMapOf<Node, Job>()
+/*
     mountDomNodePatch(
         tag.job,
         tag.domNode,
@@ -52,6 +46,7 @@ internal fun <V, I> Flow<List<V>>.renderShifted(
         if (job != null) job.cancelChildren()
         else console.error("could not cancel renderEach-jobs!")
     }
+*/
 }
 
 private inline fun registerSingle(
@@ -71,7 +66,8 @@ private inline fun registerSingle(
 
         override fun <E : Element, W : WithDomNode<E>> register(element: W, content: (W) -> Unit): W {
             if (alreadyRegistered) {
-                throw MultipleRootElementsException("You can have only one root-tag per html-context!")
+//                throw MultipleRootElementsException("You can have only one root-tag per html-context!")
+                throw IllegalStateException("You can have only one root-tag per html-context!")
             } else {
                 content(element)
                 alreadyRegistered = true

@@ -1,13 +1,10 @@
 package org.patternfly
 
-import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.WithText
-import dev.fritz2.dom.mountDomNode
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.document
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import org.patternfly.Size.LG
 import org.patternfly.Size.MD
 import org.patternfly.Size.XL
@@ -68,12 +65,12 @@ public interface WithIdProvider<T> {
  */
 internal interface WithTextDelegate<E : HTMLElement, D : HTMLElement> : WithText<E> {
 
-    override fun Flow<String>.asText() {
-        mountDomNode(job, delegate(), this.map { TextNode(it) })
+    fun Flow<String>.asText() {
+//        mountDomNode(job, delegate(), this.map { TextNode(it) })
     }
 
-    override fun <T> Flow<T>.asText() {
-        mountDomNode(job, delegate(), this.map { TextNode(it.toString()) })
+    fun <T> Flow<T>.asText() {
+//        mountDomNode(job, delegate(), this.map { TextNode(it.toString()) })
     }
 
     override operator fun String.unaryPlus(): Node = delegate().appendChild(document.createTextNode(this))
@@ -98,6 +95,8 @@ public enum class Align(public val modifier: String) {
  */
 @Suppress("EnumEntryName", "EnumNaming")
 public enum class ButtonVariation(internal val modifier: String) {
+    block("block".modifier()),
+    callToAction("display-lg".modifier()),
     control("control".modifier()),
     danger("danger".modifier()),
     `inline`("inline".modifier()),

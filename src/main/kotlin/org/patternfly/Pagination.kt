@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.TextNode
 import dev.fritz2.dom.html.Div
@@ -243,6 +242,7 @@ public class Pagination internal constructor(
      */
     public fun disabled(value: Flow<Boolean>) {
         optionsMenu.disabled(value)
+/*
         mountSingle(job, value) { v, _ ->
             if (v) {
                 controlElements.forEach { it.disabled = true }
@@ -251,6 +251,7 @@ public class Pagination internal constructor(
                 pageInfoHandler.refresh(Unit)
             }
         }
+*/
     }
 }
 

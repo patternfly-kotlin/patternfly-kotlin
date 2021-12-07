@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.html.Input
 import kotlinx.coroutines.flow.Flow
 
@@ -20,5 +19,5 @@ public fun Input.triState(value: TriState) {
  * @receiver an input of type `checkbox`
  */
 public fun Input.triState(value: Flow<TriState>) {
-    mountSingle(job, value) { v, _ -> triState(v) }
+//    mountSingle(job, value) { v, _ -> triState(v) }
 }

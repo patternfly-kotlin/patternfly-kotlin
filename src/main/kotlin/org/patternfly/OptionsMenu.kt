@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.mountSingle
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
@@ -328,7 +327,7 @@ public class OptionsMenu<T> internal constructor(
      * Updates the selection based on the specified values.
      */
     public fun select(values: Flow<List<T>>) {
-        mountSingle(job, values) { v, _ -> select(v) }
+//        mountSingle(job, values) { v, _ -> select(v) }
     }
 
     /**
@@ -342,7 +341,7 @@ public class OptionsMenu<T> internal constructor(
      * Updates the selection based on the specified value.
      */
     public fun select(value: Flow<T>) {
-        mountSingle(job, value) { v, _ -> select(v) }
+//        mountSingle(job, value) { v, _ -> select(v) }
     }
 
     /**
@@ -428,7 +427,7 @@ internal class OptionsMenuPlainTextToggle<T>(
     }
 
     override fun disabled(value: Flow<Boolean>) {
-        mountSingle(job, value) { v, _ -> disabled(v) }
+//        mountSingle(job, value) { v, _ -> disabled(v) }
     }
 }
 
