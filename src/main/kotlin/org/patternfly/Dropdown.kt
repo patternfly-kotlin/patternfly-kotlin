@@ -476,7 +476,7 @@ internal sealed interface ToggleKind
 
 internal class TextToggleKind(
     val title: String?,
-    val variation: ButtonVariation?,
+    val variation: ButtonVariant?,
     val context: Span.() -> Unit
 ) : ToggleKind
 
@@ -521,7 +521,7 @@ internal class CheckboxToggleKind(
 
 internal class ActionToggleKind(
     val title: String?,
-    val variation: ButtonVariation?,
+    val variation: ButtonVariant?,
     val baseClass: String?,
     val id: String?,
     val context: Button.() -> Unit
@@ -558,7 +558,7 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
      */
     public fun text(
         title: String? = null,
-        variation: ButtonVariation? = null,
+        variation: ButtonVariant? = null,
         context: Span.() -> Unit = {}
     ) {
         kind = TextToggleKind(title = title, variation = variation, context = context)
@@ -637,7 +637,7 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
      */
     public fun action(
         title: String? = null,
-        variation: ButtonVariation? = null,
+        variation: ButtonVariant? = null,
         baseClass: String? = null,
         id: String? = null,
         context: Button.() -> Unit = {}

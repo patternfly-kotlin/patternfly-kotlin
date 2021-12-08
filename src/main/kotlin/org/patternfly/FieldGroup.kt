@@ -215,7 +215,7 @@ public class FieldGroup internal constructor(
             classMap(expanded.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
             div(baseClass = "form".component("field-group", "toggle")) {
                 div(baseClass = "form".component("field-group", "toggle", "button")) {
-                    pushButton(ButtonVariation.plain, id = this@FieldGroup.toggleId) {
+                    pushButton(ButtonVariant.plain, id = this@FieldGroup.toggleId) {
                         aria["labelledby"] = this@FieldGroup.titleId
                         span(baseClass = "form".component("field-group", "toggle", "icon")) {
                             icon("angle-right".fas())

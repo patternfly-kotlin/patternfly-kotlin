@@ -3,8 +3,8 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.ButtonVariation.primary
-import org.patternfly.ButtonVariation.secondary
+import org.patternfly.ButtonVariant.primary
+import org.patternfly.ButtonVariant.secondary
 import org.patternfly.ItemsStore
 import org.patternfly.Severity.DEFAULT
 import org.patternfly.Severity.INFO

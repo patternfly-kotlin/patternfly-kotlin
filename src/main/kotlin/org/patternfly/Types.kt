@@ -91,24 +91,6 @@ public enum class Align(public val modifier: String) {
 }
 
 /**
- * Visual modifiers for [PushButton]s and [LinkButton]s.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class ButtonVariation(internal val modifier: String) {
-    block("block".modifier()),
-    callToAction("display-lg".modifier()),
-    control("control".modifier()),
-    danger("danger".modifier()),
-    `inline`("inline".modifier()),
-    link("link".modifier()),
-    plain("plain".modifier()),
-    primary("primary".modifier()),
-    secondary("secondary".modifier()),
-    tertiary("tertiary".modifier()),
-    warning("warning".modifier()),
-}
-
-/**
  * Enum for the [DataTable] selection mode.
  */
 public enum class DataTableSelection {

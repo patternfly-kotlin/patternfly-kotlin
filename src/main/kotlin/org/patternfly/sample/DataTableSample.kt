@@ -4,7 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.ItemsStore
 import org.patternfly.Severity.DEFAULT
 import org.patternfly.SortInfo

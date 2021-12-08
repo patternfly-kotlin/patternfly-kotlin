@@ -3,7 +3,6 @@ package org.patternfly
 import dev.fritz2.binding.EmittingHandler
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
-import dev.fritz2.dom.DomListener
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
@@ -21,17 +20,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.dom.clear
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.plusAssign
 import org.patternfly.dom.querySelector
 import org.patternfly.dom.removeFromParent
-import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
-import org.w3c.dom.events.MouseEvent
 
 // ------------------------------------------------------ dsl
 
@@ -159,14 +156,8 @@ public class ChipGroup<T> internal constructor(
     private val expanded = ExpandedStore()
     private var display: Chip.(T) -> Unit = { chip { +it.toString() } }
     private var textElement: Span? = null
-    private var closeButton: PushButton? = null
-
-    /**
-     * Listener for the close button (if any).
-     *
-     * @sample org.patternfly.sample.ChipGroupSample.closes
-     */
-    public val closes: DomListener<MouseEvent, HTMLButtonElement> by lazy { subscribe(closeButton, Events.click) }
+//    private var closeButton: Button? = null
+    // TODO closes
 
     init {
         markAs(ComponentType.ChipGroup)
@@ -205,7 +196,7 @@ public class ChipGroup<T> internal constructor(
 
         if (closable) {
             div(baseClass = "chip-group".component("close")) {
-                this@ChipGroup.closeButton = pushButton(plain) {
+                pushButton(plain) {
                     icon("times-circle".fas())
                     aria["label"] = "Close chip group"
                     domNode.addEventListener(Events.click.name, this@ChipGroup::close)
@@ -258,7 +249,7 @@ public class ChipGroup<T> internal constructor(
     }
 
     private fun close(@Suppress("UNUSED_PARAMETER") event: Event) {
-        closeButton?.domNode?.removeEventListener(Events.click.name, ::close)
+//        closeButton?.domNode?.removeEventListener(Events.click.name, ::close)
         domNode.removeFromParent()
     }
 }

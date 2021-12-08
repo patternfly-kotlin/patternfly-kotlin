@@ -5,7 +5,7 @@ import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
 import kotlinx.coroutines.Job
-import org.patternfly.ButtonVariation.link
+import org.patternfly.ButtonVariant.link
 import org.patternfly.Size.LG
 import org.patternfly.Size.MD
 import org.patternfly.Size.SM

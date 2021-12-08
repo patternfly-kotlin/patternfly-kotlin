@@ -10,7 +10,7 @@ import dev.fritz2.dom.states
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLUListElement
@@ -310,7 +310,7 @@ public class DataListExpandableContent<T> internal constructor(
 /**
  * Component for an item in a [DataList]. All other components are nested inside this component.
  *
- * The data list is very flexible when it comes to displaying the items in the [ItemsStore]. You should at least add a [DataListRow] for each item you want to render. If you want to use controls like a checkbox and / or a toggle, add them inside a [DataListControl] component. The actual content should be added inside multiple [DataListCell]s inside a [DataListContent] component. If you want to add actions like [PushButton]s or [Dropdown]s, add them inside a [DataListAction] component. Finally the expandable content goes inside a [DataListExpandableContent] component.
+ * The data list is very flexible when it comes to displaying the items in the [ItemsStore]. You should at least add a [DataListRow] for each item you want to render. If you want to use controls like a checkbox and / or a toggle, add them inside a [DataListControl] component. The actual content should be added inside multiple [DataListCell]s inside a [DataListContent] component. If you want to add actions like [Button]s or [Dropdown]s, add them inside a [DataListAction] component. Finally the expandable content goes inside a [DataListExpandableContent] component.
  *
  * ```
  * ┏━━━━━━━━━━━ dataList: DataListItem ━━━━━━━━━━━┓
@@ -423,7 +423,8 @@ public class DataListToggle<T> internal constructor(
 
     init {
         clickButton(plain) {
-            this@DataListToggle.dataListItem.toggleButton = domNode
+            // TODO Migrate this
+//            this@DataListToggle.dataListItem.toggleButton = domNode
             aria["label"] = "Details"
             aria["labelledby"] = "$id ${this@DataListToggle.itemsStore.idProvider(this@DataListToggle.item)}"
             aria["expanded"] = this@DataListToggle.dataListItem.expanded.data.map { it.toString() }

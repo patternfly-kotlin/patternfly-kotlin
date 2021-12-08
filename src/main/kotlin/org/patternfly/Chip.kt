@@ -7,7 +7,7 @@ import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
@@ -99,7 +99,7 @@ public class Chip :
                         aria["label"] = "Remove"
                         aria["labelledby"] = textId
                         domNode.addEventListener(Events.click.name, this@Chip::removeFromParent)
-                        clicks.map { it } handledBy closeStore.update
+                        clicks.map { it } handledBy this@Chip.closeStore.update
                     }
                 }
             }

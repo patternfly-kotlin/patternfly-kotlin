@@ -5,7 +5,7 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.ScopeContext
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.primary
+import org.patternfly.ButtonVariant.primary
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory

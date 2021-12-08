@@ -8,10 +8,9 @@ import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
@@ -186,7 +185,7 @@ public class Alert internal constructor(private var severity: Severity, title: S
      *
      * @sample org.patternfly.sample.AlertSample.actions
      */
-    public fun action(title: String, events: EventContext<HTMLButtonElement>.() -> Unit) {
+    public fun action(title: String, events: EventContext<HTMLElement>.() -> Unit) {
         actions.add(AlertAction({ +title }, events))
     }
 
@@ -198,7 +197,7 @@ public class Alert internal constructor(private var severity: Severity, title: S
      *
      * @sample org.patternfly.sample.AlertSample.actions
      */
-    public fun action(context: PushButton.() -> Unit, events: EventContext<HTMLButtonElement>.() -> Unit) {
+    public fun action(context: Button.() -> Unit, events: EventContext<HTMLElement>.() -> Unit) {
         actions.add(AlertAction(context, events))
     }
 
@@ -231,9 +230,9 @@ public class Alert internal constructor(private var severity: Severity, title: S
                     div(baseClass = "alert".component("action")) {
                         pushButton(plain) {
                             icon("times".fas())
-                            aria["label"] = ariaLabels.second
+                            aria["label"] = this@Alert.ariaLabels.second
                             domNode.addEventListener(Events.click.name, this@Alert::removeFromParent)
-                            clicks.map { it } handledBy closeStore.update
+                            clicks.map { it } handledBy this@Alert.closeStore.update
                         }
                     }
                 }
@@ -245,9 +244,11 @@ public class Alert internal constructor(private var severity: Severity, title: S
                 if (actions.isNotEmpty()) {
                     div(baseClass = "alert".component("action-group")) {
                         actions.forEach { alertAction ->
-                            pushButton(ButtonVariation.inline, ButtonVariation.link) {
+                            pushButton(ButtonVariant.inline, ButtonVariant.link) {
                                 alertAction.context(this)
-                                alertAction.events(this)
+                                events {
+                                    alertAction.events(this)
+                                }
                             }
                         }
                     }
@@ -267,6 +268,6 @@ public class Alert internal constructor(private var severity: Severity, title: S
 }
 
 internal class AlertAction(
-    val context: PushButton.() -> Unit,
-    val events: (EventContext<HTMLButtonElement>.() -> Unit)
+    val context: Button.() -> Unit,
+    val events: (EventContext<HTMLElement>.() -> Unit)
 )

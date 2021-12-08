@@ -15,7 +15,7 @@ import dev.fritz2.dom.states
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.DataTableSelection.MULTIPLE
 import org.patternfly.DataTableSelection.MULTIPLE_ALL
 import org.patternfly.DataTableSelection.SINGLE

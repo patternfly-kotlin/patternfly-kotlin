@@ -10,7 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
 import org.patternfly.ItemSelection.SINGLE
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLButtonElement
@@ -162,25 +161,26 @@ public class Pagination internal constructor(
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
-                    this@Pagination.controlElements.add(
-                        pushButton(plain) {
-                            aria["label"] = "Go to first page"
-                            disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
-                            clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
-                            icon("angle-double-left".fas())
-                        }.domNode
-                    )
+                    // TODO Migrate buttons
+//                    this@Pagination.controlElements.add(
+//                        pushButton(plain) {
+//                            aria["label"] = "Go to first page"
+//                            disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
+//                            clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
+//                            icon("angle-double-left".fas())
+//                        }.domNode
+//                    )
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
-                this@Pagination.controlElements.add(
-                    pushButton(plain) {
-                        aria["label"] = "Go to previous page"
-                        disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
-                        clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
-                        icon("angle-left".fas())
-                    }.domNode
-                )
+//                this@Pagination.controlElements.add(
+//                    pushButton(plain) {
+//                        aria["label"] = "Go to previous page"
+//                        disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
+//                        clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
+//                        icon("angle-left".fas())
+//                    }.domNode
+//                )
             }
             if (!compact) {
                 div(baseClass = "pagination".component("nav", "page-select")) {
@@ -204,25 +204,25 @@ public class Pagination internal constructor(
                 }
             }
             div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
-                this@Pagination.controlElements.add(
-                    pushButton(plain) {
-                        aria["label"] = "Go to next page"
-                        disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
-                        clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
-                        icon("angle-right".fas())
-                    }.domNode
-                )
+//                this@Pagination.controlElements.add(
+//                    pushButton(plain) {
+//                        aria["label"] = "Go to next page"
+//                        disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
+//                        clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
+//                        icon("angle-right".fas())
+//                    }.domNode
+//                )
             }
             if (!compact) {
                 div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
-                    this@Pagination.controlElements.add(
-                        pushButton(plain) {
-                            aria["label"] = "Go to last page"
-                            disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
-                            clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
-                            icon("angle-double-right".fas())
-                        }.domNode
-                    )
+//                    this@Pagination.controlElements.add(
+//                        pushButton(plain) {
+//                            aria["label"] = "Go to last page"
+//                            disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
+//                            clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
+//                            icon("angle-double-right".fas())
+//                        }.domNode
+//                    )
                 }
             }
         }

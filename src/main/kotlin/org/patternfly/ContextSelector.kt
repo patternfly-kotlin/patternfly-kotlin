@@ -11,7 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.control
+import org.patternfly.ButtonVariant.control
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.matches

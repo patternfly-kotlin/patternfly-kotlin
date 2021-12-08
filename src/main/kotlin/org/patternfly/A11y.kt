@@ -36,6 +36,13 @@ public class TagAria<E : Element>(private val tag: Tag<E>) : ElementAria(tag.dom
     /**
      * Sets the values from the flow as values for the ARIA attribute.
      */
+    public operator fun set(name: String, value: Flow<Boolean>) {
+        tag.attr(attributeSafeKey(name), value)
+    }
+
+    /**
+     * Sets the values from the flow as values for the ARIA attribute.
+     */
     public operator fun set(name: String, value: Flow<String>) {
         tag.attr(attributeSafeKey(name), value)
     }

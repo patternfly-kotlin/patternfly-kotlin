@@ -12,7 +12,7 @@ import dev.fritz2.dom.states
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ dsl

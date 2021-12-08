@@ -73,16 +73,6 @@ internal class ChipGroupSample {
         }
     }
 
-    fun closes() {
-        render {
-            chipGroup<String>(closable = true) {
-                +"Close me"
-                chips("Foo", "Bar")
-                closes handledBy notification(INFO, "You did it!")
-            }
-        }
-    }
-
     fun remove() {
         render {
             chipGroup<String> {

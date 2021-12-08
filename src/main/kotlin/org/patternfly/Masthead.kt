@@ -2,7 +2,7 @@ package org.patternfly
 
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 
 public class Masthead internal constructor() : PatternFlyComponent<Unit> {
 

@@ -1,8 +1,8 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import org.patternfly.ButtonVariation.link
-import org.patternfly.ButtonVariation.primary
+import org.patternfly.ButtonVariant.link
+import org.patternfly.ButtonVariant.primary
 import org.patternfly.emptyState
 import org.patternfly.emptyStateBody
 import org.patternfly.emptyStatePrimary

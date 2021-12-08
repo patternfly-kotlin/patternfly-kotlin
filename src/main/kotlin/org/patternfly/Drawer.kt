@@ -8,7 +8,7 @@ import dev.fritz2.dom.html.TagContext
 import kotlinx.browser.document
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
-import org.patternfly.ButtonVariation.plain
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.DrawerPanelPosition.BOTTOM
 import org.patternfly.DrawerPanelPosition.LEFT
 import org.patternfly.DrawerPanelPosition.RIGHT
