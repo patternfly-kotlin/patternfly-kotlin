@@ -18,7 +18,6 @@ import org.patternfly.IconAndTitle.ICON_LAST
 import org.patternfly.IconAndTitle.ICON_ONLY
 import org.patternfly.IconAndTitle.TITLE_ONLY
 import org.patternfly.IconAndTitle.UNDEFINED
-import org.patternfly.dom.debug
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.MouseEvent
 
@@ -310,8 +309,6 @@ public class Button internal constructor(
         this.type = type
     }
 
-    private lateinit var root: Tag<HTMLElement>
-
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
         val classes = classes {
             +ComponentType.Button
@@ -322,7 +319,7 @@ public class Button internal constructor(
         }
 
         with(context) {
-            root = when (buttonType) {
+            when (buttonType) {
                 BUTTON -> {
                     button(baseClass = classes, id = id) {
                         applyCommons(this)
@@ -402,7 +399,7 @@ public class Button internal constructor(
                     loadingOrTitle(context, running)
                     icon?.invoke(context, "end".modifier())
                 }
-                UNDEFINED -> console.warn("Undefined icon and title definition in button ${root.domNode.debug()}")
+                UNDEFINED -> console.warn("Undefined icon and title definition in button")
             }
         }
     }
