@@ -181,7 +181,7 @@ public class Dropdown<T> internal constructor(
                     button(
                         baseClass = classes {
                             +"dropdown".component("toggle")
-                            +kind.variation?.modifier
+                            +kind.variant?.modifier
                         }
                     ) {
                         setupToggleButton(this)
@@ -271,7 +271,7 @@ public class Dropdown<T> internal constructor(
                             +"dropdown".component("toggle")
                             +"split-button".modifier()
                             +"action".modifier()
-                            +kind.variation?.modifier
+                            +kind.variant?.modifier
                         }
                     ) {
                         button(
@@ -476,7 +476,7 @@ internal sealed interface ToggleKind
 
 internal class TextToggleKind(
     val title: String?,
-    val variation: ButtonVariant?,
+    val variant: ButtonVariant?,
     val context: Span.() -> Unit
 ) : ToggleKind
 
@@ -521,7 +521,7 @@ internal class CheckboxToggleKind(
 
 internal class ActionToggleKind(
     val title: String?,
-    val variation: ButtonVariant?,
+    val variant: ButtonVariant?,
     val baseClass: String?,
     val id: String?,
     val context: Button.() -> Unit
@@ -558,10 +558,10 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
      */
     public fun text(
         title: String? = null,
-        variation: ButtonVariant? = null,
+        variant: ButtonVariant? = null,
         context: Span.() -> Unit = {}
     ) {
-        kind = TextToggleKind(title = title, variation = variation, context = context)
+        kind = TextToggleKind(title = title, variant = variant, context = context)
     }
 
     /**
@@ -637,12 +637,12 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
      */
     public fun action(
         title: String? = null,
-        variation: ButtonVariant? = null,
+        variant: ButtonVariant? = null,
         baseClass: String? = null,
         id: String? = null,
         context: Button.() -> Unit = {}
     ) {
-        kind = ActionToggleKind(title = title, variation = variation, baseClass = baseClass, id = id, context)
+        kind = ActionToggleKind(title = title, variant = variant, baseClass = baseClass, id = id, context)
     }
 
     /**
