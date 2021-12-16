@@ -126,13 +126,15 @@ public open class ChipGroup(private var limit: Int) :
     ) {
         (MainScope() + job).launch {
             values.collect { values ->
-                itemStore.update(values.map { value ->
-                    ChipItem(idProvider(value)).apply {
-                        chip {
-                            display(this, value)
+                itemStore.update(
+                    values.map { value ->
+                        ChipItem(idProvider(value)).apply {
+                            chip {
+                                display(this, value)
+                            }
                         }
                     }
-                })
+                )
             }
         }
     }
