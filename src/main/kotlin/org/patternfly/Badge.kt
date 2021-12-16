@@ -44,7 +44,7 @@ public fun RenderContext.badge(
  * @sample org.patternfly.sample.BadgeSample.badge
  */
 @Suppress("TooManyFunctions")
-public open class Badge internal constructor(
+public open class Badge(
     count: Int,
     private var min: Int,
     private var max: Int,
@@ -56,36 +56,60 @@ public open class Badge internal constructor(
     private var read: Flow<Boolean> = flowOf(read)
     private var count: Flow<Int> = flowOf(count)
 
+    /**
+     * The minimum number shown on the badge.
+     */
     public fun min(min: Int) {
         this.min = min
     }
 
+    /**
+     * The maximum number shown on the badge.
+     */
     public fun max(max: Int) {
         this.max = max
     }
 
+    /**
+     * Sets both the minimum and maximum number shown on the badge.
+     */
     public fun bounds(min: Int, max: Int) {
         this.min = min
         this.max = max
     }
 
+    /**
+     * Sets both the minimum and maximum number shown on the badge.
+     */
     public fun bounds(bounds: IntRange) {
         this.min = bounds.first
         this.max = bounds.last
     }
 
+    /**
+     * Whether the badge is read.
+     */
     public fun read(read: Boolean) {
         this.read = flowOf(read)
     }
 
+    /**
+     * Whether the badge is read.
+     */
     public fun read(read: Flow<Boolean>) {
         this.read = read
     }
 
+    /**
+     * The current number of the badge.
+     */
     public fun count(count: Int) {
         this.count = flowOf(count)
     }
 
+    /**
+     * The current number of the badge.
+     */
     public fun count(count: Flow<Int>) {
         this.count = count
     }

@@ -104,7 +104,7 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
  *
  * The notification badge is typically part of the content area inside [Page.masthead].
  */
-public class NotificationBadge : PatternFlyComponent<Unit> {
+public open class NotificationBadge : PatternFlyComponent<Unit> {
 
     private var withCount: Boolean = false
 

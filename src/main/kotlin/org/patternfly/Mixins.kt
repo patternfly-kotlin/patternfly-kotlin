@@ -130,12 +130,12 @@ public interface WithExpandedStore {
     /**
      * The current expanded / collapsed state.
      */
-    public val expos: Flow<Boolean>
+    public val excos: Flow<Boolean>
 }
 
 public class ExpandedStoreMixin(collapsePredicate: CollapsePredicate? = null) : WithExpandedStore {
 
     override val expandedStore: ExpandedStore = ExpandedStore(collapsePredicate)
 
-    override val expos: Flow<Boolean> = expandedStore.data.drop(1)
+    override val excos: Flow<Boolean> = expandedStore.data.drop(1)
 }

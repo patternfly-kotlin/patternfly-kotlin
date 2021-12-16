@@ -35,7 +35,7 @@ public fun RenderContext.icon(
  *
  * @sample org.patternfly.sample.IconSample.icons
  */
-public class Icon internal constructor(iconClass: String) :
+public open class Icon(iconClass: String) :
     PatternFlyComponent<TextElement>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -56,22 +56,20 @@ public class Icon internal constructor(iconClass: String) :
         this.classes = iconClass
     }
 
-    override fun render(context: RenderContext, baseClass: String?, id: String?): TextElement {
-        return with(context) {
-            i(
-                baseClass = classes {
-                    +ComponentType.Icon
-                    +baseClass
-                },
-                id = id
-            ) {
-                markAs(ComponentType.Icon)
-                applyElement(this)
-                applyEvents(this)
+    override fun render(context: RenderContext, baseClass: String?, id: String?): TextElement = with(context) {
+        i(
+            baseClass = classes {
+                +ComponentType.Icon
+                +baseClass
+            },
+            id = id
+        ) {
+            markAs(ComponentType.Icon)
+            applyElement(this)
+            applyEvents(this)
 
-                aria["hidden"] = true
-                className(classes)
-            }
+            aria["hidden"] = true
+            className(classes)
         }
     }
 }

@@ -15,7 +15,6 @@ import org.patternfly.dom.Id
 /**
  * Creates an [Accordion] component.
  *
- * @param store provides data to create [AccordionItem]s using [Accordion.renderItem]
  * @param singleExpand whether only one item can be expanded at a time
  * @param fixed whether the AccordionItems use a fixed height
  * @param bordered whether to draw a border between the [AccordionItem]s
@@ -24,7 +23,6 @@ import org.patternfly.dom.Id
  * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.accordion(
-    store: Store<List<T>>? = null,
     singleExpand: Boolean = false,
     fixed: Boolean = false,
     bordered: Boolean = false,
@@ -32,8 +30,7 @@ public fun <T> RenderContext.accordion(
     id: String? = null,
     context: Accordion<T>.() -> Unit = {}
 ) {
-    Accordion(
-        store = store,
+    Accordion<T>(
         singleExpand = singleExpand,
         fixed = fixed,
         bordered = bordered
@@ -47,11 +44,12 @@ public fun <T> RenderContext.accordion(
  *
  * An accordion is used to deliver a lot of content in a small space, allowing the user to expand and collapse the component to show or hide information.
  *
- * @sample org.patternfly.sample.AccordionSample.accordion
- * @sample org.patternfly.sample.AccordionSample.store
+ * The [items][AccordionItem] can be added statically and/or by using a store. See the samples for more details.
+
+ * @sample org.patternfly.sample.AccordionSample.staticItems
+ * @sample org.patternfly.sample.AccordionSample.dynamicItems
  */
-public class Accordion<T> internal constructor(
-    private val store: Store<List<T>>?,
+public open class Accordion<T>(
     private var singleExpand: Boolean,
     private var fixed: Boolean,
     private var bordered: Boolean
@@ -59,9 +57,14 @@ public class Accordion<T> internal constructor(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private val items: MutableList<AccordionItem<T>> = mutableListOf()
-    private var display: ((T) -> AccordionItem<T>)? = null
+    private val staticItems: MutableList<AccordionItem<T>> = mutableListOf()
+    private var dynamicItems: Flow<List<T>>? = null
+    private var display: (AccordionItem<T>.(T) -> Unit)? = null
     private var selectionStore: RootStore<T?> = storeOf(null)
+
+    /**
+     * [Flow] containing the payload of the selected [AccordionItem]s.
+     */
     public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
 
     /**
@@ -88,15 +91,24 @@ public class Accordion<T> internal constructor(
     /**
      * Adds an [AccordionItem].
      */
-    public fun item(data: T, context: AccordionItem<T>.() -> Unit = {}): AccordionItem<T> =
-        AccordionItem(data).apply(context).also {
-            items.add(it)
+    public fun item(value: T, context: AccordionItem<T>.() -> Unit) {
+        AccordionItem(value).apply(context).also {
+            staticItems.add(it)
         }
+    }
 
     /**
-     * Defines how to render [AccordionItem]s when using a store.
+     * Adds the items from the specified store.
      */
-    public fun display(display: (T) -> AccordionItem<T>) {
+    public fun items(values: Store<List<T>>, display: (AccordionItem<T>.(T) -> Unit)) {
+        items(values.data, display)
+    }
+
+    /**
+     * Adds the items from the specified flow.
+     */
+    public fun items(values: Flow<List<T>>, display: (AccordionItem<T>.(T) -> Unit)) {
+        this.dynamicItems = values
         this.display = display
     }
 
@@ -114,19 +126,18 @@ public class Accordion<T> internal constructor(
                 applyElement(this)
                 applyEvents(this)
 
-                if (store != null) {
-                    store.data.render { list ->
-                        list.forEach { data ->
-                            val dsp = display ?: { item(data) }
-                            val item = dsp(data)
+                staticItems.forEach { item ->
+                    renderItem(this, item)
+                    expandItem(item)
+                }
+                dynamicItems?.let { flow ->
+                    flow.render(into = this) { values ->
+                        values.forEach { value ->
+                            val item = AccordionItem(value)
+                            display?.invoke(item, value)
                             renderItem(this, item)
                             expandItem(item)
                         }
-                    }
-                } else {
-                    items.forEach { item ->
-                        renderItem(this, item)
-                        expandItem(item)
                     }
                 }
             }
@@ -143,7 +154,7 @@ public class Accordion<T> internal constructor(
                             mapOf("expanded".modifier() to expanded)
                         }
                     )
-                    clicks.map { item.data } handledBy selectionStore.update
+                    clicks.map { item.value } handledBy selectionStore.update
                     clicks handledBy item.expandedStore.toggle
                     if (singleExpand) {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
@@ -184,16 +195,18 @@ public class Accordion<T> internal constructor(
     }
 
     private fun collapseAllBut(item: AccordionItem<T>) {
-        items.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
+        staticItems.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
     }
 }
 
 // ------------------------------------------------------ item
 
 /**
- * An item in an [Accordion] component. The item consists of a title and a content.
+ * An item in an [Accordion] component. The item consists of a typed data and a rendered content. Use string as type, if you just want to build a normal accordion:
+ *
+ * @sample org.patternfly.sample.AccordionSample.staticItems
  */
-public class AccordionItem<T> internal constructor(public val data: T) :
+public class AccordionItem<T> internal constructor(public val value: T) :
     WithExpandedStore by ExpandedStoreMixin(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
@@ -203,9 +216,12 @@ public class AccordionItem<T> internal constructor(public val data: T) :
     internal var content: (RenderContext.() -> Unit)? = null
 
     init {
-        this.title(data.toString())
+        this.title(value.toString())
     }
 
+    /**
+     * Sets the render function for the content of the accordion item.
+     */
     public fun content(content: RenderContext.() -> Unit) {
         this.content = content
     }

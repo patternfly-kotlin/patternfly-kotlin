@@ -118,9 +118,11 @@ public fun RenderContext.inlineLinkButton(
  * PatternFly [button](https://www.patternfly.org/v4/components/button/design-guidelines/) component.
  *
  * A button is a box area or text that communicates and triggers user actions when clicked or selected.
+ *
+ * The button's visual representation is controlled by one or several [ButtonVariant]s.
  */
 @Suppress("TooManyFunctions")
-public class Button internal constructor(
+public open class Button(
     private val buttonType: ButtonType,
     private val variations: Array<out ButtonVariant>
 ) : PatternFlyComponent<Unit>,
@@ -415,6 +417,8 @@ public class Button internal constructor(
 
 /**
  * Visual modifiers for [Button]s.
+ *
+ * @see <a href="https://www.patternfly.org/v4/components/button/design-guidelines#button-types">https://www.patternfly.org/v4/components/button/design-guidelines#button-types</a>
  */
 @Suppress("EnumEntryName", "EnumNaming", "unused")
 public enum class ButtonVariant(internal val modifier: String) {
@@ -439,7 +443,10 @@ public enum class ButtonSize(internal val modifier: String) {
     small("small".modifier())
 }
 
-internal enum class ButtonType {
+/**
+ * The button type which controls the DOM element used.
+ */
+public enum class ButtonType {
     BUTTON, LINK, INLINE_LINK
 }
 

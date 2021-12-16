@@ -49,7 +49,7 @@ public fun RenderContext.skeleton2(baseClass: String? = null, id: String? = null
     Skeleton2().apply(build).render(this, baseClass, id)
 }
 
-public class Skeleton2 : PatternFlyComponent<Unit> {
+public open class Skeleton2 : PatternFlyComponent<Unit> {
 
     private var fontSize: FontSize? = null
     private var height: Height? = null

@@ -1,85 +1,61 @@
 package org.patternfly.sample
 
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
-import org.patternfly.ChipGroupStore
 import org.patternfly.Severity.INFO
-import org.patternfly.chip
 import org.patternfly.chipGroup
-import org.patternfly.chips
 import org.patternfly.notification
 
 internal class ChipGroupSample {
 
-    fun vararg() {
+    fun staticItems() {
         render {
-            chipGroup<String> {
-                +"Vararg demo"
-                chips("Foo", "Bar")
-            }
-        }
-    }
-
-    fun list() {
-        render {
-            chipGroup<String> {
-                +"List demo"
-                chips(listOf("Foo", "Bar"))
-            }
-        }
-    }
-
-    fun builder() {
-        render {
-            chipGroup<String> {
-                +"Builder demo"
-                chips {
-                    +"Foo"
-                    add("Bar")
+            chipGroup {
+                +"Category"
+                chip { +"Chip one" }
+                chip { +"Chip two" }
+                for (i in 3..10) {
+                    chip(i.toString()) {
+                        badge(i)
+                    }
                 }
             }
         }
     }
 
-    fun display() {
-        render {
-            chipGroup<String> {
-                +"Display demo"
-                display {
-                    chip { +it.uppercase() }
-                }
-                chips("Foo", "Bar")
-            }
-        }
-    }
+    fun dynamicItems() {
+        data class Demo(val id: String, val name: String)
 
-    fun store() {
-        render {
-            data class Demo(val id: String, val name: String)
-
-            val store = ChipGroupStore<Demo> { it.id }
-            chipGroup(store) {
-                +"Store demo"
-                display { demo ->
-                    chip { +demo.name }
-                }
-            }
-
-            store.addAll(
-                listOf(
-                    Demo("foo", "Foo"),
-                    Demo("bar", "Bar")
-                )
+        val store = storeOf(
+            listOf(
+                Demo("foo", "Foo"),
+                Demo("bar", "Bar")
             )
+        )
+        render {
+            chipGroup {
+                +"Category"
+                chips(store, { it.id }) { demo ->
+                    +demo.name
+                }
+            }
         }
     }
 
-    fun remove() {
+    fun close() {
         render {
-            chipGroup<String> {
-                +"Remove one"
-                chips("Foo", "Bar")
-                store.removes handledBy notification(INFO) { chip ->
-                    title("You removed $chip.")
+            chipGroup {
+                chip { +"Chip one" }
+                chip {
+                    +"Chip two"
+                    // chips inside a chip group are *always* closable
+                    events {
+                        closes handledBy notification(INFO, "Bye, bye chip!")
+                    }
+                }
+                closable(true)
+                events {
+                    closes handledBy notification(INFO, "Bye, bye chip group!")
                 }
             }
         }

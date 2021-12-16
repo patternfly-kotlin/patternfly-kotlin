@@ -43,22 +43,20 @@ internal class DropdownSample {
         }
     }
 
-    fun storeEntries() {
-        render {
-            data class Demo(val id: String, val name: String)
+    fun dynamicEntries() {
+        data class Demo(val id: String, val name: String)
 
-            val store = storeOf(
-                listOf(
-                    Demo("foo", "Foo"),
-                    Demo("bar", "Bar")
-                )
+        val store = storeOf(
+            listOf(
+                Demo("foo", "Foo"),
+                Demo("bar", "Bar")
             )
-            dropdown(store) {
+        )
+        render {
+            dropdown<Demo> {
                 toggle { text("Choose one") }
-                display { demo ->
-                    item(demo) {
-                        +demo.name
-                    }
+                items(store) { demo ->
+                    +demo.name
                 }
             }
         }
@@ -86,14 +84,14 @@ internal class DropdownSample {
         }
     }
 
-    fun expos() {
+    fun excos() {
         render {
             dropdown<String> {
                 toggle { text("Choose one") }
                 item("Foo")
                 item("Bar")
                 events {
-                    expos handledBy notification(INFO) { expanded ->
+                    excos handledBy notification(INFO) { expanded ->
                         +"Expanded state of dropdown: $expanded"
                     }
                 }

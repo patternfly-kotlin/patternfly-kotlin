@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.drop
 import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
 import org.patternfly.dom.removeFromParent
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
@@ -21,16 +20,18 @@ import org.w3c.dom.events.MouseEvent
 /**
  * Creates a [Chip] component.
  *
+ * @param title the chip's title
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.chip(
+    title: String? = null,
     baseClass: String? = null,
     id: String? = null,
     context: Chip.() -> Unit
 ) {
-    Chip().apply(context).render(this, baseClass, id)
+    Chip(title).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -44,7 +45,7 @@ public fun RenderContext.chip(
  *
  * @sample org.patternfly.sample.ChipSample.basicChips
  */
-public class Chip :
+public open class Chip(title: String?) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
@@ -52,21 +53,51 @@ public class Chip :
 
     private var readOnly: Boolean = false
     private var badge: (Badge.() -> Unit)? = null
+    private var badgeCount: Int = 0
+    private var badgeMin: Int = Badge.BADGE_MIN
+    private var badgeMax: Int = Badge.BADGE_MAX
     private lateinit var root: Tag<HTMLElement>
     private var closable: Boolean = false
     private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+
+    init {
+        title?.let { title(it) }
+    }
+
+    /**
+     * [Flow] for the close events of this chip.
+     *
+     * @sample org.patternfly.sample.ChipSample.close
+     */
     public val closes: Flow<MouseEvent> = closeStore.data.drop(1)
 
+    /**
+     * Whether this chip can be closed.
+     */
     public fun closable(closable: Boolean) {
         this.closable = closable
     }
 
+    /**
+     * Whether this chip is read-only.
+     */
     public fun readOnly(readOnly: Boolean) {
         this.readOnly = readOnly
     }
 
-    public fun badge(badge: Badge.() -> Unit) {
-        this.badge = badge
+    /**
+     * Adds a [Badge] to this chip.
+     */
+    public fun badge(
+        count: Int = 0,
+        min: Int = Badge.BADGE_MIN,
+        max: Int = Badge.BADGE_MAX,
+        context: Badge.() -> Unit = {}
+    ) {
+        this.badgeCount = count
+        this.badgeMin = min
+        this.badgeMax = max
+        this.badge = context
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -85,10 +116,10 @@ public class Chip :
 
                 val textId = Id.unique(ComponentType.Chip.id, "txt")
                 span(baseClass = "chip".component("text"), id = textId) {
-                    this@Chip.applyTitle(this)
+                    applyTitle(this)
                 }
                 badge?.let { bdg ->
-                    badge {
+                    badge(badgeCount, badgeMin, badgeMax) {
                         read(true)
                         bdg(this)
                     }
@@ -107,7 +138,11 @@ public class Chip :
     }
 
     private fun removeFromParent(event: Event) {
-        (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
-        root.domNode.removeFromParent()
+        event.target?.removeEventListener(Events.click.name, ::removeFromParent)
+        if (root.scope.contains(Scopes.CHIP_GROUP)) {
+            root.domNode.parentElement.removeFromParent()
+        } else {
+            root.domNode.removeFromParent()
+        }
     }
 }

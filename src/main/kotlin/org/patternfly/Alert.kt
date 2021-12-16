@@ -88,7 +88,7 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
  *
  * @sample org.patternfly.sample.AlertSample.alertGroup
  */
-public class StaticAlertGroup : BaseAlertGroup(false) {
+public open class StaticAlertGroup : BaseAlertGroup(false) {
 
     private val alerts: MutableList<StaticAlertBuilder> = mutableListOf()
 
@@ -136,7 +136,7 @@ internal class StaticAlertBuilder(
  *
  * @sample org.patternfly.sample.AlertSample.alert
  */
-public class Alert internal constructor(private var severity: Severity, title: String) :
+public open class Alert(private var severity: Severity, title: String) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),

@@ -26,8 +26,6 @@ import org.patternfly.dom.matches
 /**
  * Creates a new [Dropdown] component.
  *
- * @param store the source for the [dropdown entries][DropdownEntry]
- * @param idProvider identifier for the data in the store
  * @param align the alignment of the dropdown
  * @param up controls the direction of the dropdown menu
  * @param baseClass optional CSS class that should be applied to the component
@@ -35,15 +33,13 @@ import org.patternfly.dom.matches
  * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.dropdown(
-    store: Store<List<T>>? = null,
-    idProvider: IdProvider<T, String>? = null,
     align: Align? = null,
     up: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     context: Dropdown<T>.() -> Unit = {}
 ) {
-    Dropdown(store, idProvider, align, up).apply(context).render(this, baseClass, id)
+    Dropdown<T>(align, up).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -64,20 +60,20 @@ public fun <T> RenderContext.dropdown(
  * The [dropdown entries][DropdownEntry] can be added statically or by using a store. See the samples for more details.
  *
  * @sample org.patternfly.sample.DropdownSample.staticEntries
- * @sample org.patternfly.sample.DropdownSample.storeEntries
+ * @sample org.patternfly.sample.DropdownSample.dynamicEntries
  */
 @Suppress("TooManyFunctions")
-public class Dropdown<T> internal constructor(
-    private val store: Store<List<T>>?,
-    private val idProvider: IdProvider<T, String>?,
+public open class Dropdown<T>(
     private val align: Align? = null,
     private val up: Boolean = false
 ) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private val entries: MutableList<DropdownEntry<T>> = mutableListOf()
-    private var display: ((T) -> DropdownEntry<T>)? = null
+    private val staticEntries: MutableList<DropdownEntry<T>> = mutableListOf()
+    private var dynamicEntries: Flow<List<T>>? = null
+    private var idProvider: IdProvider<T, String> = { Id.build(it.toString()) }
+    private var display: (DropdownItem<T>.(T) -> Unit)? = null
     private var selectionStore: RootStore<T?> = storeOf(null)
     private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {})
     private lateinit var root: Div
@@ -99,9 +95,9 @@ public class Dropdown<T> internal constructor(
     /**
      * The current expanded / collapsed state.
      *
-     * @sample org.patternfly.sample.DropdownSample.expos
+     * @sample org.patternfly.sample.DropdownSample.excos
      */
-    public val expos: Flow<Boolean> = expandedStore.data.drop(1)
+    public val excos: Flow<Boolean> = expandedStore.data.drop(1)
 
     /**
      * Disables or enables the dropdown.
@@ -127,28 +123,49 @@ public class Dropdown<T> internal constructor(
     /**
      * Adds a group to this dropdown.
      */
-    public fun group(title: String, context: DropdownGroup<T>.() -> Unit): DropdownEntry<T> =
+    public fun group(title: String, context: DropdownGroup<T>.() -> Unit) {
         DropdownGroup<T>(title).apply(context).also {
-            entries.add(it)
+            staticEntries.add(it)
         }
+    }
 
     /**
      * Adds an item to this dropdown.
      */
-    public fun item(data: T, context: DropdownItem<T>.() -> Unit = {}): DropdownEntry<T> =
-        DropdownItem(data).apply(context).also {
-            entries.add(it)
+    public fun item(value: T, context: DropdownItem<T>.() -> Unit = {}) {
+        DropdownItem(value).apply(context).also {
+            staticEntries.add(it)
         }
+    }
 
     /**
      * Adds a separator.
      */
-    public fun separator(): DropdownEntry<T> = DropdownSeparator<T>().also { entries.add(it) }
+    public fun separator() {
+        DropdownSeparator<T>().also { staticEntries.add(it) }
+    }
 
     /**
-     * Defines how to render [dropdown entries][DropdownEntry] when using a store.
+     * Adds the items from the specified store.
      */
-    public fun display(display: (T) -> DropdownEntry<T>) {
+    public fun items(
+        values: Store<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: (DropdownItem<T>.(T) -> Unit)
+    ) {
+        items(values.data, idProvider, display)
+    }
+
+    /**
+     * Adds the items from the specified flow.
+     */
+    public fun items(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: (DropdownItem<T>.(T) -> Unit)
+    ) {
+        this.dynamicEntries = values
+        this.idProvider = idProvider
         this.display = display
     }
 
@@ -324,7 +341,7 @@ public class Dropdown<T> internal constructor(
 
     @Suppress("NestedBlockDepth")
     private fun renderEntries(context: RenderContext) {
-        val groups = entries.filterIsInstance<DropdownGroup<T>>().isNotEmpty()
+        val groups = staticEntries.filterIsInstance<DropdownGroup<T>>().isNotEmpty()
         with(context) {
             val classes = classes {
                 +"dropdown".component("menu")
@@ -344,13 +361,13 @@ public class Dropdown<T> internal constructor(
                 attr("hidden", expandedStore.data.map { !it })
                 aria["labelledby"] = toggle.id
 
-                if (store != null) {
-                    store.data.renderEach(idProvider ?: { Id.build(it.toString()) }) { data ->
-                        val display = display ?: { item(data) }
-                        renderEntry(this, display(data), 0)
+                normalizeEntries(staticEntries).forEach { renderEntry(this, it, 0) }
+                dynamicEntries?.let { values ->
+                    values.renderEach(into = this, idProvider = idProvider) { value ->
+                        val item = DropdownItem(value)
+                        display?.invoke(item, value)
+                        renderItem(this, item)
                     }
-                } else {
-                    normalizeEntries(entries).forEach { renderEntry(this, it, 0) }
                 }
             }
         }

@@ -32,7 +32,7 @@ public fun RenderContext.avatar(
  *
  * @sample org.patternfly.sample.AvatarSample.avatar
  */
-public class Avatar internal constructor(private var src: String) :
+public open class Avatar(private var src: String) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {

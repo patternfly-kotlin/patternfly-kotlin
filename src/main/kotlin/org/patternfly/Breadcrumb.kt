@@ -16,8 +16,6 @@ import org.patternfly.dom.Id
 /**
  * Creates a new [Breadcrumb] component.
  *
- * @param store the source for the [items][BreadcrumbItem]
- * @param idProvider identifier for the data in the store
  * @param router if given, the specified router is used for navigation
  * @param noHomeLink set to `true`, if the first item should be plain text only
  * @param baseClass optional CSS class that should be applied to the component
@@ -25,20 +23,13 @@ import org.patternfly.dom.Id
  * @param context a lambda expression for setting up the component itself
  */
 public fun <T> RenderContext.breadcrumb(
-    store: Store<List<T>>? = null,
-    idProvider: IdProvider<T, String>? = null,
     router: Router<T>? = null,
     noHomeLink: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     context: Breadcrumb<T>.() -> Unit = {}
 ) {
-    Breadcrumb(
-        store = store,
-        idProvider = idProvider,
-        router = router,
-        noHomeLink = noHomeLink
-    ).apply(context).render(this, baseClass, id)
+    Breadcrumb(router, noHomeLink).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -48,39 +39,68 @@ public fun <T> RenderContext.breadcrumb(
  *
  * A breadcrumb provides page context to help users navigate more efficiently and understand where they are in the application hierarchy.
  *
- * The [items][BreadcrumbItem] can be added statically or by using a store. See the samples for more details.
+ * The [items][BreadcrumbItem] can be added statically and/or by using a store. See the samples for more details.
  *
  * @sample org.patternfly.sample.BreadcrumbSample.staticItems
- * @sample org.patternfly.sample.BreadcrumbSample.storeItems
+ * @sample org.patternfly.sample.BreadcrumbSample.dynamicItems
  * @sample org.patternfly.sample.BreadcrumbSample.routerItems
  */
-public class Breadcrumb<T>(
-    private val store: Store<List<T>>?,
-    private val idProvider: IdProvider<T, String>?,
+public open class Breadcrumb<T>(
     private val router: Router<T>?,
     private var noHomeLink: Boolean = false
 ) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private val items: MutableList<BreadcrumbItem<T>> = mutableListOf()
-    private var display: ((T) -> BreadcrumbItem<T>)? = null
+    private val staticItems: MutableList<BreadcrumbItem<T>> = mutableListOf()
+    private var dynamicItems: Flow<List<T>>? = null
+    private var idProvider: IdProvider<T, String> = { Id.build(it.toString()) }
+    private var display: (BreadcrumbItem<T>.(T) -> Unit)? = null
     private var selectionStore: RootStore<T?> = storeOf(null)
+    private var firstItem: Boolean = true
+
+    /**
+     * [Flow] containing the payload of the selected [BreadcrumbItem]s.
+     */
     public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
 
+    /**
+     * Whether to render the first item as a link or not.
+     */
     public fun noHomeLink(noHomeLink: Boolean) {
         this.noHomeLink = noHomeLink
     }
 
-    public fun item(data: T, context: BreadcrumbItem<T>.() -> Unit = {}): BreadcrumbItem<T> =
-        BreadcrumbItem(data).apply(context).also {
-            items.add(it)
+    /**
+     * Adds a [BreadcrumbItem].
+     */
+    public fun item(value: T, context: BreadcrumbItem<T>.() -> Unit = {}) {
+        BreadcrumbItem(value).apply(context).also {
+            staticItems.add(it)
         }
+    }
 
     /**
-     * Defines how to render [breadcrumb items][BreadcrumbItem] when using a store.
+     * Adds the items from the specified store.
      */
-    public fun display(display: (T) -> BreadcrumbItem<T>) {
+    public fun items(
+        values: Store<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: (BreadcrumbItem<T>.(T) -> Unit)
+    ) {
+        items(values.data, idProvider, display)
+    }
+
+    /**
+     * Adds the items from the specified flow.
+     */
+    public fun items(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: (BreadcrumbItem<T>.(T) -> Unit)
+    ) {
+        this.dynamicItems = values
+        this.idProvider = idProvider
         this.display = display
     }
 
@@ -93,18 +113,14 @@ public class Breadcrumb<T>(
                 applyEvents(this)
 
                 ol(baseClass = "breadcrumb".component("list")) {
-                    if (store != null) {
-                        val idp = idProvider ?: { Id.build(it.toString()) }
-                        store.data.map { it.withIndex().toList() }.renderEach(
-                            idProvider = { idp.invoke(it.value) },
-                            content = { (index, data) ->
-                                val dsp = display ?: { item(data) }
-                                renderItem(this, dsp(data), index)
-                            }
-                        )
-                    } else {
-                        items.forEachIndexed { index, item ->
-                            renderItem(this, item, index)
+                    staticItems.forEach { item ->
+                        renderItem(this, item)
+                    }
+                    dynamicItems?.let { values ->
+                        values.renderEach(into = this, idProvider = idProvider) { value ->
+                            val item = BreadcrumbItem(value)
+                            display?.invoke(item, value)
+                            renderItem(this, item)
                         }
                     }
                 }
@@ -112,15 +128,16 @@ public class Breadcrumb<T>(
         }
     }
 
-    private fun renderItem(context: RenderContext, item: BreadcrumbItem<T>, index: Int): RenderContext =
+    private fun renderItem(context: RenderContext, item: BreadcrumbItem<T>): RenderContext =
         with(context) {
             li(baseClass = "breadcrumb".component("item")) {
                 span(baseClass = "breadcrumb".component("item", "divider")) {
                     icon("angle-right".fas())
                 }
-                if (index == 0 && noHomeLink) {
+                if (firstItem && noHomeLink) {
                     item.applyEvents(this)
                     item.applyTitle(this)
+                    firstItem = false
                 } else {
                     a(baseClass = "breadcrumb".component("link")) {
                         classMap(
@@ -145,6 +162,11 @@ public class Breadcrumb<T>(
 
 // ------------------------------------------------------ item
 
+/**
+ * An item in an [Breadcrumb] component. The item consists of a typed data. Use string as type, if you just want to build a normal breadcrumb:
+ *
+ * @sample org.patternfly.sample.BreadcrumbSample.staticItems
+ */
 public class BreadcrumbItem<T> internal constructor(public val data: T) :
     WithExpandedStore by ExpandedStoreMixin(),
     WithEvents by EventMixin(),

@@ -30,7 +30,7 @@ public fun RenderContext.brand(
  *
  * A brand is used to place a product logotype on a screen.
  */
-public class Brand internal constructor(private var alt: String, private var src: String) :
+public open class Brand(private var alt: String, private var src: String) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {

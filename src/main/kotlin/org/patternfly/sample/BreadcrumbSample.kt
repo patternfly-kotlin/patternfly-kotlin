@@ -34,23 +34,22 @@ internal class BreadcrumbSample {
         }
     }
 
-    fun storeItems() {
-        render {
-            val store = storeOf(
-                listOf(
-                    "Universe",
-                    "Milky way",
-                    "Solar system",
-                    "Earth",
-                    "Europe",
-                    "Germany",
-                    "Würzburg",
-                )
+    fun dynamicItems() {
+        val store = storeOf(
+            listOf(
+                "Universe",
+                "Milky way",
+                "Solar system",
+                "Earth",
+                "Europe",
+                "Germany",
+                "Würzburg",
             )
-
-            breadcrumb(store = store) {
-                display {
-                    item(it)
+        )
+        render {
+            breadcrumb<String> {
+                items(store) { place ->
+                    title(place)
                 }
                 events {
                     selections handledBy notification(INFO) { item ->
@@ -63,9 +62,7 @@ internal class BreadcrumbSample {
 
     fun routerItems() {
         render {
-            val router = router("home")
-
-            breadcrumb(router = router) {
+            breadcrumb(router("home")) {
                 item("user-management") { +"User Managewment" }
                 item("users") { +"Users" }
                 item("current-user") { +"Current User" }

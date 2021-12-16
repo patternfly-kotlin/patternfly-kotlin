@@ -1,4 +1,4 @@
-@file:Suppress("SpellCheckingInspection", "DuplicatedCode")
+@file:Suppress("SpellCheckingInspection")
 
 package org.patternfly.sample
 
@@ -10,7 +10,7 @@ import org.patternfly.notification
 
 internal class AccordionSample {
 
-    fun accordion() {
+    fun staticItems() {
         render {
             accordion<String>(singleExpand = true) {
                 item("Item one") {
@@ -30,16 +30,21 @@ internal class AccordionSample {
                     }
                     events {
                         clicks handledBy notification(INFO, "Clicked!")
-                        expos handledBy notification(INFO) { expanded ->
+                        excos handledBy notification(INFO) { expanded ->
                             +"Expanded: $expanded"
                         }
+                    }
+                }
+                events {
+                    selections handledBy notification(INFO) { item ->
+                        +"Selected $item"
                     }
                 }
             }
         }
     }
 
-    fun store() {
+    fun dynamicItems() {
         val store = storeOf(
             listOf(
                 "Item one" to "Lorem ipsum dolor sit amet.",
@@ -49,14 +54,17 @@ internal class AccordionSample {
         )
 
         render {
-            accordion(store) {
-                display { pair ->
-                    item(pair) {
-                        title(pair.first)
-                        expanded(pair.first == "Item two")
-                        content {
-                            p { +pair.second }
-                        }
+            accordion<Pair<String, String>> {
+                items(store) { pair ->
+                    title(pair.first)
+                    expanded(pair.first == "Item two")
+                    content {
+                        p { +pair.second }
+                    }
+                }
+                events {
+                    selections handledBy notification(INFO) { item ->
+                        +"Selected ${item.first}"
                     }
                 }
             }

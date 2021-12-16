@@ -30,7 +30,7 @@ public fun RenderContext.spinner(
  *
  * @sample org.patternfly.sample.SpinnerSample.spinner
  */
-public class Spinner internal constructor(private val size: Size) :
+public open class Spinner(private val size: Size) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {

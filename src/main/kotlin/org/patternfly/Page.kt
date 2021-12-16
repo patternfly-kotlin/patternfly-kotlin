@@ -174,7 +174,7 @@ internal fun RenderContext.genericPageSection(
  *
  * @sample org.patternfly.sample.PageSample.typicalSetup
  */
-public class Page :
+public open class Page :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {

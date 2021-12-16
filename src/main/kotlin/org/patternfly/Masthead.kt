@@ -4,7 +4,7 @@ import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariant.plain
 
-public class Masthead internal constructor() : PatternFlyComponent<Unit> {
+public open class Masthead : PatternFlyComponent<Unit> {
 
     private var toggle: Boolean = false
     private var brandHref: String = "#"

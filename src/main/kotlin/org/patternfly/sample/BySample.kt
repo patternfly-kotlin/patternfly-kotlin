@@ -1,6 +1,6 @@
 package org.patternfly.sample
 
-import org.patternfly.dom.AttributeOperator
+import org.patternfly.dom.AttributeOperator.STARTS_WITH
 import org.patternfly.dom.By
 
 internal class BySample {
@@ -12,7 +12,7 @@ internal class BySample {
                     By.data("listItem", "foo")
                         .desc(
                             By.element("a")
-                                .and(By.attribute("href", "https://", AttributeOperator.STARTS_WITH))
+                                .and(By.attribute("href", "https://", STARTS_WITH))
                                 .child(By.classname("fas", "fa-check"))
                         )
                 ),

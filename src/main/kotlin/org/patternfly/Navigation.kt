@@ -72,7 +72,7 @@ public fun <T> RenderContext.navigation(
  * @sample org.patternfly.sample.NavigationSample.vertical
  */
 @Suppress("TooManyFunctions")
-public class Navigation<T> internal constructor(
+public open class Navigation<T>(
     private val router: Router<T>,
     private var expandable: Boolean
 ) : PatternFlyComponent<Unit>,

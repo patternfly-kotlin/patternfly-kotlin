@@ -25,4 +25,15 @@ internal class ChipSample {
             }
         }
     }
+
+    fun close() {
+        render {
+            chip {
+                +"Chip"
+                events {
+                    closes handledBy notification(INFO, "Bye, bye!")
+                }
+            }
+        }
+    }
 }
