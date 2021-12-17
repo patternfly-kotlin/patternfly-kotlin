@@ -22,10 +22,10 @@ public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
 
-internal class SubComponent<T>(
-    val baseClass: String? = null,
-    val id: String? = null,
-    val context: T.() -> Unit = {}
+public open class SubComponent<T>(
+    internal val baseClass: String?,
+    internal val id: String?,
+    internal val context: T.() -> Unit
 )
 
 /**
@@ -156,14 +156,6 @@ public enum class Height(public val modifier: String) {
     _66("height-66".modifier()),
     _75("height-75".modifier()),
     _100("height-100".modifier()),
-}
-
-/**
- * Enum used in [buttonIcon] to specify the position of the icon in buttons when used together with text.
- */
-public enum class IconPosition(public val modifier: String) {
-    ICON_FIRST("start".modifier()),
-    ICON_LAST("end".modifier())
 }
 
 /**

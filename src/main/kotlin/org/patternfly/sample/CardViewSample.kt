@@ -3,12 +3,12 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ItemsStore
-import org.patternfly.card
-import org.patternfly.cardAction
-import org.patternfly.cardBody
-import org.patternfly.cardCheckbox
-import org.patternfly.cardHeader
-import org.patternfly.cardTitle
+import org.patternfly.legacyCard
+import org.patternfly.legacyCardAction
+import org.patternfly.legacyCardBody
+import org.patternfly.legacyCardCheckbox
+import org.patternfly.legacyCardHeader
+import org.patternfly.legacyCardTitle
 import org.patternfly.cardView
 import org.patternfly.dropdown
 
@@ -21,19 +21,19 @@ internal interface CardViewSample {
             val store = ItemsStore<Demo> { it.id }
             cardView(store) {
                 display { demo ->
-                    card(demo) {
-                        cardHeader {
-                            cardTitle { +"Demo" }
-                            cardAction {
+                    legacyCard(demo) {
+                        legacyCardHeader {
+                            legacyCardTitle { +"Demo" }
+                            legacyCardAction {
                                 dropdown<String>(align = RIGHT) {
                                     toggle { kebab() }
                                     item("Edit")
                                     item("Remove")
                                 }
-                                cardCheckbox()
+                                legacyCardCheckbox()
                             }
                         }
-                        cardBody(id = itemId(demo)) { +demo.name }
+                        legacyCardBody(id = itemId(demo)) { +demo.name }
                     }
                 }
             }

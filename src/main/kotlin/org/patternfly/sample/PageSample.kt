@@ -5,8 +5,8 @@ import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import org.patternfly.ItemsStore
 import org.patternfly.breadcrumb
-import org.patternfly.card
-import org.patternfly.cardBody
+import org.patternfly.legacyCard
+import org.patternfly.legacyCardBody
 import org.patternfly.cardView
 import org.patternfly.dom.Id
 import org.patternfly.modifier
@@ -67,8 +67,8 @@ internal class PageSample {
                     pageSection(limitWidth = true) {
                         cardView(store) {
                             display { item ->
-                                card(item) {
-                                    cardBody { +item }
+                                legacyCard(item) {
+                                    legacyCardBody { +item }
                                 }
                             }
                         }

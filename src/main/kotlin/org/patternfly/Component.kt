@@ -39,6 +39,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Button("btn", "button".component()),
     Card("crd", "card".component()),
     CardView("cv"),
+    Checkbox("chb", "check".component()),
     Chip("chp", "chip".component()),
     ChipGroup("cpg", "chip-group".component()),
     ContextSelector("cs", "context-selector".component()),

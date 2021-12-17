@@ -3,28 +3,24 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
+import kotlinx.coroutines.flow.map
 import org.patternfly.Align.RIGHT
-import org.patternfly.Severity.INFO
+import org.patternfly.CardVariant
+import org.patternfly.CardVariant.expandable
 import org.patternfly.card
-import org.patternfly.cardAction
-import org.patternfly.cardBody
-import org.patternfly.cardCheckbox
-import org.patternfly.cardExpandableContent
-import org.patternfly.cardFooter
-import org.patternfly.cardHeader
-import org.patternfly.cardTitle
-import org.patternfly.cardToggle
+import org.patternfly.checkbox
 import org.patternfly.dropdown
-import org.patternfly.notification
 
 internal interface CardSample {
 
-    fun card() {
+    fun imageInHeader() {
         render {
             card {
-                cardHeader {
-                    img { src("./logo.svg") }
-                    cardAction {
+                header {
+                    content {
+                        img { src("./logo.svg") }
+                    }
+                    actions {
                         dropdown<String>(align = RIGHT) {
                             toggle { kebab() }
                             item("Item 1")
@@ -34,21 +30,21 @@ internal interface CardSample {
                             separator()
                             item("Separated Item")
                         }
-                        cardCheckbox()
+                        checkbox("card-check", standalone = true)
                     }
                 }
-                cardTitle { +"Title" }
-                cardBody { +"Body" }
-                cardFooter { +"Footer" }
+                title { +"Title" }
+                body { +"Body" }
+                footer { +"Footer" }
             }
         }
     }
 
-    fun cardTitleInHeader() {
+    fun titleInHeader() {
         render {
             card {
-                cardHeader {
-                    cardAction {
+                header {
+                    actions {
                         dropdown<String>(align = RIGHT) {
                             toggle { kebab() }
                             item("Item 1")
@@ -58,21 +54,22 @@ internal interface CardSample {
                             separator()
                             item("Separated Item")
                         }
+                        checkbox("card-check", standalone = true)
                     }
-                    cardTitle { +"Title" }
+                    title { +"Title" }
                 }
-                cardBody { +"Body" }
-                cardFooter { +"Footer" }
+                body { +"Body" }
+                footer { +"Footer" }
             }
         }
     }
 
-    fun cardTitleInCard() {
+    fun noHeader() {
         render {
             card {
-                cardTitle { +"Title" }
-                cardBody { +"Body" }
-                cardFooter { +"Footer" }
+                title { +"Title" }
+                body { +"Body" }
+                footer { +"Footer" }
             }
         }
     }
@@ -80,29 +77,25 @@ internal interface CardSample {
     fun multipleBodies() {
         render {
             card {
-                cardTitle { +"Title" }
-                cardBody { +"Body" }
-                cardBody { +"Body" }
-                cardBody { +"Body" }
-                cardFooter { +"Footer" }
+                title { +"Title" }
+                body { +"Body" }
+                body { +"Body" }
+                body { +"Body" }
+                footer { +"Footer" }
             }
         }
     }
 
-    fun expandable() {
+    fun expandableCard() {
         render {
-            card {
-                expanded.data handledBy notification(INFO) { expanded ->
-                    title("Expanded state of card: $expanded.")
+            card(expandable) {
+                header {
+                    title {
+                        expandedStore.data.map { "Expanded state: $it" }.asText()
+                    }
                 }
-                cardHeader {
-                    cardToggle()
-                    cardTitle { +"Title" }
-                }
-                cardExpandableContent {
-                    cardBody { +"Body" }
-                    cardFooter { +"Footer" }
-                }
+                body { +"Body" }
+                footer { +"Footer" }
             }
         }
     }
