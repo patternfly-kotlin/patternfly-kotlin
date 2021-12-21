@@ -10,7 +10,7 @@ import org.patternfly.card
 import org.patternfly.checkbox
 import org.patternfly.dropdown
 
-internal interface CardSample {
+internal class CardSample {
 
     fun imageInHeader() {
         render {

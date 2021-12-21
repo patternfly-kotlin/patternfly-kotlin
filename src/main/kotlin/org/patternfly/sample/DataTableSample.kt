@@ -21,7 +21,7 @@ import org.patternfly.icon
 import org.patternfly.notification
 import org.patternfly.pushButton
 
-internal interface DataTableSample {
+internal class DataTableSample {
 
     fun dataTable() {
         render {

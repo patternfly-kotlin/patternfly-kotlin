@@ -12,7 +12,7 @@ import org.patternfly.legacyCardTitle
 import org.patternfly.cardView
 import org.patternfly.dropdown
 
-internal interface CardViewSample {
+internal class CardViewSample {
 
     fun cardView() {
         render {
