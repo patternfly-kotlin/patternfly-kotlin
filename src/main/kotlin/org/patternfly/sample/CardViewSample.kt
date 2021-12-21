@@ -3,14 +3,14 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import org.patternfly.Align.RIGHT
 import org.patternfly.ItemsStore
+import org.patternfly.cardView
+import org.patternfly.dropdown
 import org.patternfly.legacyCard
 import org.patternfly.legacyCardAction
 import org.patternfly.legacyCardBody
 import org.patternfly.legacyCardCheckbox
 import org.patternfly.legacyCardHeader
 import org.patternfly.legacyCardTitle
-import org.patternfly.cardView
-import org.patternfly.dropdown
 
 internal class CardViewSample {
 
