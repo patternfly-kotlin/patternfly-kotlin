@@ -14,7 +14,7 @@ internal class DropdownSample {
 
     fun staticEntries() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { text("Choose one") }
                 item("Item 1") {
                     selected(true)
@@ -53,10 +53,10 @@ internal class DropdownSample {
             )
         )
         render {
-            dropdown<Demo> {
+            dropdown {
                 toggle { text("Choose one") }
-                items(store) { demo ->
-                    +demo.name
+                items(store, { it.id }) { demo ->
+                    item(demo.name)
                 }
             }
         }
@@ -64,7 +64,7 @@ internal class DropdownSample {
 
     fun customEntries() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { text("Choose one") }
                 item("Foo") {
                     description("Description")
@@ -74,10 +74,8 @@ internal class DropdownSample {
                     description("Description")
                 }
                 item("") {
-                    content {
-                        div(id = "custom-id", baseClass = "my-md".util()) {
-                            +"Custom title"
-                        }
+                    content(id = "custom-id", baseClass = "my-md".util()) {
+                        +"Custom title"
                     }
                 }
             }
@@ -86,7 +84,7 @@ internal class DropdownSample {
 
     fun excos() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { text("Choose one") }
                 item("Foo")
                 item("Bar")
@@ -99,24 +97,9 @@ internal class DropdownSample {
         }
     }
 
-    fun selections() {
-        render {
-            dropdown<String> {
-                toggle { text("Choose one") }
-                item("Foo")
-                item("Bar")
-                events {
-                    selections handledBy notification(INFO) { item ->
-                        +"You've selected $item"
-                    }
-                }
-            }
-        }
-    }
-
     fun textToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { text("Text") }
                 item("Foo")
                 item("Bar")
@@ -126,7 +109,7 @@ internal class DropdownSample {
 
     fun iconToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { icon("user".fas()) }
                 item("Foo")
                 item("Bar")
@@ -136,7 +119,7 @@ internal class DropdownSample {
 
     fun kebabToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { kebab() }
                 item("Foo")
                 item("Bar")
@@ -146,7 +129,7 @@ internal class DropdownSample {
 
     fun badgeToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { badge(5) }
                 item("Foo")
                 item("Bar")
@@ -156,7 +139,7 @@ internal class DropdownSample {
 
     fun checkboxToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle { checkbox("Text") }
                 item("Foo")
                 item("Bar")
@@ -166,7 +149,7 @@ internal class DropdownSample {
 
     fun actionToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle {
                     action("Text") {
                         events {
@@ -182,7 +165,7 @@ internal class DropdownSample {
 
     fun imgToggle() {
         render {
-            dropdown<String> {
+            dropdown {
                 toggle {
                     img(title = "Text", src = "./logo.svg")
                 }

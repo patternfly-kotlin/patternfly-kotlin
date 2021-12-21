@@ -50,7 +50,7 @@ internal interface DataTableSample {
                         pushButton(plain) { icon("pencil".fas()) }
                     }
                     dataTableActionColumn { demo ->
-                        dropdown<String>(align = RIGHT) {
+                        dropdown(align = RIGHT) {
                             toggle { kebab() }
                             item("Action 1")
                             item("Action 2")

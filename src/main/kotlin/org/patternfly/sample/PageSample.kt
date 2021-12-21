@@ -5,10 +5,10 @@ import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import org.patternfly.ItemsStore
 import org.patternfly.breadcrumb
-import org.patternfly.legacyCard
-import org.patternfly.legacyCardBody
 import org.patternfly.cardView
 import org.patternfly.dom.Id
+import org.patternfly.legacyCard
+import org.patternfly.legacyCardBody
 import org.patternfly.modifier
 import org.patternfly.navigation
 import org.patternfly.page
@@ -52,7 +52,7 @@ internal class PageSample {
                 main {
                     pageGroup(baseClass = "sticky-top".modifier()) {
                         pageBreadcrumb {
-                            breadcrumb<String> {
+                            breadcrumb {
                                 item("Item 1")
                                 item("Item 2")
                             }

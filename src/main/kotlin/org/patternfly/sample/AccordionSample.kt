@@ -12,32 +12,21 @@ internal class AccordionSample {
 
     fun staticItems() {
         render {
-            accordion<String>(singleExpand = true) {
+            accordion(singleExpand = true) {
                 item("Item one") {
-                    content {
-                        p { +"Lorem ipsum dolor sit amet." }
-                    }
+                    content { +"Lorem ipsum dolor sit amet." }
                 }
                 item("Item two") {
-                    content {
-                        p { +"Phasellus pretium est a porttitor vehicula." }
-                    }
+                    content { +"Phasellus pretium est a porttitor vehicula." }
                     expanded(true)
                 }
                 item("Item three") {
-                    content {
-                        p { +"Quisque vel commodo urna." }
-                    }
+                    content { +"Quisque vel commodo urna." }
                     events {
                         clicks handledBy notification(INFO, "Clicked!")
                         excos handledBy notification(INFO) { expanded ->
                             +"Expanded: $expanded"
                         }
-                    }
-                }
-                events {
-                    selections handledBy notification(INFO) { item ->
-                        +"Selected $item"
                     }
                 }
             }
@@ -54,18 +43,18 @@ internal class AccordionSample {
         )
 
         render {
-            accordion<Pair<String, String>> {
+            accordion {
+                item("First item") {
+                    content { +"Static item" }
+                }
                 items(store) { pair ->
-                    title(pair.first)
-                    expanded(pair.first == "Item two")
-                    content {
-                        p { +pair.second }
+                    item(pair.first) {
+                        expanded(pair.first == "Item two")
+                        content { +pair.second }
                     }
                 }
-                events {
-                    selections handledBy notification(INFO) { item ->
-                        +"Selected ${item.first}"
-                    }
+                item("Last item") {
+                    content { +"Static item" }
                 }
             }
         }

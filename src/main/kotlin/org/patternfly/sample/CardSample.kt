@@ -5,7 +5,6 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.map
 import org.patternfly.Align.RIGHT
-import org.patternfly.CardVariant
 import org.patternfly.CardVariant.expandable
 import org.patternfly.card
 import org.patternfly.checkbox
@@ -21,7 +20,7 @@ internal interface CardSample {
                         img { src("./logo.svg") }
                     }
                     actions {
-                        dropdown<String>(align = RIGHT) {
+                        dropdown(align = RIGHT) {
                             toggle { kebab() }
                             item("Item 1")
                             item("Disabled Item") {
@@ -45,7 +44,7 @@ internal interface CardSample {
             card {
                 header {
                     actions {
-                        dropdown<String>(align = RIGHT) {
+                        dropdown(align = RIGHT) {
                             toggle { kebab() }
                             item("Item 1")
                             item("Disabled Item") {

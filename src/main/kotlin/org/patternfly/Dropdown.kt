@@ -2,7 +2,6 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
-import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Img
@@ -10,11 +9,14 @@ import dev.fritz2.dom.html.Input
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import org.patternfly.DividerVariant.LI
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
@@ -28,18 +30,20 @@ import org.patternfly.dom.matches
  *
  * @param align the alignment of the dropdown
  * @param up controls the direction of the dropdown menu
+ * @param grouped whether the dropdown contains groups
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param context a lambda expression for setting up the component itself
  */
-public fun <T> RenderContext.dropdown(
+public fun RenderContext.dropdown(
     align: Align? = null,
     up: Boolean = false,
+    grouped: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    context: Dropdown<T>.() -> Unit = {}
+    context: Dropdown.() -> Unit = {}
 ) {
-    Dropdown<T>(align, up).apply(context).render(this, baseClass, id)
+    Dropdown(align = align, up = up, grouped = grouped).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -63,27 +67,13 @@ public fun <T> RenderContext.dropdown(
  * @sample org.patternfly.sample.DropdownSample.dynamicEntries
  */
 @Suppress("TooManyFunctions")
-public open class Dropdown<T>(
-    private val align: Align? = null,
-    private val up: Boolean = false
+public open class Dropdown(
+    private val align: Align?,
+    private val up: Boolean,
+    private val grouped: Boolean
 ) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
-
-    private val staticEntries: MutableList<DropdownEntry<T>> = mutableListOf()
-    private var dynamicEntries: Flow<List<T>>? = null
-    private var idProvider: IdProvider<T, String> = { Id.build(it.toString()) }
-    private var display: (DropdownItem<T>.(T) -> Unit)? = null
-    private var selectionStore: RootStore<T?> = storeOf(null)
-    private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {})
-    private lateinit var root: Div
-
-    /**
-     * The selections of this dropdown.
-     *
-     * @sample org.patternfly.sample.DropdownSample.selections
-     */
-    public val selections: Flow<T> = selectionStore.data.mapNotNull { it }
 
     /**
      * The store which holds the expanded / collapse state.
@@ -91,6 +81,13 @@ public open class Dropdown<T>(
     public val expandedStore: ExpandedStore = ExpandedStore { target ->
         !root.domNode.contains(target) && !target.matches(By.classname("dropdown".component("menu-item")))
     }
+
+    private var storeItems: Boolean = false
+    private val itemStore: DropdownEntryStore = DropdownEntryStore()
+    private val headEntries: MutableList<DropdownEntry> = mutableListOf()
+    private val tailEntries: MutableList<DropdownEntry> = mutableListOf()
+    private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {}, expandedStore)
+    private lateinit var root: Div
 
     /**
      * The current expanded / collapsed state.
@@ -123,35 +120,42 @@ public open class Dropdown<T>(
     /**
      * Adds a group to this dropdown.
      */
-    public fun group(title: String, context: DropdownGroup<T>.() -> Unit) {
-        DropdownGroup<T>(title).apply(context).also {
-            staticEntries.add(it)
-        }
+    public fun group(title: String, context: DropdownGroup.() -> Unit) {
+        (if (storeItems) tailEntries else headEntries).add(
+            DropdownGroup(
+                Id.unique(ComponentType.Dropdown.id, "grp"),
+                title,
+                emptyList()
+            ).apply(context)
+        )
     }
 
     /**
      * Adds an item to this dropdown.
      */
-    public fun item(value: T, context: DropdownItem<T>.() -> Unit = {}) {
-        DropdownItem(value).apply(context).also {
-            staticEntries.add(it)
-        }
+    public fun item(title: String, context: DropdownItem.() -> Unit = {}) {
+        (if (storeItems) tailEntries else headEntries).add(
+            DropdownItem(
+                Id.unique(ComponentType.Dropdown.id, "itm"),
+                title
+            ).apply(context)
+        )
     }
 
     /**
      * Adds a separator.
      */
     public fun separator() {
-        DropdownSeparator<T>().also { staticEntries.add(it) }
+        (if (storeItems) tailEntries else headEntries).add(DropdownSeparator())
     }
 
     /**
      * Adds the items from the specified store.
      */
-    public fun items(
+    public fun <T> items(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: (DropdownItem<T>.(T) -> Unit)
+        display: DropdownEntries.(T) -> DropdownEntry
     ) {
         items(values.data, idProvider, display)
     }
@@ -159,14 +163,23 @@ public open class Dropdown<T>(
     /**
      * Adds the items from the specified flow.
      */
-    public fun items(
+    public fun <T> items(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: (DropdownItem<T>.(T) -> Unit)
+        display: DropdownEntries.(T) -> DropdownEntry
     ) {
-        this.dynamicEntries = values
-        this.idProvider = idProvider
-        this.display = display
+        (MainScope() + NotificationStore.job).launch {
+            values.collect { values ->
+                itemStore.update(
+                    values.map { value ->
+                        DropdownEntries(idProvider(value)).run {
+                            display.invoke(this, value)
+                        }
+                    }
+                )
+            }
+        }
+        storeItems = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -184,164 +197,15 @@ public open class Dropdown<T>(
                 applyEvents(this)
 
                 classMap(expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
-                renderToggle(this, toggle.kind)
+                toggle.render(this)
                 renderEntries(this)
             }
         }
     }
 
-    @Suppress("LongMethod")
-    private fun renderToggle(context: RenderContext, kind: ToggleKind) {
-        with(context) {
-            when (kind) {
-                is TextToggleKind -> {
-                    button(
-                        baseClass = classes {
-                            +"dropdown".component("toggle")
-                            +kind.variant?.modifier
-                        }
-                    ) {
-                        setupToggleButton(this)
-                        span(baseClass = "dropdown".component("toggle", "text")) {
-                            kind.title?.let { +it }
-                            kind.context(this)
-                        }
-                        span(baseClass = "dropdown".component("toggle", "icon")) {
-                            icon("caret-down".fas())
-                        }
-                    }
-                }
-
-                is IconToggleKind -> {
-                    button(
-                        baseClass = classes(
-                            "dropdown".component("toggle"),
-                            "plain".modifier()
-                        )
-                    ) {
-                        setupToggleButton(this)
-                        icon(
-                            iconClass = kind.iconClass,
-                            baseClass = kind.baseClass,
-                            id = kind.id,
-                            context = kind.context
-                        )
-                    }
-                }
-
-                is BadgeToggleKind -> {
-                    button(
-                        baseClass = classes(
-                            "dropdown".component("toggle"),
-                            "plain".modifier()
-                        )
-                    ) {
-                        setupToggleButton(this)
-                        DropdownBadge(kind).apply(kind.context).render(
-                            context = this,
-                            baseClass = kind.baseClass,
-                            id = kind.id
-                        )
-                    }
-                }
-
-                is CheckboxToggleKind -> {
-                    div(
-                        baseClass = classes(
-                            "dropdown".component("toggle"),
-                            "split-button".modifier()
-                        )
-                    ) {
-                        val inputId =
-                            kind.id ?: Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
-                        val titleId = if (kind.title != null) {
-                            Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
-                        } else null
-
-                        classMap(toggle.disabled.map { mapOf("disabled".modifier() to it) })
-                        label(baseClass = "dropdown".component("toggle", "check")) {
-                            `for`(inputId)
-                            input(id = inputId, baseClass = kind.baseClass) {
-                                titleId?.let { id ->
-                                    aria["labelledby"] = id
-                                }
-                                type("checkbox")
-                                kind.context(this)
-                            }
-                            kind.title?.let { title ->
-                                span(baseClass = "dropdown".component("toggle", "text")) {
-                                    aria["hidden"] = true
-                                    +title
-                                }
-                            }
-                        }
-                        button(baseClass = "dropdown".component("toggle", "button")) {
-                            setupToggleButton(this)
-                            icon("caret-down".fas())
-                        }
-                    }
-                }
-
-                is ActionToggleKind -> {
-                    div(
-                        baseClass = classes {
-                            +"dropdown".component("toggle")
-                            +"split-button".modifier()
-                            +"action".modifier()
-                            +kind.variant?.modifier
-                        }
-                    ) {
-                        button(
-                            baseClass = classes(
-                                "dropdown".component("toggle", "button"),
-                                kind.baseClass
-                            ),
-                            id = kind.id
-                        ) {
-                            kind.title?.let { +it }
-                            disabled(toggle.disabled)
-                            kind.context(this)
-                        }
-                        button(baseClass = "dropdown".component("toggle", "button")) {
-                            setupToggleButton(this)
-                            icon("caret-down".fas())
-                        }
-                    }
-                }
-
-                is ImageToggleKind -> {
-                    button(baseClass = "dropdown".component("toggle")) {
-                        setupToggleButton(this)
-                        span(baseClass = "dropdown".component("toggle", "image")) {
-                            img(baseClass = kind.baseClass, id = kind.id) {
-                                kind.context(this)
-                            }
-                        }
-                        span(baseClass = "dropdown".component("toggle", "text")) {
-                            +kind.title
-                        }
-                        span(baseClass = "dropdown".component("toggle", "icon")) {
-                            icon("caret-down".fas())
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupToggleButton(button: Button) {
-        with(button) {
-            domNode.id = toggle.id
-            aria["haspopup"] = true
-            aria["expanded"] = expandedStore.data.map { it.toString() }
-            disabled(toggle.disabled)
-            clicks handledBy expandedStore.toggle
-        }
-    }
-
     @Suppress("NestedBlockDepth")
     private fun renderEntries(context: RenderContext) {
-        val groups = staticEntries.filterIsInstance<DropdownGroup<T>>().isNotEmpty()
+        val groups = grouped || (headEntries + tailEntries).filterIsInstance<DropdownGroup>().isNotEmpty()
         with(context) {
             val classes = classes {
                 +"dropdown".component("menu")
@@ -361,36 +225,37 @@ public open class Dropdown<T>(
                 attr("hidden", expandedStore.data.map { !it })
                 aria["labelledby"] = toggle.id
 
-                normalizeEntries(staticEntries).forEach { renderEntry(this, it, 0) }
-                dynamicEntries?.let { values ->
-                    values.renderEach(into = this, idProvider = idProvider) { value ->
-                        val item = DropdownItem(value)
-                        display?.invoke(item, value)
-                        renderItem(this, item)
-                    }
+                itemStore.data.map { entries ->
+                    headEntries + entries + tailEntries
+                }.map { entries ->
+                    normalizeEntries(entries)
+                }.renderEach(into = this, idProvider = { it.id }) { entry ->
+                    renderEntry(this, entry, 0)
                 }
             }
         }
     }
 
     @Suppress("NestedBlockDepth")
-    private fun normalizeEntries(entries: List<DropdownEntry<T>>): List<DropdownEntry<T>> =
-        if (entries.filterIsInstance<DropdownGroup<T>>().isNotEmpty()) {
+    private fun normalizeEntries(entries: List<DropdownEntry>): List<DropdownEntry> =
+        if (entries.filterIsInstance<DropdownGroup>().isNotEmpty()) {
             // add all top level items and separators to unnamed groups
-            val normalized = mutableListOf<DropdownEntry<T>>()
-            var unnamedGroup: DropdownGroup<T>? = null
+            val normalized = mutableListOf<DropdownEntry>()
+            var unnamedGroup: DropdownGroup? = null
             entries.forEach { entry ->
                 when (entry) {
                     is DropdownGroup -> {
-                        unnamedGroup?.let {
-                            normalized.add(it)
-                            unnamedGroup = null
-                        }
+                        unnamedGroup = null
                         normalized.add(entry)
                     }
                     is DropdownItem, is DropdownSeparator -> {
                         if (unnamedGroup == null) {
-                            unnamedGroup = DropdownGroup(null)
+                            unnamedGroup = DropdownGroup(
+                                Id.unique(ComponentType.Dropdown.id, "top", "lvl", "grp"),
+                                null,
+                                emptyList()
+                            )
+                            normalized.add(unnamedGroup!!)
                         }
                         unnamedGroup?.entries?.add(entry)
                     }
@@ -401,7 +266,7 @@ public open class Dropdown<T>(
             entries
         }
 
-    private fun renderEntry(context: RenderContext, entry: DropdownEntry<T>, depth: Int): RenderContext =
+    private fun renderEntry(context: RenderContext, entry: DropdownEntry, depth: Int): RenderContext =
         with(context) {
             when (entry) {
                 is DropdownGroup -> {
@@ -435,7 +300,7 @@ public open class Dropdown<T>(
             }
         }
 
-    private fun renderItem(context: RenderContext, item: DropdownItem<T>): RenderContext =
+    private fun renderItem(context: RenderContext, item: DropdownItem): RenderContext =
         with(context) {
             button(
                 baseClass = classes {
@@ -454,11 +319,10 @@ public open class Dropdown<T>(
                     domNode.autofocus = true
                 }
                 clicks handledBy expandedStore.collapse
-                clicks.map { item.data } handledBy selectionStore.update
                 item.applyEvents(this)
 
                 if (item.content != null) {
-                    item.content?.let { content -> content(this) }
+                    item.content?.let { content -> content.context(this) }
                 } else {
                     if (item.description != null) {
                         div(baseClass = "dropdown".component("menu", "item", "main")) {
@@ -563,7 +427,10 @@ internal class ImageToggleKind(
  * - [checkbox toggle][DropdownToggle.checkbox]
  * - [action toggle][DropdownToggle.action]
  */
-public class DropdownToggle internal constructor(internal var kind: ToggleKind) {
+public class DropdownToggle internal constructor(
+    private var kind: ToggleKind,
+    private val expandedStore: ExpandedStore
+) {
 
     internal val id: String = Id.unique(ComponentType.Dropdown.id, "tgl")
     internal var disabled: Flow<Boolean> = flowOf(false)
@@ -676,27 +543,188 @@ public class DropdownToggle internal constructor(internal var kind: ToggleKind) 
     ) {
         kind = ImageToggleKind(title = title, src = src, baseClass = baseClass, id = id, context = context)
     }
+
+    @Suppress("LongMethod")
+    internal fun render(context: RenderContext) {
+        with(context) {
+            when (val kind = this@DropdownToggle.kind) {
+                is TextToggleKind -> {
+                    button(
+                        baseClass = classes {
+                            +"dropdown".component("toggle")
+                            +kind.variant?.modifier
+                        }
+                    ) {
+                        setupToggleButton(this)
+                        span(baseClass = "dropdown".component("toggle", "text")) {
+                            kind.title?.let { +it }
+                            kind.context(this)
+                        }
+                        span(baseClass = "dropdown".component("toggle", "icon")) {
+                            icon("caret-down".fas())
+                        }
+                    }
+                }
+
+                is IconToggleKind -> {
+                    button(
+                        baseClass = classes(
+                            "dropdown".component("toggle"),
+                            "plain".modifier()
+                        )
+                    ) {
+                        setupToggleButton(this)
+                        icon(
+                            iconClass = kind.iconClass,
+                            baseClass = kind.baseClass,
+                            id = kind.id,
+                            context = kind.context
+                        )
+                    }
+                }
+
+                is BadgeToggleKind -> {
+                    button(
+                        baseClass = classes(
+                            "dropdown".component("toggle"),
+                            "plain".modifier()
+                        )
+                    ) {
+                        setupToggleButton(this)
+                        DropdownBadge(kind).apply(kind.context).render(
+                            context = this,
+                            baseClass = kind.baseClass,
+                            id = kind.id
+                        )
+                    }
+                }
+
+                is CheckboxToggleKind -> {
+                    div(
+                        baseClass = classes(
+                            "dropdown".component("toggle"),
+                            "split-button".modifier()
+                        )
+                    ) {
+                        val inputId =
+                            kind.id ?: Id.unique(ComponentType.Dropdown.id, "tgl", "chk")
+                        val titleId = if (kind.title != null) {
+                            Id.unique(ComponentType.Dropdown.id, "tgl", "txt")
+                        } else null
+
+                        classMap(disabled.map { mapOf("disabled".modifier() to it) })
+                        label(baseClass = "dropdown".component("toggle", "check")) {
+                            `for`(inputId)
+                            input(id = inputId, baseClass = kind.baseClass) {
+                                titleId?.let { id ->
+                                    aria["labelledby"] = id
+                                }
+                                type("checkbox")
+                                kind.context(this)
+                            }
+                            kind.title?.let { title ->
+                                span(baseClass = "dropdown".component("toggle", "text")) {
+                                    aria["hidden"] = true
+                                    +title
+                                }
+                            }
+                        }
+                        button(baseClass = "dropdown".component("toggle", "button")) {
+                            setupToggleButton(this)
+                            icon("caret-down".fas())
+                        }
+                    }
+                }
+
+                is ActionToggleKind -> {
+                    div(
+                        baseClass = classes {
+                            +"dropdown".component("toggle")
+                            +"split-button".modifier()
+                            +"action".modifier()
+                            +kind.variant?.modifier
+                        }
+                    ) {
+                        button(
+                            baseClass = classes(
+                                "dropdown".component("toggle", "button"),
+                                kind.baseClass
+                            ),
+                            id = kind.id
+                        ) {
+                            kind.title?.let { +it }
+                            disabled(disabled)
+                            kind.context(this)
+                        }
+                        button(baseClass = "dropdown".component("toggle", "button")) {
+                            setupToggleButton(this)
+                            icon("caret-down".fas())
+                        }
+                    }
+                }
+
+                is ImageToggleKind -> {
+                    button(baseClass = "dropdown".component("toggle")) {
+                        setupToggleButton(this)
+                        span(baseClass = "dropdown".component("toggle", "image")) {
+                            img(baseClass = kind.baseClass, id = kind.id) {
+                                kind.context(this)
+                            }
+                        }
+                        span(baseClass = "dropdown".component("toggle", "text")) {
+                            +kind.title
+                        }
+                        span(baseClass = "dropdown".component("toggle", "icon")) {
+                            icon("caret-down".fas())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupToggleButton(button: Button) {
+        with(button) {
+            domNode.id = this@DropdownToggle.id
+            aria["haspopup"] = true
+            aria["expanded"] = expandedStore.data.map { it.toString() }
+            disabled(disabled)
+            clicks handledBy expandedStore.toggle
+        }
+    }
 }
 
-// ------------------------------------------------------ item
+// ------------------------------------------------------ item & store
+
+public class DropdownEntries(internal val id: String) {
+
+    public fun group(title: String, context: DropdownGroup.() -> Unit): DropdownGroup =
+        DropdownGroup(Id.build(id, "grp"), title, emptyList()).apply(context)
+
+    public fun item(title: String? = null, context: DropdownItem.() -> Unit = {}): DropdownItem =
+        DropdownItem(Id.build(id, "itm"), title).apply(context)
+
+    public fun separator(): DropdownSeparator = DropdownSeparator()
+}
 
 /**
  * Base class for groups and items.
  */
-public sealed class DropdownEntry<T>
+public sealed class DropdownEntry(internal val id: String)
 
 /**
  * A dropdown group with a title and nested items.
  *
  * Please note that nested groups are *not* supported!
  */
-public class DropdownGroup<T> internal constructor(
+public class DropdownGroup internal constructor(
+    id: String,
     title: String?,
-    initialEntries: List<DropdownEntry<T>> = emptyList()
-) : DropdownEntry<T>(),
+    initialEntries: List<DropdownEntry>
+) : DropdownEntry(id),
     WithTitle by TitleMixin() {
 
-    internal val entries: MutableList<DropdownEntry<T>> = mutableListOf()
+    internal val entries: MutableList<DropdownEntry> = mutableListOf()
 
     init {
         title?.let { this.title(it) }
@@ -706,8 +734,8 @@ public class DropdownGroup<T> internal constructor(
     /**
      * Adds an item to this group.
      */
-    public fun item(data: T, context: DropdownItem<T>.() -> Unit = {}) {
-        DropdownItem(data).apply(context).run {
+    public fun item(title: String? = null, context: DropdownItem.() -> Unit = {}) {
+        DropdownItem(Id.unique(id, "itm"), title).apply(context).run {
             group = this@DropdownGroup
             entries.add(this)
         }
@@ -726,22 +754,21 @@ public class DropdownGroup<T> internal constructor(
  *
  * @sample org.patternfly.sample.DropdownSample.customEntries
  */
-public class DropdownItem<T> internal constructor(public val data: T) :
-    DropdownEntry<T>(),
+public class DropdownItem internal constructor(id: String, title: String?) :
+    DropdownEntry(id),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
 
-    internal val id: String = Id.unique(ComponentType.Dropdown.id, "itm")
-    internal var group: DropdownGroup<T>? = null
+    internal var group: DropdownGroup? = null
     internal var disabled: Boolean = false
     internal var selected: Boolean = false
     internal var iconClass: String = ""
     internal var iconContext: (Icon.() -> Unit)? = null
     internal var description: String? = null
-    internal var content: (RenderContext.() -> Unit)? = null
+    internal var content: (SubComponent<Button>)? = null
 
     init {
-        this.title(data.toString())
+        title?.let { this.title(it) }
     }
 
     /**
@@ -776,13 +803,18 @@ public class DropdownItem<T> internal constructor(public val data: T) :
     /**
      * Defines a custom layout for the item.
      */
-    public fun content(context: RenderContext.() -> Unit) {
-        this.content = context
+    public fun content(
+        id: String? = null,
+        baseClass: String? = null,
+        context: Button.() -> Unit
+    ) {
+        this.content = SubComponent(baseClass, id, context)
     }
 }
 
 /**
  * A dropdown separator.
  */
-public class DropdownSeparator<T> internal constructor(@Suppress("unused") private val id: Int = 23) :
-    DropdownEntry<T>()
+public class DropdownSeparator : DropdownEntry(Id.unique(ComponentType.Dropdown.id, "sep"))
+
+internal class DropdownEntryStore : RootStore<List<DropdownEntry>>(emptyList())

@@ -9,12 +9,12 @@ internal class NotificationSample {
 
     fun add() {
         render {
-            dropdown<Int> {
+            dropdown {
                 toggle { text("1, 2 or 3") }
-                (1..3).forEach { item(it) }
-                events {
-                    selections handledBy notification(INFO) { item ->
-                        title("You've selected $item")
+                (1..3).forEach { number ->
+                    item(number.toString())
+                    events {
+                        clicks handledBy notification(INFO, "You've selected $number")
                     }
                 }
             }

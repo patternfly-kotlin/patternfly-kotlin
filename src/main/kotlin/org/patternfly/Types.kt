@@ -112,13 +112,6 @@ public enum class DataTableSelection {
 }
 
 /**
- * Visual modifier for [divider]s.
- */
-public enum class DividerVariant {
-    HR, DIV, LI
-}
-
-/**
  * Modifiers for the [DrawerPanel] position.
  */
 @Suppress("EnumEntryName", "EnumNaming")

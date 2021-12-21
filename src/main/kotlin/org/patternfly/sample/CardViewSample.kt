@@ -25,7 +25,7 @@ internal interface CardViewSample {
                         legacyCardHeader {
                             legacyCardTitle { +"Demo" }
                             legacyCardAction {
-                                dropdown<String>(align = RIGHT) {
+                                dropdown(align = RIGHT) {
                                     toggle { kebab() }
                                     item("Edit")
                                     item("Remove")

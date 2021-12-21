@@ -86,7 +86,10 @@ public fun <T> LegacyCard<T>.legacyCardHeader(
     id: String? = null,
     baseClass: String? = null,
     content: LegacyCardHeader<T>.() -> Unit = {}
-): LegacyCardHeader<T> = register(LegacyCardHeader(this.itemsStore, this.item, this, id = id, baseClass = baseClass, job), content)
+): LegacyCardHeader<T> = register(
+    LegacyCardHeader(this.itemsStore, this.item, this, id = id, baseClass = baseClass, job),
+    content
+)
 
 /**
  * Creates a [LegacyCardToggle] component inside the [LegacyCardHeader] component.
@@ -458,8 +461,12 @@ public class LegacyCardCheckbox<T> internal constructor(
  * @sample org.patternfly.sample.CardSample.titleInHeader
  * @sample org.patternfly.sample.CardSample.noHeader
  */
-public class LegacyCardTitle<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore,
+public class LegacyCardTitle<T> internal constructor(
+    itemsStore: ItemsStore<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemsStore,
     Div(
         id = id, baseClass = classes("card".component("title"), baseClass), job,
         scope = Scope()
@@ -493,8 +500,12 @@ public class LegacyCardExpandableContent<T> internal constructor(
  *
  * @sample org.patternfly.sample.CardSample.multipleBodies
  */
-public class LegacyCardBody<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore,
+public class LegacyCardBody<T> internal constructor(
+    itemsStore: ItemsStore<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemsStore,
     Div(
         id = id, baseClass = classes("card".component("body"), baseClass), job,
         scope = Scope()
@@ -503,8 +514,12 @@ public class LegacyCardBody<T> internal constructor(itemsStore: ItemsStore<T>, i
 /**
  * The footer of a [LegacyCard].
  */
-public class LegacyCardFooter<T> internal constructor(itemsStore: ItemsStore<T>, id: String?, baseClass: String?, job: Job) :
-    WithIdProvider<T> by itemsStore,
+public class LegacyCardFooter<T> internal constructor(
+    itemsStore: ItemsStore<T>,
+    id: String?,
+    baseClass: String?,
+    job: Job
+) : WithIdProvider<T> by itemsStore,
     Div(
         id = id, baseClass = classes("card".component("footer"), baseClass), job,
         scope = Scope()

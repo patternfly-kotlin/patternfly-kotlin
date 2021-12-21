@@ -113,9 +113,11 @@ public open class Card(
                     components.find { it is CardHeader }?.render(this)
                     div(baseClass = "card".component("expandable", "content")) {
                         attr("hidden", expandedStore.data.map { !it })
-                        classMap(expandedStore.data.map { expanded ->
-                            mapOf("display-none".util() to !expanded)
-                        })
+                        classMap(
+                            expandedStore.data.map { expanded ->
+                                mapOf("display-none".util() to !expanded)
+                            }
+                        )
                         components.filterNot { it is CardHeader }.forEach { it.render(this) }
                     }
                 } else {

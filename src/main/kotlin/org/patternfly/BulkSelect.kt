@@ -6,12 +6,12 @@ public fun <T> ToolbarItem.bulkSelect(
     itemsStore: ItemsStore<T>,
     id: String? = null,
     baseClass: String? = null,
-    content: Dropdown<PreSelection>.() -> Unit = {}
+    content: Dropdown.() -> Unit = {}
 ) {
     domNode.classList += "bulk-select".modifier()
-    dropdown<PreSelection>(id = id, baseClass = baseClass) {
-        toggle {
-            checkbox {
+//    dropdown<PreSelection>(id = id, baseClass = baseClass) {
+//        toggle {
+//            checkbox {
 //                text {
 //                    itemsStore.selected.map {
 //                        if (it == 0) "" else "$it selected"
@@ -26,17 +26,17 @@ public fun <T> ToolbarItem.bulkSelect(
 //                        }
 //                    }
 //                )
-                events {
+//                events {
 //                    changes.states().filter { !it }.map { } handledBy itemsStore.selectNone
 //                    changes.states().filter { it }.map { } handledBy itemsStore.selectAll
-                }
-            }
-        }
-        PreSelection.values().forEach { ps ->
-            item(ps) {
-                +ps.text
-            }
-        }
-        content(this)
-    }
+//                }
+//            }
+//        }
+//        PreSelection.values().forEach { ps ->
+//            item(ps) {
+//                +ps.text
+//            }
+//        }
+//        content(this)
+//    }
 }

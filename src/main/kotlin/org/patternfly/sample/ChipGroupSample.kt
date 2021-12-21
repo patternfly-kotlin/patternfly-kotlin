@@ -36,7 +36,7 @@ internal class ChipGroupSample {
             chipGroup {
                 +"Category"
                 chips(store, { it.id }) { demo ->
-                    +demo.name
+                    chip(demo.name)
                 }
             }
         }

@@ -16,39 +16,47 @@ import org.w3c.dom.HTMLElement
 public fun RenderContext.divider(
     variant: DividerVariant = DividerVariant.HR,
     vertical: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null
-): Tag<HTMLElement> =
-    when (variant) {
-        DividerVariant.HR ->
-            hr(
-                id = id,
-                baseClass = classes {
-                    +"divider".component()
-                    +("vertical".modifier() `when` vertical)
-                    +baseClass
-                }
-            ) {}
-        DividerVariant.DIV ->
-            div(
-                id = id,
-                baseClass = classes {
-                    +"divider".component()
-                    +("vertical".modifier() `when` vertical)
-                    +baseClass
-                }
-            ) {
-                attr("role", "separator")
-            }
-        DividerVariant.LI ->
-            li(
-                id = id,
-                baseClass = classes {
-                    +"divider".component()
-                    +("vertical".modifier() `when` vertical)
-                    +baseClass
-                }
-            ) {
-                attr("role", "separator")
-            }
-    }
+    baseClass: String? = null,
+    id: String? = null
+): Tag<HTMLElement> = when (variant) {
+    DividerVariant.HR ->
+        hr(
+            baseClass = classes {
+                +"divider".component()
+                +("vertical".modifier() `when` vertical)
+                +baseClass
+            },
+            id = id
+        ) {}
+    DividerVariant.DIV ->
+        div(
+            baseClass = classes {
+                +"divider".component()
+                +("vertical".modifier() `when` vertical)
+                +baseClass
+            },
+            id = id
+        ) {
+            attr("role", "separator")
+        }
+    DividerVariant.LI ->
+        li(
+            baseClass = classes {
+                +"divider".component()
+                +("vertical".modifier() `when` vertical)
+                +baseClass
+            },
+            id = id
+        ) {
+            attr("role", "separator")
+        }
+}
+
+// ------------------------------------------------------ component
+
+/**
+ * Visual modifier for [divider]s.
+ */
+public enum class DividerVariant {
+    HR, DIV, LI
+}

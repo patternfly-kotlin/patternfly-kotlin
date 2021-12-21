@@ -1,7 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.binding.EmittingHandler
-import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
@@ -60,11 +59,11 @@ public open class ChipGroup(private var limit: Int) :
     WithExpandedStore by ExpandedStoreMixin(),
     WithTitle by TitleMixin() {
 
-    // Other than Accordion, Breadcrumb or Dropdown we don't distinguish between
-    // static and dynamic items. The reason for that is that we need *all* items
-    // to be in one store so that we can permanently remove chips.
-    private val itemStore: ChipItemStore = ChipItemStore()
     private var closable: Boolean = false
+    private var storeItems: Boolean = false
+    private val itemStore: ChipItemStore = ChipItemStore()
+    private val headItems: MutableList<ChipItem> = mutableListOf()
+    private val tailItems: MutableList<ChipItem> = mutableListOf()
     private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
     private lateinit var root: Tag<HTMLElement>
 
@@ -98,11 +97,16 @@ public open class ChipGroup(private var limit: Int) :
         id: String? = null,
         context: Chip.() -> Unit = {}
     ) {
-        ChipItem(id ?: Id.unique(ComponentType.ChipGroup.id, ComponentType.Chip.id), title).apply {
-            chip(baseClass, id, context)
-        }.also {
-            itemStore.add(it)
-        }
+        val items = if (storeItems) tailItems else headItems
+        items.add(
+            ChipItem(
+                staticItem = true,
+                title = title,
+                baseClass = baseClass,
+                id = id ?: Id.unique(ComponentType.ChipGroup.id, ComponentType.Chip.id),
+                context = context
+            )
+        )
     }
 
     /**
@@ -111,7 +115,7 @@ public open class ChipGroup(private var limit: Int) :
     public fun <T> chips(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: Chip.(T) -> Unit
+        display: ChipItems.(T) -> ChipItem
     ) {
         chips(values.data, idProvider, display)
     }
@@ -122,21 +126,20 @@ public open class ChipGroup(private var limit: Int) :
     public fun <T> chips(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: Chip.(T) -> Unit
+        display: ChipItems.(T) -> ChipItem
     ) {
         (MainScope() + job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
-                        ChipItem(idProvider(value)).apply {
-                            chip {
-                                display(this, value)
-                            }
+                        ChipItems(idProvider(value)).run {
+                            display.invoke(this, value)
                         }
                     }
                 )
             }
         }
+        storeItems = true
     }
 
     @Suppress("LongMethod", "ComplexMethod")
@@ -170,7 +173,9 @@ public open class ChipGroup(private var limit: Int) :
                         }
                     ) {
                         labelId?.let { aria["labelledby"] = it }
-                        itemStore.data.combine(expandedStore.data) { items, expanded ->
+                        itemStore.data.map { items ->
+                            headItems + items + tailItems
+                        }.combine(expandedStore.data) { items, expanded ->
                             Pair(items, expanded)
                         }.render(into = this) { (items, expanded) ->
                             val visibleChips = if (expanded) items else items.take(limit)
@@ -179,8 +184,17 @@ public open class ChipGroup(private var limit: Int) :
                                     chip(item.title, item.baseClass, item.id) {
                                         item.context(this)
                                         closable(true)
-                                        events {
-                                            closes.map { item.id } handledBy this@ChipGroup.itemStore.remove
+                                        if (item.staticItem) {
+                                            events {
+                                                closes.map { item.id } handledBy { id ->
+                                                    this@ChipGroup.headItems.removeAll { it.id == id }
+                                                    this@ChipGroup.tailItems.removeAll { it.id == id }
+                                                }
+                                            }
+                                        } else {
+                                            events {
+                                                closes.map { item.id } handledBy this@ChipGroup.itemStore.remove
+                                            }
                                         }
                                     }
                                 }
@@ -217,7 +231,7 @@ public open class ChipGroup(private var limit: Int) :
             (MainScope() + job).launch {
                 itemStore.remove.collect {
                     // The item is emitted before it is removed, so check for size == 1
-                    if (itemStore.current.size == 1) {
+                    if (itemStore.current.size == 1 && headItems.isEmpty() && tailItems.isEmpty()) {
                         domNode.removeFromParent()
                     }
                 }
@@ -231,33 +245,35 @@ public open class ChipGroup(private var limit: Int) :
     }
 }
 
+// ------------------------------------------------------ item & store
+
 /**
- * DSL related context class to create chips inside a chip group.
+ * DSL scope class to create [ChipItem]s when using [ChipGroup.chips] functions.
+ *
+ * @sample org.patternfly.sample.ChipGroupSample.dynamicItems
  */
-public class ChipItem internal constructor(internal var id: String, internal val title: String? = null) {
+public class ChipItems(internal val id: String) {
 
-    internal var baseClass: String? = null
-    internal var context: Chip.() -> Unit = {}
-
-    /**
-     * Adds a chip inside a chip group
-     */
     public fun chip(
+        title: String? = null,
         baseClass: String? = null,
         id: String? = null,
-        context: Chip.() -> Unit
-    ) {
-        this.baseClass = baseClass
-        this.context = context
-        id?.let { this.id = it }
-    }
+        context: Chip.() -> Unit = {}
+    ): ChipItem = ChipItem(false, title, baseClass, id ?: this.id, context)
 }
 
-internal class ChipItemStore : RootStore<List<ChipItem>>(emptyList()) {
+/**
+ * DSL helper class to hold data necessary to create [Chip] components when using [ChipGroup.chips] functions.
+ */
+public class ChipItem internal constructor(
+    internal val staticItem: Boolean,
+    internal val title: String?,
+    internal val baseClass: String?,
+    internal val id: String,
+    internal val context: Chip.() -> Unit
+)
 
-    val add: Handler<ChipItem> = handle { items, item ->
-        items + item
-    }
+internal class ChipItemStore : RootStore<List<ChipItem>>(emptyList()) {
 
     val remove: EmittingHandler<String, String> = handleAndEmit { items, id ->
         items.find { it.id == id }?.let { emit(it.id) }
