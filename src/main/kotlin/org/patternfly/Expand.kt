@@ -3,12 +3,14 @@ package org.patternfly
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.QueuedUpdate
 import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
 import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
@@ -62,6 +64,22 @@ public class ExpandedStore internal constructor(private val collapsePredicate: C
             addCloseHandler()
             true
         }
+    }
+
+    public fun <E : Element> Tag<E>.hideIfCollapsed() {
+        this.attr("hidden", data.map { expanded -> !expanded })
+    }
+
+    public fun <E : Element> Tag<E>.toggleAriaExpanded() {
+        this.attr("aria-expanded", data.map { expanded -> expanded.toString() })
+    }
+
+    public fun <E : Element> Tag<E>.toggleDisplayNone() {
+        this.classMap(data.map { expanded -> mapOf("display-none".util() to !expanded) })
+    }
+
+    public fun <E : Element> Tag<E>.toggleExpanded() {
+        this.classMap(data.map { expanded -> mapOf("expanded".modifier() to expanded) })
     }
 
     private fun addCloseHandler() {

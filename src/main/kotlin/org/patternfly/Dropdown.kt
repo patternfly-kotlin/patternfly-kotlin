@@ -188,6 +188,7 @@ public open class Dropdown(
                 baseClass = classes {
                     +ComponentType.Dropdown
                     +("top".modifier() `when` up)
+                    +align?.modifier
                     +baseClass
                 },
                 id = id
@@ -196,7 +197,7 @@ public open class Dropdown(
                 applyElement(this)
                 applyEvents(this)
 
-                classMap(expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+                with(expandedStore) { toggleExpanded() }
                 toggle.render(this)
                 renderEntries(this)
             }
@@ -222,8 +223,8 @@ public open class Dropdown(
             }
             with(menu) {
                 attr("role", "menu")
-                attr("hidden", expandedStore.data.map { !it })
                 aria["labelledby"] = toggle.id
+                with(expandedStore) { hideIfCollapsed() }
 
                 itemStore.data.map { entries ->
                     headEntries + entries + tailEntries

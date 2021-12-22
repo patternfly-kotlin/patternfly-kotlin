@@ -9,6 +9,7 @@ import org.patternfly.dataList
 import org.patternfly.dataListItem
 import org.patternfly.dataListRow
 import org.patternfly.drawer
+import org.patternfly.drawer2
 import org.patternfly.drawerAction
 import org.patternfly.drawerBody
 import org.patternfly.drawerBodyWithClose
@@ -16,42 +17,25 @@ import org.patternfly.drawerClose
 import org.patternfly.drawerContent
 import org.patternfly.drawerHead
 import org.patternfly.drawerPanel
-import org.patternfly.drawerSection
 import org.patternfly.notification
 
 internal class DrawerSample {
 
     fun drawerSetup() {
         render {
-            val store = ItemsStore<String>()
-
-            val drawer = drawer {
-                drawerSection {
-                    +"Primary detail demo"
+            drawer2 {
+                primary {
+                    content { +"Primary content" }
+                    content { +"More content" }
                 }
-                drawerContent {
-                    drawerBody {
-                        dataList(store, selectableRows = true) {
-                            display { item ->
-                                dataListItem(item) {
-                                    dataListRow { +item }
-                                }
-                            }
-                        }
+                detail {
+                    head {
+                        h2 { +"Details" }
                     }
-                }
-                drawerPanel {
-                    drawerBodyWithClose {
-                        h2 { +"Details of selected item" }
-                    }
-                    drawerBody {
-                        store.singleSelection.asText()
-                    }
+                    content { +"Some details" }
+                    content { +"More details" }
                 }
             }
-
-            store.addAll(listOf("One", "Two", "Three"))
-            store.singleSelection.filterNotNull().map { } handledBy drawer.expanded.expand
         }
     }
 

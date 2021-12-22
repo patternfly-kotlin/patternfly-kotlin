@@ -112,12 +112,10 @@ public open class Card(
                 if (expandable) {
                     components.find { it is CardHeader }?.render(this)
                     div(baseClass = "card".component("expandable", "content")) {
-                        attr("hidden", expandedStore.data.map { !it })
-                        classMap(
-                            expandedStore.data.map { expanded ->
-                                mapOf("display-none".util() to !expanded)
-                            }
-                        )
+                        with(expandedStore) {
+                            hideIfCollapsed()
+                            toggleDisplayNone()
+                        }
                         components.filterNot { it is CardHeader }.forEach { it.render(this) }
                     }
                 } else {
@@ -133,7 +131,7 @@ public open class Card(
  *
  * @see <a href="https://www.patternfly.org/v4/components/card/design-guidelines#variations">https://www.patternfly.org/v4/components/card/design-guidelines#variations</a>
  */
-@Suppress("EnumEntryName", "EnumNaming", "unused")
+@Suppress("EnumEntryName", "EnumNaming")
 public enum class CardVariant(internal val modifier: String) {
     compact("compact".modifier()),
     expandable(""),

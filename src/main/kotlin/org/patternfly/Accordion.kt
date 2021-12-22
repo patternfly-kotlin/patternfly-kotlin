@@ -163,12 +163,10 @@ public open class Accordion(
         with(context) {
             dt {
                 button(baseClass = "accordion".component("toggle")) {
-                    attr("aria-expanded", item.expandedStore.data.map { it.toString() })
-                    classMap(
-                        item.expandedStore.data.map { expanded ->
-                            mapOf("expanded".modifier() to expanded)
-                        }
-                    )
+                    with(item.expandedStore) {
+                        toggleAriaExpanded()
+                        toggleExpanded()
+                    }
                     clicks handledBy item.expandedStore.toggle
                     if (singleExpand) {
                         domNode.addEventListener(Events.click.name, { collapseAllBut(item) })
@@ -188,8 +186,10 @@ public open class Accordion(
                     +("fixed".modifier() `when` fixed)
                 }
             ) {
-                attr("hidden", item.expandedStore.data.map { !it })
-                classMap(item.expandedStore.data.map { expanded -> mapOf("expanded".modifier() to expanded) })
+                with(item.expandedStore) {
+                    hideIfCollapsed()
+                    toggleExpanded()
+                }
                 item.content?.let { content ->
                     div(
                         baseClass = classes(

@@ -278,11 +278,7 @@ public open class Navigation<T>(
     private fun expandableGroup(context: RenderContext, group: NavigationGroup<T>) {
         with(context) {
             li(baseClass = classes("nav".component("item"), "expandable".modifier())) {
-                classMap(
-                    group.expandedStore.data.map { expanded ->
-                        mapOf("expanded".modifier() to expanded)
-                    }
-                )
+                with(group.expandedStore) { toggleExpanded() }
                 (MainScope() + job).launch {
                     router.data.collect {
                         delay(Settings.UI_TIMEOUT) // wait a bit before testing for the current modifier
@@ -295,7 +291,7 @@ public open class Navigation<T>(
                 button("nav".component("link"), buttonId) {
                     group.applyTitle(this)
                     clicks handledBy group.expandedStore.toggle
-                    aria["expanded"] = group.expandedStore.data.map { it.toString() }
+                    with(group.expandedStore) { toggleAriaExpanded() }
                     span("nav".component("toggle")) {
                         span("nav".component("toggle", "icon")) {
                             icon("angle-right".fas())
@@ -304,7 +300,7 @@ public open class Navigation<T>(
                 }
                 section("nav".component("subnav")) {
                     aria["labelledby"] = buttonId
-                    attr("hidden", group.expandedStore.data.map { !it })
+                    with(group.expandedStore) { hideIfCollapsed() }
                     group.applyEvents(this)
                     group(this, group)
                 }
