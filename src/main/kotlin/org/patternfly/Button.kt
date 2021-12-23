@@ -371,7 +371,7 @@ public open class Button(
                     loading.distinctUntilChanged().render(into = this) { running ->
                         if (running) {
                             span(baseClass = "button".component("progress")) {
-                                spinner {}
+                                spinner(Size.MD) {}
                             }
                         }
                         renderContentOrIconAndTitle(this, running)

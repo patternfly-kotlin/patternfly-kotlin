@@ -9,6 +9,15 @@ import kotlinx.coroutines.flow.map
 
 // ------------------------------------------------------ factory
 
+/**
+ * Creates the [Checkbox] component.
+ *
+ * @param name the name of the checkbox
+ * @param standalone whether to omit any labels and descriptions
+ * @param reversed puts the label before the checkbox control
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
+ */
 public fun RenderContext.checkbox(
     name: String,
     standalone: Boolean = false,
@@ -26,6 +35,11 @@ public fun RenderContext.checkbox(
 
 // ------------------------------------------------------ component
 
+/**
+ * [PatternFly checkbox](https://www.patternfly.org/v4/components/checkbox/design-guidelines) component.
+ *
+ * A checkbox is used to select a single item or multiple items, typically to choose elements to perform an action or to reflect a binary setting.
+ */
 public class Checkbox(
     private val name: String,
     private val standalone: Boolean,
@@ -39,6 +53,7 @@ public class Checkbox(
     private var content: SubComponent<Span>? = null
     private var checked: Flow<Boolean> = emptyFlow()
     private var disabled: Flow<Boolean> = emptyFlow()
+    private var indeterminate: Flow<Boolean> = emptyFlow()
 
     public fun description(baseClass: String? = null, id: String? = null, context: Span.() -> Unit) {
         this.description = SubComponent(baseClass, id, context)
@@ -59,6 +74,20 @@ public class Checkbox(
      * Controls the checked state of the checkbox.
      */
     public fun checked(value: Flow<Boolean>) {
+        checked = value
+    }
+
+    /**
+     * Controls the indeterminate state of the checkbox.
+     */
+    public fun indeterminate(value: Boolean) {
+        indeterminate = flowOf(value)
+    }
+
+    /**
+     * Controls the indeterminate state of the checkbox.
+     */
+    public fun indeterminate(value: Flow<Boolean>) {
         checked = value
     }
 
@@ -98,6 +127,7 @@ public class Checkbox(
                     name(name)
                     checked(checked)
                     disabled(disabled)
+                    indeterminate(indeterminate)
                 }
                 if (hasTitle && !reversed) {
                     renderLabel(this)

@@ -1,221 +1,218 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import kotlinx.coroutines.Job
-import org.patternfly.ButtonVariant.link
-import org.patternfly.Size.LG
-import org.patternfly.Size.MD
-import org.patternfly.Size.SM
-import org.patternfly.Size.XL
-import org.patternfly.Size.XL_4
-import org.patternfly.Size.XS
-import org.w3c.dom.HTMLDivElement
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
- * Creates an [EmptyState] component.
+ * Creates the [EmptyState] component.
  *
- * @param size the size of the empty state component. Supported sizes are [Size.XL], [Size.LG], [Size.SM] and [Size.XS]
+ * @param size the size of the empty state component. See [EmptyState.SUPPORTED_SIZES] for supported sizes.
  * @param iconClass an optional icon class
  * @param title the title of the empty state component
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the [EmptyStateContent] component
- *
- * @sample org.patternfly.sample.EmptyStateSample.emptyState
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.emptyState(
-    size: Size = MD,
+    size: Size = Size.MD,
     iconClass: String? = null,
-    title: String,
-    id: String? = null,
+    title: String? = null,
     baseClass: String? = null,
-    content: EmptyStateContent.() -> Unit = {}
-): EmptyState = register(EmptyState(size, iconClass, title, id = id, baseClass = baseClass, job, content), {})
-
-/**
- * Creates an [EmptyState] component containing a [Spinner] and a "Loading" header.
- *
- * @param title the title of the empty state component
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the [EmptyStateContent] component
- */
-public fun RenderContext.emptyStateSpinner(
-    title: String = "Loading",
     id: String? = null,
-    baseClass: String? = null,
-    content: EmptyStateContent.() -> Unit = {}
-): EmptyState = emptyState(title = title, id = id, baseClass = baseClass, content = content).apply {
-    domNode.querySelector(ComponentType.Title)?.prepend(
-        Div(baseClass = "empty-state".component("icon"), job = Job(), scope = Scope()).apply {
-            spinner()
-        }.domNode
-    )
+    context: EmptyState.() -> Unit = {}
+) {
+    EmptyState(
+        size = size,
+        iconClass = iconClass,
+        title = title
+    ).apply(context).render(this, baseClass, id)
 }
 
-/**
- * Creates an [EmptyState] that can be used when a filter does not return results.
- *
- * @param title the title of the empty state component
- * @param body the text shown in the empty state body
- * @param action text and handler for the primary action
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the [EmptyStateContent] component
- */
-public fun RenderContext.emptyStateNoResults(
-    title: String = "No results found",
-    body: Div.() -> Unit = {
-        +"No results match the filter criteria. Remove all filters or clear all filters to show results."
-    },
-    action: Pair<String, Handler<Unit>>? = null,
-    id: String? = null,
-    baseClass: String? = null,
-    content: EmptyStateContent.() -> Unit = {}
-): EmptyState = emptyState(iconClass = "search".fas(), title = title, id = id, baseClass = baseClass) {
-    emptyStateBody {
-        body(this)
-    }
-    action?.let { (text, handler) ->
-        emptyStatePrimary {
-            clickButton(link) {
-                +text
-            } handledBy handler
-        }
-    }
-    content(this)
-}
-
-/**
- * Creates a [Div] container for the body of the [EmptyState] component. Use this function to add a description or other text related content.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun EmptyStateContent.emptyStateBody(
-    id: String? = null,
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(Div(id = id, baseClass = classes("empty-state".component("body"), baseClass), job, Scope()), content)
-
-/**
- * Creates a [Div] container for the primary action of the [EmptyState] component. Use this function if you have a special use case like multiple elements as primary action.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.EmptyStateSample.primaryContainer
- */
-public fun EmptyStateContent.emptyStatePrimary(
-    id: String? = null,
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(
-    Div(
-        id = id,
-        baseClass = classes("empty-state".component("primary"), baseClass),
-        job,
-        Scope()
-    ),
-    content
-)
-
-/**
- * Creates a [Div] container for the secondary actions of the [EmptyState] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun EmptyStateContent.emptyStateSecondary(
-    id: String? = null,
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): Div = register(
-    Div(
-        id = id,
-        baseClass = classes("empty-state".component("secondary"), baseClass),
-        job,
-        Scope()
-    ),
-    content
-)
-
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [empty state](https://www.patternfly.org/v4/components/empty-state/design-guidelines) component.
  *
- * An empty state component fills a screen that is not yet populated with data or information. All elements are nested inside the [EmptyStateContent] component. This includes the icon, the header and the primary and secondary buttons.
+ * An empty state component fills a screen that is not yet populated with data or information.
  *
- * An empty state should contain an icon, must contain a title and should contain a body and buttons. The body must be nested inside an [emptyStateBody] container. The primary button can be added directly as a [PushButton] to the [EmptyStateContent] or nested inside a [emptyStatePrimary] container. Secondary button(s) must be added inside a [emptyStateSecondary] container.
- *
- * ```
- * ┏━━━━━━━━━━━ emptyState: EmptyState ━━━━━━━━━━┓
- * ┃                                             ┃
- * ┃ ┌──emptyStateContent: EmptyStateContent───┐ ┃
- * ┃ │ ┌─────────────────────────────────────┐ │ ┃
- * ┃ │ │         emptyStateBody: Div         │ │ ┃
- * ┃ │ └─────────────────────────────────────┘ │ ┃
- * ┃ │ ┌─────────────────────────────────────┐ │ ┃
- * ┃ │ │       emptyStatePrimary: Div        │ │ ┃
- * ┃ │ └─────────────────────────────────────┘ │ ┃
- * ┃ │ ┌─────────────────────────────────────┐ │ ┃
- * ┃ │ │      emptyStateSecondary: Div       │ │ ┃
- * ┃ │ └─────────────────────────────────────┘ │ ┃
- * ┃ └─────────────────────────────────────────┘ ┃
- * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
- * ```
- *
- * @sample org.patternfly.sample.EmptyStateSample.emptyState
+ * @sample org.patternfly.sample.EmptyStateSample.basicSetup
  */
-public class EmptyState internal constructor(
-    size: Size,
-    iconClass: String?,
-    title: String,
-    id: String?,
-    baseClass: String?,
-    job: Job,
-    content: EmptyStateContent.() -> Unit
-) : PatternFlyElement<HTMLDivElement>, Div(
-    id = id,
-    baseClass = classes {
-        +ComponentType.EmptyState
-        +(size.modifier `when` (size == XL || size == LG || size == SM || size == XS))
-        +baseClass
-    },
-    job,
-    scope = Scope()
-) {
+@Suppress("TooManyFunctions")
+public open class EmptyState(
+    private val size: Size,
+    private var iconClass: String?,
+    title: String?,
+) : PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
+
+    private var icon: (Icon.() -> Unit)? = null
+    private var content: SubComponent<Div>? = null
+    private var loading: Flow<Boolean>? = null
+    private var loadingTitle: (RenderContext.() -> Unit)? = null
+    private var primaryAction: SubComponent<Button>? = null
+    private var primaryActionVariants: Array<out ButtonVariant> = emptyArray()
+    private val secondaryActions: MutableList<Pair<Array<out ButtonVariant>, SubComponent<Button>>> = mutableListOf()
 
     init {
-        markAs(ComponentType.EmptyState)
-        register(EmptyStateContent(id = null, baseClass = null, job = job)) { esc ->
-            with(esc) {
-                if (iconClass != null) {
-                    icon(iconClass, baseClass = "empty-state".component("icon"))
+        title?.let { this.title(it) }
+    }
+
+    public fun icon(iconClass: String?, context: Icon.() -> Unit = {}) {
+        this.iconClass = iconClass
+        this.icon = context
+    }
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit
+    ) {
+        this.content = SubComponent(baseClass, id, context)
+    }
+
+    public fun loading(value: Flow<Boolean>) {
+        loading = value
+    }
+
+    public fun loading(loading: Flow<Boolean>, loadingTitle: String) {
+        this.loading = loading
+        this.loadingTitle = { span { +loadingTitle } }
+    }
+
+    public fun loading(loading: Flow<Boolean>, loadingTitle: Flow<String>) {
+        this.loading = loading
+        this.loadingTitle = { span { loadingTitle.asText() } }
+    }
+
+    public fun loading(loading: Flow<Boolean>, loadingTitle: RenderContext.() -> Unit) {
+        this.loading = loading
+        this.loadingTitle = loadingTitle
+    }
+
+    public fun primaryAction(
+        vararg variants: ButtonVariant = arrayOf(ButtonVariant.primary),
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit
+    ) {
+        this.primaryAction = SubComponent(baseClass, id, context)
+        this.primaryActionVariants = variants
+    }
+
+    public fun secondaryAction(
+        vararg variants: ButtonVariant = arrayOf(ButtonVariant.link),
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit
+    ) {
+        secondaryActions.add(variants to SubComponent(baseClass, id, context))
+    }
+
+    @Suppress("LongMethod")
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(
+                baseClass = classes {
+                    +ComponentType.EmptyState
+                    +(size.modifier `when` (size in SUPPORTED_SIZES))
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.EmptyState)
+                applyElement(this)
+                applyEvents(this)
+
+                div(baseClass = "empty-state".component("content")) {
+                    if (loading != null) {
+                        loading?.let { loading ->
+                            loading.distinctUntilChanged().render(into = this) { running ->
+                                if (running) {
+                                    div(baseClass = "empty-state".component("icon")) {
+                                        spinner { }
+                                    }
+                                }
+                                renderIcon(this)
+                            }
+                        }
+                    } else {
+                        renderIcon(this)
+                    }
+                    val titleSize = when (size) {
+                        Size.XL -> Size.XL_4
+                        Size.XS -> Size.MD
+                        else -> Size.LG
+                    }
+                    title(size = titleSize) {
+                        applyTitle(this)
+                    }
+                    content?.let { body ->
+                        div(
+                            baseClass = classes("empty-state".component("body"), body.baseClass),
+                            id = body.id
+                        ) {
+                            body.context(this)
+                        }
+                    }
+                    primaryAction?.let { primary ->
+                        if (ButtonVariant.primary in primaryActionVariants) {
+                            renderPrimary(this, primary)
+                        } else {
+                            div(baseClass = "empty-state".component("primary")) {
+                                renderPrimary(this, primary)
+                            }
+                        }
+                    }
+                    if (secondaryActions.isNotEmpty()) {
+                        div(baseClass = "empty-state".component("secondary")) {
+                            secondaryActions.forEach { (variants, secondary) ->
+                                pushButton(
+                                    variants = variants,
+                                    baseClass = secondary.baseClass,
+                                    id = secondary.id
+                                ) {
+                                    secondary.context(this)
+                                }
+                            }
+                        }
+                    }
                 }
-                val titleSize = when (size) {
-                    XL -> XL_4
-                    XS -> MD
-                    else -> LG
-                }
-                title(size = titleSize) { +title }
-                content(esc)
             }
         }
     }
-}
 
-/**
- * Empty state content component.
- */
-public class EmptyStateContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("empty-state".component("content"), baseClass), job, Scope())
+    private fun renderIcon(context: RenderContext) {
+        with(context) {
+            iconClass?.let {
+                icon(
+                    iconClass = it,
+                    baseClass = "empty-state".component("icon")
+                ) {
+                    this@EmptyState.icon?.invoke(this)
+                }
+            }
+        }
+    }
+
+    private fun renderPrimary(context: RenderContext, primary: SubComponent<Button>) {
+        with(context) {
+            pushButton(
+                variants = primaryActionVariants,
+                baseClass = primary.baseClass,
+                id = primary.id
+            ) {
+                primary.context(this)
+            }
+        }
+    }
+
+    public companion object {
+        public val SUPPORTED_SIZES: Set<Size> = setOf(Size.XL, Size.LG, Size.SM, Size.XS)
+    }
+}

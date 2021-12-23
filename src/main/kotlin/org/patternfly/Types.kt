@@ -22,12 +22,6 @@ public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
 
-public open class SubComponent<T>(
-    internal val baseClass: String?,
-    internal val id: String?,
-    internal val context: T.() -> Unit
-)
-
 /**
  * Marker interface implemented by all PatternFly components.
  */
@@ -109,16 +103,6 @@ public enum class DataTableSelection {
      * Multiple rows can be selected using checkboxes. The table header contains an additional checkbox to select all rows.
      */
     MULTIPLE_ALL
-}
-
-/**
- * Modifiers for the [DrawerPanel] position.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class DrawerPanelPosition(internal val modifier: String) {
-    LEFT("panel-left".modifier()),
-    RIGHT(""),
-    BOTTOM("panel-bottom".modifier()),
 }
 
 /**

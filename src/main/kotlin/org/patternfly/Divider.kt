@@ -4,7 +4,7 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.RenderContext
 import org.w3c.dom.HTMLElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates a PatternFly [divider](https://www.patternfly.org/v4/components/divider/design-guidelines) component.

@@ -81,3 +81,12 @@ internal interface PatternFlyComponent<T> {
         id: String?,
     ): T
 }
+
+/**
+ * Helper class to compose nested components inside [PatternFlyComponent]s.
+ */
+public open class SubComponent<T>(
+    internal val baseClass: String?,
+    internal val id: String?,
+    internal val context: T.() -> Unit
+)

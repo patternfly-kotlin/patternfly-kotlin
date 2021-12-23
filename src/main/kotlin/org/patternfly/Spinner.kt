@@ -13,7 +13,7 @@ import dev.fritz2.dom.html.RenderContext
  * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.spinner(
-    size: Size = Size.MD,
+    size: Size? = null,
     baseClass: String? = null,
     id: String? = null,
     context: Spinner.() -> Unit = {}
@@ -30,7 +30,7 @@ public fun RenderContext.spinner(
  *
  * @sample org.patternfly.sample.SpinnerSample.spinner
  */
-public open class Spinner(private val size: Size) :
+public open class Spinner(private val size: Size?) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -40,7 +40,7 @@ public open class Spinner(private val size: Size) :
             span(
                 baseClass = classes {
                     +"spinner".component()
-                    +size.modifier
+                    +size?.modifier
                     +baseClass
                 },
                 id = id
