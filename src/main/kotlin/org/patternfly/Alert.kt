@@ -4,7 +4,6 @@ import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.Events.click
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
