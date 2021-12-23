@@ -65,6 +65,7 @@ public open class ChipGroup(private var limit: Int) :
     private val headItems: MutableList<ChipItem> = mutableListOf()
     private val tailItems: MutableList<ChipItem> = mutableListOf()
     private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+    private val closeHandler: (Event) -> Unit = ::removeFromParent
     private lateinit var root: Tag<HTMLElement>
 
     /**
@@ -220,7 +221,7 @@ public open class ChipGroup(private var limit: Int) :
                         pushButton(plain) {
                             icon("times-circle".fas())
                             aria["label"] = "Close chip group"
-                            domNode.addEventListener(Events.click.name, this@ChipGroup::removeFromParent)
+                            domNode.addEventListener(Events.click.name, this@ChipGroup.closeHandler)
                             clicks.map { it } handledBy this@ChipGroup.closeStore.update
                         }
                     }
@@ -240,7 +241,7 @@ public open class ChipGroup(private var limit: Int) :
     }
 
     private fun removeFromParent(event: Event) {
-        (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
+        (event.target as Element).removeEventListener(Events.click.name, closeHandler)
         root.domNode.removeFromParent()
     }
 }

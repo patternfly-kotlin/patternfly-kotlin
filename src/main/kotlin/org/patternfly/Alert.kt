@@ -5,6 +5,7 @@ import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.EventContext
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
+import dev.fritz2.dom.html.Events.click
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
@@ -155,6 +156,7 @@ public open class Alert(private var severity: Severity, title: String) :
     }
     private var closable: Boolean = false
     private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+    private val closeHandler: (Event) -> Unit = ::removeFromParent
     public val closes: Flow<MouseEvent> = closeStore.data.drop(1)
 
     init {
@@ -231,7 +233,7 @@ public open class Alert(private var severity: Severity, title: String) :
                         pushButton(plain) {
                             icon("times".fas())
                             aria["label"] = this@Alert.ariaLabels.second
-                            domNode.addEventListener(Events.click.name, this@Alert::removeFromParent)
+                            domNode.addEventListener(click.name, this@Alert.closeHandler)
                             clicks.map { it } handledBy this@Alert.closeStore.update
                         }
                     }
@@ -258,7 +260,7 @@ public open class Alert(private var severity: Severity, title: String) :
     }
 
     private fun removeFromParent(event: Event) {
-        (event.target as Element).removeEventListener(Events.click.name, ::removeFromParent)
+        (event.target as Element).removeEventListener(click.name, closeHandler)
         if (root.scope.contains(Scopes.ALERT_GROUP)) {
             root.domNode.parentElement.removeFromParent()
         } else {

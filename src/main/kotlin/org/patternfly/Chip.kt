@@ -59,6 +59,7 @@ public open class Chip(title: String?) :
     private lateinit var root: Tag<HTMLElement>
     private var closable: Boolean = false
     private val closeStore: RootStore<MouseEvent> = storeOf(MouseEvent(""))
+    private val closeHandler: (Event) -> Unit = ::removeFromParent
 
     init {
         title?.let { title(it) }
@@ -129,7 +130,7 @@ public open class Chip(title: String?) :
                         icon("times".fas())
                         aria["label"] = "Remove"
                         aria["labelledby"] = textId
-                        domNode.addEventListener(Events.click.name, this@Chip::removeFromParent)
+                        domNode.addEventListener(Events.click.name, this@Chip.closeHandler)
                         clicks.map { it } handledBy this@Chip.closeStore.update
                     }
                 }
@@ -138,7 +139,7 @@ public open class Chip(title: String?) :
     }
 
     private fun removeFromParent(event: Event) {
-        event.target?.removeEventListener(Events.click.name, ::removeFromParent)
+        event.target?.removeEventListener(Events.click.name, closeHandler)
         if (root.scope.contains(Scopes.CHIP_GROUP)) {
             root.domNode.parentElement.removeFromParent()
         } else {
