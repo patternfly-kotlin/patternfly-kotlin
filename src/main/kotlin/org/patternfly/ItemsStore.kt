@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
  * @param idProvider used to uniquely identify each item
  * @param T the type of the payload
  */
+@Deprecated("Deprecated API")
 public class ItemsStore<T>(override val idProvider: IdProvider<T, String> = { it.toString() }) :
     WithIdProvider<T>,
     RootStore<Items<T>>(Items(idProvider)),
@@ -175,6 +176,7 @@ public class ItemsStore<T>(override val idProvider: IdProvider<T, String> = { it
     }
 }
 
+@Deprecated("Deprecated API")
 public enum class PreSelection(public val text: String) {
     NONE("Select none"), PAGE("Select visible"), ALL("Select all")
 }

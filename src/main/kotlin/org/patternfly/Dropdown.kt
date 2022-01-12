@@ -354,69 +354,6 @@ public open class Dropdown(
 
 // ------------------------------------------------------ toggle
 
-internal sealed interface ToggleKind
-
-internal class TextToggleKind(
-    val title: String?,
-    val variant: ButtonVariant?,
-    val context: Span.() -> Unit
-) : ToggleKind
-
-internal class IconToggleKind(
-    val iconClass: String,
-    val baseClass: String?,
-    val id: String?,
-    val context: Icon.() -> Unit
-) : ToggleKind
-
-internal class BadgeToggleKind(
-    val count: Int,
-    val min: Int,
-    val max: Int,
-    val read: Boolean,
-    val baseClass: String?,
-    val id: String?,
-    val context: Badge.() -> Unit
-) : ToggleKind
-
-internal class DropdownBadge(kind: BadgeToggleKind) : Badge(
-    count = kind.count,
-    min = kind.min,
-    max = kind.max,
-    read = kind.read
-) {
-    override fun tail(context: RenderContext) {
-        with(context) {
-            span(baseClass = "dropdown".component("toggle", "icon")) {
-                icon("caret-down".fas())
-            }
-        }
-    }
-}
-
-internal class CheckboxToggleKind(
-    val title: String?,
-    val baseClass: String?,
-    val id: String?,
-    val context: Input.() -> Unit
-) : ToggleKind
-
-internal class ActionToggleKind(
-    val title: String?,
-    val variant: ButtonVariant?,
-    val baseClass: String?,
-    val id: String?,
-    val context: Button.() -> Unit
-) : ToggleKind
-
-internal class ImageToggleKind(
-    val title: String,
-    val src: String,
-    val baseClass: String?,
-    val id: String?,
-    val context: Img.() -> Unit
-) : ToggleKind
-
 /**
  * The dropdown toggle.
  *
@@ -679,6 +616,11 @@ public class DropdownToggle internal constructor(
                             icon("caret-down".fas())
                         }
                     }
+                }
+                else -> {
+                    val message = "Unsupported toggle kind $kind for Dropdown"
+                    !message
+                    console.warn(message)
                 }
             }
         }

@@ -22,6 +22,7 @@ import org.patternfly.ItemSelection.SINGLE_PER_GROUP
  * @param all all entries managed by this instance
  * @param filter a predicate applied to [all]
  */
+@Deprecated("Deprecated API")
 public data class Entries<T>(
     val idProvider: IdProvider<T, String>,
     val itemSelection: ItemSelection,
@@ -206,6 +207,7 @@ public data class Entries<T>(
  * Enum which controls how to select an [Item] in [Entries].
  */
 @Suppress("unused")
+@Deprecated("Deprecated API")
 public enum class ItemSelection {
 
     /**

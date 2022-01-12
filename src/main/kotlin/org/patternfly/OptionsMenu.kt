@@ -35,6 +35,7 @@ import org.w3c.dom.Node
  * @param baseClass optional CSS class that should be applied to the element
  * @param content a lambda expression for setting up the component itself
  */
+@Deprecated("Deprecated API")
 public fun <T> RenderContext.optionsMenu(
     itemSelection: ItemSelection = ItemSelection.SINGLE_PER_GROUP,
     store: OptionsMenuStore<T> = OptionsMenuStore(itemSelection = itemSelection),
@@ -74,6 +75,7 @@ public fun <T> RenderContext.optionsMenu(
  * @sample org.patternfly.sample.OptionsMenuSample.textToggle
  * @sample org.patternfly.sample.OptionsMenuSample.plainTextToggle
  */
+@Deprecated("Deprecated API")
 public fun <T> OptionsMenu<T>.textToggle(
     plain: Boolean = false,
     baseClass: String? = null,
@@ -94,6 +96,7 @@ public fun <T> OptionsMenu<T>.textToggle(
  *
  * @sample org.patternfly.sample.OptionsMenuSample.iconToggle
  */
+@Deprecated("Deprecated API")
 public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: Button.() -> Unit) {
     assignToggle(OptionsMenuIconToggle(this, baseClass, job, content))
 }
@@ -105,6 +108,7 @@ public fun <T> OptionsMenu<T>.iconToggle(baseClass: String? = null, content: But
  *
  * @sample org.patternfly.sample.OptionsMenuSample.items
  */
+@Deprecated("Deprecated API")
 public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
     val entries = ItemsBuilder(store.idProvider, store.itemSelection).apply(block).build()
     store.update(entries)
@@ -117,6 +121,7 @@ public fun <T> OptionsMenu<T>.items(block: ItemsBuilder<T>.() -> Unit = {}) {
  *
  * @sample org.patternfly.sample.OptionsMenuSample.groups
  */
+@Deprecated("Deprecated API")
 public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
     if (!grouped) {
         console.warn("Options menu ${domNode.debug()} has not been created using `grouped = true`")
@@ -156,6 +161,7 @@ public fun <T> OptionsMenu<T>.groups(block: GroupsBuilder<T>.() -> Unit = {}) {
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuDsl
  * @sample org.patternfly.sample.OptionsMenuSample.optionsMenuStore
  */
+@Deprecated("Deprecated API")
 @Suppress("LongParameterList")
 public class OptionsMenu<T> internal constructor(
     public val store: OptionsMenuStore<T>,
@@ -363,6 +369,7 @@ private fun <T> initToggle(optionsMenu: OptionsMenu<T>, tag: Tag<HTMLElement>) {
     }
 }
 
+@Deprecated("Deprecated API")
 internal class OptionsMenuTextToggle<T>(
     optionsMenu: OptionsMenu<T>,
     baseClass: String?,
@@ -390,6 +397,7 @@ internal class OptionsMenuTextToggle<T>(
     }
 }
 
+@Deprecated("Deprecated API")
 internal class OptionsMenuPlainTextToggle<T>(
     optionsMenu: OptionsMenu<T>,
     baseClass: String?,
@@ -431,6 +439,7 @@ internal class OptionsMenuPlainTextToggle<T>(
     }
 }
 
+@Deprecated("Deprecated API")
 internal class OptionsMenuIconToggle<T>(
     optionsMenu: OptionsMenu<T>,
     baseClass: String?,
@@ -466,6 +475,7 @@ internal class OptionsMenuIconToggle<T>(
 /**
  * An [EntriesStore] with the specified selection mode.
  */
+@Deprecated("Deprecated API")
 public class OptionsMenuStore<T>(
     idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
     itemSelection: ItemSelection = ItemSelection.SINGLE_PER_GROUP

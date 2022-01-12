@@ -52,6 +52,7 @@ import dev.fritz2.lenses.IdProvider
  * @sample org.patternfly.sample.ItemsSample.select
  * @sample org.patternfly.sample.ItemsSample.sort
  */
+@Deprecated("Deprecated API")
 @Suppress("TooManyFunctions")
 public data class Items<T>(
     val idProvider: IdProvider<T, String>,

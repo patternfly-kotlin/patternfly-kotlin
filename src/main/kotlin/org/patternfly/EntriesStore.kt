@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
  *
  * @param block function executed in the context of an [ItemsBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> EntriesStore<T>.updateItems(block: ItemsBuilder<T>.() -> Unit = {}) {
     update(ItemsBuilder<T>(idProvider, itemSelection).apply(block).build())
 }
@@ -26,6 +27,7 @@ public fun <T> EntriesStore<T>.updateItems(block: ItemsBuilder<T>.() -> Unit = {
  *
  * @param block function executed in the context of an [GroupsBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> EntriesStore<T>.updateGroups(block: GroupsBuilder<T>.() -> Unit = {}) {
     update(GroupsBuilder<T>(idProvider, itemSelection).apply(block).build())
 }
@@ -35,6 +37,7 @@ public fun <T> EntriesStore<T>.updateGroups(block: GroupsBuilder<T>.() -> Unit =
  *
  * The flows in this store use [Item] instead of the wrapped data. Use one of the [unwrap] functions to get the actual payload.
  */
+@Deprecated("Deprecated API")
 public abstract class EntriesStore<T> internal constructor(
     override val idProvider: IdProvider<T, String>,
     public val itemSelection: ItemSelection

@@ -13,6 +13,7 @@ import org.patternfly.dom.Id
  * @param itemSelection defines how to select items
  * @param block function executed in the context of an [ItemsBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> items(
     idProvider: IdProvider<T, String>,
     itemSelection: ItemSelection,
@@ -26,6 +27,7 @@ public fun <T> items(
  * @param itemSelection defines how to select items
  * @param block function executed in the context of an [GroupsBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> groups(
     idProvider: IdProvider<T, String>,
     itemSelection: ItemSelection,
@@ -40,6 +42,7 @@ public fun <T> groups(
  * @param text an optional text for the visual representation
  * @param block function executed in the context of an [ItemBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> ItemsBuilder<T>.item(item: T, text: String? = null, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item, text).apply(block).build())
 }
@@ -49,6 +52,7 @@ public fun <T> ItemsBuilder<T>.item(item: T, text: String? = null, block: ItemBu
  *
  * @receiver an items builder this separator is added to
  */
+@Deprecated("Deprecated API")
 public fun <T> ItemsBuilder<T>.separator() {
     entries.add(Separator())
 }
@@ -61,6 +65,7 @@ public fun <T> ItemsBuilder<T>.separator() {
  * @param text an optional text for the visual representation
  * @param block function executed in the context of an [GroupBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> GroupsBuilder<T>.group(text: String? = null, block: GroupBuilder<T>.() -> Unit) {
     entries.add(GroupBuilder<T>(text).apply(block).build())
 }
@@ -70,6 +75,7 @@ public fun <T> GroupsBuilder<T>.group(text: String? = null, block: GroupBuilder<
  *
  * @receiver a groups builder this separator is added to
  */
+@Deprecated("Deprecated API")
 public fun <T> GroupsBuilder<T>.separator() {
     entries.add(Separator())
 }
@@ -82,6 +88,7 @@ public fun <T> GroupsBuilder<T>.separator() {
  * @param text an optional text for the visual representation
  * @param block function executed in the context of an [ItemBuilder]
  */
+@Deprecated("Deprecated API")
 public fun <T> GroupBuilder<T>.item(item: T, text: String? = null, block: ItemBuilder<T>.() -> Unit = {}) {
     entries.add(ItemBuilder(item, text).apply(block).build())
 }
@@ -91,6 +98,7 @@ public fun <T> GroupBuilder<T>.item(item: T, text: String? = null, block: ItemBu
  *
  * @receiver a group builder this separator is added to
  */
+@Deprecated("Deprecated API")
 public fun <T> GroupBuilder<T>.separator() {
     entries.add(Separator())
 }
@@ -100,11 +108,13 @@ public fun <T> GroupBuilder<T>.separator() {
 /**
  * An [Entry] is either an [Item], a [Group] or a [Separator].
  */
+@Deprecated("Deprecated API")
 public sealed class Entry<T>
 
 /**
  * Group containing a list of nested [entries][Entry] and an optional group heading. A group can contain nested [Item]s and [Separator]s, but must **not** contain nested groups.
  */
+@Deprecated("Deprecated API")
 public data class Group<T> internal constructor(
     internal val id: String = Id.unique("grp"),
     val text: String?,
@@ -133,6 +143,7 @@ public data class Group<T> internal constructor(
  * @param description an optional description
  * @param icon an optional icon content function
  */
+@Deprecated("Deprecated API")
 public data class Item<T> internal constructor(
     override val item: T,
     val text: String? = null,
@@ -148,6 +159,7 @@ public data class Item<T> internal constructor(
 /**
  * Separator used for visual purposes only.
  */
+@Deprecated("Deprecated API")
 public class Separator<T> : Entry<T>()
 
 // ------------------------------------------------------ builder
@@ -155,6 +167,7 @@ public class Separator<T> : Entry<T>()
 /**
  * Builder for a list of [Item]s.
  */
+@Deprecated("Deprecated API")
 public class ItemsBuilder<T> internal constructor(
     private val idProvider: IdProvider<T, String>,
     private val itemSelection: ItemSelection
@@ -171,6 +184,7 @@ public class ItemsBuilder<T> internal constructor(
 /**
  * Builder for a list of [Group]s.
  */
+@Deprecated("Deprecated API")
 public class GroupsBuilder<T> internal constructor(
     private val idProvider: IdProvider<T, String>,
     private val itemSelection: ItemSelection
@@ -187,6 +201,7 @@ public class GroupsBuilder<T> internal constructor(
 /**
  * Builder for a [Group].
  */
+@Deprecated("Deprecated API")
 public class GroupBuilder<T> internal constructor(private val text: String?) {
     internal val entries: MutableList<Entry<T>> = mutableListOf()
     internal fun build(): Group<T> = Group(text = text, entries = entries).apply {
@@ -197,6 +212,7 @@ public class GroupBuilder<T> internal constructor(private val text: String?) {
 /**
  * Builder for an [Item].
  */
+@Deprecated("Deprecated API")
 public class ItemBuilder<T> internal constructor(private val item: T, public var text: String?) {
     public var disabled: Boolean = false
     public var selected: Boolean = false
