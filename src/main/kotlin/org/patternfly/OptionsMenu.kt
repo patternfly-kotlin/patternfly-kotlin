@@ -328,8 +328,8 @@ public class OptionsMenu(
                 }
                 item.applyEvents(this)
                 item.applyTitle(this)
-                item.selected.filter { it }.render(this) {
-                    span(baseClass = "options-menu".component("menu", "item", "icon")) {
+                span(baseClass = "options-menu".component("menu", "item", "icon")) {
+                    item.selected.filter { it }.render(this) {
                         icon("check".fas())
                     }
                 }
