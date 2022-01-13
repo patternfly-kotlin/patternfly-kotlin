@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.patternfly.DividerVariant.HR
 import org.patternfly.DividerVariant.LI
 import org.patternfly.dom.By
 import org.patternfly.dom.Id
@@ -28,22 +29,22 @@ import org.patternfly.dom.matches
 /**
  * Creates a new [Dropdown] component.
  *
+ * @param grouped whether the dropdown contains groups
  * @param align the alignment of the dropdown
  * @param up controls the direction of the dropdown menu
- * @param grouped whether the dropdown contains groups
  * @param baseClass optional CSS class that should be applied to the component
  * @param id optional ID of the component
  * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.dropdown(
+    grouped: Boolean = false,
     align: Align? = null,
     up: Boolean = false,
-    grouped: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     context: Dropdown.() -> Unit = {}
 ) {
-    Dropdown(align = align, up = up, grouped = grouped).apply(context).render(this, baseClass, id)
+    Dropdown(grouped = grouped, align = align, up = up).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -68,9 +69,9 @@ public fun RenderContext.dropdown(
  */
 @Suppress("TooManyFunctions")
 public open class Dropdown(
+    private val grouped: Boolean,
     private val align: Align?,
-    private val up: Boolean,
-    private val grouped: Boolean
+    private val up: Boolean
 ) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -86,7 +87,7 @@ public open class Dropdown(
     private val itemStore: DropdownEntryStore = DropdownEntryStore()
     private val headEntries: MutableList<DropdownEntry> = mutableListOf()
     private val tailEntries: MutableList<DropdownEntry> = mutableListOf()
-    private val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {}, expandedStore)
+    private val toggle: DropdownToggle = DropdownToggle(DropdownTextToggleKind(null, null) {}, expandedStore)
     private lateinit var root: Div
 
     /**
@@ -231,7 +232,7 @@ public open class Dropdown(
                 }.map { entries ->
                     normalizeEntries(entries)
                 }.renderEach(into = this, idProvider = { it.id }) { entry ->
-                    renderEntry(this, entry, 0)
+                    renderEntry(this, entry, groups, 0)
                 }
             }
         }
@@ -267,7 +268,7 @@ public open class Dropdown(
             entries
         }
 
-    private fun renderEntry(context: RenderContext, entry: DropdownEntry, depth: Int): RenderContext =
+    private fun renderEntry(context: RenderContext, entry: DropdownEntry, groups: Boolean, depth: Int): RenderContext =
         with(context) {
             when (entry) {
                 is DropdownGroup -> {
@@ -284,7 +285,7 @@ public open class Dropdown(
                             }
                             ul {
                                 attr("role", "none")
-                                entry.entries.forEach { renderEntry(this, it, depth + 1) }
+                                entry.entries.forEach { renderEntry(this, it, groups, depth + 1) }
                             }
                         }
                     }
@@ -296,7 +297,11 @@ public open class Dropdown(
                     }
                 }
                 is DropdownSeparator -> {
-                    divider(LI)
+                    if (groups && depth == 0) {
+                        divider(HR)
+                    } else {
+                        divider(LI)
+                    }
                 }
             }
         }
@@ -315,9 +320,6 @@ public open class Dropdown(
                 if (item.disabled) {
                     aria["disabled"] = true
                     attr("disabled", "true")
-                }
-                if (item.selected) {
-                    domNode.autofocus = true
                 }
                 clicks handledBy expandedStore.collapse
                 item.applyEvents(this)
@@ -354,6 +356,69 @@ public open class Dropdown(
 
 // ------------------------------------------------------ toggle
 
+internal sealed interface DropdownToggleKind
+
+internal class DropdownTextToggleKind(
+    val title: String?,
+    val variant: ButtonVariant?,
+    val context: Span.() -> Unit
+) : DropdownToggleKind
+
+internal class DropdownIconToggleKind(
+    val iconClass: String,
+    val baseClass: String?,
+    val id: String?,
+    val context: Icon.() -> Unit
+) : DropdownToggleKind
+
+internal class DropdownBadgeToggleKind(
+    val count: Int,
+    val min: Int,
+    val max: Int,
+    val read: Boolean,
+    val baseClass: String?,
+    val id: String?,
+    val context: Badge.() -> Unit
+) : DropdownToggleKind
+
+internal class DropdownBadge(kind: DropdownBadgeToggleKind) : Badge(
+    count = kind.count,
+    min = kind.min,
+    max = kind.max,
+    read = kind.read
+) {
+    override fun tail(context: RenderContext) {
+        with(context) {
+            span(baseClass = "dropdown".component("toggle", "icon")) {
+                icon("caret-down".fas())
+            }
+        }
+    }
+}
+
+internal class DropdownCheckboxToggleKind(
+    val title: String?,
+    val baseClass: String?,
+    val id: String?,
+    val context: Input.() -> Unit
+) : DropdownToggleKind
+
+internal class DropdownActionToggleKind(
+    val title: String?,
+    val variant: ButtonVariant?,
+    val baseClass: String?,
+    val id: String?,
+    val context: Button.() -> Unit
+) : DropdownToggleKind
+
+internal class DropdownImageToggleKind(
+    val title: String,
+    val src: String,
+    val baseClass: String?,
+    val id: String?,
+    val context: Img.() -> Unit
+) : DropdownToggleKind
+
 /**
  * The dropdown toggle.
  *
@@ -366,7 +431,7 @@ public open class Dropdown(
  * - [action toggle][DropdownToggle.action]
  */
 public class DropdownToggle internal constructor(
-    private var kind: ToggleKind,
+    private var kind: DropdownToggleKind,
     private val expandedStore: ExpandedStore
 ) {
 
@@ -374,16 +439,17 @@ public class DropdownToggle internal constructor(
     internal var disabled: Flow<Boolean> = flowOf(false)
 
     /**
-     * A text toggle.
+     * A (plain) text toggle.
      *
      * @sample org.patternfly.sample.DropdownSample.textToggle
+     * @sample org.patternfly.sample.DropdownSample.plainTextToggle
      */
     public fun text(
         title: String? = null,
         variant: ButtonVariant? = null,
         context: Span.() -> Unit = {}
     ) {
-        kind = TextToggleKind(title = title, variant = variant, context = context)
+        kind = DropdownTextToggleKind(title = title, variant = variant, context = context)
     }
 
     /**
@@ -397,7 +463,7 @@ public class DropdownToggle internal constructor(
         id: String? = null,
         context: Icon.() -> Unit = {}
     ) {
-        kind = IconToggleKind(iconClass = iconClass, baseClass = baseClass, id = id, context = context)
+        kind = DropdownIconToggleKind(iconClass = iconClass, baseClass = baseClass, id = id, context = context)
     }
 
     /**
@@ -427,7 +493,7 @@ public class DropdownToggle internal constructor(
         id: String? = null,
         context: Badge.() -> Unit = {}
     ) {
-        kind = BadgeToggleKind(
+        kind = DropdownBadgeToggleKind(
             count = count,
             min = min,
             max = max,
@@ -449,7 +515,7 @@ public class DropdownToggle internal constructor(
         id: String? = null,
         context: Input.() -> Unit = {}
     ) {
-        kind = CheckboxToggleKind(title = title, baseClass = baseClass, id = id, context = context)
+        kind = DropdownCheckboxToggleKind(title = title, baseClass = baseClass, id = id, context = context)
     }
 
     /**
@@ -464,7 +530,7 @@ public class DropdownToggle internal constructor(
         id: String? = null,
         context: Button.() -> Unit = {}
     ) {
-        kind = ActionToggleKind(title = title, variant = variant, baseClass = baseClass, id = id, context)
+        kind = DropdownActionToggleKind(title = title, variant = variant, baseClass = baseClass, id = id, context)
     }
 
     /**
@@ -479,17 +545,18 @@ public class DropdownToggle internal constructor(
         id: String? = null,
         context: Img.() -> Unit = {}
     ) {
-        kind = ImageToggleKind(title = title, src = src, baseClass = baseClass, id = id, context = context)
+        kind = DropdownImageToggleKind(title = title, src = src, baseClass = baseClass, id = id, context = context)
     }
 
     @Suppress("LongMethod")
     internal fun render(context: RenderContext) {
         with(context) {
             when (val kind = this@DropdownToggle.kind) {
-                is TextToggleKind -> {
+                is DropdownTextToggleKind -> {
                     button(
                         baseClass = classes {
                             +"dropdown".component("toggle")
+                            +("text".modifier() `when` (kind.variant == ButtonVariant.plain))
                             +kind.variant?.modifier
                         }
                     ) {
@@ -504,7 +571,7 @@ public class DropdownToggle internal constructor(
                     }
                 }
 
-                is IconToggleKind -> {
+                is DropdownIconToggleKind -> {
                     button(
                         baseClass = classes(
                             "dropdown".component("toggle"),
@@ -521,7 +588,7 @@ public class DropdownToggle internal constructor(
                     }
                 }
 
-                is BadgeToggleKind -> {
+                is DropdownBadgeToggleKind -> {
                     button(
                         baseClass = classes(
                             "dropdown".component("toggle"),
@@ -537,7 +604,7 @@ public class DropdownToggle internal constructor(
                     }
                 }
 
-                is CheckboxToggleKind -> {
+                is DropdownCheckboxToggleKind -> {
                     div(
                         baseClass = classes(
                             "dropdown".component("toggle"),
@@ -574,7 +641,7 @@ public class DropdownToggle internal constructor(
                     }
                 }
 
-                is ActionToggleKind -> {
+                is DropdownActionToggleKind -> {
                     div(
                         baseClass = classes {
                             +"dropdown".component("toggle")
@@ -601,7 +668,7 @@ public class DropdownToggle internal constructor(
                     }
                 }
 
-                is ImageToggleKind -> {
+                is DropdownImageToggleKind -> {
                     button(baseClass = "dropdown".component("toggle")) {
                         setupToggleButton(this)
                         span(baseClass = "dropdown".component("toggle", "image")) {
@@ -616,11 +683,6 @@ public class DropdownToggle internal constructor(
                             icon("caret-down".fas())
                         }
                     }
-                }
-                else -> {
-                    val message = "Unsupported toggle kind $kind for Dropdown"
-                    !message
-                    console.warn(message)
                 }
             }
         }
@@ -704,7 +766,6 @@ public class DropdownItem internal constructor(id: String, title: String?) :
 
     internal var group: DropdownGroup? = null
     internal var disabled: Boolean = false
-    internal var selected: Boolean = false
     internal var iconClass: String = ""
     internal var iconContext: (Icon.() -> Unit)? = null
     internal var description: String? = null
@@ -719,13 +780,6 @@ public class DropdownItem internal constructor(id: String, title: String?) :
      */
     public fun disabled(disabled: Boolean) {
         this.disabled = disabled
-    }
-
-    /**
-     * Whether the item is initially selected.
-     */
-    public fun selected(selected: Boolean) {
-        this.selected = selected
     }
 
     /**

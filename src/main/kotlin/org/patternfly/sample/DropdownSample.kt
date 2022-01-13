@@ -4,6 +4,7 @@ package org.patternfly.sample
 
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.Severity.INFO
 import org.patternfly.dropdown
 import org.patternfly.fas
@@ -16,9 +17,7 @@ internal class DropdownSample {
         render {
             dropdown {
                 toggle { text("Choose one") }
-                item("Item 1") {
-                    selected(true)
-                }
+                item("Item 1")
                 item("Item 2") {
                     icon("user".fas())
                     description("Item description")
@@ -101,6 +100,16 @@ internal class DropdownSample {
         render {
             dropdown {
                 toggle { text("Text") }
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun plainTextToggle() {
+        render {
+            dropdown {
+                toggle { text("Text", plain) }
                 item("Foo")
                 item("Bar")
             }

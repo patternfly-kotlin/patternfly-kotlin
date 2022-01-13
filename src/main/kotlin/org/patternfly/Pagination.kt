@@ -8,9 +8,8 @@ import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.valuesAsNumber
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import org.patternfly.ItemSelection.SINGLE
+import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.plusAssign
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
@@ -137,26 +136,26 @@ public class Pagination internal constructor(
 
     private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()
     private var inputElement: HTMLInputElement? = null
-    private val optionsMenu: OptionsMenu<Int>
 
     init {
         markAs(ComponentType.Pagination)
         div(baseClass = "pagination".component("total-items")) {
             this@Pagination.pageInfoFlow.showRange().invoke(this)
         }
-        optionsMenu = optionsMenu(itemSelection = SINGLE, closeOnSelect = true) {
-            textToggle(plain = true) {
-                this@Pagination.pageInfoFlow.showRange().invoke(this)
+        optionsMenu(closeOnSelect = true) {
+            toggle {
+                text(variant = plain) {
+                    this@Pagination.pageInfoFlow.showRange().invoke(this)
+                }
             }
-            display { +"$it per page" }
-            items {
-                pageSizes.forEachIndexed { index, pageSize ->
-                    item(pageSize) {
-                        selected = index == 0
+            pageSizes.forEach { pageSize ->
+                item(pageSize.toString()) {
+                    selected(this@Pagination.pageInfoFlow.map { it.pageSize == pageSize })
+                    events {
+                        clicks.map { pageSize } handledBy this@Pagination.pageInfoHandler.pageSize
                     }
                 }
             }
-            store.singleSelection.filterNotNull().unwrap() handledBy this@Pagination.pageInfoHandler.pageSize
         }
         nav(baseClass = "pagination".component("nav")) {
             if (!compact) {
@@ -232,7 +231,7 @@ public class Pagination internal constructor(
      * Disables / enabled this pagination instance.
      */
     public fun disabled(value: Boolean) {
-        optionsMenu.disabled(value)
+//        optionsMenu.disabled(value)
         controlElements.forEach { it.disabled = value }
         inputElement?.let { it.disabled = value }
     }
@@ -241,7 +240,7 @@ public class Pagination internal constructor(
      * Disables / enabled this pagination instance.
      */
     public fun disabled(value: Flow<Boolean>) {
-        optionsMenu.disabled(value)
+//        optionsMenu.disabled(value)
 /*
         mountSingle(job, value) { v, _ ->
             if (v) {

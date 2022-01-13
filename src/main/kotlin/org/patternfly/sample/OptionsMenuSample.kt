@@ -2,130 +2,32 @@
 
 package org.patternfly.sample
 
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
-import org.patternfly.OptionsMenuStore
+import kotlinx.coroutines.flow.map
+import org.patternfly.ButtonVariant
 import org.patternfly.Severity.INFO
 import org.patternfly.fas
-import org.patternfly.group
-import org.patternfly.groups
-import org.patternfly.icon
-import org.patternfly.iconToggle
-import org.patternfly.item
-import org.patternfly.items
 import org.patternfly.notification
 import org.patternfly.optionsMenu
-import org.patternfly.separator
-import org.patternfly.textToggle
-import org.patternfly.unwrapOrNull
-import org.patternfly.updateItems
 
 internal class OptionsMenuSample {
 
-    fun optionsMenuDsl() {
+    fun staticEntries() {
         render {
-            optionsMenu<String> {
-                textToggle { +"Choose one" }
-                groups {
-                    group { // group w/o title
-                        item("Item 1")
-                        item("Item 2") {
-                            description = "Item description"
-                        }
-                    }
-                    separator()
-                    group("Group 1") {
-                        item("Item 1")
-                        item("Item 2") {
-                            disabled = true
-                        }
-                    }
-                    separator()
-                    group("Group 2") {
-                        item("Item 1")
-                        item("Item 2")
+            optionsMenu {
+                toggle { text("Choose one") }
+                item("Item 1")
+                item("Item 2")
+                separator()
+                group("Group 1") {
+                    item("Item 1")
+                    item("Item 2") {
+                        disabled(true)
                     }
                 }
-            }
-        }
-    }
-
-    fun optionsMenuStore() {
-        render {
-            data class Demo(val id: String, val name: String)
-
-            val store = OptionsMenuStore<Demo>().also {
-                it.singleSelection.unwrapOrNull() handledBy notification(INFO) { demo ->
-                    title("You selected ${demo?.name}")
-                }
-            }
-            optionsMenu(store = store) {
-                textToggle { +"Choose one" }
-                display { demo -> +demo.name }
-            }
-
-            store.updateItems {
-                item(Demo("foo", "Foo"))
-                item(Demo("bar", "Bar"))
-            }
-        }
-    }
-
-    fun expanded() {
-        render {
-            optionsMenu<String> {
-                expanded.data handledBy notification(INFO) { expanded ->
-                    title("Expanded state of options menu: $expanded.")
-                }
-                textToggle { +"Choose one" }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
-
-    fun textToggle() {
-        render {
-            optionsMenu<String> {
-                textToggle { +"Text" }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
-
-    fun plainTextToggle() {
-        render {
-            optionsMenu<String> {
-                textToggle(plain = true) { +"Text" }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
-
-    fun iconToggle() {
-        render {
-            optionsMenu<String> {
-                iconToggle { icon("user".fas()) }
-                items {
-                    item("Foo")
-                    item("Bar")
-                }
-            }
-        }
-    }
-
-    fun items() {
-        render {
-            optionsMenu<String> {
-                textToggle { +"Please select" }
-                items {
+                separator()
+                group("Group 2") {
                     item("Item 1")
                     item("Item 2")
                 }
@@ -133,20 +35,113 @@ internal class OptionsMenuSample {
         }
     }
 
-    fun groups() {
+    fun sortOptions() {
+        val columns = listOf("Name", "Date", "Size")
+        val sortColumn = storeOf(columns[0])
+        val sortAscending = storeOf(true)
+
         render {
-            optionsMenu<String> {
-                textToggle { +"Please select" }
-                groups {
-                    group { // group w/o title
-                        item("Item 1")
-                        item("Item 2")
-                    }
-                    group("Group 1") {
-                        item("Item 1")
-                        item("Item 2")
+            optionsMenu {
+                toggle { text("Sort By") }
+                columns.forEach { name ->
+                    item(name) {
+                        selected(sortColumn.data.map { it == name })
+                        events {
+                            clicks.map { name } handledBy sortColumn.update
+                        }
                     }
                 }
+                separator()
+                item("Ascending") {
+                    selected(sortAscending.data)
+                    events {
+                        clicks.map { true } handledBy sortAscending.update
+                    }
+                }
+                item("Descending") {
+                    selected(sortAscending.data.map { !it })
+                    events {
+                        clicks.map { false } handledBy sortAscending.update
+                    }
+                }
+            }
+        }
+    }
+
+    fun dynamicEntries() {
+        data class Demo(val id: String, val name: String)
+
+        val store = storeOf(
+            listOf(
+                Demo("foo", "Foo"),
+                Demo("bar", "Bar")
+            )
+        )
+        render {
+            optionsMenu {
+                toggle { text("Choose one") }
+                items(store, { it.id }) { demo ->
+                    item(demo.name)
+                }
+            }
+        }
+    }
+
+    fun excos() {
+        render {
+            optionsMenu {
+                toggle { text("Choose one") }
+                item("Foo")
+                item("Bar")
+                events {
+                    excos handledBy notification(INFO) { expanded ->
+                        +"Expanded state of options menu: $expanded"
+                    }
+                }
+            }
+        }
+    }
+
+    fun textToggle() {
+        render {
+            val selection = storeOf<String?>(null)
+            optionsMenu {
+                toggle { text("Text") }
+                item("Foo") {
+                    selected(selection.data.map { it == id })
+
+                }
+                item("Bar")
+            }
+        }
+    }
+
+    fun plainTextToggle() {
+        render {
+            optionsMenu {
+                toggle { text("Text", ButtonVariant.plain) }
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun iconToggle() {
+        render {
+            optionsMenu {
+                toggle { icon("user".fas()) }
+                item("Foo")
+                item("Bar")
+            }
+        }
+    }
+
+    fun kebabToggle() {
+        render {
+            optionsMenu {
+                toggle { kebab() }
+                item("Foo")
+                item("Bar")
             }
         }
     }
