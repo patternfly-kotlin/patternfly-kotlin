@@ -17,10 +17,12 @@ internal class DropdownSample {
         render {
             dropdown {
                 toggle { text("Choose one") }
-                item("Item 1")
-                item("Item 2") {
-                    icon("user".fas())
-                    description("Item description")
+                group {
+                    item("Item 1")
+                    item("Item 2") {
+                        icon("user".fas())
+                        description("Item description")
+                    }
                 }
                 separator()
                 group("Group 1") {
@@ -55,7 +57,7 @@ internal class DropdownSample {
             dropdown {
                 toggle { text("Choose one") }
                 items(store, { it.id }) { demo ->
-                    item(demo.name)
+                    item(title = demo.name, id = itemId(demo))
                 }
             }
         }

@@ -17,8 +17,10 @@ internal class OptionsMenuSample {
         render {
             optionsMenu {
                 toggle { text("Choose one") }
-                item("Item 1")
-                item("Item 2")
+                group {
+                    item("Item 1")
+                    item("Item 2")
+                }
                 separator()
                 group("Group 1") {
                     item("Item 1")
@@ -71,17 +73,23 @@ internal class OptionsMenuSample {
     fun dynamicEntries() {
         data class Demo(val id: String, val name: String)
 
-        val store = storeOf(
-            listOf(
-                Demo("foo", "Foo"),
-                Demo("bar", "Bar")
-            )
+        val demos = listOf(
+            Demo("foo", "Foo"),
+            Demo("bar", "Bar")
         )
+        val store = storeOf(demos)
+        val selection = storeOf(demos[0])
+
         render {
             optionsMenu {
                 toggle { text("Choose one") }
                 items(store, { it.id }) { demo ->
-                    item(demo.name)
+                    item(demo.name) {
+                        selected(selection.data.map { it == demo })
+                        events {
+                            clicks.map { demo } handledBy selection.update
+                        }
+                    }
                 }
             }
         }

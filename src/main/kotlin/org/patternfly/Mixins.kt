@@ -37,7 +37,7 @@ internal class TitleMixin : WithTitle {
     private var staticTitle: String? = null
 
     override val hasTitle: Boolean
-        get() = staticTitle != null || flowTitle != null
+        get() = !staticTitle.isNullOrEmpty() || flowTitle != null
 
     override fun String.unaryPlus() {
         staticTitle = this
