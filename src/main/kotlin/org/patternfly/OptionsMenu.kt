@@ -66,7 +66,7 @@ public class OptionsMenu(grouped: Boolean, align: Align?, up: Boolean, private v
         ::OptionsMenuItem
     ) {
 
-    internal val defaultSelectionStore: RootStore<String?> = storeOf(null)
+    private val defaultSelectionStore: RootStore<String?> = storeOf(null)
     override val toggle: OptionsMenuToggle = OptionsMenuToggle(TextToggleKind(null, null) {}, expandedStore)
 
     override fun renderItem(context: RenderContext, entry: Entry): RenderContext =
@@ -97,7 +97,7 @@ public class OptionsMenu(grouped: Boolean, align: Align?, up: Boolean, private v
                 if (closeOnSelect) {
                     clicks handledBy expandedStore.collapse
                 }
-                if (!item.customSelected) {
+                if (!item.selectedAssigned) {
                     item.selected(defaultSelectionStore.data.map { it == item.id })
                     clicks.map { item.id } handledBy defaultSelectionStore.update
                 }
@@ -137,11 +137,11 @@ public class OptionsMenuToggle internal constructor(kind: ToggleKind, expandedSt
 public class OptionsMenuItem internal constructor(id: String, title: String?) :
     Item<OptionsMenuItem>(id, title) {
 
-    internal var customSelected: Boolean = false
+    internal var selectedAssigned: Boolean = false
     internal var selected: Flow<Boolean> = flowOf(false)
 
     public fun selected(selected: Flow<Boolean>) {
         this.selected = selected
-        this.customSelected = true
+        this.selectedAssigned = true
     }
 }

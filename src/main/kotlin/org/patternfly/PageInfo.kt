@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Common interface meant to be implemented by stores which have a [PageInfo] instance.
+ * Common interface meant to be implemented by classes which provide [Handler]s to modify a [PageInfo] instance.
  */
 public interface PageInfoHandler {
 

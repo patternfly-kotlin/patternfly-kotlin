@@ -2,259 +2,196 @@ package org.patternfly
 
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.TextNode
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.valuesAsNumber
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariant.plain
-import org.patternfly.dom.plusAssign
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
 
-// ------------------------------------------------------ dsl
-
-/**
- * Creates a new pagination component based on the specified [ItemsStore]. Use this function to bind the pagination component to an [ItemsStore].
- *
- * @param store the item store
- * @param pageSizes the size of one page
- * @param compact whether to use a compact layout
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.PaginationSample.itemStore
- */
-public fun <T> RenderContext.pagination(
-    store: ItemsStore<T>,
-    pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
-    compact: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Pagination.() -> Unit = {}
-): Pagination = register(
-    Pagination(store, store.data.map { it.pageInfo }, pageSizes, compact, id = id, baseClass = baseClass, job),
-    content
-)
+// ------------------------------------------------------ factory
 
 /**
- * Creates a new pagination component based on the specified [PageInfo] instance. Use this function to bind the pagination component to a [PageInfo] instance.
+ * Creates a new [Pagination] component.
  *
  * @param pageInfo the [PageInfo] instance
  * @param pageSizes the size of one page
  * @param compact whether to use a compact layout
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.PaginationSample.pageInfo
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.pagination(
-    pageInfo: PageInfo = PageInfo(),
+    pageInfo: PageInfo,
     pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
     compact: Boolean = false,
-    id: String? = null,
     baseClass: String? = null,
-    content: Pagination.() -> Unit = {}
-): Pagination {
+    id: String? = null,
+    context: Pagination.() -> Unit = {}
+) {
     val store = PageInfoStore(pageInfo)
-    return register(Pagination(store, store.data, pageSizes, compact, id = id, baseClass = baseClass, job), content)
+    Pagination(store, store.data, pageSizes, compact).apply(context).render(this, baseClass, id)
 }
 
-/**
- * Creates a new pagination component inside the specified [ToolbarItem] based on the specified [ItemsStore].
- *
- * @receiver the toolbar item this pagination component is part of
- *
- * @param store the item store
- * @param pageSizes the size of one page
- * @param compact whether to use a compact layout
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.PaginationSample.toolbar
- */
-public fun <T> ToolbarItem.pagination(
-    store: ItemsStore<T>,
-    pageSizes: IntArray = PageInfo.DEFAULT_PAGE_SIZES,
-    compact: Boolean = false,
-    id: String? = null,
-    baseClass: String? = null,
-    content: Pagination.() -> Unit = {}
-): Pagination {
-    this.domNode.classList += "pagination".modifier()
-    return register(
-        Pagination(
-            store,
-            store.data.map { it.pageInfo },
-            pageSizes,
-            compact,
-            id = id,
-            baseClass = baseClass,
-            job
-        ),
-        content
-    )
-}
-
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [pagination](https://www.patternfly.org/v4/components/pagination/design-guidelines) component.
  *
  * A pagination component gives users more navigational capability on pages with content views.
  *
- * Usually a pagination component is part of a toolbar and is bound to an [ItemsStore].
- *
- * @sample org.patternfly.sample.PaginationSample.toolbar
+ * @sample org.patternfly.sample.PaginationSample.pageInfo
  */
-public class Pagination internal constructor(
+public open class Pagination(
     public val pageInfoHandler: PageInfoHandler,
     public val pageInfoFlow: Flow<PageInfo>,
-    pageSizes: IntArray,
-    compact: Boolean,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLDivElement>,
-    Div(
-        id = id,
-        baseClass = classes {
-            +ComponentType.Pagination
-            +("compact".modifier() `when` compact)
-            +baseClass
-        },
-        job,
-        scope = Scope()
-    ) {
+    private val pageSizes: IntArray,
+    private val compact: Boolean
+) : PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
-    private val controlElements: MutableList<HTMLButtonElement> = mutableListOf()
-    private var inputElement: HTMLInputElement? = null
-
-    init {
-        markAs(ComponentType.Pagination)
-        div(baseClass = "pagination".component("total-items")) {
-            this@Pagination.pageInfoFlow.showRange().invoke(this)
-        }
-        optionsMenu(closeOnSelect = true) {
-            toggle {
-                text(variant = plain) {
-                    this@Pagination.pageInfoFlow.showRange().invoke(this)
-                }
-            }
-            pageSizes.forEach { pageSize ->
-                item(pageSize.toString()) {
-                    selected(this@Pagination.pageInfoFlow.map { it.pageSize == pageSize })
-                    events {
-                        clicks.map { pageSize } handledBy this@Pagination.pageInfoHandler.pageSize
-                    }
-                }
-            }
-        }
-        nav(baseClass = "pagination".component("nav")) {
-            if (!compact) {
-                div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
-                    // TODO Migrate buttons
-//                    this@Pagination.controlElements.add(
-//                        pushButton(plain) {
-//                            aria["label"] = "Go to first page"
-//                            disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
-//                            clicks handledBy this@Pagination.pageInfoHandler.gotoFirstPage
-//                            icon("angle-double-left".fas())
-//                        }.domNode
-//                    )
-                }
-            }
-            div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
-//                this@Pagination.controlElements.add(
-//                    pushButton(plain) {
-//                        aria["label"] = "Go to previous page"
-//                        disabled(this@Pagination.pageInfoFlow.map { it.firstPage })
-//                        clicks handledBy this@Pagination.pageInfoHandler.gotoPreviousPage
-//                        icon("angle-left".fas())
-//                    }.domNode
-//                )
-            }
-            if (!compact) {
-                div(baseClass = "pagination".component("nav", "page-select")) {
-                    this@Pagination.inputElement = input(baseClass = "form-control".component()) {
-                        aria["label"] = "Current page"
-                        type("number")
-                        min("1")
-                        max(this@Pagination.pageInfoFlow.map { it.pages.toString() })
-                        disabled(this@Pagination.pageInfoFlow.map { it.pages < 2 })
-                        value(this@Pagination.pageInfoFlow.map { (if (it.total == 0) 0 else it.page + 1).toString() })
-                        changes.valuesAsNumber()
-                            .map { it.toInt() - 1 } handledBy this@Pagination.pageInfoHandler.gotoPage
-                    }.domNode
-                    span {
-                        aria["hidden"] = true
-                        +"of "
-                        this@Pagination.pageInfoFlow.map {
-                            if (it.total == 0) "0" else it.pages.toString()
-                        }.asText()
-                    }
-                }
-            }
-            div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
-//                this@Pagination.controlElements.add(
-//                    pushButton(plain) {
-//                        aria["label"] = "Go to next page"
-//                        disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
-//                        clicks handledBy this@Pagination.pageInfoHandler.gotoNextPage
-//                        icon("angle-right".fas())
-//                    }.domNode
-//                )
-            }
-            if (!compact) {
-                div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
-//                    this@Pagination.controlElements.add(
-//                        pushButton(plain) {
-//                            aria["label"] = "Go to last page"
-//                            disabled(this@Pagination.pageInfoFlow.map { it.lastPage })
-//                            clicks handledBy this@Pagination.pageInfoHandler.gotoLastPage
-//                            icon("angle-double-right".fas())
-//                        }.domNode
-//                    )
-                }
-            }
-        }
-    }
+    private var disabled: Flow<Boolean> = flowOf(false)
 
     /**
-     * Disables / enabled this pagination instance.
+     * Disables the component.
      */
     public fun disabled(value: Boolean) {
-//        optionsMenu.disabled(value)
-        controlElements.forEach { it.disabled = value }
-        inputElement?.let { it.disabled = value }
+        disabled = flowOf(value)
     }
 
     /**
-     * Disables / enabled this pagination instance.
+     * Disables the component based on the values in the specified [Flow].
      */
     public fun disabled(value: Flow<Boolean>) {
-//        optionsMenu.disabled(value)
-/*
-        mountSingle(job, value) { v, _ ->
-            if (v) {
-                controlElements.forEach { it.disabled = true }
-                inputElement?.let { it.disabled = true }
-            } else {
-                pageInfoHandler.refresh(Unit)
+        disabled = value
+    }
+
+    @Suppress("LongMethod")
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(
+                baseClass = classes {
+                    +ComponentType.Pagination
+                    +("compact".modifier() `when` compact)
+                    +baseClass
+                },
+                id = id
+            ) {
+                markAs(ComponentType.Pagination)
+                applyElement(this)
+                applyEvents(this)
+
+                // to avoid having this@Pageination all over the place
+                val dis = disabled
+                val pif = pageInfoFlow
+                val pih = pageInfoHandler
+                val ps = pageSizes
+
+                div(baseClass = "pagination".component("total-items")) {
+                    pif.showRange().invoke(this)
+                }
+                optionsMenu(closeOnSelect = true) {
+                    disabled(dis)
+                    toggle {
+                        text(variant = plain) {
+                            pif.showRange().invoke(this)
+                        }
+                    }
+                    ps.forEach { pageSize ->
+                        item(pageSize.toString()) {
+                            selected(pif.map { it.pageSize == pageSize })
+                            events {
+                                clicks.map { pageSize } handledBy pih.pageSize
+                            }
+                        }
+                    }
+                }
+                nav(baseClass = "pagination".component("nav")) {
+                    if (!compact) {
+                        div(baseClass = classes("pagination".component("nav", "control"), "first".modifier())) {
+                            pushButton(plain) {
+                                aria["label"] = "Go to first page"
+                                disabled(
+                                    pif.map { it.firstPage }.combine(dis) { firstPage, disabled ->
+                                        firstPage || disabled
+                                    }
+                                )
+                                clicks handledBy pih.gotoFirstPage
+                                icon("angle-double-left".fas())
+                            }
+                        }
+                    }
+                    div(baseClass = classes("pagination".component("nav", "control"), "prev".modifier())) {
+                        pushButton(plain) {
+                            aria["label"] = "Go to previous page"
+                            disabled(
+                                pif.map { it.firstPage }.combine(dis) { firstPage, disabled ->
+                                    firstPage || disabled
+                                }
+                            )
+                            clicks handledBy pih.gotoPreviousPage
+                            icon("angle-left".fas())
+                        }
+                    }
+                    if (!compact) {
+                        div(baseClass = "pagination".component("nav", "page-select")) {
+                            input(baseClass = "form-control".component()) {
+                                aria["label"] = "Current page"
+                                type("number")
+                                min("1")
+                                max(pif.map { it.pages.toString() })
+                                disabled(
+                                    pif.map { it.pages < 2 }.combine(dis) { onePage, disabled ->
+                                        onePage || disabled
+                                    }
+                                )
+                                value(pif.map { (if (it.total == 0) 0 else it.page + 1).toString() })
+                                changes.valuesAsNumber()
+                                    .map { it.toInt() - 1 } handledBy pih.gotoPage
+                            }
+                            span {
+                                aria["hidden"] = true
+                                +"of "
+                                pif.map {
+                                    if (it.total == 0) "0" else it.pages.toString()
+                                }.asText()
+                            }
+                        }
+                    }
+                    div(baseClass = classes("pagination".component("nav", "control"), "next".modifier())) {
+                        pushButton(plain) {
+                            aria["label"] = "Go to next page"
+                            disabled(
+                                pif.map { it.lastPage }.combine(dis) { lastPage, disabled ->
+                                    lastPage || disabled
+                                }
+                            )
+                            clicks handledBy pih.gotoNextPage
+                            icon("angle-right".fas())
+                        }
+                    }
+                    if (!compact) {
+                        div(baseClass = classes("pagination".component("nav", "control"), "last".modifier())) {
+                            pushButton(plain) {
+                                aria["label"] = "Go to last page"
+                                disabled(
+                                    pif.map { it.lastPage }.combine(dis) { lastPage, disabled ->
+                                        lastPage || disabled
+                                    }
+                                )
+                                clicks handledBy pih.gotoLastPage
+                                icon("angle-double-right".fas())
+                            }
+                        }
+                    }
+                }
             }
         }
-*/
     }
 }
-
-// ------------------------------------------------------ store
 
 internal fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {

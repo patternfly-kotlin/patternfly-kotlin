@@ -22,6 +22,7 @@ import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ component
 
+@Suppress("TooManyFunctions")
 public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constructor(
     private val componentType: ComponentType,
     private val componentBaseClass: String,
@@ -100,7 +101,6 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
     public fun separator() {
         (if (storeItems) tailEntries else headEntries).add(Separator(componentType))
     }
-
 
     /**
      * Adds the items from the specified store.
@@ -235,7 +235,6 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         }
     }
 }
-
 
 // ------------------------------------------------------ entries & store
 

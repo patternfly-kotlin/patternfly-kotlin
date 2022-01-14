@@ -61,6 +61,7 @@ internal class ImageToggleKind(
 /**
  * A basic toggle.
  */
+@Suppress("TooManyFunctions")
 public open class Toggle internal constructor(
     componentType: ComponentType,
     private val componentBaseClass: String,
