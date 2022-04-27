@@ -1,5 +1,4 @@
----
-name: apidoc
+name: API documentation
 
 on:
   push:

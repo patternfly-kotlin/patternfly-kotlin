@@ -1,5 +1,4 @@
----
-name: snapshot
+name: Snapshot
 
 on: [push, pull_request]
 
