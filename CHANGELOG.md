@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add methods to hide and show tags based on `Tag.classMap()`
 
 ### Changed
-- Upgrade to fritz2 0.9
+- Renamed library to `patternfly-kotlin`
+- Upgrade to fritz2 0.14.2
 - Revisit page components ([#73](https://github.com/patternfly-kotlin/patternfly-fritz2/issues/73))
 - Different handlers for clicking and selecting entries in `EntriesStore`
 - Make sidebar body implicit

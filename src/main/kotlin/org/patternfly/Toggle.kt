@@ -1,14 +1,15 @@
 package org.patternfly
 
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.Img
 import dev.fritz2.dom.html.Input
-import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLElement
 
 internal sealed interface ToggleKind
 
@@ -167,19 +168,19 @@ public open class Toggle internal constructor(
         kind = ImageToggleKind(title = title, src = src, baseClass = baseClass, id = id, context = context)
     }
 
-    internal fun render(context: RenderContext) {
+    internal fun render(tag: Tag<HTMLElement>) {
         when (val immutableKind = kind) {
-            is TextToggleKind -> renderTextToggle(context, immutableKind)
-            is IconToggleKind -> renderIconToggle(context, immutableKind)
-            is BadgeToggleKind -> renderBadgeToggle(context, immutableKind)
-            is CheckboxToggleKind -> renderCheckboxToggle(context, immutableKind)
-            is ActionToggleKind -> renderActionToggle(context, immutableKind)
-            is ImageToggleKind -> renderImageToggle(context, immutableKind)
+            is TextToggleKind -> renderTextToggle(tag, immutableKind)
+            is IconToggleKind -> renderIconToggle(tag, immutableKind)
+            is BadgeToggleKind -> renderBadgeToggle(tag, immutableKind)
+            is CheckboxToggleKind -> renderCheckboxToggle(tag, immutableKind)
+            is ActionToggleKind -> renderActionToggle(tag, immutableKind)
+            is ImageToggleKind -> renderImageToggle(tag, immutableKind)
         }
     }
 
-    internal open fun renderTextToggle(context: RenderContext, kind: TextToggleKind) {
-        with(context) {
+    internal open fun renderTextToggle(tag: Tag<HTMLElement>, kind: TextToggleKind) {
+        with(tag) {
             button(
                 baseClass = classes {
                     +componentBaseClass.component("toggle")
@@ -199,8 +200,8 @@ public open class Toggle internal constructor(
         }
     }
 
-    internal open fun renderIconToggle(context: RenderContext, kind: IconToggleKind) {
-        with(context) {
+    internal open fun renderIconToggle(tag: Tag<HTMLElement>, kind: IconToggleKind) {
+        with(tag) {
             button(
                 baseClass = classes(
                     componentBaseClass.component("toggle"),
@@ -218,20 +219,20 @@ public open class Toggle internal constructor(
         }
     }
 
-    internal open fun renderBadgeToggle(context: RenderContext, kind: BadgeToggleKind) {
-        notImplemented(context, kind)
+    internal open fun renderBadgeToggle(tag: Tag<HTMLElement>, kind: BadgeToggleKind) {
+        notImplemented(tag, kind)
     }
 
-    internal open fun renderCheckboxToggle(context: RenderContext, kind: CheckboxToggleKind) {
-        notImplemented(context, kind)
+    internal open fun renderCheckboxToggle(tag: Tag<HTMLElement>, kind: CheckboxToggleKind) {
+        notImplemented(tag, kind)
     }
 
-    internal open fun renderActionToggle(context: RenderContext, kind: ActionToggleKind) {
-        notImplemented(context, kind)
+    internal open fun renderActionToggle(tag: Tag<HTMLElement>, kind: ActionToggleKind) {
+        notImplemented(tag, kind)
     }
 
-    internal open fun renderImageToggle(context: RenderContext, kind: ImageToggleKind) {
-        notImplemented(context, kind)
+    internal open fun renderImageToggle(tag: Tag<HTMLElement>, kind: ImageToggleKind) {
+        notImplemented(tag, kind)
     }
 
     internal open fun setupToggleButton(button: Button) {
@@ -244,8 +245,8 @@ public open class Toggle internal constructor(
         }
     }
 
-    private fun notImplemented(context: RenderContext, kind: ToggleKind) {
-        with(context) {
+    private fun notImplemented(tag: Tag<HTMLElement>, kind: ToggleKind) {
+        with(tag) {
             val message = "$kind not implemented for toggle with id ${this@Toggle.id}"
             !message
             console.warn(message)

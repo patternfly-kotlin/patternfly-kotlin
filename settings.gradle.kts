@@ -1,2 +1,2 @@
-rootProject.name = "patternfly-fritz2"
+rootProject.name = "patternfly-kotlin"
 enableFeaturePreview("VERSION_CATALOGS")

@@ -2,6 +2,7 @@
 
 package org.patternfly
 
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
@@ -12,7 +13,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -21,6 +21,7 @@ import org.patternfly.dom.By
 import org.patternfly.dom.Id
 import org.patternfly.dom.debug
 import org.patternfly.dom.querySelector
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
@@ -186,7 +187,7 @@ public open class Navigation<T>(
         }
     }
 
-    private fun verticalGrouped(context: RenderContext, entries: List<NavigationEntry<T>>) {
+    private fun verticalGrouped(context: Tag<HTMLElement>, entries: List<NavigationEntry<T>>) {
         with(context) {
             entries.forEach { entry ->
                 when (entry) {
@@ -332,7 +333,7 @@ public open class Navigation<T>(
         }
     }
 
-    private fun warning(context: RenderContext, message: String) {
+    private fun warning(context: Tag<HTMLElement>, message: String) {
         with(context) {
             !message
             console.warn("$message: ${root.domNode.debug()}")

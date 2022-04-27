@@ -80,7 +80,7 @@ public open class Skeleton2 : PatternFlyComponent<Unit> {
     public fun text(value: Flow<String>) {
         text = {
             span(baseClass = screenReader()) {
-                value.asText()
+                value.renderText(into = this)
             }
         }
     }

@@ -10,7 +10,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -232,7 +231,7 @@ public open class ChipGroup(private var limit: Int) :
                 itemStore.remove.collect {
                     // The item is emitted before it is removed, so check for size == 1
                     if (itemStore.current.size == 1 && headItems.isEmpty() && tailItems.isEmpty()) {
-                        domNode.removeFromParent()
+                        root.domNode.removeFromParent()
                     }
                 }
             }

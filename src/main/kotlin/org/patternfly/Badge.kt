@@ -122,7 +122,7 @@ public open class Badge(
                 applyEvents(this)
 
                 classMap(read.map { mapOf("read".modifier() to it, "unread".modifier() to !it) })
-                count.map { applyBounds(it) }.asText()
+                count.map { applyBounds(it) }.renderText(into = this)
                 tail(this)
             }
         }

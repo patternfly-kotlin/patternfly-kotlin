@@ -157,7 +157,7 @@ public open class Pagination(
                                 +"of "
                                 pif.map {
                                     if (it.total == 0) "0" else it.pages.toString()
-                                }.asText()
+                                }.renderText(into = this)
                             }
                         }
                     }
@@ -195,12 +195,12 @@ public open class Pagination(
 
 internal fun Flow<PageInfo>.showRange(): Tag<HTMLElement>.() -> Unit = {
     b {
-        this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.asText()
+        this@showRange.map { if (it.total == 0) "0" else it.range.first.toString() }.renderText(into = this)
         +" - "
-        this@showRange.map { it.range.last.toString() }.asText()
+        this@showRange.map { it.range.last.toString() }.renderText(into = this)
     }
     domNode.appendChild(TextNode(" of ").domNode)
     b {
-        this@showRange.map { it.total.toString() }.asText()
+        this@showRange.map { it.total.toString() }.renderText(into = this)
     }
 }

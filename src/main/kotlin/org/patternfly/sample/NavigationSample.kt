@@ -3,7 +3,7 @@
 package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
-import dev.fritz2.routing.router
+import dev.fritz2.routing.routerOf
 import org.patternfly.Severity.INFO
 import org.patternfly.navigation
 import org.patternfly.notification
@@ -13,7 +13,7 @@ import org.patternfly.pageSubNav
 internal class NavigationSample {
 
     fun horizontal() {
-        val router = router("home")
+        val router = routerOf("home")
         render {
             page {
                 masthead {
@@ -31,7 +31,7 @@ internal class NavigationSample {
     }
 
     fun horizontalSubNav() {
-        val router = router("home")
+        val router = routerOf("home")
         render {
             page {
                 main {
@@ -47,7 +47,7 @@ internal class NavigationSample {
     }
 
     fun vertical() {
-        val router = router("home")
+        val router = routerOf("home")
         render {
             page {
                 sidebar {

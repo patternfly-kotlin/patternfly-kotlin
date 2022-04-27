@@ -1,10 +1,13 @@
 package org.patternfly
 
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.Id
 import org.patternfly.dom.displayNone
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLLIElement
 
 // ------------------------------------------------------ factory
 
@@ -61,7 +64,7 @@ public open class Dropdown(grouped: Boolean, align: Align?, up: Boolean) :
 
     override val toggle: DropdownToggle = DropdownToggle(TextToggleKind(null, null) {}, expandedStore)
 
-    override fun renderItem(context: RenderContext, entry: Entry): RenderContext =
+    override fun renderItem(context: RenderContext, entry: Entry): Tag<HTMLLIElement> =
         with(context) {
             li {
                 if (entry is DropdownItem) {
@@ -157,8 +160,8 @@ internal class DropdownBadge(kind: BadgeToggleKind) : Badge(
 public class DropdownToggle internal constructor(kind: ToggleKind, expandedStore: ExpandedStore) :
     Toggle(ComponentType.Dropdown, "dropdown", kind, expandedStore) {
 
-    override fun renderBadgeToggle(context: RenderContext, kind: BadgeToggleKind) {
-        with(context) {
+    override fun renderBadgeToggle(tag: Tag<HTMLElement>, kind: BadgeToggleKind) {
+        with(tag) {
             button(
                 baseClass = classes(
                     "dropdown".component("toggle"),
@@ -175,8 +178,8 @@ public class DropdownToggle internal constructor(kind: ToggleKind, expandedStore
         }
     }
 
-    override fun renderCheckboxToggle(context: RenderContext, kind: CheckboxToggleKind) {
-        with(context) {
+    override fun renderCheckboxToggle(tag: Tag<HTMLElement>, kind: CheckboxToggleKind) {
+        with(tag) {
             div(
                 baseClass = classes(
                     "dropdown".component("toggle"),
@@ -214,8 +217,8 @@ public class DropdownToggle internal constructor(kind: ToggleKind, expandedStore
         }
     }
 
-    override fun renderActionToggle(context: RenderContext, kind: ActionToggleKind) {
-        with(context) {
+    override fun renderActionToggle(tag: Tag<HTMLElement>, kind: ActionToggleKind) {
+        with(tag) {
             div(
                 baseClass = classes {
                     +"dropdown".component("toggle")
@@ -243,8 +246,8 @@ public class DropdownToggle internal constructor(kind: ToggleKind, expandedStore
         }
     }
 
-    override fun renderImageToggle(context: RenderContext, kind: ImageToggleKind) {
-        with(context) {
+    override fun renderImageToggle(tag: Tag<HTMLElement>, kind: ImageToggleKind) {
+        with(tag) {
             button(baseClass = "dropdown".component("toggle")) {
                 setupToggleButton(this)
                 span(baseClass = "dropdown".component("toggle", "image")) {

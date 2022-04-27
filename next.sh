@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to set the next snapshot version for PatternFly Fritz2.
+# Script to set the next snapshot version for PatternFly Kotlin.
 # Should be called right after ./release.sh
 #
 # Prerequisites
@@ -41,10 +41,10 @@ if ! git diff --no-ext-diff --quiet --exit-code; then
 fi
 
 printf "\n\n\n# Bump to %s\n\n" "$SNAPSHOT_VERSION"
-sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-fritz2:.*-SNAPSHOT\"/\"patternfly-fritz2:$SNAPSHOT_VERSION/" README.md
+sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-kotlin:.*-SNAPSHOT\"/\"patternfly-kotlin:$SNAPSHOT_VERSION/" README.md
 sed -i.versionsBackup "s/^version = \".*\"$/version = \"$SNAPSHOT_VERSION/" build.gradle.kts
 find . -name "*.versionsBackup" -exec rm {} \;
 git commit -am "Next is $SNAPSHOT_VERSION"
 git push origin main
 
-printf "\n\n\n<<--==  Bump PatternFly Fritz2 to %s  ==-->>\n\n" "$SNAPSHOT_VERSION"
+printf "\n\n\n<<--==  Bump PatternFly Kotlin to %s  ==-->>\n\n" "$SNAPSHOT_VERSION"

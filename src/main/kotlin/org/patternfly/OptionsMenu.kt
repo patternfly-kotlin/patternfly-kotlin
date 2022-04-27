@@ -2,12 +2,14 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Button
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.patternfly.dom.showIf
+import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ factory
 
@@ -69,14 +71,14 @@ public class OptionsMenu(grouped: Boolean, align: Align?, up: Boolean, private v
     private val defaultSelectionStore: RootStore<String?> = storeOf(null)
     override val toggle: OptionsMenuToggle = OptionsMenuToggle(TextToggleKind(null, null) {}, expandedStore)
 
-    override fun renderItem(context: RenderContext, entry: Entry): RenderContext =
+    override fun renderItem(context: RenderContext, entry: Entry): Tag<HTMLElement> =
         with(context) {
             li {
                 if (entry is OptionsMenuItem) {
                     attr("role", "menuitem")
                     renderOptionsMenuItem(this, entry)
                 } else {
-                    unsupportedItem(context, this.domNode, entry)
+                    unsupportedItem(this, entry)
                 }
             }
         }

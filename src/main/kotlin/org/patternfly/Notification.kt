@@ -2,6 +2,7 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Scope
@@ -11,7 +12,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -51,7 +51,7 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
 
     private val timeoutHandles: MutableMap<String, Int> = mutableMapOf()
 
-    override fun renderAlerts(context: RenderContext) {
+    override fun renderAlerts(context: Tag<HTMLElement>) {
         with(context) {
             (MainScope() + NotificationStore.job).launch {
                 NotificationStore.latest.collect { notificationAlert ->
@@ -141,7 +141,7 @@ public open class NotificationBadge : PatternFlyComponent<Unit> {
                     }
                     if (withCount) {
                         span(baseClass = "notification-badge".component("count")) {
-                            NotificationStore.count.asText()
+                            NotificationStore.count.renderText(into = this)
                         }
                     }
                 }

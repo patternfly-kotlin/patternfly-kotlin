@@ -78,7 +78,7 @@ public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyCom
         }
     }
 
-    internal abstract fun renderAlerts(context: RenderContext)
+    internal abstract fun renderAlerts(context: Tag<HTMLElement>)
 }
 
 /**
@@ -102,7 +102,7 @@ public open class StaticAlertGroup : BaseAlertGroup(false) {
         alerts.add(StaticAlertBuilder(severity, title, baseClass, id, context))
     }
 
-    override fun renderAlerts(context: RenderContext) {
+    override fun renderAlerts(context: Tag<HTMLElement>) {
         with(context) {
             alerts.forEach { alertBuilder ->
                 li(baseClass = "alert-group".component("item")) {

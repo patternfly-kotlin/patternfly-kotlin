@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to release PatternFly Fritz2.
+# Script to release PatternFly Kotlin.
 #
 # Prerequisites
 #   - Clean git status (no uncommitted changes in branch 'main')
@@ -54,7 +54,7 @@ git pull origin main
 ./gradlew build || { echo "Build failed" ; exit 1; }
 
 printf "\n\n\n# Bump to %s\n\n" "$VERSION"
-sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-fritz2:.*\"/\"patternfly-fritz2:$VERSION\"/" README.md
+sed -E -i.versionsBackup "s/\"org.patternfly:patternfly-kotlin:.*\"/\"patternfly-kotlin:$VERSION\"/" README.md
 sed -i.versionsBackup "s/^version = \".*\"$/version = \"$VERSION\"/" build.gradle.kts
 find . -name "*.versionsBackup" -exec rm {} \;
 git commit -am "Bump to $VERSION"
@@ -64,4 +64,4 @@ printf "\n\n\n# Tag and push %s\n\n" "$VERSION_TAG"
 git tag "$VERSION_TAG"
 git push --tags origin
 
-printf "\n\n\n<<--==  PatternFly Fritz2 %s successfully released  ==-->>\n\n" "$VERSION_TAG"
+printf "\n\n\n<<--==  PatternFly Kotlin %s successfully released  ==-->>\n\n" "$VERSION_TAG"

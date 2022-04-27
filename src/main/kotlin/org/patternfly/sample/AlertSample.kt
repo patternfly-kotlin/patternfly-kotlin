@@ -49,7 +49,9 @@ internal class AlertSample {
                 action(
                     {
                         +"Ignore"
-                        className("your-css-class")
+                        element {
+                            className("your-css-class")
+                        }
                     },
                     {
                         clicks handledBy notification(WARNING, "Are you sure?")

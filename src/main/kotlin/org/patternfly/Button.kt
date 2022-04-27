@@ -363,7 +363,7 @@ public open class Button(
         }
     }
 
-    private fun renderContent(context: RenderContext, supportsProgress: Boolean) {
+    private fun renderContent(context: Tag<HTMLElement>, supportsProgress: Boolean) {
         if (supportsProgress && loading != null) {
             loading?.let { loading ->
                 with(context) {

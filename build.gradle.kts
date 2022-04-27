@@ -5,9 +5,9 @@ group = "org.patternfly"
 version = "0.3.0-SNAPSHOT"
 
 object Meta {
-    const val desc = "Kotlin implementation of PatternFly 4 based on fritz2"
+    const val desc = "Pure Kotlin implementation of PatternFly"
     const val license = "Apache-2.0"
-    const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
+    const val githubRepo = "patternfly-kotlin/patternfly-kotlin"
     const val release = "https://s01.oss.sonatype.org/service/local/"
     const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 }
@@ -21,6 +21,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.ktlintIdea)
+    alias(libs.plugins.kotest)
     alias(libs.plugins.detekt)
     alias(libs.plugins.nexusPublish)
     `maven-publish`
@@ -59,7 +60,7 @@ kotlin {
             }
         }
     }
-    js(BOTH) {
+    js(IR) {
         explicitApi()
         browser {
             testTask {
@@ -135,10 +136,8 @@ tasks {
 signing {
     val signingKey = providers
         .environmentVariable("GPG_SIGNING_KEY")
-        .forUseAtConfigurationTime()
     val signingPassphrase = providers
         .environmentVariable("GPG_SIGNING_PASSPHRASE")
-        .forUseAtConfigurationTime()
 
     if (signingKey.isPresent && signingPassphrase.isPresent) {
         useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
@@ -195,10 +194,8 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri(Meta.snapshot))
             val ossrhUsername = providers
                 .environmentVariable("OSSRH_USERNAME")
-                .forUseAtConfigurationTime()
             val ossrhPassword = providers
                 .environmentVariable("OSSRH_PASSWORD")
-                .forUseAtConfigurationTime()
             if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
                 username.set(ossrhUsername.get())
                 password.set(ossrhPassword.get())

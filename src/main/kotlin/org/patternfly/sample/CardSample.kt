@@ -90,7 +90,7 @@ internal class CardSample {
             card(expandable) {
                 header {
                     title {
-                        expandedStore.data.map { "Expanded state: $it" }.asText()
+                        expandedStore.data.map { "Expanded state: $it" }.renderText(into = this)
                     }
                 }
                 body { +"Body" }

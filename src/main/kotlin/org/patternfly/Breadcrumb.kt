@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLLIElement
 
 // ------------------------------------------------------ factory
 
@@ -128,7 +130,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
         }
     }
 
-    private fun renderItem(context: RenderContext, item: BreadcrumbItem): RenderContext =
+    private fun renderItem(context: RenderContext, item: BreadcrumbItem): Tag<HTMLLIElement> =
         with(context) {
             li(baseClass = "breadcrumb".component("item")) {
                 span(baseClass = "breadcrumb".component("item", "divider")) {

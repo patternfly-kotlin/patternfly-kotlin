@@ -89,7 +89,7 @@ public class Switch internal constructor(id: String?, baseClass: String?, job: J
      */
     public fun label(value: Flow<String>) {
         with(labelTag) {
-            value.asText()
+            value.renderText(into = this)
         }
     }
 
@@ -107,7 +107,7 @@ public class Switch internal constructor(id: String?, baseClass: String?, job: J
      */
     public fun labelOff(value: Flow<String>) {
         with(labelOffTag) {
-            value.asText()
+            value.renderText(into = this)
         }
     }
 

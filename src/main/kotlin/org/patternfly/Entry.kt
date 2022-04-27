@@ -2,12 +2,12 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -156,7 +156,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         }
     }
 
-    private fun renderEntries(context: RenderContext) {
+    private fun renderEntries(context: Tag<HTMLElement>) {
         val groups = grouped || (headEntries + tailEntries).filterIsInstance<Group<I>>().isNotEmpty()
         with(context) {
             val classes = classes {
@@ -186,7 +186,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         }
     }
 
-    private fun renderEntry(context: RenderContext, entry: Entry, groups: Boolean, depth: Int): RenderContext =
+    private fun renderEntry(context: RenderContext, entry: Entry, groups: Boolean, depth: Int): Tag<HTMLElement> =
         with(context) {
             when (entry) {
                 is Group<*> -> {
@@ -221,17 +221,17 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
             }
         }
 
-    internal abstract fun renderItem(context: RenderContext, entry: Entry): RenderContext
+    internal abstract fun renderItem(context: RenderContext, entry: Entry): Tag<HTMLElement>
 
-    internal fun unsupportedItem(context: RenderContext, element: HTMLElement, entry: Entry) {
-        with(element) {
-            hidden = true
-            displayNone = true
-        }
-        with(context) {
+    internal fun unsupportedItem(tag: Tag<HTMLElement>, entry: Entry) {
+        with(tag) {
             val message = "Unsupported entry $entry"
             console.log(message)
             !message
+            with(domNode) {
+                hidden = true
+                displayNone = true
+            }
         }
     }
 }

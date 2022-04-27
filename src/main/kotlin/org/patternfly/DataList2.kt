@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLLIElement
 
 // ------------------------------------------------------ factory
 
@@ -117,7 +119,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
         }
     }
 
-    private fun renderItem(context: RenderContext, item: DataListItem2): RenderContext = with(context) {
+    private fun renderItem(context: RenderContext, item: DataListItem2): Tag<HTMLLIElement> = with(context) {
         li(
             baseClass = classes {
                 +"data-list".component("item")
@@ -139,7 +141,6 @@ public open class DataList2(private val compact: Boolean, private val selectable
                     }
                 )
                 clicks.map { item.id } handledBy idSingleSelection.update
-
             } else {
                 with(item.expandedStore) {
                     toggleExpanded()
@@ -277,7 +278,7 @@ public class DataListItem2(public val id: String) :
     internal val contentId: String = Id.build(id, "cnt")
 
     internal fun <T> onSelect(block: (T) -> Unit) {
-
+        TODO("onSelect() not yet implemented")
     }
 
     public fun toggle() {

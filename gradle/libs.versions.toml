@@ -1,10 +1,10 @@
 [versions]
 detekt = "1.18.1"
-dokka = "1.6.0"
-fritz2 = "0.13"
-kotest = "4.6.3"
-kotlin = "1.6.0"
-ktlint = "10.2.0"
+dokka = "1.6.21"
+fritz2 = "0.14.2"
+kotest = "5.2.3"
+kotlin = "1.6.21"
+ktlint = "10.2.1"
 nexusPublish = "1.1.0"
 
 [libraries]
@@ -22,4 +22,5 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 js = { id = "org.jetbrains.kotlin.js", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 ktlintIdea = { id = "org.jlleitschuh.gradle.ktlint-idea", version.ref = "ktlint" }
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }

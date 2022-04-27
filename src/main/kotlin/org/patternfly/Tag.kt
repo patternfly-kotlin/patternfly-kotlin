@@ -1,14 +1,11 @@
 package org.patternfly
 
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.WithDomNode
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 
 internal fun <V, I> Flow<List<V>>.renderShifted(
@@ -48,34 +45,6 @@ internal fun <V, I> Flow<List<V>>.renderShifted(
     }
 */
 }
-
-private inline fun registerSingle(
-    job: Job,
-    parent: RenderContext,
-    content: RenderContext.() -> RenderContext
-): WithDomNode<HTMLElement> = content(
-    object : RenderContext(
-        "",
-        parent.id,
-        parent.baseClass,
-        job,
-        Scope(),
-        parent.domNode.unsafeCast<HTMLElement>()
-    ) {
-        var alreadyRegistered: Boolean = false
-
-        override fun <E : Element, W : WithDomNode<E>> register(element: W, content: (W) -> Unit): W {
-            if (alreadyRegistered) {
-//                throw MultipleRootElementsException("You can have only one root-tag per html-context!")
-                throw IllegalStateException("You can have only one root-tag per html-context!")
-            } else {
-                content(element)
-                alreadyRegistered = true
-                return element
-            }
-        }
-    }
-)
 
 private fun <T> accumulate(
     accumulator: Pair<List<T>, List<T>>,
