@@ -267,13 +267,11 @@ public class Drawer(private val variations: Array<out DrawerVariant>) :
     // ------------------------------------------------------ start resizing
 
     private fun handleMouseDown(event: Event) {
-        console.log("start panel content mouse down handler")
         event.stopPropagation()
         event.preventDefault()
         document.addEventListener(mousemove.name, mouseMoveHandler)
         document.addEventListener(mouseup.name, mouseUpHandler)
         resizing.update(true)
-        console.log("end   panel content mouse down handler")
     }
 
     private fun handleTouchStart(event: Event) {

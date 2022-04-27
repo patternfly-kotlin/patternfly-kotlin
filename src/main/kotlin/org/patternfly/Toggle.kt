@@ -238,6 +238,7 @@ public open class Toggle internal constructor(
         with(button) {
             disabled(disabled)
             domNode.id = this@Toggle.id
+            aria["haspopup"] = true
             aria["expanded"] = expandedStore.data.map { it.toString() }
             clicks handledBy expandedStore.toggle
         }

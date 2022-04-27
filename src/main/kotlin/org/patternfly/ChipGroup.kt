@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariant.plain
-import org.patternfly.NotificationStore.job
 import org.patternfly.dom.Id
 import org.patternfly.dom.removeFromParent
 import org.w3c.dom.Element
@@ -129,7 +128,7 @@ public open class ChipGroup(private var limit: Int) :
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: ChipItems.(T) -> ChipItem
     ) {
-        (MainScope() + job).launch {
+        (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
@@ -229,7 +228,7 @@ public open class ChipGroup(private var limit: Int) :
             }
 
             // Remove this chip group, after last chip has been removed
-            (MainScope() + job).launch {
+            (MainScope() + itemStore.job).launch {
                 itemStore.remove.collect {
                     // The item is emitted before it is removed, so check for size == 1
                     if (itemStore.current.size == 1 && headItems.isEmpty() && tailItems.isEmpty()) {

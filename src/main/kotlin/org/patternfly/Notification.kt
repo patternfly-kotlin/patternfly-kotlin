@@ -53,7 +53,7 @@ internal class NotificationAlertGroup : BaseAlertGroup(true) {
 
     override fun renderAlerts(context: RenderContext) {
         with(context) {
-            (MainScope() + job).launch {
+            (MainScope() + NotificationStore.job).launch {
                 NotificationStore.latest.collect { notificationAlert ->
                     val alertId = Id.unique("alert")
                     val li = Li(baseClass = "alert-group".component("item"), job = Job(), scope = Scope())

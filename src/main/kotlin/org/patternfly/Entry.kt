@@ -121,7 +121,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: Entries<I, T>.(T) -> Entry
     ) {
-        (MainScope() + NotificationStore.job).launch {
+        (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->

@@ -95,7 +95,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: BreadcrumbItems.(T) -> BreadcrumbItem
     ) {
-        (MainScope() + NotificationStore.job).launch {
+        (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->

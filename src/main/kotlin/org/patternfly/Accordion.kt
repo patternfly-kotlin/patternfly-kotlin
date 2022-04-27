@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import org.patternfly.NotificationStore.job
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
@@ -119,7 +118,7 @@ public open class Accordion(
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: AccordionItems.(T) -> AccordionItem
     ) {
-        (MainScope() + job).launch {
+        (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
