@@ -33,7 +33,7 @@ jobs:
           ALLOW_TAG_PREFIX: "true"
         with:
           args: |
-            build/libs/patternfly-fritz2*.jar
+            build/libs/patternfly-kotlin*.jar
       - name: Publish to Maven Central
         if: success()
         run: ./gradlew publish closeAndReleaseStagingRepository

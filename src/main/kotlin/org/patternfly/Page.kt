@@ -2,11 +2,13 @@ package org.patternfly
 
 import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.ScopeContext
 import kotlinx.coroutines.flow.map
 import org.patternfly.ButtonVariant.primary
 import org.patternfly.dom.Id
+import org.w3c.dom.HTMLElement
 
 // ------------------------------------------------------ factory
 
@@ -182,7 +184,7 @@ public open class Page :
     private val sidebarStore: SidebarStore = SidebarStore()
     private var masthead: SubComponent<Masthead>? = null
     private var sidebar: SubComponent<RenderContext>? = null
-    private var main: SubComponent<RenderContext>? = null
+    private var main: SubComponent<Tag<HTMLElement>>? = null
 
     public fun masthead(
         baseClass: String? = null,
@@ -203,7 +205,7 @@ public open class Page :
     public fun main(
         baseClass: String? = null,
         id: String? = null,
-        context: RenderContext.() -> Unit = {}
+        context: Tag<HTMLElement>.() -> Unit = {}
     ) {
         main = SubComponent(baseClass, id, context)
     }

@@ -6,10 +6,10 @@ import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.handledBy
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -50,14 +50,14 @@ public open class DataList2(private val compact: Boolean, private val selectable
     private val itemStore: DataListItemStore = DataListItemStore()
     private val headItems: MutableList<DataListItem2> = mutableListOf()
     private val tailItems: MutableList<DataListItem2> = mutableListOf()
-    private val idSingleSelection: RootStore<String?> = storeOf(null)
-    private var modelSingleSelection: RootStore<*>? = null
-//    private val idMultiSelection: RootStore<List<String>> = storeOf(emptyList())
+    private val singleSelection: RootStore<String?> = storeOf(null)
+    //    private val multiSelection: RootStore<List<String>> = storeOf(emptyList())
 
-    public fun item(context: DataListItem2.() -> Unit) {
-        (if (storeItems) tailItems else headItems).add(
-            DataListItem2(Id.unique(ComponentType.DataList.id, "itm")).apply(context)
-        )
+    public fun item(
+        id: String = Id.unique(ComponentType.DataList.id, "itm"),
+        context: DataListItem2.() -> Unit
+    ) {
+        (if (storeItems) tailItems else headItems).add(DataListItem2(id).apply(context))
     }
 
     public fun <T> items(
@@ -77,22 +77,18 @@ public open class DataList2(private val compact: Boolean, private val selectable
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
-                val map = values.associateBy { idProvider(it) }
+                val idToModel = values.associateBy { idProvider(it) }
                 itemStore.update(
                     values.map { value ->
                         DataListItems(idProvider(value)).run {
-                            val item = display.invoke(this, value)
-                            item.onSelect<T> {
-                                selection.update(it)
-                            }
-                            item
+                            display.invoke(this, value)
                         }
                     }
                 )
+                singleSelection.data.map { idToModel[it] } handledBy selection.update
             }
         }
         storeItems = true
-        modelSingleSelection = selection
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -129,7 +125,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
             aria["labelledby"] = item.id
             if (selectable) {
                 attr("tabindex", 0)
-                val idSelected = idSingleSelection.data.map { it == item.id }
+                val idSelected = singleSelection.data.map { it == item.id }
                 classMap(
                     item.expandedStore.data.combine(idSelected) { expanded, selected ->
                         expanded to selected
@@ -140,7 +136,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
                         )
                     }
                 )
-                clicks.map { item.id } handledBy idSingleSelection.update
+                clicks.map { item.id } handledBy singleSelection.update
             } else {
                 with(item.expandedStore) {
                     toggleExpanded()
@@ -170,11 +166,13 @@ public open class DataList2(private val compact: Boolean, private val selectable
                     }
                     if (item.toggle) {
                         div(baseClass = "data-list".component("toggle")) {
-                            clickButton(variants = arrayOf(plain), id = item.toggleId) {
-                                aria["controls"] = item.contentId
-                                aria["label"] = "Details"
-                                aria["labelledby"] = "${item.id} ${item.toggleId}"
-                                aria["expanded"] = item.expandedStore.data.map { it.toString() }
+                            clickButton(plain, id = item.toggleId) {
+                                element {
+                                    aria["controls"] = item.contentId
+                                    aria["label"] = "Details"
+                                    aria["labelledby"] = "${item.id} ${item.toggleId}"
+                                    aria["expanded"] = item.expandedStore.data.map { it.toString() }
+                                }
                                 content {
                                     div(baseClass = "data-list".component("toggle", "icon")) {
                                         icon("angle-right".fas())
@@ -276,10 +274,6 @@ public class DataListItem2(public val id: String) :
     internal val actions: MutableList<SubComponent<Div>> = mutableListOf()
     internal var content: SubComponent<Div>? = null
     internal val contentId: String = Id.build(id, "cnt")
-
-    internal fun <T> onSelect(block: (T) -> Unit) {
-        TODO("onSelect() not yet implemented")
-    }
 
     public fun toggle() {
         toggle = true
