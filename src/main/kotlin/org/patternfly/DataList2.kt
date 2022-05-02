@@ -1,5 +1,6 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
@@ -7,6 +8,7 @@ import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.handledBy
+import dev.fritz2.dom.states
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -35,49 +37,81 @@ public fun RenderContext.dataList2(
     baseClass: String? = null,
     id: String? = null,
     context: DataList2.() -> Unit = {}
-) {
-    DataList2(compact = compact, selectable = selectable).apply(context).render(this, baseClass, id)
-}
+): DataList2 = DataList2(compact = compact, selectable = selectable).apply(context).render(this, baseClass, id)
 
 // ------------------------------------------------------ component
 
 public open class DataList2(private val compact: Boolean, private val selectable: Boolean) :
-    PatternFlyComponent<Unit>,
+    PatternFlyComponent<DataList2>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: DataListItemStore = DataListItemStore()
     private val headItems: MutableList<DataListItem2> = mutableListOf()
     private val tailItems: MutableList<DataListItem2> = mutableListOf()
-    private val singleSelection: RootStore<String?> = storeOf(null)
-    //    private val multiSelection: RootStore<List<String>> = storeOf(emptyList())
+    private val singleIdSelection: RootStore<String?> = storeOf(null)
+    private val multiIdSelection: MultiIdSelectionStore = MultiIdSelectionStore()
+
+    public val selectedId: Flow<String?>
+        get() = singleIdSelection.data
+
+    public val selectedIds: Flow<List<String>>
+        get() = multiIdSelection.data
 
     public fun item(
         id: String = Id.unique(ComponentType.DataList.id, "itm"),
         context: DataListItem2.() -> Unit
     ) {
-        (if (storeItems) tailItems else headItems).add(DataListItem2(id).apply(context))
+        (if (itemsInStore) tailItems else headItems).add(DataListItem2(id).apply(context))
     }
 
     public fun <T> items(
         values: Store<List<T>>,
-        selection: RootStore<T?> = storeOf(null),
+        selection: Store<T?> = storeOf(null),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: DataListItems.(T) -> DataListItem2
     ) {
-        items(values.data, selection, idProvider, display)
+        storeItems(values.data, selection, null, idProvider, display)
     }
 
     public fun <T> items(
         values: Flow<List<T>>,
-        selection: RootStore<T?> = storeOf(null),
+        selection: Store<T?> = storeOf(null),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: DataListItems.(T) -> DataListItem2
+    ) {
+        storeItems(values, selection, null, idProvider, display)
+    }
+
+    public fun <T> items(
+        values: Store<List<T>>,
+        selection: Store<List<T>> = storeOf(emptyList()),
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: DataListItems.(T) -> DataListItem2
+    ) {
+        storeItems(values.data, null, selection, idProvider, display)
+    }
+
+    public fun <T> items(
+        values: Flow<List<T>>,
+        selection: Store<List<T>> = storeOf(emptyList()),
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        display: DataListItems.(T) -> DataListItem2
+    ) {
+        storeItems(values, null, selection, idProvider, display)
+    }
+
+    private fun <T> storeItems(
+        values: Flow<List<T>>,
+        singleDataSelection: Store<T?>?,
+        multiDataSelection: Store<List<T>>?,
+        idProvider: IdProvider<T, String>,
         display: DataListItems.(T) -> DataListItem2
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
-                val idToModel = values.associateBy { idProvider(it) }
+                val idToData = values.associateBy { idProvider(it) }
                 itemStore.update(
                     values.map { value ->
                         DataListItems(idProvider(value)).run {
@@ -85,34 +119,47 @@ public open class DataList2(private val compact: Boolean, private val selectable
                         }
                     }
                 )
-                singleSelection.data.map { idToModel[it] } handledBy selection.update
-            }
-        }
-        storeItems = true
-    }
-
-    override fun render(context: RenderContext, baseClass: String?, id: String?) {
-        with(context) {
-            ul(
-                baseClass = classes {
-                    +ComponentType.DataList
-                    +("compact".modifier() `when` compact)
-                    +baseClass
-                },
-                id = id
-            ) {
-                markAs(ComponentType.DataList)
-                applyElement(this)
-                applyEvents(this)
-                attr("role", "list")
-
-                itemStore.data.map { items ->
-                    headItems + items + tailItems
-                }.renderEach(into = this, idProvider = { it.id }) { item ->
-                    renderItem(this, item)
+                // setup two way data bindings
+                singleDataSelection?.let { sds ->
+                    // id -> data
+                    singleIdSelection.data.map { idToData[it] } handledBy sds.update
+                    // data -> id
+                    sds.data.map { if (it != null) idProvider(it) else null } handledBy singleIdSelection.update
+                }
+                multiDataSelection?.let { mds ->
+                    // id -> data
+                    multiIdSelection.data.map { ids ->
+                        idToData.filterKeys { it in ids }
+                    }.map { it.values.toList() } handledBy mds.update
+                    // data -> id
+                    mds.data.map { data -> data.map { idProvider(it) } } handledBy multiIdSelection.update
                 }
             }
         }
+        itemsInStore = true
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?): DataList2 = with(context) {
+        ul(
+            baseClass = classes {
+                +ComponentType.DataList
+                +("compact".modifier() `when` compact)
+                +baseClass
+            },
+            id = id
+        ) {
+            markAs(ComponentType.DataList)
+            applyElement(this)
+            applyEvents(this)
+            attr("role", "list")
+
+            itemStore.data.map { items ->
+                headItems + items + tailItems
+            }.renderEach(into = this, idProvider = { it.id }) { item ->
+                renderItem(this, item)
+            }
+        }
+        return this@DataList2
     }
 
     private fun renderItem(context: RenderContext, item: DataListItem2): Tag<HTMLLIElement> = with(context) {
@@ -125,7 +172,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
             aria["labelledby"] = item.id
             if (selectable) {
                 attr("tabindex", 0)
-                val idSelected = singleSelection.data.map { it == item.id }
+                val idSelected = singleIdSelection.data.map { it == item.id }
                 classMap(
                     item.expandedStore.data.combine(idSelected) { expanded, selected ->
                         expanded to selected
@@ -136,7 +183,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
                         )
                     }
                 )
-                clicks.map { item.id } handledBy singleSelection.update
+                clicks.map { item.id } handledBy singleIdSelection.update
             } else {
                 with(item.expandedStore) {
                     toggleExpanded()
@@ -189,6 +236,8 @@ public open class DataList2(private val compact: Boolean, private val selectable
                                 attr("rowId", item.id)
                                 name(item.checkId)
                                 type("checkbox")
+                                checked(multiIdSelection.data.map { it.contains(item.id) })
+                                changes.states().map { checked -> item.id to checked } handledBy multiIdSelection.select
                             }
                         }
                     }
@@ -331,3 +380,16 @@ public class DataListItem2(public val id: String) :
 }
 
 internal class DataListItemStore : RootStore<List<DataListItem2>>(emptyList())
+
+internal class MultiIdSelectionStore : RootStore<List<String>>(emptyList()) {
+
+    val selectNone: Handler<Unit> = handle { emptyList() }
+
+    val selectAll: Handler<List<String>> = handle { _, ids -> ids }
+
+    val select: Handler<Pair<String, Boolean>> = handle { ids, (id, select) ->
+        if (select) ids + id else ids - id
+    }
+
+    val selectOnly: Handler<String> = handle { _, id -> listOf(id) }
+}
