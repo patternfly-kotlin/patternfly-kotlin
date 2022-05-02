@@ -159,7 +159,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
                 renderItem(this, item)
             }
         }
-        return this@DataList2
+        this@DataList2
     }
 
     private fun renderItem(context: RenderContext, item: DataListItem2): Tag<HTMLLIElement> = with(context) {
@@ -383,13 +383,7 @@ internal class DataListItemStore : RootStore<List<DataListItem2>>(emptyList())
 
 internal class MultiIdSelectionStore : RootStore<List<String>>(emptyList()) {
 
-    val selectNone: Handler<Unit> = handle { emptyList() }
-
-    val selectAll: Handler<List<String>> = handle { _, ids -> ids }
-
     val select: Handler<Pair<String, Boolean>> = handle { ids, (id, select) ->
         if (select) ids + id else ids - id
     }
-
-    val selectOnly: Handler<String> = handle { _, id -> listOf(id) }
 }

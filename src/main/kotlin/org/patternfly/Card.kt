@@ -3,6 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Hr
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.dom.html.TextElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
@@ -27,16 +28,16 @@ public fun RenderContext.card(
 // ------------------------------------------------------ component
 
 public open class Card(
-    private val variations: Array<out CardVariant>,
+    private val variants: Array<out CardVariant>,
     private val toggleRight: Boolean
-) : PatternFlyComponent<Unit>,
+) : PatternFlyComponent<TextElement>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
     WithExpandedStore by ExpandedStoreMixin() {
 
     private var components: MutableList<CardComponent<*>> = mutableListOf()
-    private val expandable: Boolean = CardVariant.expandable in variations
-    private val selectable: Boolean = CardVariant.selectable in variations
+    private val expandable: Boolean = CardVariant.expandable in variants
+    private val selectable: Boolean = CardVariant.selectable in variants
     private var selected: Flow<Boolean> = emptyFlow()
 
     public fun header(baseClass: String? = null, id: String? = null, context: CardHeader.() -> Unit) {
@@ -87,40 +88,38 @@ public open class Card(
         selected = value
     }
 
-    override fun render(context: RenderContext, baseClass: String?, id: String?) {
-        with(context) {
-            article(
-                baseClass = classes {
-                    +ComponentType.Card
-                    +variations.joinToString(" ") { it.modifier }
-                },
-                id = id
-            ) {
-                markAs(ComponentType.Card)
-                applyElement(this)
-                applyEvents(this)
-                classMap(
-                    expandedStore.data.combine(selected) { expanded, selected ->
-                        expanded to selected
-                    }.map { (expanded, selected) ->
-                        mapOf(
-                            "expanded".modifier() to expanded,
-                            "selected-raised".modifier() to selected
-                        )
-                    }
-                )
-                if (expandable) {
-                    components.find { it is CardHeader }?.render(this)
-                    div(baseClass = "card".component("expandable", "content")) {
-                        with(expandedStore) {
-                            hideIfCollapsed()
-                            toggleDisplayNone()
-                        }
-                        components.filterNot { it is CardHeader }.forEach { it.render(this) }
-                    }
-                } else {
-                    components.forEach { it.render(this) }
+    override fun render(context: RenderContext, baseClass: String?, id: String?): TextElement = with(context) {
+        article(
+            baseClass = classes {
+                +ComponentType.Card
+                +variants.joinToString(" ") { it.modifier }
+            },
+            id = id
+        ) {
+            markAs(ComponentType.Card)
+            applyElement(this)
+            applyEvents(this)
+            classMap(
+                expandedStore.data.combine(selected) { expanded, selected ->
+                    expanded to selected
+                }.map { (expanded, selected) ->
+                    mapOf(
+                        "expanded".modifier() to expanded,
+                        "selected-raised".modifier() to selected
+                    )
                 }
+            )
+            if (expandable) {
+                components.find { it is CardHeader }?.render(this)
+                div(baseClass = "card".component("expandable", "content")) {
+                    with(expandedStore) {
+                        hideIfCollapsed()
+                        toggleDisplayNone()
+                    }
+                    components.filterNot { it is CardHeader }.forEach { it.render(this) }
+                }
+            } else {
+                components.forEach { it.render(this) }
             }
         }
     }

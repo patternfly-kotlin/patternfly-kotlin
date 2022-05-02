@@ -124,7 +124,7 @@ public fun RenderContext.inlineLinkButton(
 @Suppress("TooManyFunctions")
 public open class Button(
     private val buttonType: ButtonType,
-    private val variations: Array<out ButtonVariant>
+    private val variants: Array<out ButtonVariant>
 ) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
@@ -314,7 +314,7 @@ public open class Button(
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
         val classes = classes {
             +ComponentType.Button
-            +variations.joinToString(" ") { it.modifier }
+            +variants.joinToString(" ") { it.modifier }
             +size?.modifier
             +("progress".modifier() `when` (loading != null))
             +baseClass
