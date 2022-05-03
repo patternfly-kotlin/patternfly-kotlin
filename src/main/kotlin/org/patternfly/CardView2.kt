@@ -90,7 +90,6 @@ public open class CardView2 :
 
 }
 
-
 // ------------------------------------------------------ item & store
 
 internal class CardViewItem(

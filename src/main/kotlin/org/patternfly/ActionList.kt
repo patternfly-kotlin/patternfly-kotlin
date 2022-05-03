@@ -23,7 +23,6 @@ public fun RenderContext.actionList(
 
 // ------------------------------------------------------ component
 
-
 /**
  * PatternFly [action list](https://www.patternfly.org/v4/components/action-list/design-guidelines) component.
  *
