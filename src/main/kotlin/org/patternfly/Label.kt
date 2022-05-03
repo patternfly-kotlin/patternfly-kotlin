@@ -129,6 +129,8 @@ public open class Label(
                 val contentId = Id.unique(ComponentType.Label.id, "cnt")
                 if (hrefValue != null || hrefFlow != null) {
                     a(baseClass = "label".component("content"), id = contentId) {
+                        hrefValue?.let { href(it) }
+                        hrefFlow?.let { href(it) }
                         renderIconAndTitle(this)
                     }
                 } else {
@@ -141,8 +143,12 @@ public open class Label(
                         icon("times".fas())
                         aria["label"] = "Remove"
                         aria["labelledby"] = contentId
-                        domNode.addEventListener(Events.click.name, this@Label.closeHandler)
-                        clicks.map { it } handledBy this@Label.closeStore.update
+                        element {
+                            domNode.addEventListener(Events.click.name, this@Label.closeHandler)
+                        }
+                        events {
+                            clicks.map { it } handledBy this@Label.closeStore.update
+                        }
                     }
                 }
             }
@@ -154,7 +160,10 @@ public open class Label(
             icon?.let { icn ->
                 span(baseClass = "label".component("icon")) { icn(this) }
             }
-            applyTitle(this)
+            span(baseClass = "label".component("text")) {
+
+                applyTitle(this)
+            }
         }
     }
 

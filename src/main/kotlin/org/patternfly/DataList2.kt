@@ -41,6 +41,7 @@ public fun RenderContext.dataList2(
 
 // ------------------------------------------------------ component
 
+@Suppress("TooManyFunctions")
 public open class DataList2(private val compact: Boolean, private val selectable: Boolean) :
     PatternFlyComponent<DataList2>,
     WithElement by ElementMixin(),

@@ -284,6 +284,7 @@ public class LabelItems(internal val id: String) {
 /**
  * DSL helper class to hold data necessary to create [Label] components when using [LabelGroup.labels] functions.
  */
+@Suppress("LongParameterList")
 public class LabelItem internal constructor(
     internal val staticItem: Boolean,
     internal val color: Color,

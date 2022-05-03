@@ -130,8 +130,12 @@ public open class Chip(title: String?) :
                         icon("times".fas())
                         aria["label"] = "Remove"
                         aria["labelledby"] = textId
-                        domNode.addEventListener(Events.click.name, this@Chip.closeHandler)
-                        clicks.map { it } handledBy this@Chip.closeStore.update
+                        element {
+                            domNode.addEventListener(Events.click.name, this@Chip.closeHandler)
+                        }
+                        events {
+                            clicks.map { it } handledBy this@Chip.closeStore.update
+                        }
                     }
                 }
             }
