@@ -52,6 +52,8 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Form("frm", "form".component()),
     Icon("icn"),
     InputGroup("ig", "input-group".component()),
+    Label("lbl", "label".component()),
+    LabelGroup("lbg", "label-group".component()),
     Masthead("mh", "masthead".component()),
     Menu("mu", "menu".component()),
     Navigation("nav", "nav".component()),

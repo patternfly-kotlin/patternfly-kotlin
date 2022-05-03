@@ -30,6 +30,7 @@ internal class ChipSample {
         render {
             chip {
                 +"Chip"
+                closable(true)
                 events {
                     closes handledBy notification(INFO, "Bye, bye!")
                 }

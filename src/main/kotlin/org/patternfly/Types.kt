@@ -85,6 +85,19 @@ public enum class Align(public val modifier: String) {
 }
 
 /**
+ * Color modifier for [Label]s.
+ */
+public enum class Color(public val modifier: String) {
+    GREY(""),
+    BLUE("blue".modifier()),
+    GREEN("green".modifier()),
+    ORANGE("orange".modifier()),
+    RED("red".modifier()),
+    PURPLE("purple".modifier()),
+    CYAN("cyan".modifier()),
+}
+
+/**
  * Enum for the [DataTable] selection mode.
  */
 public enum class DataTableSelection {
