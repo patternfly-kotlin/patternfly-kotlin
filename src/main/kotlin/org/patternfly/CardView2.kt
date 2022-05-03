@@ -3,10 +3,8 @@ package org.patternfly
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.patternfly.CardVariant.compact
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
