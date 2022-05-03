@@ -24,16 +24,6 @@ public fun RenderContext.cardView2(
     context: CardView2.() -> Unit = {}
 ): CardView2 = CardView2().apply(context).render(this, baseClass, id)
 
-internal fun testCardView() {
-    render {
-        cardView2 {
-            card(compact) {
-
-            }
-        }
-    }
-}
-
 // ------------------------------------------------------ component
 
 public open class CardView2 :
@@ -87,7 +77,6 @@ public open class CardView2 :
         }
         this@CardView2
     }
-
 }
 
 // ------------------------------------------------------ item & store
