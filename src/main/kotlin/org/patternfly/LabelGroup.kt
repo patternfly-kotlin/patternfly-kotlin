@@ -188,7 +188,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                         }.render(into = this) { (items, expanded) ->
                             val visibleLabels = if (expanded) items else items.take(limit)
                             visibleLabels.forEach { item ->
-                                li(baseClass = "chip-group".component("list-item")) {
+                                li(baseClass = "label-group".component("list-item")) {
                                     label(
                                         color = item.color,
                                         title = item.title,
@@ -235,7 +235,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                     div(baseClass = "label-group".component("close")) {
                         pushButton(plain) {
                             icon("times-circle".fas())
-                            aria["label"] = "Close chip group"
+                            aria["label"] = "Close label group"
                             domNode.addEventListener(Events.click.name, this@LabelGroup.closeHandler)
                             clicks.map { it } handledBy this@LabelGroup.closeStore.update
                         }
@@ -243,7 +243,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                 }
             }
 
-            // Remove this chip group, after last chip has been removed
+            // Remove this label group, after last label has been removed
             (MainScope() + itemStore.job).launch {
                 itemStore.remove.collect {
                     // The item is emitted before it is removed, so check for size == 1

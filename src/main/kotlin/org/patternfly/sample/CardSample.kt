@@ -16,7 +16,7 @@ internal class CardSample {
         render {
             card {
                 header {
-                    content {
+                    main {
                         img { src("./logo.svg") }
                     }
                     actions {

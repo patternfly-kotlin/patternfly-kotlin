@@ -99,16 +99,22 @@ public open class Card(
             markAs(ComponentType.Card)
             applyElement(this)
             applyEvents(this)
-            classMap(
-                expandedStore.data.combine(selected) { expanded, selected ->
-                    expanded to selected
-                }.map { (expanded, selected) ->
-                    mapOf(
-                        "expanded".modifier() to expanded,
-                        "selected-raised".modifier() to selected
-                    )
+            if (selectable && expandable) {
+                classMap(
+                    expandedStore.data.combine(selected) { expanded, selected ->
+                        expanded to selected
+                    }.map { (expanded, selected) ->
+                        mapOf(
+                            "expanded".modifier() to expanded,
+                            "selected-raised".modifier() to selected
+                        )
+                    }
+                )
+            } else if (expandable) {
+                with(expandedStore) {
+                    toggleExpanded()
                 }
-            )
+            }
             if (expandable) {
                 components.find { it is CardHeader }?.render(this)
                 div(baseClass = "card".component("expandable", "content")) {
@@ -161,8 +167,9 @@ public class CardHeader(
 ) : CardComponent<Div>(baseClass, id, {}) {
 
     private var title: CardTitle? = null
-    private var content: SubComponent<Div>? = null
     private var actions: SubComponent<Div>? = null
+    private var main: SubComponent<Div>? = null
+    private var content: SubComponent<Div>? = null
 
     public fun title(
         baseClass: String? = null,
@@ -172,20 +179,28 @@ public class CardHeader(
         this.title = CardTitle(baseClass, id ?: Id.unique(ComponentType.Card.id, "title"), context)
     }
 
-    public fun content(
-        baseClass: String? = null,
-        id: String? = null,
-        context: RenderContext.() -> Unit
-    ) {
-        this.content = SubComponent(baseClass, id, context)
-    }
-
     public fun actions(
         baseClass: String? = null,
         id: String? = null,
         context: RenderContext.() -> Unit
     ) {
         this.actions = SubComponent(baseClass, id, context)
+    }
+
+    public fun main(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit
+    ) {
+        this.main = SubComponent(baseClass, id, context)
+    }
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: RenderContext.() -> Unit
+    ) {
+        this.content = SubComponent(baseClass, id, context)
     }
 
     override fun render(context: RenderContext) {
@@ -212,15 +227,19 @@ public class CardHeader(
                         actions.context(this)
                     }
                 }
-                content?.let { main ->
-                    div(
-                        baseClass = classes("card".component("header", "main"), main.baseClass),
-                        id = main.id
-                    ) {
-                        main.context(this)
+                if (content != null) {
+                    content?.context?.invoke(this)
+                } else {
+                    main?.let { main ->
+                        div(
+                            baseClass = classes("card".component("header", "main"), main.baseClass),
+                            id = main.id
+                        ) {
+                            main.context(this)
+                        }
                     }
+                    title?.render(this)
                 }
-                title?.render(this)
                 if (expandable && toggleRight) {
                     renderToggle(this)
                 }
