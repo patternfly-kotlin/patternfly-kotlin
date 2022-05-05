@@ -9,7 +9,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -53,7 +52,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     WithEvents by EventMixin() {
 
     private var firstItem: Boolean = true
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: BreadcrumbItemStore = BreadcrumbItemStore()
     private val headItems: MutableList<BreadcrumbItem> = mutableListOf()
     private val tailItems: MutableList<BreadcrumbItem> = mutableListOf()
@@ -70,7 +69,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
      * Adds a [BreadcrumbItem].
      */
     public fun item(title: String? = null, context: BreadcrumbItem.() -> Unit = {}) {
-        (if (storeItems) tailItems else headItems).add(
+        (if (itemsInStore) tailItems else headItems).add(
             BreadcrumbItem(
                 Id.unique(ComponentType.Breadcrumb.id, "itm"),
                 title
@@ -108,7 +107,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
                 )
             }
         }
-        storeItems = true
+        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {

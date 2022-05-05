@@ -28,6 +28,7 @@ import org.w3c.dom.events.MouseEvent
 /**
  * @param limit the maximum number of labels shown at once
  * @param vertical whether to render the labels vertically
+ * @param compact whether to use compact style
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param context a lambda expression for setting up the component itself
@@ -35,11 +36,12 @@ import org.w3c.dom.events.MouseEvent
 public fun RenderContext.labelGroup(
     limit: Int = 3,
     vertical: Boolean = false,
+    compact: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     context: LabelGroup.() -> Unit = {}
 ) {
-    LabelGroup(limit, vertical).apply(context).render(this, baseClass, id)
+    LabelGroup(limit, vertical, compact).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component
@@ -52,7 +54,7 @@ public fun RenderContext.labelGroup(
  * @sample org.patternfly.sample.LabelGroupSample.staticItems
  * @sample org.patternfly.sample.LabelGroupSample.dynamicItems
  */
-public open class LabelGroup(private var limit: Int, private val vertical: Boolean) :
+public open class LabelGroup(private var limit: Int, private val vertical: Boolean, private val compact: Boolean) :
     PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
@@ -60,7 +62,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
     WithTitle by TitleMixin() {
 
     private var closable: Boolean = false
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: LabelItemStore = LabelItemStore()
     private val headItems: MutableList<LabelItem> = mutableListOf()
     private val tailItems: MutableList<LabelItem> = mutableListOf()
@@ -96,12 +98,11 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
         color: Color,
         title: String? = null,
         outline: Boolean = false,
-        compact: Boolean = false,
         baseClass: String? = null,
         id: String? = null,
         context: Label.() -> Unit = {}
     ) {
-        val items = if (storeItems) tailItems else headItems
+        val items = if (itemsInStore) tailItems else headItems
         items.add(
             LabelItem(
                 staticItem = true,
@@ -146,7 +147,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                 )
             }
         }
-        storeItems = true
+        itemsInStore = true
     }
 
     @Suppress("LongMethod", "ComplexMethod")
@@ -217,8 +218,12 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                             }
                             if (items.size > limit) {
                                 li(baseClass = "label-group".component("list-item")) {
-                                    button(baseClass = classes("label".component(), "overflow".modifier())) {
-                                        span(baseClass = "label".component("text")) {
+                                    button(baseClass = classes {
+                                        +"label".component()
+                                        +"overflow".modifier()
+                                        +("compact".modifier() `when` compact)
+                                    }) {
+                                        span(baseClass = "label".component("content")) {
                                             +(if (expanded) "Shoe less" else "${items.size - limit} more")
                                         }
                                         clicks handledBy expandedStore.toggle

@@ -34,7 +34,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: EntryStore = EntryStore()
     private val headEntries: MutableList<Entry> = mutableListOf()
     private val tailEntries: MutableList<Entry> = mutableListOf()
@@ -77,7 +77,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         id: String = entryId(componentType, "grp"),
         context: Group<I>.() -> Unit
     ) {
-        (if (storeItems) tailEntries else headEntries).add(
+        (if (itemsInStore) tailEntries else headEntries).add(
             Group(componentType, id, title, emptyList(), itemProvider).apply(context)
         )
     }
@@ -90,7 +90,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
         id: String = entryId(componentType, "itm"),
         context: I.() -> Unit = {}
     ) {
-        (if (storeItems) tailEntries else headEntries).add(
+        (if (itemsInStore) tailEntries else headEntries).add(
             itemProvider(id, title).apply(context)
         )
     }
@@ -99,7 +99,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
      * Adds a separator.
      */
     public fun separator() {
-        (if (storeItems) tailEntries else headEntries).add(Separator(componentType))
+        (if (itemsInStore) tailEntries else headEntries).add(Separator(componentType))
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class EntriesComponent<G : Toggle, I : Item<I>> internal constru
                 )
             }
         }
-        storeItems = true
+        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {

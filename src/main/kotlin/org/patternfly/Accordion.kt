@@ -8,7 +8,6 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -61,7 +60,7 @@ public open class Accordion(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: AccordionItemStore = AccordionItemStore()
     private val headItems: MutableList<AccordionItem> = mutableListOf()
     private val tailItems: MutableList<AccordionItem> = mutableListOf()
@@ -91,7 +90,7 @@ public open class Accordion(
      * Adds a [AccordionItem].
      */
     public fun item(title: String? = null, context: AccordionItem.() -> Unit = {}) {
-        (if (storeItems) tailItems else headItems).add(
+        (if (itemsInStore) tailItems else headItems).add(
             AccordionItem(
                 Id.unique(ComponentType.Accordion.id, "itm"),
                 title
@@ -129,7 +128,7 @@ public open class Accordion(
                 )
             }
         }
-        storeItems = true
+        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {

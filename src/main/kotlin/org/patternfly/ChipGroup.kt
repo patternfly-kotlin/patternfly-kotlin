@@ -58,7 +58,7 @@ public open class ChipGroup(private var limit: Int) :
     WithTitle by TitleMixin() {
 
     private var closable: Boolean = false
-    private var storeItems: Boolean = false
+    private var itemsInStore: Boolean = false
     private val itemStore: ChipItemStore = ChipItemStore()
     private val headItems: MutableList<ChipItem> = mutableListOf()
     private val tailItems: MutableList<ChipItem> = mutableListOf()
@@ -96,7 +96,7 @@ public open class ChipGroup(private var limit: Int) :
         id: String? = null,
         context: Chip.() -> Unit = {}
     ) {
-        val items = if (storeItems) tailItems else headItems
+        val items = if (itemsInStore) tailItems else headItems
         items.add(
             ChipItem(
                 staticItem = true,
@@ -138,7 +138,7 @@ public open class ChipGroup(private var limit: Int) :
                 )
             }
         }
-        storeItems = true
+        itemsInStore = true
     }
 
     @Suppress("LongMethod", "ComplexMethod")
