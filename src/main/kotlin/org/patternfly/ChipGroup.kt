@@ -114,7 +114,7 @@ public open class ChipGroup(private var limit: Int) :
     public fun <T> chips(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: ChipItems.(T) -> ChipItem
+        display: ChipItemScope.(T) -> ChipItem
     ) {
         chips(values.data, idProvider, display)
     }
@@ -125,13 +125,13 @@ public open class ChipGroup(private var limit: Int) :
     public fun <T> chips(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: ChipItems.(T) -> ChipItem
+        display: ChipItemScope.(T) -> ChipItem
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
-                        ChipItems(idProvider(value)).run {
+                        ChipItemScope(idProvider(value)).run {
                             display.invoke(this, value)
                         }
                     }
@@ -251,7 +251,7 @@ public open class ChipGroup(private var limit: Int) :
  *
  * @sample org.patternfly.sample.ChipGroupSample.dynamicItems
  */
-public class ChipItems(internal val id: String) {
+public class ChipItemScope(internal val id: String) {
 
     public fun chip(
         title: String? = null,

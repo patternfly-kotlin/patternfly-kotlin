@@ -123,7 +123,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
     public fun <T> labels(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: LabelItems.(T) -> LabelItem
+        display: LabelItemScope.(T) -> LabelItem
     ) {
         labels(values.data, idProvider, display)
     }
@@ -134,13 +134,13 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
     public fun <T> labels(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: LabelItems.(T) -> LabelItem
+        display: LabelItemScope.(T) -> LabelItem
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
-                        LabelItems(idProvider(value)).run {
+                        LabelItemScope(idProvider(value)).run {
                             display.invoke(this, value)
                         }
                     }
@@ -273,7 +273,7 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
  *
  * @sample org.patternfly.sample.LabelGroupSample.dynamicItems
  */
-public class LabelItems(internal val id: String) {
+public class LabelItemScope(internal val id: String) {
 
     public fun label(
         color: Color,
