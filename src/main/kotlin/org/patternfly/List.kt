@@ -2,11 +2,9 @@ package org.patternfly
 
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
-import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.render
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -37,18 +35,6 @@ public fun RenderContext.list(
     FormattedList(type, inline, bordered).apply(context).render(this, baseClass, id)
 }
 
-internal fun test() {
-    render {
-        list {
-            item { +"First item" }
-            items(storeOf(listOf("1", "2", "2"))) {data ->
-                item { +data }
-            }
-            item { +"Lat item" }
-        }
-    }
-}
-
 // ------------------------------------------------------ component
 
 /**
@@ -71,12 +57,13 @@ public open class FormattedList(
     private val tailItems: MutableList<ListItem> = mutableListOf()
 
     public fun item(
+        text: String? = null,
         baseClass: String? = null,
         id: String? = null,
         context: ListItem.() -> Unit = {}
     ) {
         (if (itemsInStore) tailItems else headItems).add(
-            ListItem(baseClass, id ?: Id.unique(ComponentType.List.id)).apply(context),
+            ListItem(text, baseClass, id).apply(context),
         )
     }
 
@@ -158,10 +145,18 @@ public open class FormattedList(
                         } else {
                             if (item.icon != null) {
                                 span(baseClass = "list".component("item", "text")) {
-                                    item.applyTitle(this)
+                                    if (item.text != null) {
+                                        +item.text
+                                    } else {
+                                        item.applyTitle(this)
+                                    }
                                 }
                             } else {
-                                item.applyTitle(this)
+                                if (item.text != null) {
+                                    +item.text
+                                } else {
+                                    item.applyTitle(this)
+                                }
                             }
                         }
                     }
@@ -197,15 +192,17 @@ public enum class ListType {
 public class ListItemScope(internal val id: String) {
 
     public fun item(
+        text: String? = null,
         baseClass: String? = null,
         id: String? = null,
         context: ListItem.() -> Unit = {}
-    ): ListItem = ListItem(baseClass, id ?: this.id).apply(context)
+    ): ListItem = ListItem(text, baseClass, id ?: this.id).apply(context)
 }
 
 public class ListItem internal constructor(
+    internal val text: String?,
     internal val baseClass: String?,
-    internal val id: String
+    internal val id: String?
 ) : WithTitle by TitleMixin() {
 
     internal var icon: (RenderContext.() -> Unit)? = null
