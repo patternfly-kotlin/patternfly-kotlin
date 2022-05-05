@@ -218,11 +218,13 @@ public open class LabelGroup(private var limit: Int, private val vertical: Boole
                             }
                             if (items.size > limit) {
                                 li(baseClass = "label-group".component("list-item")) {
-                                    button(baseClass = classes {
-                                        +"label".component()
-                                        +"overflow".modifier()
-                                        +("compact".modifier() `when` compact)
-                                    }) {
+                                    button(
+                                        baseClass = classes {
+                                            +"label".component()
+                                            +"overflow".modifier()
+                                            +("compact".modifier() `when` compact)
+                                        }
+                                    ) {
                                         span(baseClass = "label".component("content")) {
                                             +(if (expanded) "Shoe less" else "${items.size - limit} more")
                                         }
