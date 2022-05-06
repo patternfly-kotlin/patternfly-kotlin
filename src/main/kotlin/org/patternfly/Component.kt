@@ -65,6 +65,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Select("sel", "select".component()),
     Sidebar("sb", "page".component("sidebar")),
     Skeleton("sk", "skeleton".component()),
+    Slider("sld", "slider".component()),
     Spinner("sp", "spinner".component()),
     Switch("sw", "switch".component()),
     Tabs("tbs"),

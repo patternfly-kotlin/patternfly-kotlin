@@ -25,9 +25,9 @@ public interface WithTitle {
 
     public fun <T> title(title: Flow<T>)
 
-    public fun Flow<String>.asText()
+    public fun Flow<String>.renderText()
 
-    public fun <T> Flow<T>.asText()
+    public fun <T> Flow<T>.renderText()
 
     public fun applyTitle(target: RenderContext)
 }
@@ -55,11 +55,11 @@ internal class TitleMixin : WithTitle {
         flowTitle = title.map { it.toString() }
     }
 
-    override fun Flow<String>.asText() {
+    override fun Flow<String>.renderText() {
         flowTitle = this
     }
 
-    override fun <T> Flow<T>.asText() {
+    override fun <T> Flow<T>.renderText() {
         flowTitle = this.map { it.toString() }
     }
 
@@ -69,7 +69,7 @@ internal class TitleMixin : WithTitle {
                 if (staticTitle != null) {
                     +staticTitle!!
                 } else {
-                    flowTitle!!.asText()
+                    flowTitle!!.renderText()
                 }
             }
         }

@@ -46,8 +46,7 @@ public open class FormattedList(
     private val type: ListType,
     private val inline: Boolean,
     private val bordered: Boolean
-) :
-    PatternFlyComponent<Unit>,
+) : PatternFlyComponent<Unit>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 

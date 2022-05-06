@@ -87,7 +87,7 @@ public open class EmptyState(
 
     public fun loading(loading: Flow<Boolean>, loadingTitle: Flow<String>) {
         this.loading = loading
-        this.loadingTitle = { span { loadingTitle.asText() } }
+        this.loadingTitle = { span { loadingTitle.renderText() } }
     }
 
     public fun loading(loading: Flow<Boolean>, loadingTitle: RenderContext.() -> Unit) {

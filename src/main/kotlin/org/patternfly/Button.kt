@@ -222,7 +222,7 @@ public open class Button(
      */
     public fun loading(loading: Flow<Boolean>, loadingTitle: Flow<String>) {
         this.loading = loading
-        this.loadingTitle = { span { loadingTitle.asText() } }
+        this.loadingTitle = { span { loadingTitle.renderText() } }
     }
 
     /**
@@ -276,11 +276,11 @@ public open class Button(
         assignDynamicTitle(title.map { it.toString() })
     }
 
-    override fun Flow<String>.asText() {
+    override fun Flow<String>.renderText() {
         assignDynamicTitle(this)
     }
 
-    override fun <T> Flow<T>.asText() {
+    override fun <T> Flow<T>.renderText() {
         assignDynamicTitle(this.map { it.toString() })
     }
 
@@ -297,7 +297,7 @@ public open class Button(
 
     private fun assignDynamicTitle(title: Flow<String>) {
         this.title = {
-            span { title.asText() }
+            span { title.renderText(into = this) }
         }
         iconAndTitle = if (icon == null) TITLE_ONLY else ICON_FIRST
     }

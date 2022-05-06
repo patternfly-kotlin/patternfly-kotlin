@@ -122,7 +122,7 @@ internal class ButtonSample {
                 +"Download with progress"
                 loading(download.inProgress) {
                     div(baseClass = "fmt-percentage") {
-                        download.percentage.asText()
+                        download.percentage.renderText()
                     }
                 }
             } handledBy download.start
