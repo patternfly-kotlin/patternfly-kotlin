@@ -415,9 +415,11 @@ public open class Slider(
                             }
                             icon("fa-fw") {
                                 element {
-                                    className(this@Slider.disabled.data.map {
-                                        if (it) "lock".fas() else "lock-open".fas()
-                                    })
+                                    className(
+                                        this@Slider.disabled.data.map {
+                                            if (it) "lock".fas() else "lock-open".fas()
+                                        }
+                                    )
                                 }
                             }
                             clicks.map { !this@Slider.disabled.current } handledBy this@Slider.disabled.update
