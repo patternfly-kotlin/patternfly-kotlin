@@ -1,8 +1,13 @@
 package org.patternfly.sample
 
 import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.Window.clicks
 import dev.fritz2.dom.html.render
+import org.patternfly.Severity
+import org.patternfly.Severity.INFO
 import org.patternfly.Step
+import org.patternfly.fas
+import org.patternfly.notification
 import org.patternfly.slider
 import org.patternfly.step
 
@@ -12,9 +17,7 @@ internal class SliderSample {
         render {
             slider(storeOf(23), 0..100)
             slider(storeOf(15), -25..75 step 10) {
-                steps { step, _, _, _ ->
-                    step % 25 == 0
-                }
+                steps { it % 25 == 0 }
                 showTicks()
             }
         }
@@ -41,6 +44,35 @@ internal class SliderSample {
                     Step(8, "8"),
                 )
             )
+        }
+    }
+
+    fun valueInput() {
+        render {
+            slider(storeOf(60), 0..100) {
+                valueInput()
+                valueLabel { "%" }
+            }
+        }
+    }
+
+    fun actions() {
+        render {
+            slider(storeOf(25), 0..100) {
+                headAction { increase() }
+                tailAction {
+                    decrease()
+                    action {
+                        icon("user".fas())
+                        clicks handledBy notification(INFO, "Slider action")
+                    }
+                }
+            }
+            slider(storeOf(60), 0..100) {
+                valueInput()
+                valueLabel { "%" }
+                tailAction { lock() }
+            }
         }
     }
 }

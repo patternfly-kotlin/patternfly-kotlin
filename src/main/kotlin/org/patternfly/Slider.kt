@@ -2,11 +2,17 @@ package org.patternfly
 
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.html.Input
+import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
+import dev.fritz2.dom.html.shortcutOf
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import org.patternfly.ButtonVariant.plain
+import org.w3c.dom.HTMLInputElement
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -18,6 +24,7 @@ import kotlin.math.roundToInt
  *
  * @param value the initial value
  * @param steps the possible values
+ * @param disabled whether the slider is disabled
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param context a lambda expression for setting up the component itself
@@ -27,6 +34,7 @@ import kotlin.math.roundToInt
 public fun RenderContext.slider(
     value: Store<Int> = storeOf(0),
     steps: IntProgression,
+    disabled: Store<Boolean> = storeOf(false),
     baseClass: String? = null,
     id: String? = null,
     context: Slider.() -> Unit = {}
@@ -36,16 +44,18 @@ public fun RenderContext.slider(
     progression = Step(steps.first, steps.first.toString())..Step(steps.last, steps.last.toString()) step steps.step,
     showBoundaries = SHOW_PREDICATE,
     showSteps = HIDE_PREDICATE,
-    showTicks = HIDE_PREDICATE
+    showTicks = HIDE_PREDICATE,
+    disabled = disabled
 ).apply(context).render(this, baseClass, id)
 
 /**
  * Creates a continuous slider using a step progression.
  * The step progression can have custom labels for the boundaries and uses an int progression for the steps in between.
- * Boundaries are shown as defined by the steps, steps and ticks are hidden by default.
+ * Boundaries are shown, steps and ticks are hidden by default.
  *
  * @param value the initial value
  * @param steps the possible values
+ * @param disabled whether the slider is disabled
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param context a lambda expression for setting up the component itself
@@ -55,6 +65,7 @@ public fun RenderContext.slider(
 public fun RenderContext.slider(
     value: Store<Int> = storeOf(0),
     steps: StepProgression,
+    disabled: Store<Boolean> = storeOf(false),
     baseClass: String? = null,
     id: String? = null,
     context: Slider.() -> Unit = {}
@@ -62,9 +73,10 @@ public fun RenderContext.slider(
     value = value,
     steps = emptyList(),
     progression = steps,
-    showBoundaries = LABEL_PREDICATE,
+    showBoundaries = SHOW_PREDICATE,
     showSteps = HIDE_PREDICATE,
-    showTicks = HIDE_PREDICATE
+    showTicks = HIDE_PREDICATE,
+    disabled = disabled
 ).apply(context).render(this, baseClass, id)
 
 /**
@@ -73,6 +85,7 @@ public fun RenderContext.slider(
  *
  * @param value the initial value
  * @param steps the possible values
+ * @param disabled whether the slider is disabled
  * @param baseClass optional CSS class that should be applied to the element
  * @param id the ID of the element
  * @param context a lambda expression for setting up the component itself
@@ -82,6 +95,7 @@ public fun RenderContext.slider(
 public fun RenderContext.slider(
     value: Store<Int> = storeOf(0),
     steps: List<Step>,
+    disabled: Store<Boolean> = storeOf(false),
     baseClass: String? = null,
     id: String? = null,
     context: Slider.() -> Unit = {}
@@ -89,9 +103,10 @@ public fun RenderContext.slider(
     value = value,
     steps = steps,
     progression = StepProgression.EMPTY,
-    showBoundaries = LABEL_PREDICATE,
-    showSteps = LABEL_PREDICATE,
-    showTicks = SHOW_PREDICATE
+    showBoundaries = SHOW_PREDICATE,
+    showSteps = SHOW_PREDICATE,
+    showTicks = SHOW_PREDICATE,
+    disabled = disabled
 ).apply(context).render(this, baseClass, id)
 
 // ------------------------------------------------------ component
@@ -101,6 +116,7 @@ public fun RenderContext.slider(
  *
  * A slider provides a quick and effective way for users to set and adjust a numeric value from a defined range of values.
  */
+@Suppress("TooManyFunctions")
 public open class Slider(
     private var value: Store<Int>,
     private val steps: List<Step>,
@@ -108,11 +124,11 @@ public open class Slider(
     private var showBoundaries: StepPredicate,
     private var showSteps: StepPredicate,
     private var showTicks: StepPredicate,
+    private var disabled: Store<Boolean>,
 ) : PatternFlyComponent<Slider>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var disabled: Flow<Boolean> = emptyFlow()
     private val boundary: IntRange = if (steps.isNotEmpty())
         steps.first().value..steps.last().value
     else if (!progression.isEmpty())
@@ -120,9 +136,19 @@ public open class Slider(
     else
         IntRange.EMPTY
 
+    private var floatingValueInput: Boolean = false
+    private var valueInput: SubComponent<Input>? = null
+    private var valueLabel: ((Int) -> String)? = null
+    private var valueWidth: Store<Int> = storeOf(1)
+
+    private val headActions: SliderActions = SliderActions()
+    private val tailActions: SliderActions = SliderActions()
+
     init {
         // make sure initial value is valid
-        value.update(coerceIn(value.current))
+        val validValue = coerceIn(value.current)
+        value.update(validValue)
+        valueWidth.update(validValue.toString().length)
     }
 
     public fun hideBoundaries() {
@@ -164,25 +190,53 @@ public open class Slider(
     /**
      * Disables the slider.
      */
-    public fun disabled(value: Boolean) {
-        disabled = flowOf(value)
+    public fun disable(value: Boolean) {
+        disabled.update(value)
     }
 
-    /**
-     * Disables the slider based on the values in the specified [Flow].
-     */
-    public fun disabled(value: Flow<Boolean>) {
-        disabled = value
+    public fun valueInput(
+        floating: Boolean = false,
+        baseClass: String? = null,
+        id: String? = null,
+        context: Input.() -> Unit = {}
+    ) {
+        this.floatingValueInput = floating
+        this.valueInput = SubComponent(baseClass, id, context)
     }
 
+    public fun valueLabel(label: String) {
+        valueLabel { _ -> label }
+    }
+
+    public fun valueLabel(label: (Int) -> String) {
+        this.valueLabel = label
+    }
+
+    public fun headAction(context: SliderActions.() -> Unit) {
+        context(headActions)
+    }
+
+    public fun tailAction(context: SliderActions.() -> Unit) {
+        context(tailActions)
+    }
+
+    @Suppress("ComplexMethod", "LongMethod")
     override fun render(context: RenderContext, baseClass: String?, id: String?): Slider = with(context) {
         div(baseClass = classes(ComponentType.Slider, baseClass), id = id) {
             markAs(ComponentType.Slider)
             applyElement(this)
             applyEvents(this)
-            classMap(disabled.map { mapOf("disabled".modifier() to it) })
-            inlineStyle(value.data.map { "--pf-c-slider--value: ${percent(it)}%" })
+            classMap(disabled.data.map { mapOf("disabled".modifier() to it) })
+            val style = if (valueInput != null) {
+                value.data.combine(valueWidth.data) { value, width -> value to width }.map { (value, width) ->
+                    "--pf-c-slider--value: ${percent(value)}%; --pf-c-slider__value--c-form-control--width-chars:$width"
+                }
+            } else {
+                value.data.map { "--pf-c-slider--value: ${percent(it)}%" }
+            }
+            inlineStyle(style)
 
+            renderActions(this, headActions)
             div(baseClass = "slider".component("main")) {
                 div(baseClass = "slider".component("rail")) {
                     div(baseClass = "slider".component("rail-track")) {}
@@ -214,13 +268,35 @@ public open class Slider(
                     }
                 }
                 div(baseClass = "slider".component("thumb")) {
-                    aria["valuemin"] = 0
-                    aria["valuemin"] = 8
+                    if (steps.isNotEmpty()) {
+                        aria["valuemin"] = steps.first().value
+                        aria["valuemin"] = steps.last().value
+                    } else if (!progression.isEmpty()) {
+                        aria["valuemin"] = progression.first
+                        aria["valuemin"] = progression.last
+                    }
                     attr("aria-valuenow", value)
                     attr("role", "slider")
                     attr("tabindex", 0)
                 }
+
+                if (floatingValueInput) {
+                    valueInput?.let { vi ->
+                        div(baseClass = classes("slider".component("value"), "floating".modifier())) {
+                            renderValueInput(this, vi)
+                        }
+                    }
+                }
             }
+
+            if (!floatingValueInput) {
+                valueInput?.let { vi ->
+                    div(baseClass = "slider".component("value")) {
+                        renderValueInput(this, vi)
+                    }
+                }
+            }
+            renderActions(this, tailActions)
         }
         this@Slider
     }
@@ -230,18 +306,126 @@ public open class Slider(
             div(baseClass = "slider".component("step")) {
                 classMap(value.data.map { mapOf("active".modifier() to (it >= step)) })
                 inlineStyle("--pf-c-slider__step--Left: ${percent(step)}%")
-                if (showTicks(step, label, firstStep, lastStep)) {
+                if (showTicks(step)) {
                     div(baseClass = "slider".component("step", "tick")) {}
                 }
-                val showStep = if (firstStep || lastStep)
-                    showBoundaries(step, label, firstStep, lastStep)
-                else
-                    showSteps(step, label, firstStep, lastStep)
-                if (showStep) {
-                    div(baseClass = "slider".component("step", "label")) {
-                        +label
-                        inlineStyle("cursor:pointer")
-                        clicks.map { step } handledBy value.update
+                if (label.isNotBlank()) {
+                    val showStep = if (firstStep || lastStep) showBoundaries(step) else showSteps(step)
+                    if (showStep) {
+                        div(baseClass = "slider".component("step", "label")) {
+                            +label
+                            inlineStyle("cursor:pointer")
+                            clicks.map { step } handledBy value.update
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderValueInput(context: RenderContext, vi: SubComponent<Input>) {
+        with(context) {
+            if (valueLabel != null) {
+                valueLabel?.let { vl ->
+                    // TODO Replace with input group component
+                    div(baseClass = "input-group".component()) {
+                        renderInputElement(this, vi)
+                        span(baseClass = classes("input-group".component("text"), "plain".modifier())) {
+                            value.data.map { vl(it) }.renderText(into = this)
+                        }
+                    }
+                }
+            } else {
+                renderInputElement(this, vi)
+            }
+        }
+    }
+
+    private fun renderInputElement(context: RenderContext, vi: SubComponent<Input>) {
+        with(context) {
+            input(
+                baseClass = classes("form-control".component(), vi.baseClass),
+                id = vi.id
+            ) {
+                type("number")
+                aria["label"] = "Slider value input"
+                disabled(disabled.data)
+
+                // update value input with value store
+                value(value.data.map { it.toString() })
+
+                // update value width on any keystroke...
+                keyups.map {
+                    it.target.unsafeCast<HTMLInputElement>().value.ifEmpty { " " }.length
+                } handledBy valueWidth.update
+                // ...and when the value has been changed externally
+                value.data.map {
+                    it.toString().length
+                } handledBy valueWidth.update
+
+                // update value on 'Enter'
+                keyups.events.filter { shortcutOf(it) == Keys.Enter }.map {
+                    it.preventDefault()
+                    it.target.unsafeCast<HTMLInputElement>().value.toIntOrNull()
+                }.filterNotNull().map {
+                    coerceIn(it)
+                } handledBy value.update
+
+                // update value on blur
+                blurs.map {
+                    it.target.unsafeCast<HTMLInputElement>().value.toIntOrNull()
+                }.filterNotNull().map {
+                    coerceIn(it)
+                } handledBy value.update
+
+                // ignore changes! changes happen only by pressing 'Enter' and on blur
+                changes.events.onEach { it.preventDefault() }
+            }
+        }
+    }
+
+    private fun renderActions(context: RenderContext, actions: SliderActions) {
+        if (actions.shouldRender) {
+            with(context) {
+                div(baseClass = "slider".component("actions")) {
+                    actions.decrease?.let { dec ->
+                        pushButton(plain, baseClass = dec.baseClass, id = dec.id) {
+                            element { aria["label"] = "Minus" }
+                            icon(classes("minus".fas(), "fa-fw")!!)
+                            clicks.map {
+                                this@Slider.coerceIn(this@Slider.value.current - 1)
+                            } handledBy this@Slider.value.update
+                            dec.context(this)
+                        }
+                    }
+                    actions.increase?.let { inc ->
+                        pushButton(plain, baseClass = inc.baseClass, id = inc.id) {
+                            element { aria["label"] = "Plus" }
+                            icon(classes("plus".fas(), "fa-fw")!!)
+                            clicks.map {
+                                this@Slider.coerceIn(this@Slider.value.current + 1)
+                            } handledBy this@Slider.value.update
+                            inc.context(this)
+                        }
+                    }
+                    actions.lock?.let { lck ->
+                        pushButton(plain, baseClass = lck.baseClass, id = lck.id) {
+                            element {
+                                aria["label"] = this@Slider.disabled.data.map { if (it) "Locked" else "Unlocked" }
+                            }
+                            icon("fa-fw") {
+                                element {
+                                    className(this@Slider.disabled.data.map { if (it) "lock".fas() else "lock-open".fas() })
+                                }
+                            }
+                            clicks.map { !this@Slider.disabled.current } handledBy this@Slider.disabled.update
+                            lck.context(this)
+                        }
+                    }
+                    for (action in actions.actions) {
+                        pushButton(plain, baseClass = action.baseClass, id = action.id) {
+                            action.context(this)
+                        }
                     }
                 }
             }
@@ -283,6 +467,7 @@ public open class Slider(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun percent(current: Int): Double {
         val diff = abs(boundary.first)
         val percent = (current + diff).toDouble() / (boundary.last + diff).toDouble() * 100
@@ -290,15 +475,59 @@ public open class Slider(
     }
 }
 
-public typealias StepPredicate = (step: Int, label: String, first: Boolean, last: Boolean) -> Boolean
+public class SliderActions {
 
-internal val SHOW_PREDICATE: StepPredicate = { _, _, _, _ -> true }
+    internal var increase: SubComponent<Button>? = null
+    internal var decrease: SubComponent<Button>? = null
+    internal var lock: SubComponent<Button>? = null
+    internal var disabled: Store<Boolean> = storeOf(false)
+    internal val actions: MutableList<SubComponent<Button>> = mutableListOf()
 
-internal val LABEL_PREDICATE: StepPredicate = { _, label, _, _ -> label.isNotBlank() }
+    internal val shouldRender: Boolean
+        get() = increase != null || decrease != null || lock != null || actions.isNotEmpty()
 
-internal val HIDE_PREDICATE: StepPredicate = { _, _, _, _ -> false }
+    public fun increase(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit = {}
+    ) {
+        this.increase = SubComponent(baseClass, id, context)
+    }
+
+    public fun decrease(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit = {}
+    ) {
+        this.decrease = SubComponent(baseClass, id, context)
+    }
+
+    public fun lock(
+        disabled: Store<Boolean>? = null,
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit = {}
+    ) {
+        disabled?.let { this.disabled = it }
+        this.lock = SubComponent(baseClass, id, context)
+    }
+
+    public fun action(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Button.() -> Unit
+    ) {
+        actions.add(SubComponent(baseClass, id, context))
+    }
+}
 
 // ------------------------------------------------------ step
+
+public typealias StepPredicate = (step: Int) -> Boolean
+
+internal val SHOW_PREDICATE: StepPredicate = { _ -> true }
+
+internal val HIDE_PREDICATE: StepPredicate = { _ -> false }
 
 public infix fun StepProgression.step(step: Int): StepProgression {
     require(step > 0) { "Step must be positive, was $step" }
@@ -310,7 +539,7 @@ public data class StepProgression(val first: Step, val last: Step, val step: Int
     public fun isEmpty(): Boolean =
         if (step > 0) first.value > last.value else first.value < last.value
 
-    // We don't need a Step class for each step, just start, end and an int progression in between
+    // we don't need a Step class for each step, just start, end and an int progression in between
     internal val values: IntProgression = first.value..last.value step step
 
     internal companion object {
@@ -320,5 +549,5 @@ public data class StepProgression(val first: Step, val last: Step, val step: Int
 
 public data class Step(val value: Int, val label: String = "") {
 
-    public operator fun rangeTo(endInclusive: Step): StepProgression = StepProgression(this, endInclusive)
+    public operator fun rangeTo(last: Step): StepProgression = StepProgression(this, last)
 }
