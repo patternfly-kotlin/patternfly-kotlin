@@ -3,7 +3,6 @@ package org.patternfly.sample
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Window.clicks
 import dev.fritz2.dom.html.render
-import org.patternfly.Severity
 import org.patternfly.Severity.INFO
 import org.patternfly.Step
 import org.patternfly.fas
@@ -41,7 +40,7 @@ internal class SliderSample {
                     Step(5),
                     Step(6, "6"),
                     Step(7),
-                    Step(8, "8"),
+                    Step(8, "8")
                 )
             )
         }

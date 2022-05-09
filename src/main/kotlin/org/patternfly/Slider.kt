@@ -277,7 +277,7 @@ public open class Slider(
                     }
                     attr("aria-valuenow", value)
                     attr("role", "slider")
-                    attr("tabindex", 0)
+                    attr("tabindex", disabled.data.map { if (it) -1 else 0 })
                 }
 
                 if (floatingValueInput) {
