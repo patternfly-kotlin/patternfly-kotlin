@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.patternfly.ButtonVariant.plain
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
-import kotlin.math.abs
+import org.w3c.dom.events.MouseEvent
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 // ------------------------------------------------------ factory
@@ -141,8 +143,11 @@ public open class Slider(
     private var valueLabel: ((Int) -> String)? = null
     private var valueWidth: Store<Int> = storeOf(1)
 
-    private val headActions: SliderActions = SliderActions()
-    private val tailActions: SliderActions = SliderActions()
+    private val leftActions: SliderActions = SliderActions()
+    private val rightActions: SliderActions = SliderActions()
+
+    private lateinit var thumbElement: HTMLDivElement
+    private lateinit var railElement: HTMLDivElement
 
     init {
         // make sure initial value is valid
@@ -150,6 +155,8 @@ public open class Slider(
         value.update(validValue)
         valueWidth.update(validValue.toString().length)
     }
+
+    // ------------------------------------------------------ slider API
 
     public fun hideBoundaries() {
         boundaries(HIDE_PREDICATE)
@@ -212,13 +219,15 @@ public open class Slider(
         this.valueLabel = label
     }
 
-    public fun headAction(context: SliderActions.() -> Unit) {
-        context(headActions)
+    public fun leftActions(context: SliderActions.() -> Unit) {
+        context(leftActions)
     }
 
-    public fun tailAction(context: SliderActions.() -> Unit) {
-        context(tailActions)
+    public fun rightActions(context: SliderActions.() -> Unit) {
+        context(rightActions)
     }
+
+    // ------------------------------------------------------ render methods
 
     @Suppress("ComplexMethod", "LongMethod")
     override fun render(context: RenderContext, baseClass: String?, id: String?): Slider = with(context) {
@@ -236,9 +245,11 @@ public open class Slider(
             }
             inlineStyle(style)
 
-            renderActions(this, headActions)
+            renderActions(this, leftActions)
             div(baseClass = "slider".component("main")) {
                 div(baseClass = "slider".component("rail")) {
+                    railElement = domNode
+                    clicks.map { onRailClick(it) } handledBy value.update
                     div(baseClass = "slider".component("rail-track")) {}
                 }
                 div(baseClass = "slider".component("steps")) {
@@ -268,6 +279,7 @@ public open class Slider(
                     }
                 }
                 div(baseClass = "slider".component("thumb")) {
+                    thumbElement = domNode
                     if (steps.isNotEmpty()) {
                         aria["valuemin"] = steps.first().value
                         aria["valuemin"] = steps.last().value
@@ -296,7 +308,7 @@ public open class Slider(
                     }
                 }
             }
-            renderActions(this, tailActions)
+            renderActions(this, rightActions)
         }
         this@Slider
     }
@@ -436,6 +448,20 @@ public open class Slider(
         }
     }
 
+    // ------------------------------------------------------ event handler
+
+    private fun onRailClick(event: MouseEvent): Int {
+        val x = event.clientX
+        val left = railElement.getBoundingClientRect().left.toInt()
+        val end = railElement.offsetWidth - (thumbElement.offsetWidth / 2)
+        val position = (x - left).coerceIn(0..end)
+        val percentage = (position.toDouble() / end.toDouble())
+        val value = (((boundary.last - boundary.first).absoluteValue) * percentage).roundToInt() + boundary.first
+        return coerceIn(value)
+    }
+
+    // ------------------------------------------------------ helper methods
+
     private fun coerceIn(value: Int): Int = if (steps.isNotEmpty()) {
         val values = steps.map { it.value }.toIntArray().sorted()
         if (value !in values) {
@@ -473,7 +499,7 @@ public open class Slider(
 
     @Suppress("MagicNumber")
     private fun percent(current: Int): Double {
-        val diff = abs(boundary.first)
+        val diff = if (boundary.first < 0) boundary.first.absoluteValue else boundary.first * -1
         val percent = (current + diff).toDouble() / (boundary.last + diff).toDouble() * 100
         return (percent * 100.0).roundToInt() / 100.0 // round to two decimal places
     }

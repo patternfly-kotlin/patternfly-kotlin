@@ -59,8 +59,8 @@ internal class SliderSample {
     fun actions() {
         render {
             slider(storeOf(25), 0..100) {
-                headAction { increase() }
-                tailAction {
+                leftActions { increase() }
+                rightActions {
                     decrease()
                     action {
                         icon("user".fas())
@@ -71,7 +71,7 @@ internal class SliderSample {
             slider(storeOf(60), 0..100) {
                 valueInput()
                 valueLabel { "%" }
-                tailAction { lock() }
+                rightActions { lock() }
             }
         }
     }
