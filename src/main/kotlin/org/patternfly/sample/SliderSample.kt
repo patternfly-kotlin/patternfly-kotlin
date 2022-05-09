@@ -31,7 +31,8 @@ internal class SliderSample {
     fun customSteps() {
         render {
             slider(
-                storeOf(3), listOf(
+                storeOf(3),
+                listOf(
                     Step(0, "0"),
                     Step(1),
                     Step(2, "2"),
