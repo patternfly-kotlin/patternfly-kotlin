@@ -16,7 +16,7 @@ internal class SliderSample {
         render {
             slider(storeOf(23), 0..100)
             slider(storeOf(15), -25..75 step 10) {
-                steps { it % 25 == 0 }
+                showSteps { it % 25 == 0 }
                 showTicks()
             }
         }
@@ -50,8 +50,7 @@ internal class SliderSample {
     fun valueInput() {
         render {
             slider(storeOf(60), 0..100) {
-                valueInput()
-                valueLabel { "%" }
+                valueInput(label = "%")
             }
         }
     }
@@ -68,10 +67,13 @@ internal class SliderSample {
                     }
                 }
             }
+            val disabled = storeOf(false)
             slider(storeOf(60), 0..100) {
-                valueInput()
-                valueLabel { "%" }
-                rightActions { lock() }
+                disabled(disabled.data)
+                valueInput(label = "%")
+                rightActions {
+                    lock(disabled)
+                }
             }
         }
     }
