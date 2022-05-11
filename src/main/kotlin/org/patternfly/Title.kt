@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.H
 import dev.fritz2.dom.html.RenderContext
 import org.patternfly.Level.H1
 import org.patternfly.Level.H2
@@ -46,8 +45,6 @@ public open class Title(private val level: Level, private val size: Size, title:
     WithElement by ElementMixin(),
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
-
-    private var content: (H.() -> Unit)? = null
 
     init {
         title?.let { title(it) }

@@ -1,25 +1,23 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import kotlinx.coroutines.Job
-import org.w3c.dom.HTMLDivElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates a [TextContent] component.
  *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param content a lambda expression for setting up the text content
  */
 public fun RenderContext.textContent(
-    id: String? = null,
     baseClass: String? = null,
-    content: TextContent.() -> Unit = {}
-): TextContent = register(TextContent(id = id, baseClass = baseClass, job), content)
+    id: String? = null,
+    content: RenderContext.() -> Unit = {}
+) {
+    TextContent(content).render(this, baseClass, id)
+}
 
 // ------------------------------------------------------ tag
 
@@ -30,11 +28,14 @@ public fun RenderContext.textContent(
  *
  * @sample org.patternfly.sample.TextContentSample.textContent
  */
-public class TextContent internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLDivElement>,
-    Div(id = id, baseClass = classes(ComponentType.TextContent, baseClass), job, Scope()) {
+public open class TextContent(private val content: RenderContext.() -> Unit) : PatternFlyComponent<Unit> {
 
-    init {
-        markAs(ComponentType.TextContent)
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(classes(ComponentType.TextContent, baseClass)) {
+                markAs(ComponentType.TextContent)
+                content.invoke(this)
+            }
+        }
     }
 }
