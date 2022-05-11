@@ -5,10 +5,6 @@ import dev.fritz2.dom.WithText
 import dev.fritz2.lenses.IdProvider
 import kotlinx.browser.document
 import kotlinx.coroutines.flow.Flow
-import org.patternfly.Size.LG
-import org.patternfly.Size.MD
-import org.patternfly.Size.XL
-import org.patternfly.Size.XL_2
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 
@@ -18,6 +14,7 @@ import org.w3c.dom.Node
  * @param C the component type such as [Button][dev.fritz2.dom.html.Button], [Div][dev.fritz2.dom.html.Div] or [Td][dev.fritz2.dom.html.Td]
  * @param T the payload type which should be rendered inside the component type
  */
+@Deprecated("Should no longer be necessary when using PatternFlyComponent<T>")
 public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 
 // ------------------------------------------------------ types
@@ -25,6 +22,7 @@ public typealias ComponentDisplay<C, T> = C.(T) -> Unit
 /**
  * Marker interface implemented by all PatternFly components.
  */
+@Deprecated("Replace with PatternFlyComponent<T>")
 public interface PatternFlyElement<out E : HTMLElement> : WithDomNode<E>
 
 /**
@@ -85,19 +83,6 @@ public enum class Align(public val modifier: String) {
 }
 
 /**
- * Color modifier for [Label]s.
- */
-public enum class Color(public val modifier: String) {
-    GREY(""),
-    BLUE("blue".modifier()),
-    GREEN("green".modifier()),
-    ORANGE("orange".modifier()),
-    RED("red".modifier()),
-    PURPLE("purple".modifier()),
-    CYAN("cyan".modifier()),
-}
-
-/**
  * Enum for the [DataTable] selection mode.
  */
 public enum class DataTableSelection {
@@ -118,48 +103,6 @@ public enum class DataTableSelection {
     MULTIPLE_ALL
 }
 
-/**
- * FontSize modifier for [Skeleton] components.
- */
-public enum class FontSize(public val modifier: String) {
-    XL_4("text-4xl".modifier()),
-    XL_3("text-3xl".modifier()),
-    XL_2("text-2xl".modifier()),
-    XL("text-xl".modifier()),
-    LG("text-lg".modifier()),
-    MD("text-md".modifier()),
-    SM("text-sm".modifier()),
-    XS("text-xs".modifier())
-}
-
-/**
- * Height modifier for [Skeleton] components.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class Height(public val modifier: String) {
-    SM("height-sm".modifier()),
-    MD("height-md".modifier()),
-    LG("height-lg".modifier()),
-    _25("height-25".modifier()),
-    _33("height-33".modifier()),
-    _50("height-50".modifier()),
-    _66("height-66".modifier()),
-    _75("height-75".modifier()),
-    _100("height-100".modifier()),
-}
-
-/**
- * Heading level used for the [Title] component.
- */
-@Suppress("MagicNumber")
-public enum class Level(public val level: Int, public val size: Size) {
-    H1(1, XL_2),
-    H2(2, XL),
-    H3(3, LG),
-    H4(4, MD),
-    H5(5, MD),
-    H6(6, MD),
-}
 
 /**
  * Flag used for various components.
@@ -183,28 +126,6 @@ public enum class Severity(
 }
 
 /**
- * Shape modifier for [Skeleton] components.
- */
-public enum class Shape(public val modifier: String) {
-    CIRCLE("circle".modifier()),
-    SQUARE("square".modifier()),
-}
-
-/**
- * Size modifier used in various components.
- */
-public enum class Size(public val modifier: String) {
-    XL_4("4xl".modifier()),
-    XL_3("3xl".modifier()),
-    XL_2("2xl".modifier()),
-    XL("xl".modifier()),
-    LG("lg".modifier()),
-    MD("md".modifier()),
-    SM("sm".modifier()),
-    XS("xs".modifier())
-}
-
-/**
  * Sticky modifier for [Page] components.
  */
 public enum class Sticky(public val modifier: String) {
@@ -219,19 +140,4 @@ public enum class TriState(internal val checked: Boolean, internal val indetermi
     OFF(false, false),
     INDETERMINATE(false, true),
     ON(true, false)
-}
-
-/**
- * Width modifier for [Skeleton] components.
- */
-@Suppress("EnumEntryName", "EnumNaming")
-public enum class Width(public val modifier: String) {
-    SM("width-sm".modifier()),
-    MD("width-md".modifier()),
-    LG("width-lg".modifier()),
-    _25("width-25".modifier()),
-    _33("width-33".modifier()),
-    _50("width-50".modifier()),
-    _66("width-66".modifier()),
-    _75("width-75".modifier()),
 }

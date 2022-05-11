@@ -1,88 +1,72 @@
 package org.patternfly
 
-import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLSpanElement
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
  * Creates a [Skeleton] component.
  *
- * @param id optional id of the element
- * @param baseClass optional CSS class(es) that should be applied to the element
- * @param fontSize optional fontSize of the component
- * @param height optional height of the component
- * @param width optional width of the component
- * @param shape optional shape of the component
- * @param content a lambda expression for setting up the component itself
+ * @param shape optional shape of the skeleton
+ * @param width optional width of the skeleton
+ * @param height optional height of the skeleton
+ * @param textSize optional fontSize of the skeleton
+ * @param title optional screen reader text
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.skeleton(
-    id: String? = null,
-    baseClass: String? = null,
-    fontSize: FontSize? = null,
-    height: Height? = null,
-    width: Width? = null,
     shape: Shape? = null,
-    content: Skeleton.() -> Unit = {},
-): Skeleton = register(
-    Skeleton(
-        id = id,
-        baseClass = baseClass,
-        fontSize = fontSize,
-        height = height,
-        width = width,
-        shape = shape,
-        job
-    ),
-    content
-)
+    width: String? = null,
+    height: String? = null,
+    textSize: TextSize? = null,
+    title: String? = null,
+    baseClass: String? = null,
+    id: String? = null,
+    context: Skeleton.() -> Unit = {},
+) {
+    Skeleton(shape, width, height, textSize, title).apply(context).render(this, baseClass, id)
+}
 
 // ------------------------------------------------------ component
 
-public fun RenderContext.skeleton2(baseClass: String? = null, id: String? = null, build: Skeleton2.() -> Unit) {
-    Skeleton2().apply(build).render(this, baseClass, id)
-}
+/**
+ * PatternFly [skeleton](https://www.patternfly.org/v4/components/skeleton/design-guidelines) component.
+ *
+ * A skeleton is a type of loading state that allows you to expose content incrementally. For content that may take a long time to load, use a progress bar in place of a skeleton.
+ *
+ * @sample org.patternfly.sample.SkeletonSample.skeletons
+ */
+public open class Skeleton(
+    private var shape: Shape?,
+    private var width: String?,
+    private var height: String?,
+    private var textSize: TextSize?,
+    title: String?
+) : PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
-public open class Skeleton2 : PatternFlyComponent<Unit> {
-
-    private var fontSize: FontSize? = null
-    private var height: Height? = null
-    private var width: Width? = null
-    private var shape: Shape? = null
-    private var text: (RenderContext.() -> Unit)? = null
-
-    public fun fontSize(fontSize: FontSize) {
-        this.fontSize = fontSize
-    }
-
-    public fun height(height: Height) {
-        this.height = height
-    }
-
-    public fun width(width: Width) {
-        this.width = width
+    init {
+        title?.let { title(it) }
     }
 
     public fun shape(shape: Shape) {
         this.shape = shape
     }
 
-    public fun text(value: String) {
-        this.text(flowOf(value))
+    public fun width(width: String) {
+        this.width = width
     }
 
-    public fun text(value: Flow<String>) {
-        text = {
-            span(baseClass = screenReader()) {
-                value.renderText(into = this)
-            }
-        }
+    public fun height(height: String) {
+        this.height = height
+    }
+
+    public fun textSize(textSize: TextSize) {
+        this.textSize = textSize
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -90,60 +74,34 @@ public open class Skeleton2 : PatternFlyComponent<Unit> {
             div(
                 baseClass = classes {
                     +ComponentType.Skeleton
-                    +fontSize?.modifier
-                    +height?.modifier
-                    +width?.modifier
+                    +textSize?.modifier
                     +shape?.modifier
                     +baseClass
                 },
                 id = id
             ) {
                 markAs(ComponentType.Skeleton)
-                text?.invoke(this)
+                val style = buildString {
+                    width?.let { append("--pf-c-skeleton--Width:$it;") }
+                    height?.let { append("--pf-c-skeleton--Height:$it;") }
+                }
+                if (style.isNotEmpty()) {
+                    inlineStyle(style)
+                }
+                applyElement(this)
+                applyEvents(this)
+                if (hasTitle) {
+                    span(baseClass = "screen-reader".util()) { applyTitle(this) }
+                }
             }
         }
     }
 }
 
-// ------------------------------------------------------ tag
-
 /**
- * PatternFly [skeleton](https://www.patternfly.org/v4/components/skeleton) component.
- *
- * A skeleton is a type of loading state that allows you to expose content incrementally. For content that may take a
- * long time to load, use a [progress bar](https://www.patternfly.org/v4/components/progress) in place of a skeleton.
- *
- * @sample org.patternfly.sample.SkeletonSample.skeletons
+ * Shape modifier for the [Skeleton] component.
  */
-public class Skeleton internal constructor(
-    id: String?,
-    baseClass: String?,
-    fontSize: FontSize?,
-    height: Height?,
-    width: Width?,
-    shape: Shape?,
-    job: Job
-) : PatternFlyElement<HTMLDivElement>,
-    WithTextDelegate<HTMLDivElement, HTMLSpanElement>,
-    Div(
-        id = id,
-        baseClass = classes {
-            +ComponentType.Skeleton
-            +fontSize?.modifier
-            +height?.modifier
-            +width?.modifier
-            +shape?.modifier
-            +baseClass
-        },
-        job,
-        scope = Scope()
-    ) {
-
-    init {
-        markAs(ComponentType.Skeleton)
-    }
-
-    override fun delegate(): HTMLSpanElement {
-        return span(baseClass = screenReader()) {}.domNode
-    }
+public enum class Shape(public val modifier: String) {
+    CIRCLE("circle".modifier()),
+    SQUARE("square".modifier()),
 }

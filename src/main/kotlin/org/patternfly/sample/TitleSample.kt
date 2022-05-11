@@ -4,9 +4,7 @@ import dev.fritz2.dom.html.render
 import org.patternfly.Level.H1
 import org.patternfly.Level.H2
 import org.patternfly.Level.H3
-import org.patternfly.Level.H4
-import org.patternfly.Level.H5
-import org.patternfly.Level.H6
+import org.patternfly.Size
 import org.patternfly.title
 
 internal class TitleSample {
@@ -14,11 +12,8 @@ internal class TitleSample {
     fun title() {
         render {
             title(H1) { +"Level 1" }
-            title(H2) { +"Level 2" }
-            title(H3) { +"Level 3" }
-            title(H4) { +"Level 4" }
-            title(H5) { +"Level 5" }
-            title(H6) { +"Level 6" }
+            title(H2, title = "Level 2")
+            title(H3, size = Size.SM) { +"Level 3" }
         }
     }
 }

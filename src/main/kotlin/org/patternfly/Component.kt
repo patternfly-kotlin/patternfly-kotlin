@@ -23,10 +23,6 @@ internal fun Tag<HTMLElement>.markAs(componentType: ComponentType) {
     }
 }
 
-internal fun ParentNode.querySelector(componentType: ComponentType): Element? = this.querySelector(
-    By.data(COMPONENT_TYPE, componentType.id)
-)
-
 @Suppress("EnumNaming")
 internal enum class ComponentType(val id: String, internal val baseClass: String? = null) {
     Accordion("ac", "accordion".component()),
