@@ -3,11 +3,7 @@ package org.patternfly
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.browser.window
-import org.patternfly.dom.By
-import org.patternfly.dom.querySelector
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.ParentNode
 import org.w3c.dom.get
 import org.w3c.dom.set
 

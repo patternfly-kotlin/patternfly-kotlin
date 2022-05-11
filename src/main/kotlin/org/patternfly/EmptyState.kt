@@ -150,7 +150,9 @@ public open class EmptyState(
                         else -> Size.LG
                     }
                     title(size = titleSize) {
-                        applyTitle(this)
+                        element {
+                            applyTitle(this)
+                        }
                     }
                     content?.let { body ->
                         div(

@@ -26,7 +26,13 @@ public fun RenderContext.skeleton(
     id: String? = null,
     context: Skeleton.() -> Unit = {},
 ) {
-    Skeleton(shape, width, height, textSize, title).apply(context).render(this, baseClass, id)
+    Skeleton(
+        shape = shape,
+        width = width,
+        height = height,
+        textSize = textSize,
+        title = title
+    ).apply(context).render(this, baseClass, id)
 }
 
 // ------------------------------------------------------ component

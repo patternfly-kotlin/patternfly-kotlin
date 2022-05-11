@@ -1,30 +1,37 @@
 package org.patternfly
 
+import dev.fritz2.binding.Store
 import dev.fritz2.dom.html.Input
-import dev.fritz2.dom.html.Label
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
 import dev.fritz2.dom.html.Span
-import kotlinx.coroutines.Job
+import dev.fritz2.dom.states
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import org.patternfly.dom.Id
-import org.patternfly.dom.plusAssign
-import org.w3c.dom.HTMLLabelElement
 
 // ------------------------------------------------------ dsl
 
 /**
  * Creates a [Switch] component.
  *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
+ * @param value the value of the switch
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
  * @param content a lambda expression for setting up the component itself
  */
 public fun RenderContext.switch(
-    id: String? = null,
+    value: Store<Boolean>,
+    reversed: Boolean = false,
+    withCheckIcon: Boolean = false,
     baseClass: String? = null,
+    id: String? = null,
     content: Switch.() -> Unit = {}
-): Switch = register(Switch(id = id, baseClass = baseClass, job), content)
+): Input = Switch(
+    value = value,
+    reversed = reversed,
+    withCheckIcon = withCheckIcon
+).apply(content).render(this, baseClass, id)
 
 // ------------------------------------------------------ tag
 
@@ -35,93 +42,126 @@ public fun RenderContext.switch(
  *
  * @sample org.patternfly.sample.SwitchSample.switch
  */
-public class Switch internal constructor(id: String?, baseClass: String?, job: Job) :
-    PatternFlyElement<HTMLLabelElement>,
-    Label(id = id, baseClass = classes(ComponentType.Switch, baseClass), job, Scope()) {
+public open class Switch(
+    private val value: Store<Boolean>,
+    private val reversed: Boolean,
+    private val withCheckIcon: Boolean
+) : PatternFlyComponent<Input>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
 
-    private val toggleTag: Span
-    private val labelTag: Span
-    private val labelOffTag: Span
+    private var disabled: Flow<Boolean> = emptyFlow()
+    private var label: SubComponent<Span>? = null
+    private var labelOff: SubComponent<Span>? = null
+    private var inputContext: (Input.() -> Unit)? = null
+    private lateinit var inputTag: Input
 
     /**
-     * The underlying input tag. Use this property if you want to use the events of the input element.
+     * Disables / enables the switch according to [value].
+     */
+    public fun disabled(value: Boolean) {
+        disabled = flowOf(value)
+    }
+
+    /**
+     * Disables / enables the switch according to [value].
+     */
+    public fun disabled(value: Flow<Boolean>) {
+        disabled = value
+    }
+
+    /**
+     * Defines the label when the switch is on.
+     */
+    public fun label(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Span.() -> Unit = {}
+    ) {
+        this.label = SubComponent(baseClass, id, context)
+    }
+
+    /**
+     * Defines the label when the switch is off (if not set this is the same as [label]).
+     */
+    public fun labelOff(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Span.() -> Unit = {}
+    ) {
+        this.labelOff = SubComponent(baseClass, id, context)
+    }
+
+    /**
+     * Allows customization of the underlying input tag.
      *
      * @sample org.patternfly.sample.SwitchSample.input
      */
-    public val input: Input
+    public fun input(context: Input.() -> Unit) {
+        inputContext = context
+    }
 
-    init {
-        markAs(ComponentType.Switch)
-        val inputId = Id.unique(ComponentType.Switch.id, "chk")
-        val onId = Id.unique(ComponentType.Switch.id, "on")
-        val offId = Id.unique(ComponentType.Switch.id, "off")
-        domNode.htmlFor = inputId
-        input = input(id = inputId, baseClass = "switch".component("input")) {
-            type("checkbox")
-            aria["labelledby"] = onId
-        }
-        toggleTag = span(baseClass = "switch".component("toggle")) {
-            span(baseClass = "switch".component("toggle", "icon")) {
-                icon("check".fas())
+    override fun render(context: RenderContext, baseClass: String?, id: String?): Input = with(context) {
+        label(
+            baseClass = classes {
+                +"switch".component()
+                +("reverse".modifier() `when` reversed)
+            }
+        ) {
+            markAs(ComponentType.Switch)
+
+            val inputId = id ?: Id.unique(ComponentType.Switch.id, "chk")
+            val onId = label?.id ?: Id.unique(ComponentType.Switch.id, "on")
+            val offId = labelOff?.id ?: Id.unique(ComponentType.Switch.id, "off")
+            domNode.htmlFor = inputId
+
+            inputTag = input(baseClass = classes("switch".component("input"), baseClass), id = inputId) {
+                applyElement(this)
+                applyEvents(this)
+                type("checkbox")
+                aria["labelledby"] = onId
+                disabled(disabled)
+                checked(value.data)
+                changes.states() handledBy value.update
+                inputContext?.invoke(this)
+            }
+
+            span(baseClass = "switch".component("toggle")) {
+                if (withCheckIcon) {
+                    span(baseClass = "switch".component("toggle", "icon")) {
+                        icon("check".fas())
+                    }
+                }
+            }
+
+            label?.let { lbl ->
+                span(
+                    baseClass = classes {
+                        +"switch".component("label")
+                        +"on".modifier()
+                        +lbl.baseClass
+                    },
+                    id = onId
+                ) {
+                    aria["hidden"] = true
+                    lbl.context(this)
+                }
+            }
+            labelOff?.let { lbl ->
+                span(
+                    baseClass = classes {
+                        +"switch".component("label")
+                        +"off".modifier()
+                        +lbl.baseClass
+                    },
+                    id = offId
+                ) {
+                    aria["hidden"] = true
+                    lbl.context(this)
+                }
             }
         }
-        labelTag = span(id = onId, baseClass = "switch".component("label")) {
-            domNode.classList += "on".modifier()
-            aria["hidden"] = true
-        }
-        labelOffTag = span(id = offId, baseClass = "switch".component("label")) {
-            domNode.classList += "off".modifier()
-            aria["hidden"] = true
-        }
-    }
-
-    /**
-     * Text value for the label when on
-     */
-    public fun label(value: String) {
-        with(labelTag) {
-            +value
-        }
-    }
-
-    /**
-     * Text value for the label when on
-     */
-    public fun label(value: Flow<String>) {
-        with(labelTag) {
-            value.renderText(into = this)
-        }
-    }
-
-    /**
-     * Text value for the label when off
-     */
-    public fun labelOff(value: String) {
-        with(labelOffTag) {
-            +value
-        }
-    }
-
-    /**
-     * Text value for the label when off
-     */
-    public fun labelOff(value: Flow<String>) {
-        with(labelOffTag) {
-            value.renderText(into = this)
-        }
-    }
-
-    /**
-     * Disables or enables the switch.
-     */
-    public fun disabled(value: Boolean) {
-        input.disabled(value)
-    }
-
-    /**
-     * Disables or enables the switch.
-     */
-    public fun disabled(value: Flow<Boolean>) {
-        input.disabled(value)
+        inputTag
     }
 }

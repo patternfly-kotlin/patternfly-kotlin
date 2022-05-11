@@ -103,7 +103,6 @@ public enum class DataTableSelection {
     MULTIPLE_ALL
 }
 
-
 /**
  * Flag used for various components.
  */
