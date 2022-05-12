@@ -1,27 +1,31 @@
 package org.patternfly.sample
 
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.render
-import org.patternfly.TabStore
-import org.patternfly.item
-import org.patternfly.items
+import dev.fritz2.lenses.IdProvider
+import org.patternfly.dom.Id
+import org.patternfly.tabContent
 import org.patternfly.tabs
 import org.patternfly.textContent
-import org.patternfly.updateItems
 
 internal class TabsSample {
 
     fun tabs() {
         render {
-            tabs<String> {
-                items {
-                    item("Users") { +"Users" }
-                    item("Containers") { +"Containers" }
-                    item("Database") { +"Database" }
-                    item("Server") { +"Server" }
-                    item("System") { +"System" }
-                    item("Network") { +"Network" }
-                }
+            tabs {
+                item("users") { +"Users" }
+                item("containers") { +"Containers" }
+                item("database") { +"Database" }
+                item("server") { +"Server" }
+                item("system") { +"System" }
+                item("network") { +"Network" }
             }
+            tabContent("users") { +"Users" }
+            tabContent("containers") { +"Containers" }
+            tabContent("database") { +"Database" }
+            tabContent("server") { +"Server" }
+            tabContent("system") { +"System" }
+            tabContent("network") { +"Network" }
         }
     }
 
@@ -33,26 +37,25 @@ internal class TabsSample {
                 val description: String
             )
 
-            fun loadCategories(): List<Category> {
-                // fetching categories from backend
-                return emptyList()
+            val categories = storeOf(listOf<Category>())
+            val idProvider: IdProvider<Category, String> = {
+                Id.build("tab", it.id)
             }
 
-            val store = TabStore<Category> { it.id }
-            tabs(store) {
-                tabDisplay { +it.name }
-                contentDisplay {
+            tabs {
+                items(categories, idProvider) { category ->
+                    item { +category.name }
+                }
+            }
+            categories.data.renderEach(idProvider) { category ->
+                tabContent(category, idProvider) {
                     textContent {
                         dl {
-                            dt { +it.name }
-                            dd { +it.description }
+                            dt { +category.name }
+                            dd { +category.description }
                         }
                     }
                 }
-            }
-
-            store.updateItems {
-                loadCategories().forEach { item(it) }
             }
         }
     }

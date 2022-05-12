@@ -68,13 +68,12 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     /**
      * Adds a [BreadcrumbItem].
      */
-    public fun item(title: String? = null, context: BreadcrumbItem.() -> Unit = {}) {
-        (if (itemsInStore) tailItems else headItems).add(
-            BreadcrumbItem(
-                Id.unique(ComponentType.Breadcrumb.id, "itm"),
-                title
-            ).apply(context)
-        )
+    public fun item(
+        id: String = Id.unique(ComponentType.Breadcrumb.id, "itm"),
+        title: String? = null,
+        context: BreadcrumbItem.() -> Unit = {}
+    ) {
+        (if (itemsInStore) tailItems else headItems).add(BreadcrumbItem(id, title).apply(context))
     }
 
     /**
@@ -83,7 +82,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     public fun <T> items(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: BreadcrumbItems.(T) -> BreadcrumbItem
+        display: BreadcrumbItemScope.(T) -> BreadcrumbItem
     ) {
         items(values.data, idProvider, display)
     }
@@ -94,13 +93,13 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     public fun <T> items(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: BreadcrumbItems.(T) -> BreadcrumbItem
+        display: BreadcrumbItemScope.(T) -> BreadcrumbItem
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
-                        BreadcrumbItems(idProvider(value)).run {
+                        BreadcrumbItemScope(idProvider(value)).run {
                             display.invoke(this, value)
                         }
                     }
@@ -167,7 +166,7 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
  *
  * @sample org.patternfly.sample.BreadcrumbSample.dynamicItems
  */
-public class BreadcrumbItems(internal val id: String) {
+public class BreadcrumbItemScope(internal val id: String) {
 
     /**
      * Creates and returns a new [BreadcrumbItem].

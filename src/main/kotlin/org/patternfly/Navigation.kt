@@ -3,16 +3,12 @@
 package org.patternfly
 
 import dev.fritz2.dom.Tag
-import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.routing.Router
-import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -22,7 +18,6 @@ import org.patternfly.dom.Id
 import org.patternfly.dom.debug
 import org.patternfly.dom.querySelector
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
 
 // ------------------------------------------------------ factory
 
@@ -141,13 +136,12 @@ public open class Navigation<T>(
                     classMap(scrollStore.data.map { mapOf("scrollable".modifier() to (it.showButtons)) })
 
                     // update scroll buttons, when window has been resized
-                    callbackFlow {
-                        val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
-                        window.addEventListener(Events.resize.name, listener)
-                        awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
-                    }.map {
-                        ul.domNode.updateScrollButtons()
-                    }.filterNotNull() handledBy scrollStore.update
+                    ScrollButton.windowResizes().map { ul.domNode.updateScrollButtons() }
+                        .filterNotNull() handledBy scrollStore.update
+                    // initial update
+                    (MainScope() + job).launch {
+                        ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
+                    }
                 }
 
                 if (variant == NavigationVariant.HORIZONTAL || variant == NavigationVariant.SUBNAV) {
@@ -232,14 +226,9 @@ public open class Navigation<T>(
                 if (scroll) {
                     // update scroll buttons, when scroll event has been fired
                     // e.g. by scrollLeft() or scrollRight()
-                    // Using scrolls.map leads to a CCE :-(
-                    callbackFlow {
-                        val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
-                        domNode.addEventListener(Events.scroll.name, listener)
-                        awaitClose { domNode.removeEventListener(Events.scroll.name, listener) }
-                    }.map { domNode.updateScrollButtons() }
-                        .filterNotNull()
-                        .handledBy(scrollStore.update)
+                    ScrollButton.scrolls(domNode).map {
+                        domNode.updateScrollButtons()
+                    }.filterNotNull() handledBy (scrollStore.update)
                 }
                 entries.forEach { entry ->
                     when (entry) {

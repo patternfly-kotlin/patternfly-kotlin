@@ -89,13 +89,12 @@ public open class Accordion(
     /**
      * Adds a [AccordionItem].
      */
-    public fun item(title: String? = null, context: AccordionItem.() -> Unit = {}) {
-        (if (itemsInStore) tailItems else headItems).add(
-            AccordionItem(
-                Id.unique(ComponentType.Accordion.id, "itm"),
-                title
-            ).apply(context)
-        )
+    public fun item(
+        id: String = Id.unique(ComponentType.Accordion.id, "itm"),
+        title: String? = null,
+        context: AccordionItem.() -> Unit = {}
+    ) {
+        (if (itemsInStore) tailItems else headItems).add(AccordionItem(id, title).apply(context))
     }
 
     /**
@@ -104,7 +103,7 @@ public open class Accordion(
     public fun <T> items(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: AccordionItems.(T) -> AccordionItem
+        display: AccordionItemScope.(T) -> AccordionItem
     ) {
         items(values.data, idProvider, display)
     }
@@ -115,13 +114,13 @@ public open class Accordion(
     public fun <T> items(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        display: AccordionItems.(T) -> AccordionItem
+        display: AccordionItemScope.(T) -> AccordionItem
     ) {
         (MainScope() + itemStore.job).launch {
             values.collect { values ->
                 itemStore.update(
                     values.map { value ->
-                        AccordionItems(idProvider(value)).run {
+                        AccordionItemScope(idProvider(value)).run {
                             display.invoke(this, value)
                         }
                     }
@@ -224,7 +223,7 @@ public open class Accordion(
  *
  * @sample org.patternfly.sample.AccordionSample.dynamicItems
  */
-public class AccordionItems internal constructor(internal var id: String) {
+public class AccordionItemScope internal constructor(internal var id: String) {
 
     /**
      * Creates and returns a new [AccordionItem].

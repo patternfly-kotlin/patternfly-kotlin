@@ -1,368 +1,340 @@
 package org.patternfly
 
-import dev.fritz2.binding.EmittingHandler
+import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.Events
+import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.Span
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
+import dev.fritz2.dom.html.handledBy
 import dev.fritz2.lenses.IdProvider
-import kotlinx.browser.window
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.browser.document
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flattenMerge
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
+import org.patternfly.dom.hidden
 
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
- * Creates a new [Tabs] component.
+ * Creates a [Tab] component.
  *
- * @param store the tab items store
- * @param box whether to use box styling
- * @param filled whether to use the filled tab list layout
- * @param vertical whether to use vertical tab styling
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.TabsSample.tabs
+ * @param box whether tabs are outlined by a box.
+ * @param filled whether tabs take all available space
+ * @param vertical whether tabs are placed on the left-hand side of a page or container
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
-public fun <T> RenderContext.tabs(
-    store: TabStore<T> = TabStore(),
+public fun RenderContext.tabs(
     box: Boolean = false,
     filled: Boolean = false,
     vertical: Boolean = false,
-    id: String? = null,
     baseClass: String? = null,
-    content: Tabs<T>.() -> Unit = {}
-): Tabs<T> = register(
-    Tabs(store, box = box, filled = filled, vertical = vertical, id = id, baseClass = baseClass, job),
-    content
-)
-
-/**
- * Creates and returns a list of [TabItem]s.
- *
- * @param block code block for adding the tab items.
- */
-public fun <T> items(block: TabItemsBuilder<T>.() -> Unit = {}): List<TabItem<T>> =
-    TabItemsBuilder<T>().apply(block).build()
-
-/**
- * Starts a block to add tab items to the [TabStore].
- *
- * @receiver the [Tabs] component.
- *
- * @param block code block for adding the tab items.
- */
-public fun <T> Tabs<T>.items(block: TabItemsBuilder<T>.() -> Unit = {}) {
-    val tabItems = TabItemsBuilder<T>().apply(block).build()
-    store.update(tabItems)
-}
-
-/**
- * Starts a block to add tab items to the [TabStore].
- *
- * @receiver the [TabStore].
- *
- * @param block code block for adding the tab items.
- *
- * @sample org.patternfly.sample.TabsSample.store
- */
-public fun <T> TabStore<T>.updateItems(block: TabItemsBuilder<T>.() -> Unit = {}) {
-    val tabItems = TabItemsBuilder<T>().apply(block).build()
-    update(tabItems)
-}
-
-/**
- * Adds a tab item.
- *
- * @param item the wrapped data
- * @param selected whether this tab item is selected
- * @param icon an optional icon
- * @param content lambda for setting up the tab content
- */
-public fun <T> TabItemsBuilder<T>.item(
-    item: T,
-    selected: Boolean = false,
-    icon: (Span.() -> Unit)? = null,
-    content: ComponentDisplay<TabContent<T>, T> = {}
+    id: String? = null,
+    context: Tab.() -> Unit = {}
 ) {
-    tabItems.add(TabItem(item, selected = selected, icon = icon, content = content))
+    Tab(box = box, filled = filled, vertical = vertical).apply(context).render(this, baseClass, id)
 }
 
-// ------------------------------------------------------ tag
+/**
+ * Creates a tab content.
+ *
+ * @param forItem the tab item this content relates to
+ * @param idProvider the id provider to identify the tab item
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param content a lambda expression for setting up the tab content
+ */
+public fun <T> RenderContext.tabContent(
+    forItem: T,
+    idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+    baseClass: String? = null,
+    content: Div.() -> Unit
+): TextElement = tabContent(idProvider(forItem), baseClass, content)
+
+/**
+ * Creates a tab content.
+ *
+ * @param forTab the tab id this content relates to
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param content a lambda expression for setting up the tab content
+ */
+public fun RenderContext.tabContent(
+    forTab: String,
+    baseClass: String? = null,
+    content: Div.() -> Unit
+): TextElement = section(baseClass = classes("tab-content".component(), baseClass), id = contentId(forTab)) {
+    aria["labelledby"] = forTab
+    attr("hidden", true)
+    attr("role", "tabpanel")
+    attr("tabindex", 0)
+    div(baseClass = "tab-content".component("body")) {
+        content(this)
+    }
+}
+
+internal fun contentId(tabId: String) = Id.build(tabId, "cnt")
+
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [tabs](https://www.patternfly.org/v4/components/tabs/design-guidelines) component.
  *
- * A tab component creates a set of tabs to organize content on a page. Unlike the PatternFly counterpart, this class combines both the [tabs](https://www.patternfly.org/v4/components/tabs/design-guidelines) **and** the [tab content](https://www.patternfly.org/v4/components/tab-content/design-guidelines) component.
+ * Tabs allow users to navigate between views within the same page or context.
  *
- * Tabs are managed by a [TabStore] and rendered by display functions (see below). Each tab is typed to a specific type `T` and wrapped inside an [TabItem] instance.
- *
- * ### Adding items
- *
- * Tabs can be added by using the [TabStore] or by using the DSL.
- *
- * ### Rendering items
- *
- * The actual tabs are rendered by the [tabDisplay] function, which defaults to `{ +it.toString() }`. The function to render the tab content can be specified using two different ways:
- *
- * 1. The [contentDisplay] function
- * 1. The [TabItem.content] function
- *
- * The latter takes precedence over the former.
+ * Tab items and tab content are created independently of each other.
  *
  * @sample org.patternfly.sample.TabsSample.tabs
  * @sample org.patternfly.sample.TabsSample.store
  */
-public class Tabs<T> internal constructor(
-    public val store: TabStore<T>,
-    public val box: Boolean,
-    public val filled: Boolean,
-    public val vertical: Boolean,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLDivElement>, Div(id = id, job = job, scope = Scope()) {
+public open class Tab(
+    private val box: Boolean,
+    private val filled: Boolean,
+    private val vertical: Boolean,
+) : PatternFlyComponent<Unit>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
 
     private lateinit var ul: Ul
     private val scrollStore = ScrollButtonStore()
-    private var tabDisplay: ComponentDisplay<Span, T> = { +it.toString() }
-    private var contentDisplay: ComponentDisplay<TabContent<T>, T> = {}
+    private var itemsInStore: Boolean = false
+    private val itemStore: TabItemStore = TabItemStore()
+    private val headItems: MutableList<TabItem> = mutableListOf()
+    private val tailItems: MutableList<TabItem> = mutableListOf()
+    private val idSelection: RootStore<String?> = storeOf(null)
+    private val idDisabled = object : RootStore<List<String>>(listOf()) {
+        val disable: Handler<String> = handle { ids, id -> ids + id }
+    }
+
+    /**
+     * Adds a static [TabItem].
+     *
+     * @param id a unique id for the tab item
+     * @param title the title of the tab item (can also be defined later)
+     * @param selected whether the tab item is selected
+     * @param disabled whether the tab item is disabled
+     * @param context a lambda expression for setting up the tab item
+     */
+    public fun item(
+        id: String,
+        title: String? = null,
+        selected: Boolean = false,
+        disabled: Boolean = false,
+        context: TabItem.() -> Unit = {}
+    ) {
+        if (selected) {
+            idSelection.update(id)
+        }
+        if (disabled) {
+            idDisabled.disable(id)
+        }
+        (if (itemsInStore) tailItems else headItems).add(TabItem(id, title).apply(context))
+    }
+
+    /**
+     * Adds tab items from the specified values.
+     *
+     * @param values the values for the tab items
+     * @param idProvider an id Provider to create unique IDs for the tabs
+     * @param selection stores the selected tab item
+     * @param disabled stores the disabled tab items
+     * @param display function to render the tab item
+     */
+    public fun <T> items(
+        values: Store<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
+        disabled: Store<List<T>> = storeOf(listOf()),
+        display: TabItemScope.(T) -> TabItem
+    ) {
+        items(values.data, idProvider, selection, disabled, display)
+    }
+
+    /**
+     * Adds tab items from the specified values.
+     *
+     * @param values the values for the tab items
+     * @param idProvider an id Provider to create unique IDs for the tabs
+     * @param selection stores the selected tab item
+     * @param disabled stores the disabled tab items
+     * @param display function to render the tab item
+     */
+    public fun <T> items(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
+        disabled: Store<List<T>> = storeOf(listOf()),
+        display: TabItemScope.(T) -> TabItem
+    ) {
+        (MainScope() + itemStore.job).launch {
+            values.collect { values ->
+                val idToData = values.associateBy { idProvider(it) }
+                itemStore.update(
+                    values.map { value ->
+                        TabItemScope(idProvider(value)).run {
+                            display.invoke(this, value)
+                        }
+                    }
+                )
+
+                // setup selection two-way data bindings
+                // 1. id -> data
+                idSelection.data.map { idToData[it] } handledBy selection.update
+                // 2. data -> id
+                selection.data.map { if (it != null) idProvider(it) else null } handledBy idSelection.update
+
+                // setup disabled two-way data bindings
+                // id -> data
+                idDisabled.data.map { ids ->
+                    idToData.filterKeys { it in ids }
+                }.map { it.values.toList() } handledBy disabled.update
+                // data -> id
+                disabled.data.map { data -> data.map { idProvider(it) } } handledBy idDisabled.update
+
+                // update scroll buttons
+                ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
+            }
+        }
+        itemsInStore = true
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?) {
+        with(context) {
+            div(
+                baseClass = classes {
+                    +"tabs".component()
+                    +("box".modifier() `when` box)
+                    +("fill".modifier() `when` filled)
+                    +("vertical".modifier() `when` vertical)
+                    +baseClass
+                }
+            ) {
+                markAs(ComponentType.Tabs)
+                applyElement(this)
+                applyEvents(this)
+
+                classMap(
+                    scrollStore.data.map {
+                        mapOf("scrollable".modifier() to (!vertical && it.showButtons))
+                    }
+                )
+                button(baseClass = "tabs".component("scroll", "button")) {
+                    aria["label"] = "Scroll left"
+                    disabled(scrollStore.data.map { it.disableLeft })
+                    aria["hidden"] = scrollStore.data.map { it.disableLeft.toString() }
+                    domNode.onclick = { ul.domNode.scrollLeft() }
+                    icon("angle-left".fas())
+                }
+                ul = ul(baseClass = "tabs".component("list")) {
+                    // update scroll buttons, when scroll event has been fired
+                    // e.g. by scrollLeft() or scrollRight()
+                    ScrollButton.scrolls(domNode).map {
+                        domNode.updateScrollButtons()
+                    }.filterNotNull() handledBy (scrollStore.update)
+
+                    itemStore.data.map { items ->
+                        headItems + items + tailItems
+                    }.renderEach(idProvider = { it.id }, into = this) { item ->
+                    renderItem(this, item)
+                }
+                }
+                button(baseClass = "tabs".component("scroll", "button")) {
+                    aria["label"] = "Scroll right"
+                    disabled(scrollStore.data.map { it.disableRight })
+                    aria["hidden"] = scrollStore.data.map { it.disableRight.toString() }
+                    domNode.onclick = { ul.domNode.scrollRight() }
+                    icon("angle-right".fas())
+                }
+            }
+
+            // update scroll buttons, when window has been resized
+            ScrollButton.windowResizes().map { ul.domNode.updateScrollButtons() }
+                .filterNotNull() handledBy scrollStore.update
+            // initial update
+            (MainScope() + job).launch {
+                ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
+            }
+
+            // control tab content
+            (MainScope() + job).launch {
+                idSelection.data.filterNotNull().distinctUntilChanged().collect { selectedTabId ->
+                    for (item in (headItems + itemStore.current + tailItems)) {
+                        document.getElementById(contentId(item.id))?.hidden = item.id != selectedTabId
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderItem(context: RenderContext, item: TabItem): Li = with(context) {
+        li(baseClass = classes("tabs".component("item"))) {
+            attr("role", "presentation")
+            classMap(idSelection.data.filterNotNull().map { mapOf("current".modifier() to (it == item.id)) })
+            button(id = item.id, baseClass = "tabs".component("link")) {
+                aria["controls"] = contentId(item.id)
+                aria["selected"] = idSelection.data.map { (item.id == it).toString() }
+                aria["disabled"] = idDisabled.data.map { (it.contains(item.id)).toString() }
+                disabled(idDisabled.data.map { it.contains(item.id) })
+                attr("role", "tab")
+                clicks.map { item.id } handledBy idSelection.update
+                item.icon?.let { icn ->
+                    span(baseClass = "tabs".component("item", "icon")) {
+                        icn.invoke(this)
+                    }
+                }
+                span(baseClass = "tabs".component("item", "text")) {
+                    item.applyTitle(this)
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------------------------------ item & store
+
+/**
+ * DSL scope class to create [TabItem]s when using [Tab.items] functions.
+ */
+public class TabItemScope internal constructor(internal var id: String) {
+
+    /**
+     * Creates and returns a new [TabItem].
+     */
+    public fun item(title: String? = null, context: TabItem.() -> Unit = {}): TabItem =
+        TabItem(id, title).apply(context)
+}
+
+/**
+ * An item in an [Tab] component.
+ */
+public class TabItem internal constructor(internal val id: String, title: String?) :
+    WithEvents by EventMixin(),
+    WithTitle by TitleMixin() {
+
+    internal var icon: (RenderContext.() -> Unit)? = null
 
     init {
-        markAs(ComponentType.Tabs)
-
-        div(
-            baseClass = classes {
-                +"tabs".component()
-                +("box".modifier() `when` box)
-                +("fill".modifier() `when` filled)
-                +("vertical".modifier() `when` vertical)
-                +baseClass
-            }
-        ) {
-            classMap(
-                this@Tabs.scrollStore.data.map {
-                    mapOf("scrollable".modifier() to (!this@Tabs.vertical && it.showButtons))
-                }
-            )
-            button(baseClass = "tabs".component("scroll", "button")) {
-                aria["label"] = "Scroll left"
-                disabled(this@Tabs.scrollStore.data.map { it.disableLeft })
-                aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableLeft.toString() }
-                domNode.onclick = { this@Tabs.ul.domNode.scrollLeft() }
-                icon("angle-left".fas())
-            }
-            this@Tabs.ul = ul(baseClass = "tabs".component("list")) {
-                // update scroll buttons, when scroll event has been fired
-                // e.g. by scrollLeft() or scrollRight()
-                scrolls.map { domNode.updateScrollButtons() }
-                    .filterNotNull()
-                    .handledBy(this@Tabs.scrollStore.update)
-
-                this@Tabs.store.data.renderEach({ this@Tabs.selectId(it) }) { tab ->
-                    li(
-                        baseClass = classes {
-                            +"tabs".component("item")
-                            +("current".modifier() `when` tab.selected)
-                        }
-                    ) {
-                        button(id = this@Tabs.tabId(tab.item), baseClass = "tabs".component("link")) {
-                            aria["controls"] = this@Tabs.contentId(tab.item)
-                            clicks.map { tab } handledBy this@Tabs.store.selectTab
-                            if (tab.icon != null) {
-                                span(baseClass = "tabs".component("item", "icon")) {
-                                    tab.icon.invoke(this)
-                                }
-                            }
-                            span(baseClass = "tabs".component("item", "text")) {
-                                this@Tabs.tabDisplay(this, tab.item)
-                            }
-                        }
-                    }
-                }
-            }
-            button(baseClass = "tabs".component("scroll", "button")) {
-                aria["label"] = "Scroll right"
-                disabled(this@Tabs.scrollStore.data.map { it.disableRight })
-                aria["hidden"] = this@Tabs.scrollStore.data.map { it.disableRight.toString() }
-                domNode.onclick = { this@Tabs.ul.domNode.scrollRight() }
-                icon("angle-right".fas())
-            }
-        }
-
-        store.data.renderShifted(
-            1,
-            this,
-            { selectId(it) },
-            { tabItem ->
-                register(
-                    TabContent(
-                        tabItem.item,
-                        this@Tabs.tabId(tabItem.item),
-                        this@Tabs.contentId(tabItem.item),
-                        job
-                    ),
-                ) { tabContent ->
-                    if (!tabItem.selected) {
-                        tabContent.attr("hidden", "")
-                    }
-                    // tab content rendering order:
-                    // (1) content display function of this Tabs instance
-                    // (2) content display function from the TabItem
-                    this@Tabs.contentDisplay.invoke(tabContent, tabContent.item)
-                    tabItem.content.invoke(tabContent, tabContent.item)
-                }
-            }
-        )
-
-        // update scroll buttons, when tab items have been updated
-        store.data.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
-
-        // update scroll buttons, when window has been resized
-        callbackFlow {
-            val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
-            window.addEventListener(Events.resize.name, listener)
-            awaitClose { domNode.removeEventListener(Events.resize.name, listener) }
-        }.map { ul.domNode.updateScrollButtons() }.filterNotNull() handledBy scrollStore.update
+        title?.let { this.title(it) }
     }
 
     /**
-     * Sets the function used to render the tabs.
+     * Sets the render function for the icon of the tab.
      */
-    public fun tabDisplay(display: ComponentDisplay<Span, T>) {
-        this.tabDisplay = display
-    }
-
-    /**
-     * Sets the function used to render the tab panels.
-     */
-    public fun contentDisplay(display: ComponentDisplay<TabContent<T>, T>) {
-        this.contentDisplay = display
-    }
-
-    private fun selectId(tabItem: TabItem<T>) = Id.build(store.identifier(tabItem.item), tabItem.selected.toString())
-    private fun tabId(item: T) = Id.build(store.identifier(item), "tab")
-    private fun contentId(item: T) = Id.build(store.identifier(item), "cnt")
-}
-
-/**
- * PatternFly [tab content](https://www.patternfly.org/v4/components/tab-content/design-guidelines) component.
- *
- * A tab content component must always be used with the [Tabs] component.
- */
-public class TabContent<T> internal constructor(public val item: T, tabId: String, contentId: String, job: Job) :
-    PatternFlyElement<HTMLElement>,
-    TextElement("section", id = contentId, baseClass = classes("tab".component("content")), job, Scope()) {
-
-    init {
-        aria["labeledby"] = tabId
-        attr("role", "tabpanel")
-        attr("tabindex", "0")
-    }
-}
-
-// ------------------------------------------------------ store
-
-/**
- * Store for a list of [TabItem]s.
- */
-public class TabStore<T>(public val identifier: IdProvider<T, String> = { Id.build(it.toString()) }) :
-    RootStore<List<TabItem<T>>>(emptyList()) {
-
-    internal val selectTab: EmittingHandler<TabItem<T>, TabItem<T>> =
-        handleAndEmit { items, tab ->
-            emit(tab)
-            items.map {
-                if (identifier(it.unwrap()) == identifier(tab.unwrap()))
-                    it.copy(selected = true)
-                else
-                    it.copy(selected = false)
-            }
-        }
-
-    public val selectItem: EmittingHandler<T, TabItem<T>> =
-        handleAndEmit { items, item ->
-            items.find { identifier(it.unwrap()) == identifier(item) }?.let { emit(it) }
-            items.map {
-                if (identifier(it.item) == identifier(item))
-                    it.copy(selected = true)
-                else
-                    it.copy(selected = false)
-            }
-        }
-
-    /**
-     * Flow with the last selected tab item.
-     */
-    @FlowPreview
-    public val selects: Flow<TabItem<T>> = flowOf(selectTab, selectItem).flattenMerge()
-}
-
-// ------------------------------------------------------ types
-
-/**
- * Wrapper for the data of a tab item.
- */
-public data class TabItem<T>(
-    override val item: T,
-    public val selected: Boolean = false,
-    internal val icon: (Span.() -> Unit)? = null,
-    internal val content: ComponentDisplay<TabContent<T>, T> = {}
-) : HasItem<T>
-
-/**
- * Builder for a [TabItem].
- */
-public class TabItemsBuilder<T> internal constructor() {
-    internal val tabItems: MutableList<TabItem<T>> = mutableListOf()
-
-    @Suppress("NestedBlockDepth")
-    internal fun build(): List<TabItem<T>> {
-        return when (tabItems.count { it.selected }) {
-            0 -> {
-                // no selection -> select first
-                tabItems.mapIndexed { index, tab ->
-                    if (index == 0) tab.copy(selected = true) else tab
-                }
-            }
-            1 -> {
-                // one selection -> we're fine
-                tabItems
-            }
-            else -> {
-                // more than one selection -> take first selection, unselect remaining
-                var hasSelection = false
-                val modified = mutableListOf<TabItem<T>>()
-                for (tabItem in tabItems) {
-                    if (hasSelection) {
-                        if (tabItem.selected) {
-                            modified.add(tabItem.copy(selected = false))
-                        } else {
-                            modified.add(tabItem)
-                        }
-                    } else {
-                        modified.add(tabItem)
-                    }
-                    hasSelection = hasSelection || tabItem.selected
-                }
-                modified
+    public fun icon(iconClass: String = "", context: Icon.() -> Unit = {}) {
+        this.icon = {
+            icon(iconClass = iconClass) {
+                context(this)
             }
         }
     }
 }
+
+internal class TabItemStore : RootStore<List<TabItem>>(emptyList())

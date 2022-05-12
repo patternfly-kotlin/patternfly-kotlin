@@ -1,10 +1,17 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
+import dev.fritz2.dom.WindowListener
+import dev.fritz2.dom.html.Events
+import kotlinx.browser.document
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import org.patternfly.dom.isInView
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
+import org.w3c.dom.events.Event
 
 internal fun Element.updateScrollButtons(): ScrollButton? {
     val left = this.firstElementChild
@@ -64,6 +71,24 @@ internal data class ScrollButton(
     val showButtons: Boolean = false,
     val disableLeft: Boolean = true,
     val disableRight: Boolean = false
-)
+) {
+    companion object {
+        // Using scrolls.map leads to a CCE :-(
+        internal fun scrolls(element: Element): Flow<Event> = callbackFlow {
+            val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
+            element.addEventListener(Events.scroll.name, listener)
+            awaitClose { element.removeEventListener(Events.scroll.name, listener) }
+        }
+
+        // Window.resizes gives an error, so we implement it ourselves using document.defaultView
+        internal fun windowResizes(): WindowListener<Event> = WindowListener(
+            callbackFlow {
+                val listener: (Event) -> Unit = { this.trySend(it).isSuccess }
+                document.defaultView?.addEventListener(Events.resize.name, listener)
+                awaitClose { document.defaultView?.removeEventListener(Events.resize.name, listener) }
+            }
+        )
+    }
+}
 
 internal class ScrollButtonStore : RootStore<ScrollButton>(ScrollButton())

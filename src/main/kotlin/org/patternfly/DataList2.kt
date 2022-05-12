@@ -69,45 +69,45 @@ public open class DataList2(private val compact: Boolean, private val selectable
 
     public fun <T> items(
         values: Store<List<T>>,
-        selection: Store<T?> = storeOf(null),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
         display: DataListItems.(T) -> DataListItem2
     ) {
-        storeItems(values.data, selection, null, idProvider, display)
+        storeItems(values.data, idProvider, selection, null, display)
     }
 
     public fun <T> items(
         values: Flow<List<T>>,
-        selection: Store<T?> = storeOf(null),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
         display: DataListItems.(T) -> DataListItem2
     ) {
-        storeItems(values, selection, null, idProvider, display)
+        storeItems(values, idProvider, selection, null, display)
     }
 
     public fun <T> items(
         values: Store<List<T>>,
-        selection: Store<List<T>> = storeOf(emptyList()),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<List<T>> = storeOf(emptyList()),
         display: DataListItems.(T) -> DataListItem2
     ) {
-        storeItems(values.data, null, selection, idProvider, display)
+        storeItems(values.data, idProvider, null, selection, display)
     }
 
     public fun <T> items(
         values: Flow<List<T>>,
-        selection: Store<List<T>> = storeOf(emptyList()),
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<List<T>> = storeOf(emptyList()),
         display: DataListItems.(T) -> DataListItem2
     ) {
-        storeItems(values, null, selection, idProvider, display)
+        storeItems(values, idProvider, null, selection, display)
     }
 
     private fun <T> storeItems(
         values: Flow<List<T>>,
+        idProvider: IdProvider<T, String>,
         singleDataSelection: Store<T?>?,
         multiDataSelection: Store<List<T>>?,
-        idProvider: IdProvider<T, String>,
         display: DataListItems.(T) -> DataListItem2
     ) {
         (MainScope() + itemStore.job).launch {
@@ -120,7 +120,7 @@ public open class DataList2(private val compact: Boolean, private val selectable
                         }
                     }
                 )
-                // setup two way data bindings
+                // setup two-way data bindings
                 singleDataSelection?.let { sds ->
                     // id -> data
                     singleIdSelection.data.map { idToData[it] } handledBy sds.update
