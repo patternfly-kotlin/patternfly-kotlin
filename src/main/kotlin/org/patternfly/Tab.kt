@@ -110,7 +110,7 @@ public open class Tab(
     private val headItems: MutableList<TabItem> = mutableListOf()
     private val tailItems: MutableList<TabItem> = mutableListOf()
     private val idSelection: RootStore<String?> = storeOf(null)
-    private val idDisabled = object : RootStore<List<String>>(listOf()) {
+    private val disabledIds = object : RootStore<List<String>>(listOf()) {
         val disable: Handler<String> = handle { ids, id -> ids + id }
     }
 
@@ -134,7 +134,7 @@ public open class Tab(
             idSelection.update(id)
         }
         if (disabled) {
-            idDisabled.disable(id)
+            disabledIds.disable(id)
         }
         (if (itemsInStore) tailItems else headItems).add(TabItem(id, title).apply(context))
     }
@@ -186,18 +186,18 @@ public open class Tab(
                 )
 
                 // setup selection two-way data bindings
-                // 1. id -> data
+                // 1. id -> T
                 idSelection.data.map { idToData[it] } handledBy selection.update
-                // 2. data -> id
+                // 2. T -> id
                 selection.data.map { if (it != null) idProvider(it) else null } handledBy idSelection.update
 
                 // setup disabled two-way data bindings
-                // id -> data
-                idDisabled.data.map { ids ->
+                // id -> T
+                disabledIds.data.map { ids ->
                     idToData.filterKeys { it in ids }
                 }.map { it.values.toList() } handledBy disabled.update
-                // data -> id
-                disabled.data.map { data -> data.map { idProvider(it) } } handledBy idDisabled.update
+                // T -> id
+                disabled.data.map { data -> data.map { idProvider(it) } } handledBy disabledIds.update
 
                 // update scroll buttons
                 ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
@@ -281,8 +281,8 @@ public open class Tab(
             button(id = item.id, baseClass = "tabs".component("link")) {
                 aria["controls"] = contentId(item.id)
                 aria["selected"] = idSelection.data.map { (item.id == it).toString() }
-                aria["disabled"] = idDisabled.data.map { (it.contains(item.id)).toString() }
-                disabled(idDisabled.data.map { it.contains(item.id) })
+                aria["disabled"] = disabledIds.data.map { (it.contains(item.id)).toString() }
+                disabled(disabledIds.data.map { it.contains(item.id) })
                 attr("role", "tab")
                 clicks.map { item.id } handledBy idSelection.update
                 item.icon?.let { icn ->

@@ -63,6 +63,7 @@ internal enum class ComponentType(val id: String, internal val baseClass: String
     Tabs("tbs"),
     TextContent("tc", "content".component()),
     Title("tlt", "title".component()),
+    ToggleGroup("tg", "toggle-group".component()),
     Toolbar("tb", "toolbar".component()),
     TreeView("tv", "tree-view".component());
 }

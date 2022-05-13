@@ -1,436 +1,397 @@
 package org.patternfly
 
+import dev.fritz2.binding.Handler
+import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
+import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
-import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.Scope
-import dev.fritz2.dom.html.TextElement
-import dev.fritz2.dom.html.Ul
+import dev.fritz2.dom.html.handledBy
 import dev.fritz2.dom.states
-import kotlinx.coroutines.Job
+import dev.fritz2.lenses.IdProvider
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.HTMLLIElement
 
-// TODO draggable rows
-//  breakpoints
-// ------------------------------------------------------ dsl
+// ------------------------------------------------------ factory
 
 /**
- * Creates a [DataList] component.
+ * Creates an [DataList] component.
  *
- * @param store the item store
- * @param selectableRows whether the rows are selectable
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.DataListSample.dataList
+ * @param compact whether to use compact layout
+ * @param selectable whether the datalist items are selectable
+ * @param baseClass optional CSS class that should be applied to the component
+ * @param id optional ID of the component
+ * @param context a lambda expression for setting up the component itself
  */
-public fun <T> RenderContext.dataList(
-    store: ItemsStore<T> = ItemsStore(),
-    selectableRows: Boolean = false,
+public fun RenderContext.dataList(
+    compact: Boolean = false,
+    selectable: Boolean = false,
+    baseClass: String? = null,
     id: String? = null,
-    baseClass: String? = null,
-    content: DataList<T>.() -> Unit = {}
-): DataList<T> = register(DataList(store, selectableRows, id = id, baseClass = baseClass, job), content)
+    context: DataList.() -> Unit = {}
+): DataList = DataList(compact = compact, selectable = selectable).apply(context).render(this, baseClass, id)
 
-/**
- * Creates the [DataListAction] component inside the [DataListRow] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListRow<T>.dataListAction(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListAction.() -> Unit = {}
-): DataListAction = register(DataListAction(id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates a [DataListCell] component inside the [DataListContent] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListContent<T>.dataListCell(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListCell<T>.() -> Unit = {}
-): DataListCell<T> = register(DataListCell(itemsStore, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListCheckbox] component inside the [DataListControl] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListControl<T>.dataListCheckbox(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListCheckbox<T>.() -> Unit = {}
-): DataListCheckbox<T> =
-    register(DataListCheckbox(this.itemsStore, this.item, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListContent] component inside the [DataListRow] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListRow<T>.dataListContent(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListContent<T>.() -> Unit = {}
-): DataListContent<T> = register(DataListContent(itemsStore, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListControl] component inside the [DataListRow] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListRow<T>.dataListControl(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListControl<T>.() -> Unit = {}
-): DataListControl<T> = register(
-    DataListControl(this.itemsStore, this.item, this.dataListItem, id = id, baseClass = baseClass, job),
-    content
-)
-
-/**
- * Creates the [DataListExpandableContent] component inside the [DataListItem] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the expandable content
- */
-public fun <T> DataListItem<T>.dataListExpandableContent(
-    id: String? = Id.unique(ComponentType.DataList.id, "ec"),
-    baseClass: String? = null,
-    content: Div.() -> Unit = {}
-): DataListExpandableContent<T> =
-    register(DataListExpandableContent(this, id = id, baseClass = baseClass, job, content), {})
-
-/**
- * Creates the [DataListItem] component. All other components are nested inside this component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataList<T>.dataListItem(
-    item: T,
-    id: String? = "${itemsStore.idProvider(item)}-row",
-    baseClass: String? = null,
-    content: DataListItem<T>.() -> Unit = {}
-): DataListItem<T> = register(DataListItem(this.itemsStore, item, this, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListRow] component inside the [DataListItem] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListItem<T>.dataListRow(
-    id: String? = null,
-    baseClass: String? = null,
-    content: DataListRow<T>.() -> Unit = {}
-): DataListRow<T> =
-    register(DataListRow(this.itemsStore, this.item, this, id = id, baseClass = baseClass, job), content)
-
-/**
- * Creates the [DataListToggle] component inside the [DataListControl] component.
- *
- * If you use this component, don't forget to also use [dataListExpandableContent] to add a [DataListExpandableContent] component to the [DataListItem] component.
- *
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- */
-public fun <T> DataListControl<T>.dataListToggle(
-    id: String? = Id.unique(ComponentType.DataList.id, "tgl"),
-    baseClass: String? = null,
-    content: DataListToggle<T>.() -> Unit = {}
-): DataListToggle<T> =
-    register(
-        DataListToggle(this.itemsStore, this.item, this.dataListItem, id = id, baseClass = baseClass, job),
-        content
-    )
-
-// ------------------------------------------------------ tag
+// ------------------------------------------------------ component
 
 /**
  * PatternFly [data list](https://www.patternfly.org/v4/components/data-list/design-guidelines) component.
  *
- * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts. The data list uses a [display] function to render the items in an [ItemsStore] as [DataListItem]s.
- *
- * One of the tags used in the [display] function should assign an [element ID][org.w3c.dom.Element.id] based on [ItemsStore.idProvider]. This ID is referenced by various [ARIA labelledby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-labelledby_attribute) attributes. Since most of the data list components implement [WithIdProvider], this can be easily done using [org.patternfly.WithIdProvider.itemId].
- *
- * @param T the type which is used for the [DataListItem]s in this data list.
+ * A data list is used to display large data sets when you need a flexible layout or need to include interactive content like charts.
  *
  * @sample org.patternfly.sample.DataListSample.dataList
  */
-public class DataList<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
-    internal val selectableRows: Boolean,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : PatternFlyElement<HTMLUListElement>,
-    Ul(
-        id = id,
-        baseClass = classes(ComponentType.DataList, baseClass),
-        job,
-        Scope()
+@Suppress("TooManyFunctions")
+public open class DataList(private val compact: Boolean, private val selectable: Boolean) :
+    PatternFlyComponent<DataList>,
+    WithElement by ElementMixin(),
+    WithEvents by EventMixin() {
+
+    private var itemsInStore: Boolean = false
+    private val itemStore: DataListItemStore = DataListItemStore()
+    private val headItems: MutableList<DataListItem> = mutableListOf()
+    private val tailItems: MutableList<DataListItem> = mutableListOf()
+    private val singleIdSelection: RootStore<String?> = storeOf(null)
+    private val multiIdSelection: MultiIdSelectionStore = MultiIdSelectionStore()
+
+    public val selectedId: Flow<String?>
+        get() = singleIdSelection.data
+
+    public val selectedIds: Flow<List<String>>
+        get() = multiIdSelection.data
+
+    public fun item(
+        id: String = Id.unique(ComponentType.DataList.id, "itm"),
+        context: DataListItem.() -> Unit
     ) {
-
-    init {
-        markAs(ComponentType.DataList)
-        attr("role", "list")
+        (if (itemsInStore) tailItems else headItems).add(DataListItem(id).apply(context))
     }
 
-    /**
-     * Defines how to display the items in the [ItemsStore] as [DataListItem]s.
-     */
-    public fun display(display: (T) -> DataListItem<T>) {
-        itemsStore.page.renderEach({ itemsStore.idProvider(it) }) { item -> display(item) }
-    }
-}
-
-/**
- * A component to group the actions in a [DataListRow] component.
- */
-public class DataListAction internal constructor(id: String?, baseClass: String?, job: Job) :
-    Div(id = id, baseClass = classes("data-list".component("item-action"), baseClass), job, Scope())
-
-/**
- * A cell in a [DataListContent] component. Cells are usually used to display properties of the items.
- */
-public class DataListCell<T> internal constructor(
-    itemsStore: ItemsStore<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) :
-    WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("cell"), baseClass), job, Scope())
-
-/**
- * Checkbox to (de)select a data item. The checkbox is bound to the selection state of the [ItemsStore].
- *
- * You can use the [ItemsStore] to track the selection of an item.
- *
- * @sample org.patternfly.sample.DataListSample.selects
- */
-public class DataListCheckbox<T> internal constructor(
-    private val itemsStore: ItemsStore<T>,
-    private val item: T,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : Div(id = id, baseClass = classes("data-list".component("check"), baseClass), job, Scope()) {
-
-    init {
-        input {
-            val inputId = Id.unique(ComponentType.DataList.id, "chk")
-            name(inputId)
-            type("checkbox")
-            checked(this@DataListCheckbox.itemsStore.data.map { it.isSelected(this@DataListCheckbox.item) })
-            aria["invalid"] = false
-            aria["labelledby"] = this@DataListCheckbox.itemsStore.idProvider(this@DataListCheckbox.item)
-            changes.states()
-                .map { (this@DataListCheckbox.item to it) } handledBy this@DataListCheckbox.itemsStore.select
-        }
-    }
-}
-
-/**
- * Component to group [DataListCell]s components inside a [DataListRow] component.
- */
-public class DataListContent<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("item-content"), baseClass), job, Scope())
-
-/**
- * Component for controls of a [DataListRow] component. Use this class to add a [DataListToggle] or a [DataListCheckbox] component.
- */
-public class DataListControl<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
-    internal val item: T,
-    internal val dataListItem: DataListItem<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : Div(id = id, baseClass = classes("data-list".component("item-control"), baseClass), job, Scope())
-
-/**
- * Component for the expandable content inside a [DataListItem] component.
- */
-public class DataListExpandableContent<T> internal constructor(
-    dataListItem: DataListItem<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job,
-    content: Div.() -> Unit
-) : TextElement(
-    "section",
-    id = id,
-    baseClass = classes("data-list".component("expandable-content"), baseClass),
-    job,
-    scope = Scope()
-) {
-
-    init {
-        domNode.hidden = true // tp prevent flickering during updates
-        if (dataListItem.toggleButton != null && id != null) {
-            dataListItem.toggleButton!!.aria["controls"] = id
-        }
-        attr("hidden", dataListItem.expanded.data.map { !it })
-        div(baseClass = "data-list".component("expandable-content", "body")) {
-            content(this)
-        }
-    }
-}
-
-/**
- * Component for an item in a [DataList]. All other components are nested inside this component.
- *
- * The data list is very flexible when it comes to displaying the items in the [ItemsStore]. You should at least add a [DataListRow] for each item you want to render. If you want to use controls like a checkbox and / or a toggle, add them inside a [DataListControl] component. The actual content should be added inside multiple [DataListCell]s inside a [DataListContent] component. If you want to add actions like [Button]s or [Dropdown]s, add them inside a [DataListAction] component. Finally the expandable content goes inside a [DataListExpandableContent] component.
- *
- * ```
- * ┏━━━━━━━━━━━ dataList: DataListItem ━━━━━━━━━━━┓
- * ┃                                              ┃
- * ┃ ┌──────── dataListRow: DataListRow ────────┐ ┃
- * ┃ │                                          │ ┃
- * ┃ │ ┌── dataListControl: DataListControl ──┐ │ ┃
- * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
- * ┃ │ │ │  dataListToggle: DataListToggle  │ │ │ ┃
- * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
- * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
- * ┃ │ │ │dataListCheckbox: DataListCheckbox│ │ │ ┃
- * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
- * ┃ │ └──────────────────────────────────────┘ │ ┃
- * ┃ │                                          │ ┃
- * ┃ │ ┌── dataListContent: DataListContent ──┐ │ ┃
- * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
- * ┃ │ │ │    dataListCell: DataListCell    │ │ │ ┃
- * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
- * ┃ │ └──────────────────────────────────────┘ │ ┃
- * ┃ │                                          │ ┃
- * ┃ │ ┌─── dataListAction: DataListAction ───┐ │ ┃
- * ┃ │ │ ┌──────────────────────────────────┐ │ │ ┃
- * ┃ │ │ │  control components like buttons │ │ │ ┃
- * ┃ │ │ │           or dropdowns           │ │ │ ┃
- * ┃ │ │ └──────────────────────────────────┘ │ │ ┃
- * ┃ │ └──────────────────────────────────────┘ │ ┃
- * ┃ └──────────────────────────────────────────┘ ┃
- * ┃ ┌──────────────────────────────────────────┐ ┃
- * ┃ │        dataListExpandableContent:        │ ┃
- * ┃ │        DataListExpandableContent         │ ┃
- * ┃ └──────────────────────────────────────────┘ ┃
- * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
- * ```
- */
-public class DataListItem<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
-    internal val item: T,
-    dataList: DataList<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : WithIdProvider<T> by itemsStore,
-    Li(
-        id = id,
-        baseClass = classes {
-            +"data-list".component("item")
-            +("selectable".modifier() `when` dataList.selectableRows)
-            +baseClass
-        },
-        job,
-        scope = Scope()
+    public fun <T> items(
+        values: Store<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
+        display: DataListItemScope.(T) -> DataListItem
     ) {
+        storeItems(values.data, idProvider, selection, null, display)
+    }
 
-    /**
-     * Manages the expanded state of the [DataListExpandableContent]. Use this property if you want to track the collapse / expand state.
-     *
-     * @sample org.patternfly.sample.DataListSample.expanded
-     */
-    public val expanded: ExpandedStore = ExpandedStore()
+    public fun <T> items(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
+        display: DataListItemScope.(T) -> DataListItem
+    ) {
+        storeItems(values, idProvider, selection, null, display)
+    }
 
-    internal var toggleButton: HTMLButtonElement? = null
+    public fun <T> items(
+        values: Store<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<List<T>> = storeOf(emptyList()),
+        display: DataListItemScope.(T) -> DataListItem
+    ) {
+        storeItems(values.data, idProvider, null, selection, display)
+    }
 
-    init {
-        aria["labelledby"] = itemsStore.idProvider(item)
-        if (dataList.selectableRows) {
-            classMap(
-                expanded.data.combine(itemsStore.data.map { it.isSelected(item) }) { expanded, selected ->
-                    expanded to selected
-                }.map { (expanded, selected) ->
-                    mapOf(
-                        "expanded".modifier() to expanded,
-                        "selected".modifier() to selected
-                    )
+    public fun <T> items(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<List<T>> = storeOf(emptyList()),
+        display: DataListItemScope.(T) -> DataListItem
+    ) {
+        storeItems(values, idProvider, null, selection, display)
+    }
+
+    private fun <T> storeItems(
+        values: Flow<List<T>>,
+        idProvider: IdProvider<T, String>,
+        singleDataSelection: Store<T?>?,
+        multiDataSelection: Store<List<T>>?,
+        display: DataListItemScope.(T) -> DataListItem
+    ) {
+        (MainScope() + itemStore.job).launch {
+            values.collect { values ->
+                val idToData = values.associateBy { idProvider(it) }
+                itemStore.update(
+                    values.map { value ->
+                        DataListItemScope(idProvider(value)).run {
+                            display.invoke(this, value)
+                        }
+                    }
+                )
+                // setup two-way data bindings
+                singleDataSelection?.let { sds ->
+                    // id -> data
+                    singleIdSelection.data.map { idToData[it] } handledBy sds.update
+                    // data -> id
+                    sds.data.map { if (it != null) idProvider(it) else null } handledBy singleIdSelection.update
                 }
-            )
-            clicks.map { item } handledBy itemsStore.selectOnly
-        } else {
-            classMap(expanded.data.map { mapOf("expanded".modifier() to it) })
+                multiDataSelection?.let { mds ->
+                    // id -> data
+                    multiIdSelection.data.map { ids ->
+                        idToData.filterKeys { it in ids }
+                    }.map { it.values.toList() } handledBy mds.update
+                    // data -> id
+                    mds.data.map { data -> data.map { idProvider(it) } } handledBy multiIdSelection.update
+                }
+            }
+        }
+        itemsInStore = true
+    }
+
+    override fun render(context: RenderContext, baseClass: String?, id: String?): DataList = with(context) {
+        ul(
+            baseClass = classes {
+                +ComponentType.DataList
+                +("compact".modifier() `when` compact)
+                +baseClass
+            },
+            id = id
+        ) {
+            markAs(ComponentType.DataList)
+            applyElement(this)
+            applyEvents(this)
+            attr("role", "list")
+
+            itemStore.data.map { items ->
+                headItems + items + tailItems
+            }.renderEach(into = this, idProvider = { it.id }) { item ->
+                renderItem(this, item)
+            }
+        }
+        this@DataList
+    }
+
+    private fun renderItem(context: RenderContext, item: DataListItem): Tag<HTMLLIElement> = with(context) {
+        li(
+            baseClass = classes {
+                +"data-list".component("item")
+                +("selectable".modifier() `when` selectable)
+            }
+        ) {
+            aria["labelledby"] = item.id
+            if (selectable) {
+                attr("tabindex", 0)
+                val idSelected = singleIdSelection.data.map { it == item.id }
+                classMap(
+                    item.expandedStore.data.combine(idSelected) { expanded, selected ->
+                        expanded to selected
+                    }.map { (expanded, selected) ->
+                        mapOf(
+                            "expanded".modifier() to expanded,
+                            "selected".modifier() to selected
+                        )
+                    }
+                )
+                clicks.map { item.id } handledBy singleIdSelection.update
+            } else {
+                with(item.expandedStore) {
+                    toggleExpanded()
+                }
+            }
+            renderRow(this, item)
+            renderContent(this, item)
+        }
+    }
+
+    private fun renderRow(context: RenderContext, item: DataListItem) {
+        with(context) {
+            div(baseClass = "data-list".component("item", "row")) {
+                renderControls(this, item)
+                renderCells(this, item)
+                renderActions(this, item)
+            }
+        }
+    }
+
+    private fun renderControls(context: RenderContext, item: DataListItem) {
+        if (item.controls) {
+            with(context) {
+                div(baseClass = "data-list".component("item", "control")) {
+                    if (selectable) {
+                        domNode.onclick = { it.stopPropagation() }
+                    }
+                    if (item.toggle) {
+                        div(baseClass = "data-list".component("toggle")) {
+                            clickButton(plain, id = item.toggleId) {
+                                element {
+                                    aria["controls"] = item.contentId
+                                    aria["label"] = "Details"
+                                    aria["labelledby"] = "${item.id} ${item.toggleId}"
+                                    aria["expanded"] = item.expandedStore.data.map { it.toString() }
+                                }
+                                content {
+                                    div(baseClass = "data-list".component("toggle", "icon")) {
+                                        icon("angle-right".fas())
+                                    }
+                                }
+                            } handledBy item.expandedStore.toggle
+                        }
+                    }
+                    if (item.check) {
+                        div(baseClass = "data-list".component("check")) {
+                            input {
+                                aria["labelledby"] = item.id
+                                aria["invalid"] = false
+                                attr("rowId", item.id)
+                                name(item.checkId)
+                                type("checkbox")
+                                checked(multiIdSelection.data.map { it.contains(item.id) })
+                                changes.states().map { checked -> item.id to checked } handledBy multiIdSelection.select
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderCells(context: RenderContext, item: DataListItem) {
+        with(context) {
+            div(baseClass = "data-list".component("item", "content")) {
+                item.cells.forEach { cell ->
+                    div(
+                        baseClass = classes("data-list".component("cell"), cell.baseClass),
+                        id = cell.id
+                    ) {
+                        cell.context(this)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderActions(context: RenderContext, item: DataListItem) {
+        with(context) {
+            item.actions.forEach { action ->
+                div(
+                    baseClass = classes("data-list".component("item", "action"), action.baseClass),
+                    id = action.id
+                ) {
+                    if (selectable) {
+                        domNode.onclick = { it.stopPropagation() }
+                    }
+                    attr("rowId", item.id)
+                    action.context(this)
+                }
+            }
+        }
+    }
+
+    private fun renderContent(context: RenderContext, item: DataListItem) {
+        item.content?.let { expandableContent ->
+            with(context) {
+                section(
+                    baseClass = "data-list".component("expandable", "content"),
+                    id = item.contentId
+                ) {
+                    with(item.expandedStore) {
+                        hideIfCollapsed()
+                    }
+                    div(
+                        baseClass = classes(
+                            "data-list".component("expandable", "content", "body"),
+                            expandableContent.baseClass
+                        ),
+                        id = expandableContent.id
+                    ) {
+                        expandableContent.context(this)
+                    }
+                }
+            }
         }
     }
 }
 
-/**
- * Component for the main data of a [DataListItem] component (except content for [DataListExpandableContent]).
- */
-public class DataListRow<T> internal constructor(
-    internal val itemsStore: ItemsStore<T>,
-    internal val item: T,
-    internal val dataListItem: DataListItem<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : WithIdProvider<T> by itemsStore,
-    Div(id = id, baseClass = classes("data-list".component("item-row"), baseClass), job, Scope())
+// ------------------------------------------------------ item & store
 
-/**
- * Toggle to expand / collapse the [DataListExpandableContent].
- *
- * If you use this component, don't forget to also add a [DataListExpandableContent] component to the [DataListItem] component.
- */
-public class DataListToggle<T> internal constructor(
-    private val itemsStore: ItemsStore<T>,
-    private val item: T,
-    private val dataListItem: DataListItem<T>,
-    id: String?,
-    baseClass: String?,
-    job: Job
-) : Div(baseClass = classes("data-list".component("toggle"), baseClass), job = job, scope = Scope()) {
+public class DataListItemScope(internal val id: String) {
 
-    init {
-        clickButton(plain) {
-            // TODO Migrate this
-//            this@DataListToggle.dataListItem.toggleButton = domNode
-            aria["label"] = "Details"
-            aria["labelledby"] = "$id ${this@DataListToggle.itemsStore.idProvider(this@DataListToggle.item)}"
-            aria["expanded"] = this@DataListToggle.dataListItem.expanded.data.map { it.toString() }
-            div(baseClass = "data-list".component("toggle", "icon")) {
-                icon("angle-right".fas())
+    public fun item(context: DataListItem.() -> Unit): DataListItem = DataListItem(id).apply(context)
+}
+
+public class DataListItem(public val id: String) :
+    WithExpandedStore by ExpandedStoreMixin() {
+
+    internal var toggle: Boolean = false
+    internal val toggleId: String = Id.build(id, "tgl")
+    internal var check: Boolean = false
+    internal val checkId: String = Id.build(id, "chk")
+    internal val controls: Boolean
+        get() = toggle || check
+    internal val cells: MutableList<SubComponent<Div>> = mutableListOf()
+    internal val actions: MutableList<SubComponent<Div>> = mutableListOf()
+    internal var content: SubComponent<Div>? = null
+    internal val contentId: String = Id.build(id, "cnt")
+
+    public fun toggle() {
+        toggle = true
+    }
+
+    public fun check() {
+        check = true
+    }
+
+    public fun cellIcon(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit = {}
+    ) {
+        cell(baseClass = classes(baseClass, "icon".modifier()), id = id, context = context)
+    }
+
+    public fun cell(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit = {}
+    ) {
+        cells.add(SubComponent(baseClass, id, context))
+    }
+
+    public fun actionWrapper(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit = {}
+    ) {
+        actions.add(
+            SubComponent(baseClass, id) {
+                div(baseClass = "data-list".component("action")) {
+                    context(this)
+                }
             }
-        } handledBy this@DataListToggle.dataListItem.expanded.toggle
+        )
+    }
+
+    public fun action(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit = {}
+    ) {
+        actions.add(SubComponent(baseClass, id, context))
+    }
+
+    public fun content(
+        baseClass: String? = null,
+        id: String? = null,
+        context: Div.() -> Unit = {}
+    ) {
+        content = SubComponent(baseClass, id, context)
+    }
+}
+
+internal class DataListItemStore : RootStore<List<DataListItem>>(emptyList())
+
+internal class MultiIdSelectionStore : RootStore<List<String>>(emptyList()) {
+
+    val select: Handler<Pair<String, Boolean>> = handle { ids, (id, select) ->
+        if (select) ids + id else ids - id
     }
 }
