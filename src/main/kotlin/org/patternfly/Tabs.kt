@@ -11,21 +11,19 @@ import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
 import dev.fritz2.dom.html.handledBy
 import dev.fritz2.lenses.IdProvider
-import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
-import org.patternfly.dom.hidden
 
 // ------------------------------------------------------ factory
 
 /**
- * Creates a [Tab] component.
+ * Creates a [Tabs] component.
  *
  * @param box whether tabs are outlined by a box.
  * @param filled whether tabs take all available space
@@ -40,48 +38,10 @@ public fun RenderContext.tabs(
     vertical: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
-    context: Tab.() -> Unit = {}
+    context: Tabs.() -> Unit = {}
 ) {
-    Tab(box = box, filled = filled, vertical = vertical).apply(context).render(this, baseClass, id)
+    Tabs(box = box, filled = filled, vertical = vertical).apply(context).render(this, baseClass, id)
 }
-
-/**
- * Creates a tab content.
- *
- * @param forItem the tab item this content relates to
- * @param idProvider the id provider to identify the tab item
- * @param baseClass optional CSS class that should be applied to the component
- * @param content a lambda expression for setting up the tab content
- */
-public fun <T> RenderContext.tabContent(
-    forItem: T,
-    idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-    baseClass: String? = null,
-    content: Div.() -> Unit
-): TextElement = tabContent(idProvider(forItem), baseClass, content)
-
-/**
- * Creates a tab content.
- *
- * @param forTab the tab id this content relates to
- * @param baseClass optional CSS class that should be applied to the component
- * @param content a lambda expression for setting up the tab content
- */
-public fun RenderContext.tabContent(
-    forTab: String,
-    baseClass: String? = null,
-    content: Div.() -> Unit
-): TextElement = section(baseClass = classes("tab-content".component(), baseClass), id = contentId(forTab)) {
-    aria["labelledby"] = forTab
-    attr("hidden", true)
-    attr("role", "tabpanel")
-    attr("tabindex", 0)
-    div(baseClass = "tab-content".component("body")) {
-        content(this)
-    }
-}
-
-internal fun contentId(tabId: String) = Id.build(tabId, "cnt")
 
 // ------------------------------------------------------ component
 
@@ -95,7 +55,7 @@ internal fun contentId(tabId: String) = Id.build(tabId, "cnt")
  * @sample org.patternfly.sample.TabsSample.tabs
  * @sample org.patternfly.sample.TabsSample.store
  */
-public open class Tab(
+public open class Tabs(
     private val box: Boolean,
     private val filled: Boolean,
     private val vertical: Boolean,
@@ -104,39 +64,52 @@ public open class Tab(
     WithEvents by EventMixin() {
 
     private lateinit var ul: Ul
-    private val scrollStore = ScrollButtonStore()
     private var itemsInStore: Boolean = false
-    private val itemStore: TabItemStore = TabItemStore()
+
     private val headItems: MutableList<TabItem> = mutableListOf()
     private val tailItems: MutableList<TabItem> = mutableListOf()
+
+    private val scrollStore = ScrollButtonStore()
+    private val itemStore: TabItemStore = TabItemStore()
     private val idSelection: RootStore<String?> = storeOf(null)
     private val disabledIds = object : RootStore<List<String>>(listOf()) {
         val disable: Handler<String> = handle { ids, id -> ids + id }
+        val enable: Handler<String> = handle { ids, id -> ids - id }
     }
 
     /**
      * Adds a static [TabItem].
      *
      * @param id a unique id for the tab item
-     * @param title the title of the tab item (can also be defined later)
-     * @param selected whether the tab item is selected
-     * @param disabled whether the tab item is disabled
      * @param context a lambda expression for setting up the tab item
      */
     public fun item(
-        id: String,
-        title: String? = null,
-        selected: Boolean = false,
-        disabled: Boolean = false,
-        context: TabItem.() -> Unit = {}
+        id: String = Id.unique(ComponentType.Tabs.id, "itm"),
+        context: StaticTabItem.() -> Unit = {}
     ) {
-        if (selected) {
-            idSelection.update(id)
+        val item = StaticTabItem(id).apply(context)
+        (if (itemsInStore) tailItems else headItems).add(item)
+
+        item.selectedFlag?.let { selected ->
+            if (selected) {
+                idSelection.update(id)
+            }
         }
-        if (disabled) {
-            disabledIds.disable(id)
+        item.disabledFlag?.let { disabled ->
+            if (disabled) {
+                disabledIds.disable(id)
+            }
         }
-        (if (itemsInStore) tailItems else headItems).add(TabItem(id, title).apply(context))
+        item.selectedFlow?.let { selected ->
+            // setup one-way selection data binding: flow -> id
+            selected.filter { it }.map { id } handledBy idSelection.update
+            selected.filter { !it }.map { null } handledBy idSelection.update
+        }
+        item.disabledFlow?.let { disabled ->
+            // setup disabled one-way disabled data binding: flow -> id
+            disabled.filter { it }.map { id } handledBy disabledIds.disable
+            disabled.filter { !it }.map { id } handledBy disabledIds.enable
+        }
     }
 
     /**
@@ -206,6 +179,7 @@ public open class Tab(
         itemsInStore = true
     }
 
+    @Suppress("LongMethod")
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
         with(context) {
             div(
@@ -255,21 +229,18 @@ public open class Tab(
                 }
             }
 
+            itemStore.data.map { items ->
+                headItems + items + tailItems
+            }.renderEach(idProvider = { it.id }) { item ->
+                renderContent(this, item)
+            }
+
             // update scroll buttons, when window has been resized
             ScrollButton.windowResizes().map { ul.domNode.updateScrollButtons() }
                 .filterNotNull() handledBy scrollStore.update
             // initial update
             (MainScope() + job).launch {
                 ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
-            }
-
-            // control tab content
-            (MainScope() + job).launch {
-                idSelection.data.filterNotNull().distinctUntilChanged().collect { selectedTabId ->
-                    for (item in (headItems + itemStore.current + tailItems)) {
-                        document.getElementById(contentId(item.id))?.hidden = item.id != selectedTabId
-                    }
-                }
             }
         }
     }
@@ -278,21 +249,55 @@ public open class Tab(
         li(baseClass = classes("tabs".component("item"))) {
             attr("role", "presentation")
             classMap(idSelection.data.filterNotNull().map { mapOf("current".modifier() to (it == item.id)) })
-            button(id = item.id, baseClass = "tabs".component("link")) {
-                aria["controls"] = contentId(item.id)
+            button(id = item.tabId, baseClass = "tabs".component("link")) {
+                aria["controls"] = item.contentId
                 aria["selected"] = idSelection.data.map { (item.id == it).toString() }
                 aria["disabled"] = disabledIds.data.map { (it.contains(item.id)).toString() }
                 disabled(disabledIds.data.map { it.contains(item.id) })
                 attr("role", "tab")
                 clicks.map { item.id } handledBy idSelection.update
-                item.icon?.let { icn ->
-                    span(baseClass = "tabs".component("item", "icon")) {
-                        icn.invoke(this)
+
+                item.tab?.let { tab ->
+                    if (tab.iconFirst) {
+                        renderIcon(this, tab)
+                        renderText(this, tab)
+                    } else {
+                        renderText(this, tab)
+                        renderIcon(this, tab)
                     }
                 }
-                span(baseClass = "tabs".component("item", "text")) {
-                    item.applyTitle(this)
+            }
+        }
+    }
+
+    private fun renderIcon(context: RenderContext, tab: Tab) {
+        with(context) {
+            tab.icon?.let { icn ->
+                span(baseClass = "tabs".component("item", "icon")) {
+                    icn(this)
                 }
+            }
+        }
+    }
+
+    private fun renderText(context: RenderContext, tab: Tab) {
+        with(context) {
+            if (tab.hasTitle) {
+                span(baseClass = "tabs".component("item", "text")) {
+                    tab.applyTitle(this)
+                }
+            }
+        }
+    }
+
+    private fun renderContent(context: RenderContext, item: TabItem): TextElement = with(context) {
+        section(baseClass = "tab-content".component(), id = item.contentId) {
+            aria["labelledby"] = item.tabId
+            attr("hidden", idSelection.data.map { item.id != it })
+            attr("role", "tabpanel")
+            attr("tabindex", 0)
+            div(baseClass = "tab-content".component("body")) {
+                item.content?.invoke(this)
             }
         }
     }
@@ -301,25 +306,86 @@ public open class Tab(
 // ------------------------------------------------------ item & store
 
 /**
- * DSL scope class to create [TabItem]s when using [Tab.items] functions.
+ * DSL scope class to create [Tab]s when using [Tabs.items] functions.
  */
 public class TabItemScope internal constructor(internal var id: String) {
 
     /**
-     * Creates and returns a new [TabItem].
+     * Creates and returns a new [Tab].
      */
-    public fun item(title: String? = null, context: TabItem.() -> Unit = {}): TabItem =
-        TabItem(id, title).apply(context)
+    public fun item(context: TabItem.() -> Unit = {}): TabItem = TabItem(id).apply(context)
 }
 
 /**
- * An item in an [Tab] component.
+ * An item in a [Tabs] component. An item consists of the tab and the related content.
  */
-public class TabItem internal constructor(internal val id: String, title: String?) :
-    WithEvents by EventMixin(),
-    WithTitle by TitleMixin() {
+public open class TabItem internal constructor(internal val id: String) {
+
+    internal val tabId = Id.build(id, "tab")
+    internal val contentId = Id.build(id, "cnt")
+    internal var tab: Tab? = null
+    internal var content: (Div.() -> Unit)? = null
+
+    public fun tab(title: String? = null, tab: Tab.() -> Unit = {}) {
+        this.tab = Tab(title).apply(tab)
+    }
+
+    public fun content(content: Div.() -> Unit) {
+        this.content = content
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+
+        other as TabItem
+
+        if (id != other.id) return false
+        if (content != other.content) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "TabItem(id='$id', tabId='$tabId', contentId='$contentId')"
+    }
+}
+
+/**
+ * A static item in a [Tabs] component.
+ */
+public class StaticTabItem internal constructor(id: String) : TabItem(id) {
+
+    internal var selectedFlag: Boolean? = null
+    internal var disabledFlag: Boolean? = null
+    internal var selectedFlow: Flow<Boolean>? = null
+    internal var disabledFlow: Flow<Boolean>? = null
+
+    public fun selected(value: Boolean) {
+        this.selectedFlag = value
+    }
+
+    public fun selected(value: Flow<Boolean>) {
+        this.selectedFlow = value
+    }
+
+    public fun disabled(value: Boolean) {
+        this.disabledFlag = value
+    }
+
+    public fun disabled(value: Flow<Boolean>) {
+        this.disabledFlow = value
+    }
+}
+
+public class Tab(title: String?) : WithTitle by TitleMixin() {
 
     internal var icon: (RenderContext.() -> Unit)? = null
+    internal var iconFirst: Boolean = false
 
     init {
         title?.let { this.title(it) }
@@ -329,6 +395,7 @@ public class TabItem internal constructor(internal val id: String, title: String
      * Sets the render function for the icon of the tab.
      */
     public fun icon(iconClass: String = "", context: Icon.() -> Unit = {}) {
+        iconFirst = !hasTitle
         this.icon = {
             icon(iconClass = iconClass) {
                 context(this)

@@ -304,7 +304,6 @@ public class Drawer(private val variations: Array<out DrawerVariant>) :
     // ------------------------------------------------------ end resizing
 
     private fun handleMouseUp(@Suppress("UNUSED_PARAMETER") event: Event) {
-        console.log("start document mouse up handler")
         if (!resizing.current) {
             return
         }
@@ -312,7 +311,6 @@ public class Drawer(private val variations: Array<out DrawerVariant>) :
         resizing.update(false)
         document.removeEventListener(mousemove.name, mouseMoveHandler)
         document.removeEventListener(mouseup.name, mouseUpHandler)
-        console.log("end   document mouse up handler")
     }
 
     private fun handleTouchEnd(event: Event) {

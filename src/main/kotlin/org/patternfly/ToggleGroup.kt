@@ -241,13 +241,9 @@ public open class ToggleGroup(
 
                 if (item.iconFirst) {
                     renderIcon(this, item)
-                }
-                if (item.hasTitle) {
-                    span(baseClass = "toggle-group".component("text")) {
-                        item.applyTitle(this)
-                    }
-                }
-                if (!item.iconFirst) {
+                    renderText(this, item)
+                } else {
+                    renderText(this, item)
                     renderIcon(this, item)
                 }
             }
@@ -259,6 +255,16 @@ public open class ToggleGroup(
             item.icon?.let { icn ->
                 span(baseClass = "toggle-group".component("icon")) {
                     icn(this)
+                }
+            }
+        }
+    }
+
+    private fun renderText(context: RenderContext, item: ToggleGroupItem) {
+        with(context) {
+            if (item.hasTitle) {
+                span(baseClass = "toggle-group".component("text")) {
+                    item.applyTitle(this)
                 }
             }
         }
