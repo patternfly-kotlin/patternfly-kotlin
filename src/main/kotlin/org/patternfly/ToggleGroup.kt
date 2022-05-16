@@ -1,19 +1,13 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.handledBy
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
@@ -51,13 +45,10 @@ public open class ToggleGroup(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var itemsInStore: Boolean = false
-    private val itemStore: ToggleGroupItemStore = ToggleGroupItemStore()
-    private val headItems: MutableList<ToggleGroupItem> = mutableListOf()
-    private val tailItems: MutableList<ToggleGroupItem> = mutableListOf()
     private val singleIdSelection: SingleIdStore = SingleIdStore()
     private val multiIdSelection: MultiIdStore = MultiIdStore()
     private val disabledIds: MultiIdStore = MultiIdStore()
+    private val itemStore: HeadTailItemStore<ToggleGroupItem> = HeadTailItemStore()
 
     /**
      * Adds a [ToggleGroupItem].
@@ -68,36 +59,9 @@ public open class ToggleGroup(
         context: StaticToggleGroupItem.() -> Unit = {}
     ) {
         val item = StaticToggleGroupItem(id, title).apply(context)
-        (if (itemsInStore) tailItems else headItems).add(item)
-
-        item.selectedFlag?.let { selected ->
-            if (selected) {
-                if (singleSelect) {
-                    singleIdSelection.update(id)
-                } else {
-                    multiIdSelection.select(id to true)
-                }
-            }
-        }
-        item.disabledFlag?.let { disabled ->
-            if (disabled) {
-                disabledIds.disable(id)
-            }
-        }
-        item.selectedFlow?.let { selected ->
-            // setup one-way selection data binding: flow -> id
-            if (singleSelect) {
-                selected.filter { it }.map { id } handledBy singleIdSelection.update
-                selected.filter { !it }.map { null } handledBy singleIdSelection.update
-            } else {
-                selected.map { id to it } handledBy multiIdSelection.select
-            }
-        }
-        item.disabledFlow?.let { disabled ->
-            // setup disabled one-way disabled data binding: flow -> id
-            disabled.filter { it }.map { id } handledBy disabledIds.disable
-            disabled.filter { !it }.map { id } handledBy disabledIds.enable
-        }
+        itemStore.add(item)
+        item.select(singleSelect, singleIdSelection, multiIdSelection)
+        item.disable(disabledIds)
     }
 
     /**
@@ -151,24 +115,19 @@ public open class ToggleGroup(
         disabled: Store<List<T>>,
         display: ToggleGroupItemScope.(T) -> ToggleGroupItem
     ) {
-        (MainScope() + itemStore.job).launch {
-            values.collect { values ->
-                val idToData = values.associateBy { idProvider(it) }
-                itemStore.update(
-                    values.map { value ->
-                        ToggleGroupItemScope(idProvider(value)).run {
-                            display.invoke(this, value)
-                        }
-                    }
-                )
-
-                // setup data bindings
-                idToData.dataBinding(singleIdSelection, singleSelection, idProvider)
-                idToData.dataBinding(multiIdSelection, multiSelection, idProvider)
-                idToData.dataBinding(disabledIds, disabled, idProvider)
+        itemStore.collect(values) { valueList ->
+            val idToData = valueList.associateBy { idProvider(it) }
+            itemStore.update(valueList) { value ->
+                ToggleGroupItemScope(idProvider(value)).run {
+                    display.invoke(this, value)
+                }
             }
+
+            // setup data bindings
+            idToData.dataBinding(singleIdSelection, singleSelection, idProvider)
+            idToData.dataBinding(multiIdSelection, multiSelection, idProvider)
+            idToData.dataBinding(disabledIds, disabled, idProvider)
         }
-        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -185,9 +144,7 @@ public open class ToggleGroup(
                 applyElement(this)
                 applyEvents(this)
 
-                itemStore.data.map { items ->
-                    headItems + items + tailItems
-                }.render(into = this) { items ->
+                itemStore.allItems.render(into = this) { items ->
                     items.forEach { item ->
                         renderItem(this, item)
                     }
@@ -310,26 +267,34 @@ public open class ToggleGroupItem internal constructor(internal val id: String, 
 
 public class StaticToggleGroupItem internal constructor(id: String, title: String?) : ToggleGroupItem(id, title) {
 
-    internal var selectedFlag: Boolean? = null
-    internal var disabledFlag: Boolean? = null
-    internal var selectedFlow: Flow<Boolean>? = null
-    internal var disabledFlow: Flow<Boolean>? = null
+    private val selection: FlagOrFlow = FlagOrFlow(id)
+    private val disabled: FlagOrFlow = FlagOrFlow(id)
 
     public fun selected(value: Boolean) {
-        this.selectedFlag = value
+        selection.flag = value
     }
 
     public fun selected(value: Flow<Boolean>) {
-        this.selectedFlow = value
+        selection.flow = value
     }
 
     public fun disabled(value: Boolean) {
-        this.disabledFlag = value
+        disabled.flag = value
     }
 
     public fun disabled(value: Flow<Boolean>) {
-        this.disabledFlow = value
+        disabled.flow = value
+    }
+
+    internal fun select(singleSelect: Boolean, singleIdSelection: SingleIdStore, multiIdSelection: MultiIdStore) {
+        if (singleSelect) {
+            selection.singleSelect(singleIdSelection)
+        } else {
+            selection.multiSelect(multiIdSelection)
+        }
+    }
+
+    internal fun disable(disabledIds: MultiIdStore) {
+        disabled.disable(disabledIds)
     }
 }
-
-internal class ToggleGroupItemStore : RootStore<List<ToggleGroupItem>>(emptyList())

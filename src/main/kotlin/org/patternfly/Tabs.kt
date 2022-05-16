@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.Div
@@ -8,11 +7,9 @@ import dev.fritz2.dom.html.Li
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.TextElement
 import dev.fritz2.dom.html.Ul
-import dev.fritz2.dom.html.handledBy
 import dev.fritz2.lenses.IdProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -63,15 +60,11 @@ public open class Tabs(
     WithEvents by EventMixin() {
 
     private lateinit var ul: Ul
-    private var itemsInStore: Boolean = false
-
-    private val headItems: MutableList<TabItem> = mutableListOf()
-    private val tailItems: MutableList<TabItem> = mutableListOf()
 
     private val scrollStore = ScrollButtonStore()
-    private val itemStore: TabItemStore = TabItemStore()
     private val idSelection: SingleIdStore = SingleIdStore()
     private val disabledIds: MultiIdStore = MultiIdStore()
+    private val itemStore: HeadTailItemStore<TabItem> = HeadTailItemStore()
 
     /**
      * Adds a static [TabItem].
@@ -84,28 +77,9 @@ public open class Tabs(
         context: StaticTabItem.() -> Unit = {}
     ) {
         val item = StaticTabItem(id).apply(context)
-        (if (itemsInStore) tailItems else headItems).add(item)
-
-        item.selectedFlag?.let { selected ->
-            if (selected) {
-                idSelection.update(id)
-            }
-        }
-        item.disabledFlag?.let { disabled ->
-            if (disabled) {
-                disabledIds.disable(id)
-            }
-        }
-        item.selectedFlow?.let { selected ->
-            // setup one-way selection data binding: flow -> id
-            selected.filter { it }.map { id } handledBy idSelection.update
-            selected.filter { !it }.map { null } handledBy idSelection.update
-        }
-        item.disabledFlow?.let { disabled ->
-            // setup disabled one-way disabled data binding: flow -> id
-            disabled.filter { it }.map { id } handledBy disabledIds.disable
-            disabled.filter { !it }.map { id } handledBy disabledIds.enable
-        }
+        itemStore.add(item)
+        item.select(idSelection)
+        item.disable(disabledIds)
     }
 
     /**
@@ -143,26 +117,21 @@ public open class Tabs(
         disabled: Store<List<T>> = storeOf(listOf()),
         display: TabItemScope.(T) -> TabItem
     ) {
-        (MainScope() + itemStore.job).launch {
-            values.collect { values ->
-                val idToData = values.associateBy { idProvider(it) }
-                itemStore.update(
-                    values.map { value ->
-                        TabItemScope(idProvider(value)).run {
-                            display.invoke(this, value)
-                        }
-                    }
-                )
-
-                // setup data bindings
-                idToData.dataBinding(idSelection, selection, idProvider)
-                idToData.dataBinding(disabledIds, disabled, idProvider)
-
-                // update scroll buttons
-                ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
+        itemStore.collect(values) { valueList ->
+            val idToData = valueList.associateBy { idProvider(it) }
+            itemStore.update(valueList) { value ->
+                TabItemScope(idProvider(value)).run {
+                    display.invoke(this, value)
+                }
             }
+
+            // setup data bindings
+            idToData.dataBinding(idSelection, selection, idProvider)
+            idToData.dataBinding(disabledIds, disabled, idProvider)
+
+            // update scroll buttons
+            ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
         }
-        itemsInStore = true
     }
 
     @Suppress("LongMethod")
@@ -193,14 +162,12 @@ public open class Tabs(
                     ScrollButton.scrolls(domNode).map { domNode.updateScrollButtons() }
                         .filterNotNull() handledBy (scrollStore.update)
 
-                    itemStore.data.map { items -> headItems + items + tailItems }
-                        .renderEach(idProvider = { it.id }, into = this) { renderItem(this, it) }
+                    itemStore.allItems.renderEach(idProvider = { it.id }, into = this) { renderItem(this, it) }
                 }
                 rightScrollButton(ul.domNode, scrollStore)
             }
 
-            itemStore.data.map { items -> headItems + items + tailItems }
-                .renderEach(idProvider = { it.id }) { renderContent(this, it) }
+            itemStore.allItems.renderEach(idProvider = { it.id }) { renderContent(this, it) }
 
             // update scroll buttons, when window has been resized
             ScrollButton.windowResizes().map { ul.domNode.updateScrollButtons() }
@@ -327,25 +294,31 @@ public open class TabItem internal constructor(internal val id: String) {
  */
 public class StaticTabItem internal constructor(id: String) : TabItem(id) {
 
-    internal var selectedFlag: Boolean? = null
-    internal var disabledFlag: Boolean? = null
-    internal var selectedFlow: Flow<Boolean>? = null
-    internal var disabledFlow: Flow<Boolean>? = null
+    private val selection: FlagOrFlow = FlagOrFlow(id)
+    private val disabled: FlagOrFlow = FlagOrFlow(id)
 
     public fun selected(value: Boolean) {
-        this.selectedFlag = value
+        selection.flag = value
     }
 
     public fun selected(value: Flow<Boolean>) {
-        this.selectedFlow = value
+        selection.flow = value
     }
 
     public fun disabled(value: Boolean) {
-        this.disabledFlag = value
+        disabled.flag = value
     }
 
     public fun disabled(value: Flow<Boolean>) {
-        this.disabledFlow = value
+        disabled.flow = value
+    }
+
+    internal fun select(idSelection: SingleIdStore) {
+        selection.singleSelect(idSelection)
+    }
+
+    internal fun disable(disabledIds: MultiIdStore) {
+        disabled.disable(disabledIds)
     }
 }
 
@@ -370,5 +343,3 @@ public class Tab(title: String?) : WithTitle by TitleMixin() {
         }
     }
 }
-
-internal class TabItemStore : RootStore<List<TabItem>>(emptyList())

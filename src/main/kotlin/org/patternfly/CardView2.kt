@@ -1,7 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -33,8 +32,8 @@ public open class CardView2 :
     private val itemStore: CardViewItemStore = CardViewItemStore()
     private val headItems: MutableList<CardViewItem> = mutableListOf()
     private val tailItems: MutableList<CardViewItem> = mutableListOf()
-    private val singleIdSelection: RootStore<String?> = storeOf(null)
-    private val multiIdSelection: MultiIdSelectionStore = MultiIdSelectionStore()
+    private val singleIdSelection: SingleIdStore = SingleIdStore()
+    private val multiIdSelection: MultiIdStore = MultiIdStore()
 
     public val selectedId: Flow<String?>
         get() = singleIdSelection.data

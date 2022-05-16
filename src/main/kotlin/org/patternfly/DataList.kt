@@ -1,21 +1,15 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.html.handledBy
 import dev.fritz2.dom.states
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.patternfly.ButtonVariant.plain
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLLIElement
@@ -54,12 +48,9 @@ public open class DataList(private val compact: Boolean, private val selectable:
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var itemsInStore: Boolean = false
-    private val itemStore: DataListItemStore = DataListItemStore()
-    private val headItems: MutableList<DataListItem> = mutableListOf()
-    private val tailItems: MutableList<DataListItem> = mutableListOf()
-    private val singleIdSelection: RootStore<String?> = storeOf(null)
-    private val multiIdSelection: MultiIdSelectionStore = MultiIdSelectionStore()
+    private val singleIdSelection: SingleIdStore = SingleIdStore()
+    private val multiIdSelection: MultiIdStore = MultiIdStore()
+    private val itemStore: HeadTailItemStore<DataListItem> = HeadTailItemStore()
 
     public val selectedId: Flow<String?>
         get() = singleIdSelection.data
@@ -69,9 +60,11 @@ public open class DataList(private val compact: Boolean, private val selectable:
 
     public fun item(
         id: String = Id.unique(ComponentType.DataList.id, "itm"),
-        context: DataListItem.() -> Unit
+        context: StaticDataListItem.() -> Unit
     ) {
-        (if (itemsInStore) tailItems else headItems).add(DataListItem(id).apply(context))
+        val item = StaticDataListItem(id).apply(context)
+        itemStore.add(item)
+        item.select(singleIdSelection, multiIdSelection)
     }
 
     public fun <T> items(
@@ -117,34 +110,22 @@ public open class DataList(private val compact: Boolean, private val selectable:
         multiDataSelection: Store<List<T>>?,
         display: DataListItemScope.(T) -> DataListItem
     ) {
-        (MainScope() + itemStore.job).launch {
-            values.collect { values ->
-                val idToData = values.associateBy { idProvider(it) }
-                itemStore.update(
-                    values.map { value ->
-                        DataListItemScope(idProvider(value)).run {
-                            display.invoke(this, value)
-                        }
-                    }
-                )
-                // setup two-way data bindings
-                singleDataSelection?.let { sds ->
-                    // id -> data
-                    singleIdSelection.data.map { idToData[it] } handledBy sds.update
-                    // data -> id
-                    sds.data.map { if (it != null) idProvider(it) else null } handledBy singleIdSelection.update
-                }
-                multiDataSelection?.let { mds ->
-                    // id -> data
-                    multiIdSelection.data.map { ids ->
-                        idToData.filterKeys { it in ids }
-                    }.map { it.values.toList() } handledBy mds.update
-                    // data -> id
-                    mds.data.map { data -> data.map { idProvider(it) } } handledBy multiIdSelection.update
+        itemStore.collect(values) { valueList ->
+            val idToData = valueList.associateBy { idProvider(it) }
+            itemStore.update(valueList) { value ->
+                DataListItemScope(idProvider(value)).run {
+                    display(this, value)
                 }
             }
+
+            // setup data bindings
+            singleDataSelection?.let { sds ->
+                idToData.dataBinding(singleIdSelection, sds, idProvider)
+            }
+            multiDataSelection?.let { mds ->
+                idToData.dataBinding(multiIdSelection, mds, idProvider)
+            }
         }
-        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?): DataList = with(context) {
@@ -161,9 +142,7 @@ public open class DataList(private val compact: Boolean, private val selectable:
             applyEvents(this)
             attr("role", "list")
 
-            itemStore.data.map { items ->
-                headItems + items + tailItems
-            }.renderEach(into = this, idProvider = { it.id }) { item ->
+            itemStore.allItems.renderEach(into = this, idProvider = { it.id }) { item ->
                 renderItem(this, item)
             }
         }
@@ -318,7 +297,7 @@ public class DataListItemScope(internal val id: String) {
     public fun item(context: DataListItem.() -> Unit): DataListItem = DataListItem(id).apply(context)
 }
 
-public class DataListItem(public val id: String) :
+public open class DataListItem(public val id: String) :
     WithExpandedStore by ExpandedStoreMixin() {
 
     internal var toggle: Boolean = false
@@ -387,11 +366,20 @@ public class DataListItem(public val id: String) :
     }
 }
 
-internal class DataListItemStore : RootStore<List<DataListItem>>(emptyList())
+public class StaticDataListItem internal constructor(id: String) : DataListItem(id) {
 
-internal class MultiIdSelectionStore : RootStore<List<String>>(emptyList()) {
+    private val selection: FlagOrFlow = FlagOrFlow(id)
 
-    val select: Handler<Pair<String, Boolean>> = handle { ids, (id, select) ->
-        if (select) ids + id else ids - id
+    public fun selected(value: Boolean) {
+        selection.flag = value
+    }
+
+    public fun selected(value: Flow<Boolean>) {
+        selection.flow = value
+    }
+
+    internal fun select(singleIdSelection: SingleIdStore, multiIdSelection: MultiIdStore) {
+        selection.singleSelect(singleIdSelection)
+        selection.multiSelect(multiIdSelection)
     }
 }

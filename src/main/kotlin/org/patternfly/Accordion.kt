@@ -1,16 +1,11 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.Events
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
 
 // ------------------------------------------------------ factory
@@ -60,10 +55,7 @@ public open class Accordion(
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
 
-    private var itemsInStore: Boolean = false
-    private val itemStore: AccordionItemStore = AccordionItemStore()
-    private val headItems: MutableList<AccordionItem> = mutableListOf()
-    private val tailItems: MutableList<AccordionItem> = mutableListOf()
+    private val itemStore: HeadTailItemStore<AccordionItem> = HeadTailItemStore()
 
     /**
      * whether only one [AccordionItem] can be expanded at a time
@@ -94,7 +86,7 @@ public open class Accordion(
         title: String? = null,
         context: AccordionItem.() -> Unit = {}
     ) {
-        (if (itemsInStore) tailItems else headItems).add(AccordionItem(id, title).apply(context))
+        itemStore.add(AccordionItem(id, title).apply(context))
     }
 
     /**
@@ -116,18 +108,13 @@ public open class Accordion(
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
         display: AccordionItemScope.(T) -> AccordionItem
     ) {
-        (MainScope() + itemStore.job).launch {
-            values.collect { values ->
-                itemStore.update(
-                    values.map { value ->
-                        AccordionItemScope(idProvider(value)).run {
-                            display.invoke(this, value)
-                        }
-                    }
-                )
+        itemStore.collect(values) { valueList ->
+            itemStore.update(valueList) { value ->
+                AccordionItemScope(idProvider(value)).run {
+                    display.invoke(this, value)
+                }
             }
         }
-        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -144,9 +131,7 @@ public open class Accordion(
                 applyElement(this)
                 applyEvents(this)
 
-                itemStore.data.map { items ->
-                    headItems + items + tailItems
-                }.render(into = this) { items ->
+                itemStore.allItems.render(into = this) { items ->
                     items.forEach { item ->
                         renderItem(this, item)
                         expandItem(item)
@@ -212,7 +197,7 @@ public open class Accordion(
     }
 
     private fun collapseAllBut(item: AccordionItem) {
-        (headItems + tailItems).filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
+        itemStore.headTailItems.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
     }
 }
 
@@ -267,5 +252,3 @@ public class AccordionItem internal constructor(internal val id: String, title: 
         this.initiallyExpanded = expanded
     }
 }
-
-internal class AccordionItemStore : RootStore<List<AccordionItem>>(emptyList())
