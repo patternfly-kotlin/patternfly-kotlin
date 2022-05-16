@@ -217,8 +217,8 @@ public open class Tabs(
                     itemStore.data.map { items ->
                         headItems + items + tailItems
                     }.renderEach(idProvider = { it.id }, into = this) { item ->
-                    renderItem(this, item)
-                }
+                        renderItem(this, item)
+                    }
                 }
                 button(baseClass = "tabs".component("scroll", "button")) {
                     aria["label"] = "Scroll right"
