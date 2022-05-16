@@ -214,11 +214,8 @@ public open class Tabs(
                         domNode.updateScrollButtons()
                     }.filterNotNull() handledBy (scrollStore.update)
 
-                    itemStore.data.map { items ->
-                        headItems + items + tailItems
-                    }.renderEach(idProvider = { it.id }, into = this) { item ->
-                        renderItem(this, item)
-                    }
+                    itemStore.data.map { items -> headItems + items + tailItems }
+                        .renderEach(idProvider = { it.id }, into = this) { renderItem(this, it) }
                 }
                 button(baseClass = "tabs".component("scroll", "button")) {
                     aria["label"] = "Scroll right"
@@ -229,11 +226,8 @@ public open class Tabs(
                 }
             }
 
-            itemStore.data.map { items ->
-                headItems + items + tailItems
-            }.renderEach(idProvider = { it.id }) { item ->
-                renderContent(this, item)
-            }
+            itemStore.data.map { items -> headItems + items + tailItems }
+                .renderEach(idProvider = { it.id }) { renderContent(this, it) }
 
             // update scroll buttons, when window has been resized
             ScrollButton.windowResizes().map { ul.domNode.updateScrollButtons() }
