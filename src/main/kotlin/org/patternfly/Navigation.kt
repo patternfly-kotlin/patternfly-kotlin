@@ -163,21 +163,9 @@ public open class Navigation<T>(
 
     private fun horizontal(context: RenderContext, entries: List<NavigationEntry<T>>) {
         with(context) {
-            button(baseClass = "nav".component("scroll", "button")) {
-                aria["label"] = "Scroll left"
-                disabled(scrollStore.data.map { it.disableLeft })
-                aria["hidden"] = scrollStore.data.map { it.disableLeft.toString() }
-                domNode.onclick = { ul.domNode.scrollLeft() }
-                icon("angle-left".fas())
-            }
+            leftScrollButton(ul.domNode, scrollStore)
             flat(this, entries, true)
-            button(baseClass = "nav".component("scroll", "button")) {
-                aria["label"] = "Scroll right"
-                disabled(scrollStore.data.map { it.disableRight })
-                aria["hidden"] = scrollStore.data.map { it.disableRight.toString() }
-                domNode.onclick = { ul.domNode.scrollRight() }
-                icon("angle-right".fas())
-            }
+            rightScrollButton(ul.domNode, scrollStore)
         }
     }
 

@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
@@ -56,12 +55,9 @@ public open class ToggleGroup(
     private val itemStore: ToggleGroupItemStore = ToggleGroupItemStore()
     private val headItems: MutableList<ToggleGroupItem> = mutableListOf()
     private val tailItems: MutableList<ToggleGroupItem> = mutableListOf()
-    private val singleIdSelection: RootStore<String?> = storeOf(null)
-    private val multiIdSelection: ToggleGroupMultiSelectionStore = ToggleGroupMultiSelectionStore()
-    private val disabledIds = object : RootStore<List<String>>(listOf()) {
-        val disable: Handler<String> = handle { ids, id -> ids + id }
-        val enable: Handler<String> = handle { ids, id -> ids - id }
-    }
+    private val singleIdSelection: SingleIdStore = SingleIdStore()
+    private val multiIdSelection: MultiIdStore = MultiIdStore()
+    private val disabledIds: MultiIdStore = MultiIdStore()
 
     /**
      * Adds a [ToggleGroupItem].
@@ -165,27 +161,11 @@ public open class ToggleGroup(
                         }
                     }
                 )
-                // setup single selection two-way data bindings
-                // id -> T
-                singleIdSelection.data.map { idToData[it] } handledBy singleSelection.update
-                // T -> id
-                singleSelection.data.map { if (it != null) idProvider(it) else null } handledBy singleIdSelection.update
 
-                // setup multi selection two-way data bindings
-                // id -> T
-                multiIdSelection.data.map { ids ->
-                    idToData.filterKeys { it in ids }
-                }.map { it.values.toList() } handledBy multiSelection.update
-                // T -> id
-                multiSelection.data.map { data -> data.map { idProvider(it) } } handledBy multiIdSelection.update
-
-                // setup disabled two-way data bindings
-                // id -> T
-                disabledIds.data.map { ids ->
-                    idToData.filterKeys { it in ids }
-                }.map { it.values.toList() } handledBy disabled.update
-                // T -> id
-                disabled.data.map { data -> data.map { idProvider(it) } } handledBy disabledIds.update
+                // setup data bindings
+                idToData.dataBinding(singleIdSelection, singleSelection, idProvider)
+                idToData.dataBinding(multiIdSelection, multiSelection, idProvider)
+                idToData.dataBinding(disabledIds, disabled, idProvider)
             }
         }
         itemsInStore = true
@@ -307,6 +287,25 @@ public open class ToggleGroupItem internal constructor(internal val id: String, 
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+
+        other as ToggleGroupItem
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "ToggleGroupItem(id='$id')"
+    }
 }
 
 public class StaticToggleGroupItem internal constructor(id: String, title: String?) : ToggleGroupItem(id, title) {
@@ -334,14 +333,3 @@ public class StaticToggleGroupItem internal constructor(id: String, title: Strin
 }
 
 internal class ToggleGroupItemStore : RootStore<List<ToggleGroupItem>>(emptyList())
-
-internal class ToggleGroupMultiSelectionStore : RootStore<List<String>>(emptyList()) {
-
-    val select: Handler<Pair<String, Boolean>> = handle { ids, (id, select) ->
-        if (select) ids + id else ids - id
-    }
-
-    val toggle: Handler<String> = handle { ids, id ->
-        if (ids.contains(id)) ids - id else ids + id
-    }
-}

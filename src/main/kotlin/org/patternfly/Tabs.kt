@@ -1,6 +1,5 @@
 package org.patternfly
 
-import dev.fritz2.binding.Handler
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
@@ -71,11 +70,8 @@ public open class Tabs(
 
     private val scrollStore = ScrollButtonStore()
     private val itemStore: TabItemStore = TabItemStore()
-    private val idSelection: RootStore<String?> = storeOf(null)
-    private val disabledIds = object : RootStore<List<String>>(listOf()) {
-        val disable: Handler<String> = handle { ids, id -> ids + id }
-        val enable: Handler<String> = handle { ids, id -> ids - id }
-    }
+    private val idSelection: SingleIdStore = SingleIdStore()
+    private val disabledIds: MultiIdStore = MultiIdStore()
 
     /**
      * Adds a static [TabItem].
@@ -158,19 +154,9 @@ public open class Tabs(
                     }
                 )
 
-                // setup selection two-way data bindings
-                // 1. id -> T
-                idSelection.data.map { idToData[it] } handledBy selection.update
-                // 2. T -> id
-                selection.data.map { if (it != null) idProvider(it) else null } handledBy idSelection.update
-
-                // setup disabled two-way data bindings
-                // id -> T
-                disabledIds.data.map { ids ->
-                    idToData.filterKeys { it in ids }
-                }.map { it.values.toList() } handledBy disabled.update
-                // T -> id
-                disabled.data.map { data -> data.map { idProvider(it) } } handledBy disabledIds.update
+                // setup data bindings
+                idToData.dataBinding(idSelection, selection, idProvider)
+                idToData.dataBinding(disabledIds, disabled, idProvider)
 
                 // update scroll buttons
                 ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }
@@ -200,30 +186,17 @@ public open class Tabs(
                         mapOf("scrollable".modifier() to (!vertical && it.showButtons))
                     }
                 )
-                button(baseClass = "tabs".component("scroll", "button")) {
-                    aria["label"] = "Scroll left"
-                    disabled(scrollStore.data.map { it.disableLeft })
-                    aria["hidden"] = scrollStore.data.map { it.disableLeft.toString() }
-                    domNode.onclick = { ul.domNode.scrollLeft() }
-                    icon("angle-left".fas())
-                }
+                leftScrollButton(ul.domNode, scrollStore)
                 ul = ul(baseClass = "tabs".component("list")) {
                     // update scroll buttons, when scroll event has been fired
                     // e.g. by scrollLeft() or scrollRight()
-                    ScrollButton.scrolls(domNode).map {
-                        domNode.updateScrollButtons()
-                    }.filterNotNull() handledBy (scrollStore.update)
+                    ScrollButton.scrolls(domNode).map { domNode.updateScrollButtons() }
+                        .filterNotNull() handledBy (scrollStore.update)
 
                     itemStore.data.map { items -> headItems + items + tailItems }
                         .renderEach(idProvider = { it.id }, into = this) { renderItem(this, it) }
                 }
-                button(baseClass = "tabs".component("scroll", "button")) {
-                    aria["label"] = "Scroll right"
-                    disabled(scrollStore.data.map { it.disableRight })
-                    aria["hidden"] = scrollStore.data.map { it.disableRight.toString() }
-                    domNode.onclick = { ul.domNode.scrollRight() }
-                    icon("angle-right".fas())
-                }
+                rightScrollButton(ul.domNode, scrollStore)
             }
 
             itemStore.data.map { items -> headItems + items + tailItems }
