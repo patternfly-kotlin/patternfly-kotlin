@@ -1,17 +1,13 @@
 package org.patternfly
 
-import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.Store
 import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.A
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.lenses.IdProvider
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.patternfly.dom.Id
 import org.w3c.dom.HTMLLIElement
 
@@ -52,11 +48,8 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     WithEvents by EventMixin() {
 
     private var firstItem: Boolean = true
-    private var itemsInStore: Boolean = false
-    private val itemStore: BreadcrumbItemStore = BreadcrumbItemStore()
-    private val headItems: MutableList<BreadcrumbItem> = mutableListOf()
-    private val tailItems: MutableList<BreadcrumbItem> = mutableListOf()
-    private val selectionStore: RootStore<String?> = storeOf(null)
+    private val idSelection: SingleIdStore = SingleIdStore()
+    private val itemStore: HeadTailItemStore<BreadcrumbItem> = HeadTailItemStore()
 
     /**
      * Whether to render the first item as a link or not.
@@ -71,9 +64,11 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     public fun item(
         id: String = Id.unique(ComponentType.Breadcrumb.id, "itm"),
         title: String? = null,
-        context: BreadcrumbItem.() -> Unit = {}
+        context: StaticBreadcrumbItem.() -> Unit = {}
     ) {
-        (if (itemsInStore) tailItems else headItems).add(BreadcrumbItem(id, title).apply(context))
+        val item = StaticBreadcrumbItem(id, title).apply(context)
+        itemStore.add(item)
+        item.select(idSelection)
     }
 
     /**
@@ -82,9 +77,10 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     public fun <T> items(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
         display: BreadcrumbItemScope.(T) -> BreadcrumbItem
     ) {
-        items(values.data, idProvider, display)
+        items(values.data, idProvider, selection, display)
     }
 
     /**
@@ -93,20 +89,20 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
     public fun <T> items(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
+        selection: Store<T?> = storeOf(null),
         display: BreadcrumbItemScope.(T) -> BreadcrumbItem
     ) {
-        (MainScope() + itemStore.job).launch {
-            values.collect { values ->
-                itemStore.update(
-                    values.map { value ->
-                        BreadcrumbItemScope(idProvider(value)).run {
-                            display.invoke(this, value)
-                        }
-                    }
-                )
+        itemStore.collect(values) { valueList ->
+            val idToData = valueList.associateBy { idProvider(it) }
+            itemStore.update(valueList) { value ->
+                BreadcrumbItemScope(idProvider(value)).run {
+                    display.invoke(this, value)
+                }
             }
+
+            // setup data bindings
+            idSelection.dataBinding(idToData, idProvider, selection)
         }
-        itemsInStore = true
     }
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -118,9 +114,12 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
                 applyEvents(this)
 
                 ol(baseClass = "breadcrumb".component("list")) {
-                    itemStore.data.map { items ->
-                        headItems + items + tailItems
-                    }.renderEach(into = this, idProvider = { it.id }) { item ->
+                    itemStore.allItems.renderEach(
+                        into = this,
+                        idProvider = {
+                            it.id
+                        }
+                    ) { item ->
                         renderItem(this, item)
                     }
                 }
@@ -141,11 +140,11 @@ public open class Breadcrumb(private var noHomeLink: Boolean = false) :
                 } else {
                     a(baseClass = "breadcrumb".component("link")) {
                         classMap(
-                            selectionStore.data.map {
+                            idSelection.data.map {
                                 mapOf("current".modifier() to (item.id == it))
                             }
                         )
-                        clicks.map { item.id } handledBy selectionStore.update
+                        clicks.map { item.id } handledBy idSelection.update
                         item.applyEvents(this)
 
                         if (item.content != null) {
@@ -180,7 +179,7 @@ public class BreadcrumbItemScope(internal val id: String) {
  *
  * @sample org.patternfly.sample.BreadcrumbSample.staticItems
  */
-public class BreadcrumbItem internal constructor(internal val id: String, title: String?) :
+public open class BreadcrumbItem internal constructor(internal val id: String, title: String?) :
     WithEvents by EventMixin(),
     WithTitle by TitleMixin() {
 
@@ -199,4 +198,19 @@ public class BreadcrumbItem internal constructor(internal val id: String, title:
     }
 }
 
-internal class BreadcrumbItemStore : RootStore<List<BreadcrumbItem>>(emptyList())
+public class StaticBreadcrumbItem(id: String, title: String?) : BreadcrumbItem(id, title) {
+
+    private val selection: FlagOrFlow = FlagOrFlow(id)
+
+    public fun selected(value: Boolean) {
+        selection.flag = value
+    }
+
+    public fun selected(value: Flow<Boolean>) {
+        selection.flow = value
+    }
+
+    internal fun select(idSelection: SingleIdStore) {
+        selection.singleSelect(idSelection)
+    }
+}

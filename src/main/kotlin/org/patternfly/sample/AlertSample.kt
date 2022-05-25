@@ -40,12 +40,19 @@ internal class AlertSample {
         }
     }
 
-    fun actions() {
+    fun actionTitle() {
         render {
             alert(INFO, "Alert title") {
                 action("View details") {
-                    clicks handledBy notification(INFO, "Here are the details...")
+                    clicks handledBy notification(INFO, "Details...")
                 }
+            }
+        }
+    }
+
+    fun actionContent() {
+        render {
+            alert(INFO, "Alert title") {
                 action(
                     {
                         +"Ignore"

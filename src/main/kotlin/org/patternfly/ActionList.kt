@@ -26,7 +26,10 @@ public fun RenderContext.actionList(
 /**
  * PatternFly [action list](https://www.patternfly.org/v4/components/action-list/design-guidelines) component.
  *
- * An action list is a group of actions with set spacing.
+ * An action list is a group of actions with set spacing. An action list can contain items, groups and a mix of both.
+ *
+ * @sample org.patternfly.sample.ActionListSample.items
+ * @sample org.patternfly.sample.ActionListSample.mixed
  */
 public open class ActionList(private val icons: Boolean) :
     PatternFlyComponent<Unit>,
@@ -34,6 +37,9 @@ public open class ActionList(private val icons: Boolean) :
 
     private val elements: MutableList<ActionListElement> = mutableListOf()
 
+    /**
+     * Adds a new group.
+     */
     public fun group(
         baseClass: String? = null,
         id: String? = null,
@@ -42,6 +48,9 @@ public open class ActionList(private val icons: Boolean) :
         elements.add(ActionListGroup(baseClass, id).also(context))
     }
 
+    /**
+     * Adds a new item.
+     */
     public fun item(
         baseClass: String? = null,
         id: String? = null,
@@ -85,8 +94,14 @@ public open class ActionList(private val icons: Boolean) :
     }
 }
 
+/**
+ * Common interface for action list items and groups.
+ */
 public sealed interface ActionListElement
 
+/**
+ * An action list group.
+ */
 public class ActionListGroup internal constructor(baseClass: String?, id: String?) :
     ActionListElement, SubComponent<Div>(classes("action-list".component("group"), baseClass), id, {}) {
 
@@ -101,5 +116,8 @@ public class ActionListGroup internal constructor(baseClass: String?, id: String
     }
 }
 
+/**
+ * An action list item.
+ */
 public class ActionListItem internal constructor(baseClass: String?, id: String?, context: Div.() -> Unit) :
     ActionListElement, SubComponent<Div>(classes("action-list".component("item"), baseClass), id, context)

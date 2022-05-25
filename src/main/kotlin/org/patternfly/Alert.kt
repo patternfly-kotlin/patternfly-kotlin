@@ -57,6 +57,9 @@ public fun RenderContext.alert(
 
 // ------------------------------------------------------ component
 
+/**
+ * Common base class for alert groups.
+ */
 public abstract class BaseAlertGroup(private val toast: Boolean) : PatternFlyComponent<Unit> {
 
     override fun render(context: RenderContext, baseClass: String?, id: String?) {
@@ -179,24 +182,24 @@ public open class Alert(private var severity: Severity, title: String) :
     }
 
     /**
-     * Adds an actions to this [Alert].
+     * Adds an actions to this [Alert]. Use this method, if you only need to provide the action's title.
      *
      * @param title the title of the action
      * @param events a lambda expression for setting up the events of the action
      *
-     * @sample org.patternfly.sample.AlertSample.actions
+     * @sample org.patternfly.sample.AlertSample.actionTitle
      */
     public fun action(title: String, events: EventContext<HTMLElement>.() -> Unit) {
         actions.add(AlertAction({ +title }, events))
     }
 
     /**
-     * Adds an actions to this [Alert].
+     * Adds an actions to this [Alert]. Use this method, if you need to customize the action's content.
      *
      * @param context a lambda expression for setting up the action
      * @param events a lambda expression for setting up the events of the action
      *
-     * @sample org.patternfly.sample.AlertSample.actions
+     * @sample org.patternfly.sample.AlertSample.actionContent
      */
     public fun action(context: Button.() -> Unit, events: EventContext<HTMLElement>.() -> Unit) {
         actions.add(AlertAction(context, events))

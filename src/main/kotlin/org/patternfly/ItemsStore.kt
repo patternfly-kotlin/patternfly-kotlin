@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Store used in data-driven components like [CardView], [DataList] and [DataTable]. The store uses an instance of [Items] as its data. It provides flows to get the properties of [Items] and handlers to modify it.
+ * Store used in data-driven components like [LegacyCardView], [DataList] and [DataTable]. The store uses an instance of [Items] as its data. It provides flows to get the properties of [Items] and handlers to modify it.
  *
  * @param idProvider used to uniquely identify each item
  * @param T the type of the payload

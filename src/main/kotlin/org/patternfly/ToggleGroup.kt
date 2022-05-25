@@ -124,9 +124,12 @@ public open class ToggleGroup(
             }
 
             // setup data bindings
-            idToData.dataBinding(singleIdSelection, singleSelection, idProvider)
-            idToData.dataBinding(multiIdSelection, multiSelection, idProvider)
-            idToData.dataBinding(disabledIds, disabled, idProvider)
+            if (singleSelect) {
+                singleIdSelection.dataBinding(idToData, idProvider, singleSelection)
+            } else {
+                multiIdSelection.dataBinding(idToData, idProvider, multiSelection)
+            }
+            disabledIds.dataBinding(idToData, idProvider, disabled)
         }
     }
 

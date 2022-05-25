@@ -1,7 +1,6 @@
 package org.patternfly
 
 import dev.fritz2.binding.Store
-import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
@@ -19,6 +18,7 @@ import org.w3c.dom.HTMLLIElement
 /**
  * Creates an [DataList] component.
  *
+ * @param selectionMode the selection mode for items
  * @param compact whether to use compact layout
  * @param selectable whether the datalist items are selectable
  * @param baseClass optional CSS class that should be applied to the component
@@ -26,12 +26,14 @@ import org.w3c.dom.HTMLLIElement
  * @param context a lambda expression for setting up the component itself
  */
 public fun RenderContext.dataList(
+    selectionMode: SelectionMode = SelectionMode.NONE,
     compact: Boolean = false,
     selectable: Boolean = false,
     baseClass: String? = null,
     id: String? = null,
     context: DataList.() -> Unit = {}
-): DataList = DataList(compact = compact, selectable = selectable).apply(context).render(this, baseClass, id)
+): DataList =
+    DataList(selectionMode, compact = compact, selectable = selectable).apply(context).render(this, baseClass, id)
 
 // ------------------------------------------------------ component
 
@@ -43,7 +45,11 @@ public fun RenderContext.dataList(
  * @sample org.patternfly.sample.DataListSample.dataList
  */
 @Suppress("TooManyFunctions")
-public open class DataList(private val compact: Boolean, private val selectable: Boolean) :
+public open class DataList(
+    private val selectionMode: SelectionMode,
+    private val compact: Boolean,
+    private val selectable: Boolean
+) :
     PatternFlyComponent<DataList>,
     WithElement by ElementMixin(),
     WithEvents by EventMixin() {
@@ -70,37 +76,21 @@ public open class DataList(private val compact: Boolean, private val selectable:
     public fun <T> items(
         values: Store<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        selection: Store<T?> = storeOf(null),
+        singleSelection: Store<T?>? = null,
+        multiSelection: Store<List<T>>? = null,
         display: DataListItemScope.(T) -> DataListItem
     ) {
-        storeItems(values.data, idProvider, selection, null, display)
+        storeItems(values.data, idProvider, singleSelection, multiSelection, display)
     }
 
     public fun <T> items(
         values: Flow<List<T>>,
         idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        selection: Store<T?> = storeOf(null),
+        singleSelection: Store<T?>? = null,
+        multiSelection: Store<List<T>>? = null,
         display: DataListItemScope.(T) -> DataListItem
     ) {
-        storeItems(values, idProvider, selection, null, display)
-    }
-
-    public fun <T> items(
-        values: Store<List<T>>,
-        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        selection: Store<List<T>> = storeOf(emptyList()),
-        display: DataListItemScope.(T) -> DataListItem
-    ) {
-        storeItems(values.data, idProvider, null, selection, display)
-    }
-
-    public fun <T> items(
-        values: Flow<List<T>>,
-        idProvider: IdProvider<T, String> = { Id.build(it.toString()) },
-        selection: Store<List<T>> = storeOf(emptyList()),
-        display: DataListItemScope.(T) -> DataListItem
-    ) {
-        storeItems(values, idProvider, null, selection, display)
+        storeItems(values, idProvider, singleSelection, multiSelection, display)
     }
 
     private fun <T> storeItems(
@@ -119,11 +109,14 @@ public open class DataList(private val compact: Boolean, private val selectable:
             }
 
             // setup data bindings
-            singleDataSelection?.let { sds ->
-                idToData.dataBinding(singleIdSelection, sds, idProvider)
-            }
-            multiDataSelection?.let { mds ->
-                idToData.dataBinding(multiIdSelection, mds, idProvider)
+            if (selectionMode == SelectionMode.SINGLE) {
+                singleDataSelection?.let { sds ->
+                    singleIdSelection.dataBinding(idToData, idProvider, sds)
+                }
+            } else if (selectionMode == SelectionMode.MULTI) {
+                multiDataSelection?.let { mds ->
+                    multiIdSelection.dataBinding(idToData, idProvider, mds)
+                }
             }
         }
     }
@@ -290,14 +283,25 @@ public open class DataList(private val compact: Boolean, private val selectable:
     }
 }
 
+/**
+ * Visual modifiers for a [DataList].
+ *
+ * @see <a href="https://www.patternfly.org/v4/components/data-list/design-guidelines">https://www.patternfly.org/v4/components/data-list/design-guidelines</a>
+ */
+@Suppress("EnumEntryName", "EnumNaming")
+public enum class DataListVariant(internal val modifier: String) {
+    compact("compact".modifier()),
+    selectable("selectable-raised".modifier()),
+}
+
 // ------------------------------------------------------ item & store
 
-public class DataListItemScope(internal val id: String) {
+public class DataListItemScope internal constructor(internal val id: String) {
 
     public fun item(context: DataListItem.() -> Unit): DataListItem = DataListItem(id).apply(context)
 }
 
-public open class DataListItem(public val id: String) :
+public open class DataListItem internal constructor(public val id: String) :
     WithExpandedStore by ExpandedStoreMixin() {
 
     internal var toggle: Boolean = false

@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLDivElement
 // ------------------------------------------------------ dsl
 
 /**
- * Creates a [CardView] component.
+ * Creates a [LegacyCardView] component.
  *
  * @param store the item store
  * @param id the ID of the element
@@ -18,13 +18,13 @@ import org.w3c.dom.HTMLDivElement
  *
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
-public fun <T> RenderContext.cardView(
+public fun <T> RenderContext.legacyCardView(
     store: ItemsStore<T> = ItemsStore(),
     singleSelection: Boolean = false,
     id: String? = null,
     baseClass: String? = null,
-    content: CardView<T>.() -> Unit = {}
-): CardView<T> = register(CardView(store, singleSelection, id = id, baseClass = baseClass, job), content)
+    content: LegacyCardView<T>.() -> Unit = {}
+): LegacyCardView<T> = register(LegacyCardView(store, singleSelection, id = id, baseClass = baseClass, job), content)
 
 // ------------------------------------------------------ tag
 
@@ -39,7 +39,7 @@ public fun <T> RenderContext.cardView(
  *
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
-public class CardView<T> internal constructor(
+public class LegacyCardView<T> internal constructor(
     internal val itemsStore: ItemsStore<T>,
     internal val singleSelection: Boolean,
     id: String?,

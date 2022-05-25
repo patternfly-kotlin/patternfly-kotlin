@@ -28,7 +28,7 @@ public interface PatternFlyElement<out E : HTMLElement> : WithDomNode<E>
 /**
  * Interface meant to be implemented by components which want to have an easy access to an item ID based on [IdProvider]. These components can for example use [itemId] to set the ID attribute on their DOM element.
  *
- * This interface is implemented by most of the components which are part of [CardView], [DataList] and [DataTable]. These implementations use the ID provider of the [ItemsStore]: [ItemsStore.idProvider].
+ * This interface is implemented by most of the components which are part of [LegacyCardView], [DataList] and [DataTable]. These implementations use the ID provider of the [ItemsStore]: [ItemsStore.idProvider].
  */
 @Deprecated("Should no longer be necessary when using PatternFlyComponent<T>")
 public interface WithIdProvider<T> {

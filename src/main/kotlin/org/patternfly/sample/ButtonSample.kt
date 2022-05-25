@@ -13,7 +13,6 @@ import org.patternfly.ButtonVariant.plain
 import org.patternfly.ButtonVariant.primary
 import org.patternfly.ButtonVariant.secondary
 import org.patternfly.ButtonVariant.tertiary
-import org.patternfly.OnOffStore
 import org.patternfly.Severity.INFO
 import org.patternfly.classes
 import org.patternfly.clickButton
@@ -90,7 +89,9 @@ internal class ButtonSample {
     }
 
     fun loading() {
-        val onOff = OnOffStore()
+        val onOff = object : RootStore<Boolean>(false) {
+            val toggle = handle { !it }
+        }
         render {
             clickButton(primary) {
                 title("Click to start loading")

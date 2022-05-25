@@ -197,7 +197,7 @@ public open class Accordion(
     }
 
     private fun collapseAllBut(item: AccordionItem) {
-        itemStore.headTailItems.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
+        itemStore.staticItems.filter { it.id != item.id }.forEach { it.expandedStore.collapse(Unit) }
     }
 }
 

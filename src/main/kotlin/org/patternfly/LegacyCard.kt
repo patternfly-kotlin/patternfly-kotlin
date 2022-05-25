@@ -18,7 +18,7 @@ import org.w3c.dom.HTMLElement
 // ------------------------------------------------------ dsl
 
 /**
- * Creates a [LegacyCard] component which is part of an [CardView].
+ * Creates a [LegacyCard] component which is part of an [LegacyCardView].
  *
  * @param item the item for the card
  * @param selectable whether the card is selectable
@@ -28,7 +28,7 @@ import org.w3c.dom.HTMLElement
  *
  * @sample org.patternfly.sample.CardViewSample.cardView
  */
-public fun <T> CardView<T>.legacyCard(
+public fun <T> LegacyCardView<T>.legacyCard(
     item: T,
     selectable: Boolean = false,
     id: String? = null,
@@ -47,16 +47,6 @@ public fun <T> CardView<T>.legacyCard(
     content
 )
 
-/**
- * Creates a standalone [LegacyCard] component.
- *
- * @param selectable whether the card is selectable
- * @param id the ID of the element
- * @param baseClass optional CSS class that should be applied to the element
- * @param content a lambda expression for setting up the component itself
- *
- * @sample org.patternfly.sample.CardSample.imageInHeader
- */
 public fun RenderContext.legacyCard(
     selectable: Boolean = false,
     id: String? = null,
@@ -122,7 +112,7 @@ public fun <T> LegacyCardHeader<T>.legacyCardAction(
     register(LegacyCardAction(this.itemsStore, this.item, this.card, id = id, baseClass = baseClass, job), content)
 
 /**
- * Creates a [LegacyCardCheckbox] inside the [LegacyCardAction]. If the card is selectable, the checkbox is bound to the [LegacyCard.selected] store (when used standalone) or the [ItemsStore] (when used as part of a [CardView]).
+ * Creates a [LegacyCardCheckbox] inside the [LegacyCardAction]. If the card is selectable, the checkbox is bound to the [LegacyCard.selected] store (when used standalone) or the [ItemsStore] (when used as part of a [LegacyCardView]).
  *
  * @param id the ID of the element
  * @param baseClass optional CSS class that should be applied to the element
@@ -240,7 +230,7 @@ public fun <T> LegacyCardExpandableContent<T>.legacyCardFooter(
 /**
  * PatternFly [card](https://www.patternfly.org/v4/components/card/design-guidelines) component.
  *
- * A card can be used standalone or as part of a [CardView]. If used standalone and the card is created as [selectable], the card stores its selection state using the [selected] property. If the card is part of a [CardView], the selection is stored in the [ItemsStore].
+ * A card can be used standalone or as part of a [LegacyCardView]. If used standalone and the card is created as [selectable], the card stores its selection state using the [selected] property. If the card is part of a [LegacyCardView], the selection is stored in the [ItemsStore].
  *
  * A card contains nested components which make up the card itself. The [LegacyCardTitle] can be placed either in the [LegacyCardHeader] or in the [LegacyCard] itself. If used in the [LegacyCardHeader], make sure to add it **after** the [LegacyCardAction]. Besides the [LegacyCardCheckbox] the [LegacyCardAction] can contain other control components such as [Dropdown]s or [PushButton]s.
  *
@@ -305,7 +295,7 @@ public class LegacyCard<T> internal constructor(
     ) {
 
     /**
-     * Stores the selection of this card if this card is used standalone (i.e. not as part of a [CardView])
+     * Stores the selection of this card if this card is used standalone (i.e. not as part of a [LegacyCardView])
      */
     public val selected: LegacyCardStore = LegacyCardStore()
 
@@ -424,7 +414,7 @@ public class LegacyCardAction<T> internal constructor(
 }
 
 /**
- * Checkbox to (de)select a card. If the card is used standalone and is [selectable][LegacyCard.selectable], the checkbox is bound to a [LegacyCardStore]. If the card is part of a [CardView], the checkbox is bound to the selection state of the [ItemsStore].
+ * Checkbox to (de)select a card. If the card is used standalone and is [selectable][LegacyCard.selectable], the checkbox is bound to a [LegacyCardStore]. If the card is part of a [LegacyCardView], the checkbox is bound to the selection state of the [ItemsStore].
  */
 public class LegacyCardCheckbox<T> internal constructor(
     itemsStore: ItemsStore<T>,

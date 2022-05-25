@@ -126,8 +126,8 @@ public open class Tabs(
             }
 
             // setup data bindings
-            idToData.dataBinding(idSelection, selection, idProvider)
-            idToData.dataBinding(disabledIds, disabled, idProvider)
+            idSelection.dataBinding(idToData, idProvider, selection)
+            disabledIds.dataBinding(idToData, idProvider, disabled)
 
             // update scroll buttons
             ul.domNode.updateScrollButtons()?.let { scrollStore.update(it) }

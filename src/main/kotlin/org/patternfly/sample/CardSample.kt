@@ -5,9 +5,7 @@ package org.patternfly.sample
 import dev.fritz2.dom.html.render
 import kotlinx.coroutines.flow.map
 import org.patternfly.Align.RIGHT
-import org.patternfly.CardVariant.expandable
 import org.patternfly.card
-import org.patternfly.checkbox
 import org.patternfly.dropdown
 
 internal class CardSample {
@@ -16,7 +14,7 @@ internal class CardSample {
         render {
             card {
                 header {
-                    main {
+                    content {
                         img { src("./logo.svg") }
                     }
                     actions {
@@ -29,7 +27,6 @@ internal class CardSample {
                             separator()
                             item("Separated Item")
                         }
-                        checkbox("card-check", standalone = true)
                     }
                 }
                 title { +"Title" }
@@ -53,7 +50,6 @@ internal class CardSample {
                             separator()
                             item("Separated Item")
                         }
-                        checkbox("card-check", standalone = true)
                     }
                     title { +"Title" }
                 }
@@ -87,8 +83,9 @@ internal class CardSample {
 
     fun expandableCard() {
         render {
-            card(expandable) {
+            card {
                 header {
+                    toggle()
                     title {
                         expandedStore.data.map { "Expanded state: $it" }.renderText(into = this)
                     }

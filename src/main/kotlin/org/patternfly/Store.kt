@@ -13,28 +13,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
-// ------------------------------------------------------ data binding
-
-internal fun <T> Map<String, T>.dataBinding(
-    idStore: SingleIdStore,
-    dataStore: Store<T?>,
-    idProvider: IdProvider<T, String>
-) {
-    idStore.data.map { this[it] } handledBy dataStore.update
-    dataStore.data.map { if (it != null) idProvider(it) else null } handledBy idStore.update
-}
-
-internal fun <T> Map<String, T>.dataBinding(
-    idStore: MultiIdStore,
-    dataStore: Store<List<T>>,
-    idProvider: IdProvider<T, String>
-) {
-    idStore.data.map { ids ->
-        this.filterKeys { it in ids }
-    }.map { it.values.toList() } handledBy dataStore.update
-    dataStore.data.map { data -> data.map { idProvider(it) } } handledBy idStore.update
-}
-
 // ------------------------------------------------------ flag or flow
 
 internal class FlagOrFlow(private val id: String) {
@@ -49,8 +27,7 @@ internal class FlagOrFlow(private val id: String) {
         }
         flow?.let { selected ->
             // setup one-way selection data binding: flow -> id
-            selected.filter { it }.map { id } handledBy idSelection.update
-            selected.filter { !it }.map { null } handledBy idSelection.update
+            selected.map { if (it) id else null } handledBy idSelection.update
         }
     }
 
@@ -61,6 +38,7 @@ internal class FlagOrFlow(private val id: String) {
             }
         }
         flow?.let { selected ->
+            // setup one-way selection data binding: flow -> id
             selected.map { id to it } handledBy idSelection.select
         }
     }
@@ -72,7 +50,7 @@ internal class FlagOrFlow(private val id: String) {
             }
         }
         flow?.let { disabled ->
-            // setup disabled one-way disabled data binding: flow -> id
+            // setup one-way disabled data binding: flow -> id
             disabled.filter { it }.map { id } handledBy disabledIds.disable
             disabled.filter { !it }.map { id } handledBy disabledIds.enable
         }
@@ -81,11 +59,21 @@ internal class FlagOrFlow(private val id: String) {
 
 // ------------------------------------------------------ stores
 
-internal class OnOffStore : RootStore<Boolean>(false) {
-    val toggle = handle { !it }
-}
+internal class SingleIdStore : RootStore<String?>(null) {
 
-internal class SingleIdStore : RootStore<String?>(null)
+    fun <T> dataBinding(
+        idToData: Map<String, T>,
+        idProvider: IdProvider<T, String>,
+        dataStore: Store<T?>
+    ) {
+        // perform initial selection
+        dataStore.current?.let { data ->
+            this.update(idProvider(data))
+        }
+        data.map { idToData[it] } handledBy dataStore.update
+        dataStore.data.map { if (it != null) idProvider(it) else null } handledBy update
+    }
+}
 
 internal class MultiIdStore : RootStore<List<String>>(emptyList()) {
 
@@ -104,6 +92,23 @@ internal class MultiIdStore : RootStore<List<String>>(emptyList()) {
     val toggle: Handler<String> = handle { ids, id ->
         if (ids.contains(id)) ids - id else ids + id
     }
+
+    fun <T> dataBinding(
+        idToData: Map<String, T>,
+        idProvider: IdProvider<T, String>,
+        dataStore: Store<List<T>>
+    ) {
+        // perform initial selection
+        if (dataStore.current.isNotEmpty()) {
+            this.update(dataStore.current.map { idProvider(it) })
+        }
+        data.map { ids ->
+            idToData.filterKeys { it in ids }
+        }.map { it.values.toList() } handledBy dataStore.update
+        dataStore.data.map { data ->
+            data.map { idProvider(it) }
+        } handledBy update
+    }
 }
 
 internal class HeadTailItemStore<I> : RootStore<List<I>>(emptyList()) {
@@ -112,7 +117,7 @@ internal class HeadTailItemStore<I> : RootStore<List<I>>(emptyList()) {
     private val headItems: MutableList<I> = mutableListOf()
     private val tailItems: MutableList<I> = mutableListOf()
 
-    val headTailItems: List<I>
+    val staticItems: List<I>
         get() = headItems + tailItems
 
     val allItems: Flow<List<I>>
@@ -127,7 +132,16 @@ internal class HeadTailItemStore<I> : RootStore<List<I>>(emptyList()) {
     }
 
     fun <T> update(values: List<T>, transform: (T) -> I) {
-        update(values.map(transform)) // invoke handler from super
+        update(values.map(transform)) // invoke handler from root store
         itemsInStore = true
     }
+}
+
+// ------------------------------------------------------ selection mode
+
+/**
+ * Selection mode for [CardView], [DataList] and [DataTable]
+ */
+public enum class SelectionMode {
+    NONE, SINGLE, MULTI
 }

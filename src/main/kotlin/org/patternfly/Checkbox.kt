@@ -1,7 +1,10 @@
 package org.patternfly
 
+import dev.fritz2.binding.Store
+import dev.fritz2.binding.storeOf
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.html.Span
+import dev.fritz2.dom.states
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.map
  * Creates the [Checkbox] component.
  *
  * @param name the name of the checkbox
+ * @param value the value of the checkbox
  * @param standalone whether to omit any labels and descriptions
  * @param reversed puts the label before the checkbox control
  * @param id optional ID of the component
@@ -20,6 +24,7 @@ import kotlinx.coroutines.flow.map
  */
 public fun RenderContext.checkbox(
     name: String,
+    value: Store<Boolean> = storeOf(false),
     standalone: Boolean = false,
     reversed: Boolean = false,
     baseClass: String? = null,
@@ -27,6 +32,7 @@ public fun RenderContext.checkbox(
     context: Checkbox.() -> Unit = {}
 ) {
     Checkbox(
+        value = value,
         name = name,
         standalone = standalone,
         reversed = reversed
@@ -42,6 +48,7 @@ public fun RenderContext.checkbox(
  */
 public class Checkbox(
     private val name: String,
+    private val value: Store<Boolean>,
     private val standalone: Boolean,
     private val reversed: Boolean
 ) : PatternFlyComponent<Unit>,
@@ -51,7 +58,6 @@ public class Checkbox(
 
     private var description: SubComponent<Span>? = null
     private var content: SubComponent<Span>? = null
-    private var checked: Flow<Boolean> = emptyFlow()
     private var disabled: Flow<Boolean> = emptyFlow()
     private var indeterminate: Flow<Boolean> = emptyFlow()
 
@@ -61,20 +67,6 @@ public class Checkbox(
 
     public fun content(baseClass: String? = null, id: String? = null, context: Span.() -> Unit) {
         this.content = SubComponent(baseClass, id, context)
-    }
-
-    /**
-     * Controls the checked state of the checkbox.
-     */
-    public fun checked(value: Boolean) {
-        checked = flowOf(value)
-    }
-
-    /**
-     * Controls the checked state of the checkbox.
-     */
-    public fun checked(value: Flow<Boolean>) {
-        checked = value
     }
 
     /**
@@ -88,7 +80,7 @@ public class Checkbox(
      * Controls the indeterminate state of the checkbox.
      */
     public fun indeterminate(value: Flow<Boolean>) {
-        checked = value
+        indeterminate = value
     }
 
     /**
@@ -125,9 +117,10 @@ public class Checkbox(
                     applyEvents(this)
                     type("checkbox")
                     name(name)
-                    checked(checked)
+                    checked(value.data)
                     disabled(disabled)
                     indeterminate(indeterminate)
+                    changes.states() handledBy value.update
                 }
                 if (hasTitle && !reversed) {
                     renderLabel(this)
