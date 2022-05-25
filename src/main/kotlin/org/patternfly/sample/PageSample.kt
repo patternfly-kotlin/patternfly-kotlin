@@ -5,10 +5,10 @@ import dev.fritz2.routing.Router
 import dev.fritz2.routing.StringRoute
 import org.patternfly.ItemsStore
 import org.patternfly.breadcrumb
-import org.patternfly.legacyCardView
 import org.patternfly.dom.Id
 import org.patternfly.legacyCard
 import org.patternfly.legacyCardBody
+import org.patternfly.legacyCardView
 import org.patternfly.modifier
 import org.patternfly.navigation
 import org.patternfly.page

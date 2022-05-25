@@ -4,7 +4,6 @@ package org.patternfly.sample
 
 import dev.fritz2.dom.html.render
 import org.patternfly.Align
-import org.patternfly.ButtonVariant
 import org.patternfly.ButtonVariant.link
 import org.patternfly.ButtonVariant.primary
 import org.patternfly.ButtonVariant.secondary
