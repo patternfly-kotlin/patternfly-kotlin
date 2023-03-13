@@ -1,5 +1,5 @@
 [versions]
-detekt = "1.18.1"
+detekt = "1.22.0"
 dokka = "1.6.21"
 fritz2 = "0.14.2"
 kotest = "5.2.3"
