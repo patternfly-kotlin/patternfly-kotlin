@@ -4,7 +4,7 @@ dokka = "1.6.21"
 fritz2 = "0.14.2"
 kotest = "5.2.3"
 kotlin = "1.6.21"
-ktlint = "10.2.1"
+ktlint = "11.3.1"
 nexusPublish = "1.1.0"
 
 [libraries]
