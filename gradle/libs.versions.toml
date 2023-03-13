@@ -1,6 +1,6 @@
 [versions]
 detekt = "1.18.1"
-dokka = "1.6.21"
+dokka = "1.8.10"
 fritz2 = "0.14.2"
 kotest = "5.2.3"
 kotlin = "1.6.21"
