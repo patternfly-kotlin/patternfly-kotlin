@@ -2,7 +2,7 @@
 detekt = "1.22.0"
 dokka = "1.6.21"
 fritz2 = "0.14.4"
-kotest = "5.2.3"
+kotest = "5.5.5"
 kotlin = "1.6.21"
 ktlint = "11.3.1"
 nexusPublish = "1.1.0"
