@@ -1,12 +1,10 @@
-# PatternFly Kotlin
+> [!IMPORTANT]  
+> 
+> PatternFly Kotlin has been archived in favor of [PatternFly Java](https://github.com/patternfly-java).
 
-[![GitHub Super-Linter](https://github.com/patternfly-kotlin/patternfly-kotlin/workflows/lint/badge.svg)](https://github.com/marketplace/actions/super-linter) 
-[![Detekt](https://github.com/patternfly-kotlin/patternfly-kotlin/workflows/detekt/badge.svg)](https://detekt.github.io/detekt/index.html) 
-[![Build Passing](https://github.com/patternfly-kotlin/patternfly-kotlin/workflows/build/badge.svg)](https://github.com/patternfly-kotlin/patternfly-kotlin/actions)
-[![API Docs](https://img.shields.io/badge/api-docs-brightgreen)](https://patternfly-kotlin.github.io/patternfly-kotlin/patternfly-kotlin/)
-[![Slack](https://img.shields.io/badge/slack-chat-green.svg)](https://patternfly.slack.com/messages/C01RC86378Q)
-[![IR](https://img.shields.io/badge/Kotlin%2FJS-IR%20supported-yellow)](https://kotl.in/jsirsupported)
-[![Download](https://img.shields.io/maven-central/v/org.patternfly/patternfly-kotlin)](https://search.maven.org/search?q=g:org.patternfly%20AND%20a:patternfly-kotlin)
+---
+
+# PatternFly Kotlin
 
 PatternFly Kotlin is a 💯 Kotlin implementation of [PatternFly](https://www.patternfly.org/) based on [fritz2](https://www.fritz2.dev/) targeting [Kotlin/JS](https://kotl.in/js).
 
